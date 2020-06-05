@@ -7,5 +7,5 @@ require_once(__DIR__ . '/../tools.php');
 $serverName = MSSQL_HOST;
 $connectionInfo = array('Database' => SSCP_DB, 'UID' => MSSQL_USER, 'PWD' => MSSQL_PASSWORD);
 
-$connessione = connect($serverName, $connectionInfo, 5, 40000);
+$conn = connect($serverName, $connectionInfo, 5, 40000);
 
