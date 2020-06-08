@@ -6,38 +6,9 @@ if (isset($_REQUEST['var'])) {
     
     $conn = connect('dbcore');
     
-    $var = htmlspecialchars(strip_tags($_REQUEST['var']));
+    $paramValues = array(htmlspecialchars(strip_tags($_REQUEST['var'])));
     
-    $query = 'SELECT
-                    scarichi.impianto,
-                    scarichi.variabile AS variabile_scarico,
-                    scarichi.denominazione,
-                    db.db_name AS db,
-                    variabili_scarichi.variabile,
-                    categorie.categoria,
-                    variabili_scarichi.tipo_dato
-                FROM
-                    variabili_scarichi
-                    INNER JOIN
-                        db
-                    ON
-                        variabili_scarichi.db = db.id_db
-                    INNER JOIN
-                        categorie
-                    ON
-                        variabili_scarichi.categoria = categorie.id_categoria
-                    INNER JOIN
-                        scarichi
-                    ON
-                        variabili_scarichi.scarico = scarichi.id_scarico
-                    INNER JOIN
-                        tipi_scarico
-                    ON
-                        scarichi.tipo_scarico = tipi_scarico.id_tipo_scarico
-                WHERE
-                    scarichi.variabile = ' . $var;
-    
-    $stmt = sqlsrv_query($conn, $query);
+    $stmt = query($conn, 'query_variabili_correlate_dbcore', $paramValues);
     
     if ($stmt !== false) {
         

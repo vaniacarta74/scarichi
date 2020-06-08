@@ -3,6 +3,7 @@
 require_once(__DIR__ . '/config/config_MSSQL_HOST.php');
 require_once('php_MSSQL_' . HOST . '.inc.php');
 
+
 function connect(string $dbName) //: resource
 {
     $n = 5;
@@ -23,3 +24,14 @@ function connect(string $dbName) //: resource
     return $connessione;
 }
 
+
+function query($conn, string $queryFile, array $paramValues)
+{
+    include __DIR__ . '/include/query/' . $queryFile . '.php';
+
+    $query = str_replace($paramNames, $paramValues, $queryString);
+    
+    $stmt = sqlsrv_query($conn, $query);
+    
+    return $stmt;
+}
