@@ -1,12 +1,12 @@
 <?php
 
+require_once(__DIR__ . '/tools.php');
+
 if (isset($_REQUEST['var'])) {
     
-    require_once(__DIR__ . '/config/config_DBCORE.php');
-    //echo $conn;
+    $conn = connect('dbcore');
     
     $var = htmlspecialchars(strip_tags($_REQUEST['var']));
-    //echo 'Variabile: ' . $variabile;
     
     $query = 'SELECT
                     scarichi.impianto,
@@ -40,7 +40,6 @@ if (isset($_REQUEST['var'])) {
     $stmt = sqlsrv_query($conn, $query);
     
     if ($stmt !== false) {
-        //echo 'ok';
         
         $i = 0;
         while($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
@@ -68,15 +67,3 @@ if (isset($_REQUEST['var'])) {
 } else {
     echo 'Richiesta variabile';
 }
-
-require_once(__DIR__ . '/config/config_DBCORE.php');
-
-echo $connessione;
-
-require_once(__DIR__ . '/config/config_SPT.php');
-
-echo $connessione;
-
-require_once(__DIR__ . '/config/config_SSCP_data.php');
-
-echo $connessione;
