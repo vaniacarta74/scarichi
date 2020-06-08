@@ -10,31 +10,15 @@ if (isset($_REQUEST['var'])) {
     
     $stmt = query($conn, 'query_variabili_correlate_dbcore', $paramValues);
     
-    if ($stmt !== false) {
+    if ($stmt !== false) {        
+        $dati = fetch($stmt);
         
-        $i = 0;
-        while($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
-            $id_impianto = $row['impianto'];
-            $variabile_scarico = $row['variabile_scarico'];
-            $nome_scarico = $row['denominazione'];
-            $db[$i] = $row['db'];
-            $variabile[$i] = $row['variabile'];
-            $categoria[$i] = $row['categoria'];
-            $tipo_dato[$i] = $row['tipo_dato'];
-            $i++;
-        }
-
-        var_dump($id_impianto);
-        var_dump($variabile_scarico);
-        var_dump($nome_scarico);
-        var_dump($variabile);
-        var_dump($categoria);
-        var_dump($tipo_dato);
+        var_dump($dati); 
+        
         
     } else {
         die(print_r(sqlsrv_errors(), true));
-    }
-    
+    }    
 } else {
     echo 'Richiesta variabile';
 }

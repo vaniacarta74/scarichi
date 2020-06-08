@@ -35,3 +35,17 @@ function query($conn, string $queryFile, array $paramValues)
     
     return $stmt;
 }
+
+
+function fetch($stmt) : array
+{
+    $record = 0;
+    while($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+        foreach ($row as $key => $value) {
+            $dati[$record][$key] = $value;
+        }
+        $record++;
+    }
+    
+    return $dati;
+}
