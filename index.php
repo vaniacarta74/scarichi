@@ -62,7 +62,9 @@ if (isset($_REQUEST['var'])) {
                     $dati_acquisiti[$key] = fetch($stmt);        
                     close($conn);
 
-                    var_dump($dati_acquisiti); 
+                    $dati_acquisiti_medie[$key] = addMedia($dati_acquisiti[$key]);
+                    
+                    $dati_medie_delta[$key] = addDelta($dati_acquisiti_medie[$key]);
 
                 } else {
                     die(print_r(sqlsrv_errors(), true));
@@ -70,7 +72,10 @@ if (isset($_REQUEST['var'])) {
                 } 
             }
 
-            var_dump($variabili);        
+            //var_dump($variabili);
+            //var_dump($dati_acquisiti);
+            //var_dump($dati_acquisiti_medie);
+            var_dump($dati_medie_delta);
 
         } else {
             die(print_r(sqlsrv_errors(), true));

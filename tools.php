@@ -86,3 +86,47 @@ function close($conn)
 {
     sqlsrv_close($conn);
 }
+
+
+function addMedia(array $dati) : array
+{
+    foreach ($dati as $record => $campi) {
+        foreach ($campi as $campo => $valore) {
+            
+            $medie[$record][$campo] = $valore;
+            
+            if ($campo === 'valore') {
+                if ($record === 0) {
+                    $media = $valore;
+                } else {
+                    $media = ($valore + $medie[$record - 1][$campo])/2;
+                }                
+                $medie[$record]['media'] = $media;
+            }
+        }
+    }
+    return $medie;
+}
+
+
+function addDelta(array $dati) : array
+{
+    foreach ($dati as $record => $campi) {
+        foreach ($campi as $campo => $valore) {
+            
+            $delta[$record][$campo] = $valore;
+            
+            if ($campo === 'data_e_ora') {
+                if ($record === 0) {
+                    $deltaT = 0;
+                } else {                    
+                    $timestamp0 = $delta[$record - 1][$campo]->getTimestamp();
+                    $timestamp1 = $valore->getTimestamp();
+                    $deltaT = $timestamp1 - $timestamp0;                    
+                }                
+                $delta[$record]['delta'] = $deltaT;
+            }
+        }
+    }
+    return $delta;
+}
