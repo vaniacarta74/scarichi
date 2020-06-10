@@ -34,34 +34,53 @@ function setDates(array $request) : array
 
 function connect(string $dbName) //: resource
 {
-    $n = 5;
+    $n = 2;
     $delay = 40000;
     $serverName = MSSQL_HOST;
     $connectionInfo = array('Database' => $dbName, 'UID' => MSSQL_USER, 'PWD' => MSSQL_PASSWORD);   
+    
+    try {
+        for ($i=1; $i <= $n; $i++) {
+            $conn = sqlsrv_connect($serverName, $connectionInfo);
 
-    for ($i=1; $i <= $n; $i++) {
-        try {
-            $connessione = sqlsrv_connect($serverName, $connectionInfo);            
-            break;
-        } 
-        catch (Error $e) {
-            echo $e->getMessage();
+            if($conn) {
+                break;
+            } else {
+                usleep($delay);
+            }
         }
-        usleep($delay);
-    }  
-    return $connessione;
+        if($conn) {
+            return $conn;
+        } else {
+            throw new Exception(error());
+        }
+    }
+    catch (Throwable $e) {
+        exit($e->getMessage());
+    }   
 }
 
 
 function query($conn, string $queryFile, array $paramValues)
 {
-    include __DIR__ . '/include/query/' . $queryFile . '.php';
+    try {
+        include __DIR__ . '/include/query/' . $queryFile . '.php';
 
-    $query = str_replace($paramNames, $paramValues, $queryString);
-    
-    $stmt = sqlsrv_query($conn, $query);
-    
-    return $stmt;
+        $query = str_replace($paramNames, $paramValues, $queryString);
+
+        $stmt = sqlsrv_query($conn, $query);
+        
+        if ($stmt !== false) {            
+            return $stmt;                    
+        } else {            
+            $errorsMessage = error();
+            sqlsrv_close($conn);
+            throw new Exception($errorsMessage);
+        } 
+    } 
+    catch (Throwable $e) {
+        exit($e->getMessage());
+    }   
 }
 
 
@@ -85,6 +104,15 @@ function fetch($stmt) : ?array
 function close($conn)
 {
     sqlsrv_close($conn);
+}
+
+
+function error() : string
+{
+    $errors = sqlsrv_errors();
+    $text = '<pre>' . print_r($errors, true) . '</pre>';
+    
+    return $text;
 }
 
 
