@@ -1,23 +1,13 @@
 <?php
 
 $queryString = "SELECT
-                    variabili_scarichi.scarico,
-                    db.db_name AS db,
-                    variabili_scarichi.variabile,
-                    variabili_scarichi.tipo_dato,
-                    categorie.categoria    
+                    id_variabile,
+                    impianto,
+                    unita_misura
                 FROM
-                    variabili_scarichi
-                    INNER JOIN
-                        db
-                    ON
-                        variabili_scarichi.db = db.id_db
-                    INNER JOIN
-                        categorie
-                    ON
-                        variabili_scarichi.categoria = categorie.id_categoria       
+                    variabili
                 WHERE
-                    variabili_scarichi.scarico = ?scarico?";
+                    id_variabile = ?variabile?";
 
-$paramNames = array('?scarico?');
+$paramNames = array('?variabile?');
 

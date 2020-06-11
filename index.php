@@ -12,28 +12,41 @@ if (isset($_REQUEST['var'])) {
     $stmt = query($conn, 'query_scarichi', array($variabile)); 
     $scarichi = fetch($stmt);
     
+    echo '<br/>Scarichi:';
     var_dump($scarichi);
     
     $scarico = $scarichi[0]['scarico'];
+    $db = $scarichi[0]['db'];
+    $variabile = $scarichi[0]['variabile'];
     $tipo = $scarichi[0]['tipo'];
     
-    $stmt = query($conn, 'query_variabili', array($scarico));       
-    $variabili = fetch($stmt);        
+    $stmt = query($conn, 'query_variabili_scarichi', array($scarico));       
+    $variabili_scarichi = fetch($stmt);        
     close($conn);
     
-    var_dump($variabili);
+    echo '<br/>Variabili Scarichi:';
+    var_dump($variabili_scarichi);
     
-    foreach ($variabili as $key => $record) {
+    $conn = connect($db);        
+    $stmt = query($conn, 'query_variabili', array($variabile)); 
+    $variabili = fetch($stmt);
+    close($conn);
+    
+    echo '<br/>Variabili:';
+    var_dump($variabili); 
+        
+    foreach ($variabili_scarichi as $key => $record) {
 
         $conn = connect($record['db']);
         $stmt = query($conn, 'query_dati_acquisiti', array($record['variabile'], $record['tipo_dato'], $dates['datefrom'], $dates['dateto']));
         $dati_acquisiti[$key] = fetch($stmt);        
         close($conn);
 
-        $dati_acquisiti[$key] = addMedia($dati_acquisiti[$key]);
-        $dati_acquisiti[$key] = addDelta($dati_acquisiti[$key]);
+        //$dati_acquisiti[$key] = addMedia($dati_acquisiti[$key], 'valore');
+        //$dati_acquisiti[$key] = addDelta($dati_acquisiti[$key], 'data_e_ora');
     }
     
+    echo '<br/>Dati Acquisiti:';
     var_dump($dati_acquisiti);
     
     switch ($tipo) {
@@ -44,7 +57,27 @@ if (isset($_REQUEST['var'])) {
             $sfiori = fetch($stmt);
             close($conn);
             
-            var_dump($sfiori);
+            echo '<br/>Sfiori:';
+            var_dump($sfiori);            
+            
+            $volumi = initVolumi($variabili[0], $dati_acquisiti[0]);
+            
+            echo '<br/>Volumi:';
+            var_dump($volumi);
+            
+            $volumi = addLivello($volumi, $dati_acquisiti[0]);
+            
+            echo '<br/>Livelli:';
+            var_dump($volumi);  
+            
+            $volumi = addMedia($volumi, 'livello');
+            
+            echo '<br/>Medie:';
+            var_dump($volumi);
+            
+            $volumi = addDelta($volumi, 'data_e_ora');
+            echo '<br/>Delta:';
+            var_dump($volumi);
             
             break;
         case 'scarico di superficie':

@@ -116,14 +116,14 @@ function error() : string
 }
 
 
-function addMedia(array $dati) : array
+function addMedia(array $dati, string $nomeCampo) : array
 {
     foreach ($dati as $record => $campi) {
         foreach ($campi as $campo => $valore) {
             
             $medie[$record][$campo] = $valore;
             
-            if ($campo === 'valore') {
+            if ($campo === $nomeCampo) {
                 if ($record === 0) {
                     $media = $valore;
                 } else {
@@ -137,14 +137,14 @@ function addMedia(array $dati) : array
 }
 
 
-function addDelta(array $dati) : array
+function addDelta(array $dati, string $nomeCampo) : array
 {
     foreach ($dati as $record => $campi) {
         foreach ($campi as $campo => $valore) {
             
             $delta[$record][$campo] = $valore;
             
-            if ($campo === 'data_e_ora') {
+            if ($campo === $nomeCampo) {
                 if ($record === 0) {
                     $deltaT = 0;
                 } else {                    
@@ -157,4 +157,48 @@ function addDelta(array $dati) : array
         }
     }
     return $delta;
+}
+
+
+function initVolumi(array $variabili, array $dati) : array
+{
+    foreach ($dati as $record => $campi) {
+        
+        $volumi[$record]['variabile'] = $variabili['id_variabile'];
+        
+        foreach ($campi as $campo => $valore) {
+            if ($campo === 'data_e_ora') {
+                $volumi[$record][$campo] = $valore;
+            }      
+        }
+        
+        $volumi[$record]['unita_misura'] = $variabili['unita_misura'];
+        $volumi[$record]['impianto'] = $variabili['impianto'];
+        $volumi[$record]['tipo_dato'] = 1;
+    }
+    return $volumi;
+}
+
+
+function addLivello(array $volumi, array $dati) : array
+{
+    try {
+        if (count($volumi) !== count($dati)) {
+            throw new Exception('Array differenti');
+        }
+        foreach ($volumi as $record => $campi) {
+            foreach ($campi as $campo => $valore) {
+                
+                $livelli[$record][$campo] = $valore;
+                
+                if (($campo === 'data_e_ora') && ($volumi[$record][$campo] === $dati[$record][$campo])) {
+                    $livelli[$record]['livello'] = $dati[$record]['valore'];
+                }
+                
+            }            
+        }
+        return $livelli;
+    } catch (Throwable $e) {
+        exit($e->getMessage());
+    }    
 }
