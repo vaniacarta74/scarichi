@@ -12,7 +12,7 @@ if (isset($_REQUEST['var'])) {
     $stmt = query($conn, 'query_scarichi', array($variabile)); 
     $scarichi = fetch($stmt);
     
-    echo '<br/>Scarichi:';
+    echo '<br/><b>Variabile Scarico:</b>';
     var_dump($scarichi);
     
     $scarico = $scarichi[0]['scarico'];
@@ -24,7 +24,7 @@ if (isset($_REQUEST['var'])) {
     $variabili_scarichi = fetch($stmt);        
     close($conn);
     
-    echo '<br/>Variabili Scarichi:';
+    echo '<br/><b>Variabili Correlate Scarico:</b>';
     var_dump($variabili_scarichi);
     
     $conn = connect($db);        
@@ -32,7 +32,7 @@ if (isset($_REQUEST['var'])) {
     $variabili = fetch($stmt);
     close($conn);
     
-    echo '<br/>Variabili:';
+    echo '<br/><b>Variabile Volume Scaricato:</b>';
     var_dump($variabili); 
         
     foreach ($variabili_scarichi as $key => $record) {
@@ -41,13 +41,7 @@ if (isset($_REQUEST['var'])) {
         $stmt = query($conn, 'query_dati_acquisiti', array($record['variabile'], $record['tipo_dato'], $dates['datefrom'], $dates['dateto']));
         $dati_acquisiti[$key] = fetch($stmt);        
         close($conn);
-
-        //$dati_acquisiti[$key] = addMedia($dati_acquisiti[$key], 'valore');
-        //$dati_acquisiti[$key] = addDelta($dati_acquisiti[$key], 'data_e_ora');
     }
-    
-    echo '<br/>Dati Acquisiti:';
-    var_dump($dati_acquisiti);
     
     switch ($tipo) {
         case 'sfioratore di superficie':
@@ -57,26 +51,24 @@ if (isset($_REQUEST['var'])) {
             $sfiori = fetch($stmt);
             close($conn);
             
-            echo '<br/>Sfiori:';
+            echo '<br/><b>Caratteristiche Sfioro:</b>';
             var_dump($sfiori);            
             
             $volumi = initVolumi($variabili[0], $dati_acquisiti[0]);
-            
-            echo '<br/>Volumi:';
-            var_dump($volumi);
-            
+                        
             $volumi = addLivello($volumi, $dati_acquisiti[0]);
-            
-            echo '<br/>Livelli:';
-            var_dump($volumi);  
             
             $volumi = addMedia($volumi, 'livello');
             
-            echo '<br/>Medie:';
-            var_dump($volumi);
+            $volumi = addAltezza($volumi, $sfiori[0]['quota'], 'media');
             
+            $volumi = addPortata($volumi, $sfiori[0]);
+                        
             $volumi = addDelta($volumi, 'data_e_ora');
-            echo '<br/>Delta:';
+            
+            $volumi = addVolume($volumi);
+            
+            echo '<br/><b>Volumi Sfiorati:</b>';
             var_dump($volumi);
             
             break;

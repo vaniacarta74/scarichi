@@ -202,3 +202,66 @@ function addLivello(array $volumi, array $dati) : array
         exit($e->getMessage());
     }    
 }
+
+
+function addAltezza(array $dati, float $quota, string $nomeCampo) : array
+{
+    foreach ($dati as $record => $campi) {
+        foreach ($campi as $campo => $valore) {
+
+            $altezze[$record][$campo] = $valore;
+
+            if ($campo === $nomeCampo) {
+                $altezze[$record]['altezza'] = $dati[$record][$campo] - $quota;
+            }
+        }            
+    }
+    return $altezze;
+}
+
+
+function addPortata(array $dati, array $specifiche) : array
+{
+    $mi = $specifiche['mi'];
+    $larghezza_soglia = $specifiche['larghezza'];
+    $portata_massima = $specifiche['limite'];
+    $nomeCampo = 'altezza';
+    
+    foreach ($dati as $record => $campi) {
+        foreach ($campi as $campo => $valore) {
+
+            $portate[$record][$campo] = $valore;
+
+            if ($campo === $nomeCampo) {
+                $altezza_sfioro = $dati[$record][$campo];
+            }
+        }
+        if($altezza_sfioro > 0) {
+            
+            $portata = $mi * $larghezza_soglia * $altezza_sfioro * sqrt(2 * 9,81 * $altezza_sfioro);
+            
+            if ($portata <= $portata_massima) {
+                $portate[$record]['portata'] = $portata;
+            } else {
+                $portate[$record]['portata'] = 0;
+            }
+        } else {
+            $portate[$record]['portata'] = 0;
+        }
+    }
+    return $portate;
+}
+
+
+function addVolume(array $dati) : array
+{
+    foreach ($dati as $record => $campi) {
+        foreach ($campi as $campo => $valore) {
+
+            $volumi[$record][$campo] = $valore;
+            
+        }
+        $volumi[$record]['volume'] = $volumi[$record]['portata'] * $volumi[$record]['delta'];
+    }    
+    return $volumi;
+}
