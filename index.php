@@ -8,6 +8,8 @@ if (isset($_REQUEST['var'])) {
     
     $dates = setDates($_REQUEST);
     
+    $fileName = setFile($variabile, $dates);
+    
     $conn = connect('dbcore');        
     $stmt = query($conn, 'query_scarichi', array($variabile)); 
     $scarichi = fetch($stmt);
@@ -66,7 +68,7 @@ if (isset($_REQUEST['var'])) {
                         
             $volumi = addDelta($volumi, 'data_e_ora');
             
-            $volumi = addVolume($volumi);
+            $volumi = addVolume($volumi);          
             
             echo '<br/><b>Volumi Sfiorati:</b>';
             var_dump($volumi);
@@ -84,7 +86,15 @@ if (isset($_REQUEST['var'])) {
         case 'galleria':
 
             break;
-    }    
+    }
+
+    $volumi = format($volumi);
+    
+    echo '<br/><b>Volumi Formattati:</b>';
+    var_dump($volumi);
+    
+    printToCSV($volumi, $fileName);           
+    
 } else {
     echo 'Richiesta variabile';
 }

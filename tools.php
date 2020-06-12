@@ -1,7 +1,7 @@
 <?php
 
-require_once(__DIR__ . '/config/config_MSSQL_HOST.php');
-require_once('php_MSSQL_' . HOST . '.inc.php');
+require_once(__DIR__ . '/config/config.php');
+require_once('php_MSSQL_' . RDBMS . '.inc.php');
 
 
 function setDates(array $request) : array
@@ -265,3 +265,61 @@ function addVolume(array $dati) : array
     }    
     return $volumi;
 }
+
+
+function printToCSV(array $dati, string $fileName) : void
+{
+    $mode = 'w';
+    $delimiter = ';';
+    
+    try {
+        $handle = fopen($fileName, $mode);
+        
+        $nomiCampi = array_keys($dati[0]);
+        
+        fputcsv($handle, $nomiCampi, $delimiter);
+        
+        foreach ($dati AS $valori) {
+            fputcsv($handle, $valori, $delimiter);
+        }        
+        
+        fclose($handle);
+    } catch (Throwable $e) {
+        echo $e->getMessage();
+    }
+}
+
+
+function setFile(string $variabile, array $dates) : string
+{
+    $dateFrom = str_replace('/', '', $dates['datefrom']);
+    $dateTo = str_replace('/', '', $dates['dateto']);
+    
+    $fileName = CSV . '/Volumi_' . $variabile . '_' . $dateFrom . '_' . $dateTo . '.csv';
+    
+    return $fileName;
+}
+
+
+function format(array $dati) : array
+{  
+    $nomiCampi = array('variabile' => 'variabile', 'valore' => 'volume', 'data_e_ora' => 'data_e_ora', 'tipo_dato' => 'tipo_dato');
+    
+    foreach ($dati as $record => $campi) {
+        foreach ($campi as $campo => $valore) {
+            if(in_array($campo, $nomiCampi)) {
+                foreach($nomiCampi AS $nuovo => $vecchio) {
+                    if($campo === $vecchio) {
+                        if(is_a($valore, 'DateTime')) {
+                            $formatted[$record][$nuovo] = $valore->date;
+                        } else {
+                            $formatted[$record][$nuovo] = $valore;
+                        }                        
+                        break;
+                    }
+                }           
+            }
+        }    
+    }    
+    return $formatted;
+}  
