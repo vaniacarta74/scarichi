@@ -303,7 +303,12 @@ function setFile(string $variabile, array $dates) : string
 
 function format(array $dati) : array
 {  
-    $nomiCampi = array('variabile' => 'variabile', 'valore' => 'volume', 'data_e_ora' => 'data_e_ora', 'tipo_dato' => 'tipo_dato');
+    $nomiCampi = array(
+        'variabile' => 'variabile',
+        'valore' => 'volume',
+        'data_e_ora' => 'data_e_ora',
+        'tipo_dato' => 'tipo_dato'
+    );
     
     foreach ($dati as $record => $campi) {
         foreach ($campi as $campo => $valore) {
@@ -311,7 +316,7 @@ function format(array $dati) : array
                 foreach($nomiCampi AS $nuovo => $vecchio) {
                     if($campo === $vecchio) {
                         if(is_a($valore, 'DateTime')) {
-                            $formatted[$record][$nuovo] = $valore->date;
+                            $formatted[$record][$nuovo] = $valore->format('d/m/Y H:i');
                         } else {
                             $formatted[$record][$nuovo] = $valore;
                         }                        

@@ -37,13 +37,17 @@ if (isset($_REQUEST['var'])) {
     echo '<br/><b>Variabile Volume Scaricato:</b>';
     var_dump($variabili); 
         
-    foreach ($variabili_scarichi as $key => $record) {
-
+    foreach ($variabili_scarichi as $record) {
+        
+        $categoria = $record['categoria'];
         $conn = connect($record['db']);
-        $stmt = query($conn, 'query_dati_acquisiti', array($record['variabile'], $record['tipo_dato'], $dates['datefrom'], $dates['dateto']));
-        $dati_acquisiti[$key] = fetch($stmt);        
+        $stmt = query($conn, 'query_dati_acquisiti', array($record['variabile'], $record['tipo_dato'], $dates['datefrom'], $dates['dateto'], $record['data_attivazione']->format('d/m/Y H:i'), $record['data_disattivazione']->format('d/m/Y H:i')));
+        $dati_acquisiti[$categoria] = fetch($stmt);        
         close($conn);
     }
+    
+    echo '<br/><b>Dati Acquisiti:</b>';
+    var_dump($dati_acquisiti);
     
     switch ($tipo) {
         case 'sfioratore di superficie':
@@ -56,9 +60,9 @@ if (isset($_REQUEST['var'])) {
             echo '<br/><b>Caratteristiche Sfioro:</b>';
             var_dump($sfiori);            
             
-            $volumi = initVolumi($variabili[0], $dati_acquisiti[0]);
+            $volumi = initVolumi($variabili[0], $dati_acquisiti['livello']);
                         
-            $volumi = addLivello($volumi, $dati_acquisiti[0]);
+            $volumi = addLivello($volumi, $dati_acquisiti['livello']);
             
             $volumi = addMedia($volumi, 'livello');
             
