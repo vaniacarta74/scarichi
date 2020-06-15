@@ -21,6 +21,7 @@ $queryString = "SELECT
                 WHERE
                     variabili_scarichi.scarico = ?scarico?
                 ORDER BY
+                    variabili_scarichi.categoria,
                     variabili_scarichi.data_attivazione";
 
 $paramNames = array('?scarico?');

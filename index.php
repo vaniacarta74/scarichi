@@ -36,13 +36,17 @@ if (isset($_REQUEST['var'])) {
     
     echo '<br/><b>Variabile Volume Scaricato:</b>';
     var_dump($variabili); 
+    
+    $dati_acquisiti = array();
+    foreach ($variabili_scarichi as $record) {        
         
-    foreach ($variabili_scarichi as $record) {
-        
+        $dati = array();
         $categoria = $record['categoria'];
         $conn = connect($record['db']);
-        $stmt = query($conn, 'query_dati_acquisiti', array($record['variabile'], $record['tipo_dato'], $dates['datefrom'], $dates['dateto'], $record['data_attivazione']->format('d/m/Y H:i'), $record['data_disattivazione']->format('d/m/Y H:i')));
-        $dati_acquisiti[$categoria] = fetch($stmt);        
+        $stmt = query($conn, 'query_dati_acquisiti', array($record['variabile'], $record['tipo_dato'], $dates['datefrom'], $dates['dateto'], $record['data_attivazione']->format('d/m/Y H:i'), $record['data_disattivazione']->format('d/m/Y H:i')));      
+        $dati[$categoria] = fetch($stmt);
+        $dati_acquisiti = array_merge_recursive($dati_acquisiti, $dati);
+        
         close($conn);
     }
     
@@ -55,13 +59,10 @@ if (isset($_REQUEST['var'])) {
             $conn = connect('dbcore');
             $stmt = query($conn, 'query_sfiori', array($scarico));
             $sfiori = fetch($stmt);
-            close($conn);
-            
-            echo '<br/><b>Caratteristiche Sfioro:</b>';
-            var_dump($sfiori);            
+            close($conn);            
             
             $volumi = initVolumi($variabili[0], $dati_acquisiti['livello']);
-                        
+            
             $volumi = addLivello($volumi, $dati_acquisiti['livello']);
             
             $volumi = addMedia($volumi, 'livello');
