@@ -4,14 +4,14 @@ require_once(__DIR__ . '/config/config.php');
 require_once('php_MSSQL_' . RDBMS . '.inc.php');
 
 
-function printErrorInfo(string $functionName)
+function printErrorInfo(string $functionName) : void
 {
     $date = New DateTime();
     echo $date->format('d/m/Y H:i:s') . ': Errore fatale funzione <b>' . $functionName . '()</b><br/>'; 
 }
 
 
-function errorHandler(Throwable $e)
+function errorHandler(Throwable $e) : void
 {
     echo '<br/><b>Descrizione Errore:</b><br/>';
     echo 'File: ' . $e->getFile() . '<br/>'; 
@@ -83,6 +83,33 @@ function formatDate(string $date) : string
 }
 
 
+function formatDateTime(string $date) : string
+{
+    try {
+        $dateTimeParts = explode(' ', $date);
+        
+        $dateParts = explode('/', $dateTimeParts[0]);
+        $timeParts = explode(':', $dateTimeParts[1]);
+
+        $day = intval($dateParts[0]);
+        $month = intval($dateParts[1]);
+        $year = intval($dateParts[2]);
+        
+        $hours = intval($timeParts[0]);
+        $minutes = intval($timeParts[1]);
+        $seconds = intval($timeParts[2]);
+        
+        $formatDateTime = date('Y-m-d H:i:s', mktime($hours, $minutes, $seconds, $month, $day, $year));
+
+        return $formatDateTime;
+        
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
 function setDates(?array $request) : array
 {
     try {
@@ -106,6 +133,26 @@ function setDates(?array $request) : array
             $dateFrom = date('Y-m-d');
             $dateTo = date('Y-m-d', strtotime($dateFrom . ' +1 day'));
         }
+        $dateTimeFrom = New DateTime($dateFrom);
+        $dateTimeTo = New DateTime($dateTo);
+
+        $dates = array('datefrom' => $dateTimeFrom, 'dateto' => $dateTimeTo);
+
+        return $dates;
+        
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function setDateTimes(array $request) : array
+{
+    try {
+        $dateFrom = formatDateTime($request['datefrom']);       
+        $dateTo = formatDateTime($request['dateto']);
+        
         $dateTimeFrom = New DateTime($dateFrom);
         $dateTimeTo = New DateTime($dateTo);
 
@@ -406,36 +453,11 @@ function addVolume(array $dati) : array
 }
 
 
-function printToCSV(array $dati, string $fileName) : void
-{
-    $mode = 'w';
-    $delimiter = ';';
-    
-    try {
-        $handle = fopen($fileName, $mode);
-        
-        $nomiCampi = array_keys($dati[0]);
-        
-        fputcsv($handle, $nomiCampi, $delimiter);
-        
-        foreach ($dati AS $valori) {
-            fputcsv($handle, $valori, $delimiter);
-        }        
-        
-        fclose($handle);
-        
-    } catch (Throwable $e) {
-        printErrorInfo(__FUNCTION__);
-        throw $e;
-    }
-}
-
-
 function setFile(string $variabile, array $dates) : string
 {    
     try {
-        $dateFrom = $dates['datefrom']->format('Ymd');
-        $dateTo = $dates['dateto']->format('Ymd');
+        $dateFrom = $dates['datefrom']->format('YmdHi');
+        $dateTo = $dates['dateto']->format('YmdHi');
 
         $fileName = CSV . '/Volumi_' . $variabile . '_' . $dateFrom . '_' . $dateTo . '.csv';
 
@@ -589,3 +611,67 @@ function getDataFromDB(string $db, string $queryFileName, array $parametri) : ?a
         throw $e;
     }
 }
+
+
+function printToCSV(array $dati, string $fileName) : void
+{
+    $mode = 'w';
+    $delimiter = ';';
+    
+    try {
+        $handle = fopen($fileName, $mode);
+        
+        $nomiCampi = array_keys($dati[0]);
+        
+        fputcsv($handle, $nomiCampi, $delimiter);
+        
+        foreach ($dati AS $valori) {
+            fputcsv($handle, $valori, $delimiter);
+        }        
+        
+        fclose($handle);
+        
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function divideAndPrint(array $data) : void
+{
+    try {
+        $i = 0;
+        $printableData = array();
+        foreach($data as $record) {
+            if ($i === MAXRECORD) {                
+                $variabile = $printableData[0]['variabile'];
+                $dates = array(
+                    'datefrom' => $printableData[0]['data_e_ora'],
+                    'dateto' => $printableData[$i - 1]['data_e_ora']
+                );
+                $dateTimes = setDateTimes($dates);
+                $fileName = setFile($variabile, $dateTimes);
+                printToCSV($printableData, $fileName);
+                $i = 0;
+                $printableData = array();                
+            }
+            $printableData[$i] = $record;
+            $i++;
+        }
+        if ($i > 0) {
+            $variabile = $printableData[0]['variabile'];
+            $dates = array(
+                'datefrom' => $printableData[0]['data_e_ora'],
+                'dateto' => $printableData[$i - 1]['data_e_ora']
+            );
+            $dateTimes = setDateTimes($dates);
+            $fileName = setFile($variabile, $dateTimes);
+            printToCSV($printableData, $fileName);
+        }   
+        
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}    

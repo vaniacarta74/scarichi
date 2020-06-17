@@ -110,7 +110,9 @@ try {
     echo '<br/><b>Volumi Formattati:</b>';
     var_dump($volumi);
 
-    printToCSV($volumi, $fileName);
+    //printToCSV($volumi, $fileName);
+    
+    divideAndPrint($volumi);
     
 } catch (Throwable $e) {
     errorHandler($e);
