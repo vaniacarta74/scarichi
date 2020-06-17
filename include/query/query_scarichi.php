@@ -19,5 +19,7 @@ $queryString = "SELECT
                 WHERE
                     scarichi.variabile = ?variabile?";
 
-$paramNames = array('?variabile?');
+$paramNames = array(
+    '?variabile?'
+);
 
