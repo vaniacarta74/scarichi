@@ -15,7 +15,7 @@ $queryString = "SELECT
                     variabili.id_variabile = ?variabile? AND
                     dati_acquisiti.tipo_dato = ?tipo_dato? AND
                     dati_acquisiti.data_e_ora >= '?data_iniziale?' AND
-                    dati_acquisiti.data_e_ora <= '?data_finale?' AND
+                    dati_acquisiti.data_e_ora < '?data_finale?' AND
                     dati_acquisiti.data_e_ora >= '?data_attivazione?' AND
                     dati_acquisiti.data_e_ora < '?data_disattivazione?'
                 ORDER BY

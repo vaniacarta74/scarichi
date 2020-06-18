@@ -37,7 +37,7 @@ function checkVariable(?array $request) : string
             $paramNames = array('var', 'variabile', 'variable');
             foreach ($paramNames AS $key) {
                 if (array_key_exists($key, $request)) {                    
-                    $variabile = $request[$key];
+                    $variabile = htmlspecialchars(strip_tags($request[$key]));
                     break;
                 }
             }
@@ -51,6 +51,31 @@ function checkVariable(?array $request) : string
         } else {
             throw new Exception("Parametro variabile non presente nell'url o nome parametro non valido. Usare var, variable o variabile");
         }        
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function checkFilter(?array $request) : bool
+{
+    try {
+        if (isset($request['full'])) {
+            
+            $full = intval(htmlspecialchars(strip_tags($request['full'])));
+            
+            if ($full === 0) {
+                $filtered = true;
+            } else {
+                $filtered = false;
+            }            
+        } else {
+            $filtered = false;
+        }
+
+        return $filtered;
+        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -110,7 +135,7 @@ function formatDateTime(string $date) : string
 }
 
 
-function setDates(?array $request) : array
+function checkInterval(?array $request) : array
 {
     try {
         if (isset($request['datefrom']) && isset($request['dateto'])) {
@@ -413,7 +438,7 @@ function addPortata(array $dati, array $specifiche) : array
             }
             if($altezza_sfioro > 0) {
 
-                $portata = $mi * $larghezza_soglia * $altezza_sfioro * sqrt(2 * 9,81 * $altezza_sfioro);
+                $portata = $mi * $larghezza_soglia * $altezza_sfioro * sqrt(2 * 9.81 * $altezza_sfioro);
 
                 if ($portata <= $portata_massima) {
                     $portate[$record]['portata'] = $portata;
@@ -572,9 +597,10 @@ function checkDates(string $db, array $dates, bool $isLocalToUTC) : array
 }
 
 
-function setToLocal(string $db, array $dati) : ?array
+function setToLocal(string $db, array $dati) : array
 {
     try {
+        $locals = array();
         foreach ($dati as $record => $campi) {
             $locals[$record] = checkDates($db, $campi, false);        
         }
@@ -587,9 +613,11 @@ function setToLocal(string $db, array $dati) : ?array
 }
 
 
-function getDataFromDB(string $db, string $queryFileName, array $parametri) : ?array
+function getDataFromDB(string $db, string $queryFileName, array $parametri) : array
 {
     try {
+        $data = array();
+        
         $conn = connect($db);
         
         $checkedDateParams = checkDates($db, $parametri, true);
@@ -638,21 +666,14 @@ function printToCSV(array $dati, string $fileName) : void
 }
 
 
-function divideAndPrint(array $data) : void
+function divideAndPrint(?array $data) : void
 {
     try {
         $i = 0;
         $printableData = array();
         foreach($data as $record) {
-            if ($i === MAXRECORD) {                
-                $variabile = $printableData[0]['variabile'];
-                $dates = array(
-                    'datefrom' => $printableData[0]['data_e_ora'],
-                    'dateto' => $printableData[$i - 1]['data_e_ora']
-                );
-                $dateTimes = setDateTimes($dates);
-                $fileName = setFile($variabile, $dateTimes);
-                printToCSV($printableData, $fileName);
+            if ($i === MAXRECORD) {
+                printPart($printableData, $i);
                 $i = 0;
                 $printableData = array();                
             }
@@ -660,18 +681,59 @@ function divideAndPrint(array $data) : void
             $i++;
         }
         if ($i > 0) {
-            $variabile = $printableData[0]['variabile'];
-            $dates = array(
-                'datefrom' => $printableData[0]['data_e_ora'],
-                'dateto' => $printableData[$i - 1]['data_e_ora']
-            );
-            $dateTimes = setDateTimes($dates);
-            $fileName = setFile($variabile, $dateTimes);
-            printToCSV($printableData, $fileName);
+            printPart($printableData, $i);
         }   
         
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
-}    
+}
+
+
+function printPart(array $printableData, int $i) : void
+{
+    try {
+        $variabile = $printableData[0]['variabile'];
+        $dates = array(
+            'datefrom' => $printableData[0]['data_e_ora'],
+            'dateto' => $printableData[$i - 1]['data_e_ora']
+        );
+        $dateTimes = setDateTimes($dates);
+        $fileName = setFile($variabile, $dateTimes);
+        printToCSV($printableData, $fileName);
+        
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function filter(array $dati, bool $filtered) : array
+{  
+    try {
+        if (!$filtered) {
+            $filteredData = $dati;
+        } else {
+            $filteredData = array();
+            foreach ($dati as $record => $campi) {
+                $flag = true;
+                foreach ($campi as $campo => $valore) {
+                    if (($campo === 'valore') && ($valore === 0)) {
+                        $flag = false;
+                    }
+                }
+                if ($flag) {
+                    $filteredData[$record] = $campi;
+                }
+            }
+        }
+        
+        return $filteredData;
+    
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}

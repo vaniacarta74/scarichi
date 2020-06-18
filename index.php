@@ -4,8 +4,10 @@ try {
     require_once(__DIR__ . '/tools.php');
 
     $variabile = checkVariable($_REQUEST);
+    
+    $filtered = checkFilter($_REQUEST);
 
-    $dates = setDates($_REQUEST);
+    $dates = checkInterval($_REQUEST);
 
     $fileName = setFile($variabile, $dates);
 
@@ -106,12 +108,12 @@ try {
     }
 
     $volumi = format($volumi);
+    
+    $volumi = filter($volumi, $filtered);
 
     echo '<br/><b>Volumi Formattati:</b>';
     var_dump($volumi);
 
-    //printToCSV($volumi, $fileName);
-    
     divideAndPrint($volumi);
     
 } catch (Throwable $e) {
