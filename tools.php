@@ -1,7 +1,7 @@
 <?php
 
 require_once(__DIR__ . '/config/config.php');
-require_once('php_MSSQL_' . RDBMS . '.inc.php');
+require_once('php_MSSQL_router.inc.php');
 
 
 function printErrorInfo(string $functionName) : void
@@ -26,6 +26,29 @@ function errorHandler(Throwable $e) : void
     foreach ($arrStack as $line) {
         echo $line . '<br/>';
     }    
+}
+
+
+function checkRequest(?array $request) : array
+{
+    try {
+        $request = array();
+        
+        $variables['var'] = checkVariable($_REQUEST);    
+        
+        $dates = checkInterval($_REQUEST);
+        
+        $filters['full'] = checkFilter($_REQUEST);
+        
+        $request = array_merge($variables, $dates, $filters);
+        
+        return $request;
+        
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+    
 }
 
 
@@ -73,8 +96,9 @@ function checkFilter(?array $request) : bool
         } else {
             $filtered = false;
         }
-
-        return $filtered;
+        $notFiltered = !$filtered;
+        
+        return $notFiltered;
         
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
@@ -292,6 +316,7 @@ function error() : string
 function addMedia(array $dati, string $nomeCampo) : array
 {
     try {
+        $medie = array();
         foreach ($dati as $record => $campi) {
             foreach ($campi as $campo => $valore) {
 
@@ -319,6 +344,7 @@ function addMedia(array $dati, string $nomeCampo) : array
 function addDelta(array $dati, string $nomeCampo) : array
 {
     try {
+        $delta = array();
         foreach ($dati as $record => $campi) {
             foreach ($campi as $campo => $valore) {
 
@@ -348,6 +374,7 @@ function addDelta(array $dati, string $nomeCampo) : array
 function initVolumi(array $variabili, array $dati) : array
 {
     try {
+        $volumi = array();
         foreach ($dati as $record => $campi) {
 
             $volumi[$record]['variabile'] = $variabili['id_variabile'];
@@ -358,8 +385,6 @@ function initVolumi(array $variabili, array $dati) : array
                 }      
             }
 
-            $volumi[$record]['unita_misura'] = $variabili['unita_misura'];
-            $volumi[$record]['impianto'] = $variabili['impianto'];
             $volumi[$record]['tipo_dato'] = 1;
         }
         return $volumi;
@@ -374,6 +399,7 @@ function initVolumi(array $variabili, array $dati) : array
 function addLivello(array $volumi, array $dati) : array
 {
     try {
+        $livelli = array();
         if (count($volumi) !== count($dati)) {
             throw new Exception('Array differenti');
         }
@@ -400,6 +426,7 @@ function addLivello(array $volumi, array $dati) : array
 function addAltezza(array $dati, float $quota, string $nomeCampo) : array
 {
     try {
+        $altezze = array();
         foreach ($dati as $record => $campi) {
             foreach ($campi as $campo => $valore) {
 
@@ -427,6 +454,7 @@ function addPortata(array $dati, array $specifiche) : array
     $nomeCampo = 'altezza';
     
     try {
+        $portate = array();
         foreach ($dati as $record => $campi) {
             foreach ($campi as $campo => $valore) {
 
@@ -461,6 +489,7 @@ function addPortata(array $dati, array $specifiche) : array
 function addVolume(array $dati) : array
 {
     try {
+        $volumi = array();
         foreach ($dati as $record => $campi) {
             foreach ($campi as $campo => $valore) {
 
@@ -478,14 +507,20 @@ function addVolume(array $dati) : array
 }
 
 
-function setFile(string $variabile, array $dates) : string
+function setFile(string $variabile, array $dates, bool $filtered) : string
 {    
     try {
         $dateFrom = $dates['datefrom']->format('YmdHi');
         $dateTo = $dates['dateto']->format('YmdHi');
-
-        $fileName = CSV . '/Volumi_' . $variabile . '_' . $dateFrom . '_' . $dateTo . '.csv';
-
+        
+        $fileName = CSV . '/Volumi_' . $variabile . '_' . $dateFrom . '_' . $dateTo;
+        
+        if ($filtered) {
+            $fileName .= '_no0.csv';
+        } else {
+            $fileName .= '_full.csv';
+        }
+        
         return $fileName;
     
     } catch (Throwable $e) {
@@ -505,6 +540,7 @@ function format(array $dati) : array
     );
     
     try {
+        $formatted = array();
         foreach ($dati as $record => $campi) {
             foreach ($campi as $campo => $valore) {
                 if(in_array($campo, $nomiCampi)) {
@@ -666,14 +702,16 @@ function printToCSV(array $dati, string $fileName) : void
 }
 
 
-function divideAndPrint(?array $data) : void
+function divideAndPrint(?array $data, bool $full) : void
 {
+    $filtered = !$full; 
+    
     try {
         $i = 0;
         $printableData = array();
         foreach($data as $record) {
             if ($i === MAXRECORD) {
-                printPart($printableData, $i);
+                printPart($printableData, $i, $filtered);
                 $i = 0;
                 $printableData = array();                
             }
@@ -681,7 +719,7 @@ function divideAndPrint(?array $data) : void
             $i++;
         }
         if ($i > 0) {
-            printPart($printableData, $i);
+            printPart($printableData, $i, $filtered);
         }   
         
     } catch (Throwable $e) {
@@ -691,7 +729,7 @@ function divideAndPrint(?array $data) : void
 }
 
 
-function printPart(array $printableData, int $i) : void
+function printPart(array $printableData, int $i, bool $filtered) : void
 {
     try {
         $variabile = $printableData[0]['variabile'];
@@ -700,7 +738,7 @@ function printPart(array $printableData, int $i) : void
             'dateto' => $printableData[$i - 1]['data_e_ora']
         );
         $dateTimes = setDateTimes($dates);
-        $fileName = setFile($variabile, $dateTimes);
+        $fileName = setFile($variabile, $dateTimes, $filtered);
         printToCSV($printableData, $fileName);
         
     } catch (Throwable $e) {
@@ -710,10 +748,10 @@ function printPart(array $printableData, int $i) : void
 }
 
 
-function filter(array $dati, bool $filtered) : array
+function filter(array $dati, bool $full) : array
 {  
     try {
-        if (!$filtered) {
+        if ($full) {
             $filteredData = $dati;
         } else {
             $filteredData = array();

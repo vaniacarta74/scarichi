@@ -3,23 +3,17 @@
 try {
     require_once(__DIR__ . '/tools.php');
 
-    $variabile = checkVariable($_REQUEST);
+    $request = checkRequest($_REQUEST);
     
-    $filtered = checkFilter($_REQUEST);
-
-    $dates = checkInterval($_REQUEST);
-
-    $fileName = setFile($variabile, $dates);
-
     $db = 'dbcore';
     $queryFileName = 'query_scarichi';
     $parametri = array(
-        'variabile' => $variabile
+        'variabile' => $request['var']
     );
     $scarichi = getDataFromDB($db, $queryFileName, $parametri);
 
     echo '<br/><b>Variabile Scarico:</b>';
-    var_dump($scarichi);
+    //var_dump($scarichi);
 
     $db = 'dbcore';
     $queryFileName = 'query_variabili_scarichi';
@@ -29,7 +23,7 @@ try {
     $variabili_scarichi = getDataFromDB($db, $queryFileName, $parametri);
 
     echo '<br/><b>Variabili Correlate Scarico:</b>';
-    var_dump($variabili_scarichi);
+    //var_dump($variabili_scarichi);
 
     $db = $scarichi[0]['db'];
     $queryFileName = 'query_variabili';
@@ -39,7 +33,7 @@ try {
     $variabili = getDataFromDB($db, $queryFileName, $parametri);
 
     echo '<br/><b>Variabile Volume Scaricato:</b>';
-    var_dump($variabili); 
+    //var_dump($variabili); 
 
     $dati_acquisiti = array();
     foreach ($variabili_scarichi as $record) {        
@@ -52,8 +46,8 @@ try {
         $parametri = array(
             'variabile' => $record['variabile'],
             'tipo_dato' => $record['tipo_dato'],
-            'data_iniziale' => $dates['datefrom'],
-            'data_finale' => $dates['dateto'],
+            'data_iniziale' => $request['datefrom'],
+            'data_finale' => $request['dateto'],
             'data_attivazione' => $record['data_attivazione'],
             'data_disattivazione' => $record['data_disattivazione']        
         );
@@ -63,7 +57,7 @@ try {
     }
 
     echo '<br/><b>Dati Acquisiti:</b>';
-    var_dump($dati_acquisiti);
+    //var_dump($dati_acquisiti);
 
     switch ($scarichi[0]['tipo']) {
         case 'sfioratore di superficie':
@@ -90,7 +84,7 @@ try {
             $volumi = addVolume($volumi);          
 
             echo '<br/><b>Volumi Sfiorati:</b>';
-            var_dump($volumi);
+            //var_dump($volumi);
 
             break;
         case 'scarico di superficie':
@@ -109,12 +103,14 @@ try {
 
     $volumi = format($volumi);
     
-    $volumi = filter($volumi, $filtered);
+    $volumi = filter($volumi, $request['full']);
 
     echo '<br/><b>Volumi Formattati:</b>';
-    var_dump($volumi);
+    //var_dump($volumi);
 
-    divideAndPrint($volumi);
+    divideAndPrint($volumi, $request['full']);
+    
+    echo '<br/><br/>Esportazione <b>Volumi Scaricati</b> variabile <b>' . $request['var'] . '</b> dal <b>' . $request['datefrom']->format('d/m/Y') . '</b> al <b>' . $request['dateto']->format('d/m/Y') . '</b> avvenuta con successo.';
     
 } catch (Throwable $e) {
     errorHandler($e);
