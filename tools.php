@@ -32,17 +32,17 @@ function errorHandler(Throwable $e) : void
 function checkRequest(?array $request) : array
 {
     try {
-        $request = array();
+        $variables['var'] = checkVariable($request);    
         
-        $variables['var'] = checkVariable($_REQUEST);    
+        $dates = checkInterval($request);
         
-        $dates = checkInterval($_REQUEST);
+        $filters['full'] = checkFilter($request);
         
-        $filters['full'] = checkFilter($_REQUEST);
+        $fields['field'] = checkField($request);
         
-        $request = array_merge($variables, $dates, $filters);
+        $checked = array_merge($variables, $dates, $filters, $fields);
         
-        return $request;
+        return $checked;
         
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
@@ -80,15 +80,46 @@ function checkVariable(?array $request) : string
     }
 }
 
+function checkField(?array $request) : string
+{
+    try {
+        if (isset($request['field'])) {
+            
+            $fieldsNames = [
+                'volume',
+                'livello',
+                'portata',
+                'media',
+                'delta',
+                'altezza'
+            ];
+            
+            $urlField = strtolower(htmlspecialchars(strip_tags($request['field'])));
+            
+            if (in_array($urlField, $fieldsNames)) {
+                $field = $urlField;
+            } else {
+                $field = 'volume';
+            }    
+        } else {
+            $field = 'volume';
+        }        
+        return $field;
+        
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
 
 function checkFilter(?array $request) : bool
 {
     try {
         if (isset($request['full'])) {
             
-            $full = intval(htmlspecialchars(strip_tags($request['full'])));
+            $full = htmlspecialchars(strip_tags($request['full']));           
             
-            if ($full === 0) {
+            if ($full === '0') {
                 $filtered = true;
             } else {
                 $filtered = false;
@@ -113,6 +144,10 @@ function formatDate(string $date) : string
         $cleanDate = htmlspecialchars(strip_tags($date));
 
         $dateParts = explode('/', $cleanDate);
+        
+        if (count($dateParts) !== 3) {
+            throw new Exception('Parametro data inserito nel formato errato. Formato richiesto "gg/mm/yyyy"');
+        } 
 
         $day = intval($dateParts[0]);
         $month = intval($dateParts[1]);
@@ -123,7 +158,7 @@ function formatDate(string $date) : string
             
             return $formatDate;    
         } else {        
-            throw new Exception('Parametro data inserito nel formato errato. Formato richiesto "gg/mm/yyyy"');
+            throw new Exception('Data inserita inesistente');
         }
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
@@ -132,24 +167,35 @@ function formatDate(string $date) : string
 }
 
 
-function formatDateTime(string $date) : string
+function formatDateTime(string $dateTime) : string
 {
     try {
-        $dateTimeParts = explode(' ', $date);
+        $dateTimeParts = explode(' ', $dateTime);        
+        if (count($dateTimeParts) !== 2) {
+            throw new Exception('Parametro data e ora inserito nel formato errato. Formato richiesto "gg/mm/yyyy hh:ii:ss"');
+        } 
         
-        $dateParts = explode('/', $dateTimeParts[0]);
+        $dateString = formatDate($dateTimeParts[0]);
+        
         $timeParts = explode(':', $dateTimeParts[1]);
+        if (count($timeParts) !== 3) {
+            throw new Exception('Parametro data e ora inserito nel formato errato. Formato ora richiesto "hh:ii:ss"');
+        }
 
-        $day = intval($dateParts[0]);
-        $month = intval($dateParts[1]);
-        $year = intval($dateParts[2]);
-        
         $hours = intval($timeParts[0]);
         $minutes = intval($timeParts[1]);
         $seconds = intval($timeParts[2]);
         
-        $formatDateTime = date('Y-m-d H:i:s', mktime($hours, $minutes, $seconds, $month, $day, $year));
-
+        if ($hours < 0 || $hours > 24 || $minutes < 0 || $minutes > 60 || $seconds < 0 || $seconds > 60) {
+            throw new Exception('Ora inesistente');
+        }
+        
+        $timeString = date('H:i:s', mktime($hours, $minutes, $seconds));
+        
+        $dateTimeString = $dateString . ' ' . $timeString;
+        
+        $formatDateTime = date('Y-m-d H:i:s', strtotime($dateTimeString));
+        
         return $formatDateTime;
         
     } catch (Throwable $e) {
@@ -199,6 +245,9 @@ function checkInterval(?array $request) : array
 function setDateTimes(array $request) : array
 {
     try {
+        if (count($request) !== 2 && !array_key_exists('datefrom', $request) && !array_key_exists('datefrom', $request)) {
+            throw new Exception('Array non valido. Richieste due chiavi: "datefrom" e "dateto"');
+        }
         $dateFrom = formatDateTime($request['datefrom']);       
         $dateTo = formatDateTime($request['dateto']);
         
@@ -507,13 +556,13 @@ function addVolume(array $dati) : array
 }
 
 
-function setFile(string $variabile, array $dates, bool $filtered) : string
+function setFile(string $variabile, array $dates, bool $filtered, string $field) : string
 {    
     try {
         $dateFrom = $dates['datefrom']->format('YmdHi');
         $dateTo = $dates['dateto']->format('YmdHi');
         
-        $fileName = CSV . '/Volumi_' . $variabile . '_' . $dateFrom . '_' . $dateTo;
+        $fileName = CSV . '/' . ucfirst($field) . '_' . $variabile . '_' . $dateFrom . '_' . $dateTo;
         
         if ($filtered) {
             $fileName .= '_no0.csv';
@@ -530,11 +579,11 @@ function setFile(string $variabile, array $dates, bool $filtered) : string
 }
 
 
-function format(array $dati) : array
+function format(array $dati, string $field) : array
 {  
     $nomiCampi = array(
         'variabile' => 'variabile',
-        'valore' => 'volume',
+        'valore' => $field,
         'data_e_ora' => 'data_e_ora',
         'tipo_dato' => 'tipo_dato'
     );
@@ -548,6 +597,12 @@ function format(array $dati) : array
                         if($campo === $vecchio) {
                             if(is_a($valore, 'DateTime')) {
                                 $formatted[$record][$nuovo] = $valore->format('d/m/Y H:i:s');
+                            } elseif(is_numeric($valore)) {
+                                if (is_int($valore)) {
+                                    $formatted[$record][$nuovo] = number_format($valore, 0, '', '');
+                                } elseif (is_float($valore)) {
+                                    $formatted[$record][$nuovo] = number_format($valore, 3, ',', '');
+                                }                                
                             } else {
                                 $formatted[$record][$nuovo] = $valore;
                             }                        
@@ -702,7 +757,7 @@ function printToCSV(array $dati, string $fileName) : void
 }
 
 
-function divideAndPrint(?array $data, bool $full) : void
+function divideAndPrint(?array $data, bool $full, string $field) : void
 {
     $filtered = !$full; 
     
@@ -711,7 +766,7 @@ function divideAndPrint(?array $data, bool $full) : void
         $printableData = array();
         foreach($data as $record) {
             if ($i === MAXRECORD) {
-                printPart($printableData, $i, $filtered);
+                printPart($printableData, $i, $filtered, $field);
                 $i = 0;
                 $printableData = array();                
             }
@@ -719,7 +774,7 @@ function divideAndPrint(?array $data, bool $full) : void
             $i++;
         }
         if ($i > 0) {
-            printPart($printableData, $i, $filtered);
+            printPart($printableData, $i, $filtered, $field);
         }   
         
     } catch (Throwable $e) {
@@ -729,7 +784,7 @@ function divideAndPrint(?array $data, bool $full) : void
 }
 
 
-function printPart(array $printableData, int $i, bool $filtered) : void
+function printPart(array $printableData, int $i, bool $filtered, string $field) : void
 {
     try {
         $variabile = $printableData[0]['variabile'];
@@ -738,7 +793,7 @@ function printPart(array $printableData, int $i, bool $filtered) : void
             'dateto' => $printableData[$i - 1]['data_e_ora']
         );
         $dateTimes = setDateTimes($dates);
-        $fileName = setFile($variabile, $dateTimes, $filtered);
+        $fileName = setFile($variabile, $dateTimes, $filtered, $field);
         printToCSV($printableData, $fileName);
         
     } catch (Throwable $e) {
@@ -758,7 +813,7 @@ function filter(array $dati, bool $full) : array
             foreach ($dati as $record => $campi) {
                 $flag = true;
                 foreach ($campi as $campo => $valore) {
-                    if (($campo === 'valore') && ($valore === 0)) {
+                    if (($campo === 'valore') && ($valore === '0')) {
                         $flag = false;
                     }
                 }

@@ -2,7 +2,7 @@
 
 try {
     require_once(__DIR__ . '/tools.php');
-
+        
     $request = checkRequest($_REQUEST);
     
     $db = 'dbcore';
@@ -101,16 +101,16 @@ try {
             break;
     }
 
-    $volumi = format($volumi);
+    $volumi = format($volumi, $request['field']);
     
     $volumi = filter($volumi, $request['full']);
 
     echo '<br/><b>Volumi Formattati:</b>';
     //var_dump($volumi);
 
-    divideAndPrint($volumi, $request['full']);
+    divideAndPrint($volumi, $request['full'], $request['field']);
     
-    echo '<br/><br/>Esportazione <b>Volumi Scaricati</b> variabile <b>' . $request['var'] . '</b> dal <b>' . $request['datefrom']->format('d/m/Y') . '</b> al <b>' . $request['dateto']->format('d/m/Y') . '</b> avvenuta con successo.';
+    echo '<br/><br/>Esportazione <b>' . ucfirst($request['field']) . '</b> variabile <b>' . $request['var'] . '</b> dal <b>' . $request['datefrom']->format('d/m/Y') . '</b> al <b>' . $request['dateto']->format('d/m/Y') . '</b> avvenuta con successo.';
     
 } catch (Throwable $e) {
     errorHandler($e);
