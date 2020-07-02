@@ -364,9 +364,14 @@ function error() : string
 
 function addMedia(array $dati, string $nomeCampo) : array
 {
-    try {
+    try {       
         $medie = array();
         foreach ($dati as $record => $campi) {
+            
+            if (!array_key_exists($nomeCampo, $campi)) {
+                throw new Exception('Campo inesistente. Impossibile eseguirne la media');
+            }
+            
             foreach ($campi as $campo => $valore) {
 
                 $medie[$record][$campo] = $valore;
@@ -395,11 +400,21 @@ function addDelta(array $dati, string $nomeCampo) : array
     try {
         $delta = array();
         foreach ($dati as $record => $campi) {
+            
+            if (!array_key_exists($nomeCampo, $campi)) {
+                throw new Exception('Campo inesistente. Impossibile calcolare il delta temporale');
+            }
+            
             foreach ($campi as $campo => $valore) {
 
                 $delta[$record][$campo] = $valore;
 
                 if ($campo === $nomeCampo) {
+                    
+                    if (!is_a($valore, 'DateTime')) {
+                        throw new Exception('Per calcolare il delta temporale è neccessario che gli elementi del campo scelto siano del tipo \'DateTime\'');
+                    }
+                    
                     if ($record === 0) {
                         $deltaT = 0;
                     } else {                    
@@ -457,10 +472,14 @@ function addLivello(array $volumi, array $dati) : array
                 
                 $livelli[$record][$campo] = $valore;
                 
-                if (($campo === 'data_e_ora') && ($volumi[$record][$campo] === $dati[$record][$campo])) {
-                    $livelli[$record]['livello'] = $dati[$record]['valore'];
-                }
-                
+                if ($campo === 'data_e_ora') {
+                    $dato = $dati[$record][$campo];
+                    if ($valore->format('d/m/Y H:i:s') === $dato->format('d/m/Y H:i:s')) {                
+                        $livelli[$record]['livello'] = $dati[$record]['valore'];
+                    } else {
+                        throw new Exception('Date differenti');
+                    }
+                }                
             }            
         }
         return $livelli;
@@ -477,6 +496,11 @@ function addAltezza(array $dati, float $quota, string $nomeCampo) : array
     try {
         $altezze = array();
         foreach ($dati as $record => $campi) {
+            
+            if (!array_key_exists($nomeCampo, $campi)) {
+                throw new Exception('Campo inesistente. Impossibile calcolare l\'altezza');
+            }
+            
             foreach ($campi as $campo => $valore) {
 
                 $altezze[$record][$campo] = $valore;
@@ -591,6 +615,11 @@ function format(array $dati, string $field) : array
     try {
         $formatted = array();
         foreach ($dati as $record => $campi) {
+            
+            if (!array_key_exists($field, $campi)) {
+                throw new Exception('Campo inesistente. Impossibile assegnarlo a \'valore\'');
+            }
+            
             foreach ($campi as $campo => $valore) {
                 if(in_array($campo, $nomiCampi)) {
                     foreach($nomiCampi AS $nuovo => $vecchio) {
@@ -601,7 +630,11 @@ function format(array $dati, string $field) : array
                                 if (is_int($valore)) {
                                     $formatted[$record][$nuovo] = number_format($valore, 0, '', '');
                                 } elseif (is_float($valore)) {
-                                    $formatted[$record][$nuovo] = number_format($valore, 3, ',', '');
+                                    $strFloat = number_format($valore, 3, ',', '');
+                                    if ($strFloat === '0,000') {
+                                        $strFloat = '0';                                        
+                                    }
+                                    $formatted[$record][$nuovo] = $strFloat;
                                 }                                
                             } else {
                                 $formatted[$record][$nuovo] = $valore;
@@ -757,15 +790,16 @@ function printToCSV(array $dati, string $fileName) : void
 }
 
 
-function divideAndPrint(?array $data, bool $full, string $field) : void
+function divideAndPrint(?array $data, bool $full, string $field, ?int $limit = null) : void
 {
+    $limit = $limit ?? MAXRECORD;
     $filtered = !$full; 
     
     try {
         $i = 0;
         $printableData = array();
         foreach($data as $record) {
-            if ($i === MAXRECORD) {
+            if ($i === $limit) {
                 printPart($printableData, $i, $filtered, $field);
                 $i = 0;
                 $printableData = array();                
