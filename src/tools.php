@@ -11,21 +11,22 @@ function printErrorInfo(string $functionName) : void
 }
 
 
-function errorHandler(Throwable $e) : void
+function errorHandler(Throwable $e) : string
 {
-    echo '<br/><b>Descrizione Errore:</b><br/>';
-    echo 'File: ' . $e->getFile() . '<br/>'; 
-    echo 'Linea: ' . $e->getLine() . '<br/>'; 
-    echo 'Codice errore: ' . $e->getCode() . '<br/>'; 
-    echo 'Messaggio di errore: <b>' . $e->getMessage() . '</b><br/>';
+    $html = '<br/><b>Descrizione Errore:</b><br/>';
+    $html .= 'File: ' . $e->getFile() . '<br/>'; 
+    $html .= 'Linea: ' . $e->getLine() . '<br/>'; 
+    $html .= 'Codice errore: ' . $e->getCode() . '<br/>'; 
+    $html .= 'Messaggio di errore: <b>' . $e->getMessage() . '</b><br/>';
     
     $stack = $e->getTraceAsString();
     $arrStack = explode('#', $stack);
     
-    echo '<br/><b>Stack:</b>';
+    $html .= '<br/><b>Stack:</b>';
     foreach ($arrStack as $line) {
-        echo $line . '<br/>';
-    }    
+        $html .= $line . '<br/>';
+    } 
+    return $html;
 }
 
 
@@ -99,7 +100,7 @@ function checkField(?array $request) : string
             if (in_array($urlField, $fieldsNames)) {
                 $field = $urlField;
             } else {
-                $field = 'volume';
+                throw new Exception('Nome campo non supportato. Valori ammessi: ' . implode(', ' , $fieldsNames));
             }    
         } else {
             $field = 'volume';
@@ -121,9 +122,11 @@ function checkFilter(?array $request) : bool
             
             if ($full === '0') {
                 $filtered = true;
-            } else {
+            } elseif ($full === '1') {
                 $filtered = false;
-            }            
+            } else {
+                throw new Exception('Valore parametro "full" non ammesso. Scegliere fra 0 e 1');
+            }           
         } else {
             $filtered = false;
         }
@@ -224,9 +227,7 @@ function checkInterval(?array $request) : array
             $dateTo = date('Y-m-d', strtotime($dateFrom . ' +1 day'));
 
         } else {
-
-            $dateFrom = date('Y-m-d');
-            $dateTo = date('Y-m-d', strtotime($dateFrom . ' +1 day'));
+            throw new Exception('Parametri intervallo date assenti. Indicare uno o entrambi i parametri "datefrom" e "dateto"');
         }
         $dateTimeFrom = New DateTime($dateFrom);
         $dateTimeTo = New DateTime($dateTo);
@@ -325,7 +326,7 @@ function fetch($stmt) : ?array
                 $dati[$record][$key] = $value;
             }
             $record++;
-        }
+        }        
         if (!isset($dati)) {
             $dati = array();
         }
@@ -338,11 +339,12 @@ function fetch($stmt) : ?array
 }
 
 
-function close($conn)
+function close($conn) : void
 {
     try {
-        
-        sqlsrv_close($conn);
+        if (!sqlsrv_close($conn)) {
+            throw new Exception(error());
+        }
         
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
@@ -437,7 +439,11 @@ function addDelta(array $dati, string $nomeCampo) : array
 
 function initVolumi(array $variabili, array $dati) : array
 {
-    try {
+    try {        
+        if (count($dati) === 0) {
+            throw new Exception('Nessun dato presente per le date selezionate');
+        }
+        
         $volumi = array();
         foreach ($dati as $record => $campi) {
 
@@ -491,9 +497,13 @@ function addLivello(array $volumi, array $dati) : array
 }
 
 
-function addAltezza(array $dati, float $quota, string $nomeCampo) : array
+function addAltezza(array $dati, ?float $quota, string $nomeCampo) : array
 {
     try {
+        if(!isset($quota)) {
+            throw new Exception('Quota non definita');
+        }
+        
         $altezze = array();
         foreach ($dati as $record => $campi) {
             
@@ -521,12 +531,16 @@ function addAltezza(array $dati, float $quota, string $nomeCampo) : array
 
 function addPortata(array $dati, array $specifiche) : array
 {
-    $mi = $specifiche['mi'];
-    $larghezza_soglia = $specifiche['larghezza'];
-    $portata_massima = $specifiche['limite'];
-    $nomeCampo = 'altezza';
-    
     try {
+        if(count($specifiche) === 0) {
+            throw new Exception('Specifiche scarico non definite');
+        } else {
+            $mi = $specifiche['mi'];
+            $larghezza_soglia = $specifiche['larghezza'];
+            $portata_massima = $specifiche['limite'];
+            $nomeCampo = 'altezza';
+        }
+        
         $portate = array();
         foreach ($dati as $record => $campi) {
             foreach ($campi as $campo => $valore) {
@@ -564,6 +578,11 @@ function addVolume(array $dati) : array
     try {
         $volumi = array();
         foreach ($dati as $record => $campi) {
+            
+            if (!array_key_exists('portata', $campi) || !array_key_exists('delta', $campi)) {
+                throw new Exception('Dati di portata e delta t assenti impossibile calcolare volume scaricato');
+            }
+            
             foreach ($campi as $campo => $valore) {
 
                 $volumi[$record][$campo] = $valore;
@@ -580,13 +599,17 @@ function addVolume(array $dati) : array
 }
 
 
-function setFile(string $variabile, array $dates, bool $filtered, string $field) : string
+function setFile(string $variabile, array $dates, bool $filtered, string $field, string $path) : string
 {    
     try {
+        if (!is_dir($path)) {
+            throw new Exception('Directory inesistente');
+        }
+        
         $dateFrom = $dates['datefrom']->format('YmdHi');
         $dateTo = $dates['dateto']->format('YmdHi');
         
-        $fileName = CSV . '/' . ucfirst($field) . '_' . $variabile . '_' . $dateFrom . '_' . $dateTo;
+        $fileName = $path . '/' . ucfirst($field) . '_' . $variabile . '_' . $dateFrom . '_' . $dateTo;
         
         if ($filtered) {
             $fileName .= '_no0.csv';
@@ -657,6 +680,10 @@ function format(array $dati, string $field) : array
 function changeTimeZone (string $dateIn, bool $isLocalToUTC, bool $format)
 {
     try {
+        if (!preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (?:2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]$/", $dateIn)) {
+            throw new Exception('Inserire la data nel formato Y-m-d H:i:s');
+        }
+        
         if ($isLocalToUTC) {
             $zoneIn = 'Europe/Rome';
             $zoneOut = 'Etc/GMT-1';    
@@ -684,10 +711,15 @@ function changeTimeZone (string $dateIn, bool $isLocalToUTC, bool $format)
 
 function datesToString(array $dates, string $format) : array
 {
-    try {
+    try {        
         foreach ($dates as $key => $date) {
             if (is_a($date, 'DateTime')) {
                 $formattedDates[$key] = $date->format($format);
+                
+                if (!DateTime::createFromFormat($format, $formattedDates[$key])) {
+                    throw new Exception('Formato data scelto non valido. Utilizzare "d/m/Y H:i:s" o "Y-m-d H:i:s"');
+                }
+                
             } else {
                 $formattedDates[$key] = $date;
             }
@@ -703,21 +735,23 @@ function datesToString(array $dates, string $format) : array
 
 function checkDates(string $db, array $dates, bool $isLocalToUTC) : array
 {
-    try {    
+    try {
+        $checkedDates = array();
         foreach ($dates as $key => $date) {
             if (is_a($date, 'DateTime') && ($db === 'SPT')) {
                 $dateString = $date->format('Y-m-d H:i:s');
-                $checkedDates[$key] = changeTimeZone($dateString, $isLocalToUTC, false);
+                $checkedDates[$key] = changeTimeZone($dateString, $isLocalToUTC, false);                
             } else {
                 $checkedDates[$key] = $date;
             }
         }    
-        return $checkedDates;
-        
+        return $checkedDates;        
+    // @codeCoverageIgnoreStart    
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
+    // @codeCoverageIgnoreEnd
 }
 
 
@@ -729,22 +763,40 @@ function setToLocal(string $db, array $dati) : array
             $locals[$record] = checkDates($db, $campi, false);        
         }
         return $locals;
-        
+    // @codeCoverageIgnoreStart    
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+    // @codeCoverageIgnoreEnd
+}
+
+function checkNull($value)
+{
+    try {
+        if (is_null($value)) {
+            throw new Exception('Valore parametro non valido o nullo');
+        } else {
+            $res = $value;
+        }
+        return $res;
+    
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
 
-
-function getDataFromDB(string $db, string $queryFileName, array $parametri) : array
+function getDataFromDb(string $db, string $queryFileName, array $parametri) : array
 {
     try {
         $data = array();
         
         $conn = connect($db);
         
-        $checkedDateParams = checkDates($db, $parametri, true);
+        $checkedParams = array_map('checkNull', $parametri);
+        
+        $checkedDateParams = checkDates($db, $checkedParams, true);
         
         $params = datesToString($checkedDateParams, 'd/m/Y H:i:s');
         
@@ -771,17 +823,23 @@ function printToCSV(array $dati, string $fileName) : void
     $delimiter = ';';
     
     try {
-        $handle = fopen($fileName, $mode);
+        $handle = @fopen($fileName, $mode);
         
-        $nomiCampi = array_keys($dati[0]);
-        
-        fputcsv($handle, $nomiCampi, $delimiter);
-        
-        foreach ($dati AS $valori) {
-            fputcsv($handle, $valori, $delimiter);
-        }        
-        
-        fclose($handle);
+        if($handle) {
+            
+            $nomiCampi = array_keys($dati[0]);
+
+            fputcsv($handle, $nomiCampi, $delimiter);
+
+            foreach ($dati AS $valori) {
+                fputcsv($handle, $valori, $delimiter);
+            }       
+
+            fclose($handle);
+            
+        } else {
+            throw new Exception('Problemi con l\'apertura del file CSV');
+        }
         
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
@@ -790,26 +848,35 @@ function printToCSV(array $dati, string $fileName) : void
 }
 
 
-function divideAndPrint(?array $data, bool $full, string $field, ?int $limit = null) : void
+function divideAndPrint(array $data, bool $full, string $field, ?int $limit = null) : bool
 {
     $limit = $limit ?? MAXRECORD;
     $filtered = !$full; 
     
     try {
-        $i = 0;
-        $printableData = array();
-        foreach($data as $record) {
-            if ($i === $limit) {
-                printPart($printableData, $i, $filtered, $field);
-                $i = 0;
-                $printableData = array();                
-            }
-            $printableData[$i] = $record;
-            $i++;
+        if ($limit <= 0) {
+            throw new Exception('Impostare un numero massimo di record da esportare almeno uguale ad 1');
         }
-        if ($i > 0) {
-            printPart($printableData, $i, $filtered, $field);
-        }   
+        if (count($data) === 0) {
+            $printed = false;
+        } else {
+            $i = 0;
+            $printableData = array();
+            foreach($data as $record) {
+                if ($i === $limit) {
+                    printPart($printableData, $i, $filtered, $field);
+                    $i = 0;
+                    $printableData = array();                
+                }
+                $printableData[$i] = $record;
+                $i++;
+            }
+            if ($i > 0) {
+                printPart($printableData, $i, $filtered, $field);
+            }
+            $printed = true;
+        }
+        return $printed;
         
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
@@ -821,13 +888,18 @@ function divideAndPrint(?array $data, bool $full, string $field, ?int $limit = n
 function printPart(array $printableData, int $i, bool $filtered, string $field) : void
 {
     try {
+        $max = $i - 1;
+        if (!array_key_exists($max, $printableData)) {
+            throw new Exception('Indice array in stampa non definito');
+        }
+        
         $variabile = $printableData[0]['variabile'];
         $dates = array(
             'datefrom' => $printableData[0]['data_e_ora'],
-            'dateto' => $printableData[$i - 1]['data_e_ora']
+            'dateto' => $printableData[$max]['data_e_ora']
         );
         $dateTimes = setDateTimes($dates);
-        $fileName = setFile($variabile, $dateTimes, $filtered, $field);
+        $fileName = setFile($variabile, $dateTimes, $filtered, $field, CSV);
         printToCSV($printableData, $fileName);
         
     } catch (Throwable $e) {
@@ -845,7 +917,12 @@ function filter(array $dati, bool $full) : array
         } else {
             $filteredData = array();
             foreach ($dati as $record => $campi) {
-                $flag = true;
+                
+                if(!array_key_exists('valore', $campi)) {
+                    throw new Exception('Campo "valore" su cui eseguire il filtro non presente');
+                }            
+                
+                $flag = true;             
                 foreach ($campi as $campo => $valore) {
                     if (($campo === 'valore') && ($valore === '0')) {
                         $flag = false;
@@ -855,8 +932,7 @@ function filter(array $dati, bool $full) : array
                     $filteredData[$record] = $campi;
                 }
             }
-        }
-        
+        }        
         return $filteredData;
     
     } catch (Throwable $e) {
@@ -864,3 +940,30 @@ function filter(array $dati, bool $full) : array
         throw $e;
     }
 }
+    
+function response(array $request, bool $printed) : string
+{
+    try {
+        $keys = array_flip(['var', 'datefrom', 'dateto', 'full', 'field']);
+        
+        if (array_diff_key($request, $keys) || array_diff_key($keys, $request)) {
+            throw new Exception('Parametri mancanti');
+        }
+        
+        $type = $request['full'] ? 'full' : 'senza zeri';
+        
+        $html = 'Elaborazione dati <b>' . ucfirst($request['field']) . '</b> variabile <b>' . $request['var'] . '</b> dal <b>' . $request['datefrom']->format('d/m/Y') . '</b> al <b>' . $request['dateto']->format('d/m/Y') . '</b> avvenuta con successo.';
+        
+        if($printed) {
+            $html .= ' File CSV <b>' . $type . '</b> esportati.';
+        } else {
+            $html .= ' Nessun file CSV <b>' . $type . '</b> esportato per mancanza di dati.';
+        }
+        return $html;
+        
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+

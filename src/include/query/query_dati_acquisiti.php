@@ -1,6 +1,6 @@
 <?php
 
-$queryString = "SELECT
+$queryString = "SELECT DISTINCT
                     dati_acquisiti.variabile,
                     dati_acquisiti.valore,
                     dati_acquisiti.data_e_ora,                    

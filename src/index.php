@@ -10,9 +10,9 @@ try {
     $parametri = array(
         'variabile' => $request['var']
     );
-    $scarichi = getDataFromDB($db, $queryFileName, $parametri);
+    $scarichi = getDataFromDb($db, $queryFileName, $parametri);
 
-    echo '<br/><b>Variabile Scarico:</b>';
+    //echo '<br/><b>Variabile Scarico:</b>';
     //var_dump($scarichi);
 
     $db = 'dbcore';
@@ -20,9 +20,9 @@ try {
     $parametri = array(
         'scarico' => $scarichi[0]['scarico']
     );
-    $variabili_scarichi = getDataFromDB($db, $queryFileName, $parametri);
+    $variabili_scarichi = getDataFromDb($db, $queryFileName, $parametri);
 
-    echo '<br/><b>Variabili Correlate Scarico:</b>';
+    //echo '<br/><b>Variabili Correlate Scarico:</b>';
     //var_dump($variabili_scarichi);
 
     $db = $scarichi[0]['db'];
@@ -30,9 +30,9 @@ try {
     $parametri = array(
         'variabile' => $scarichi[0]['variabile']
     );
-    $variabili = getDataFromDB($db, $queryFileName, $parametri);
+    $variabili = getDataFromDb($db, $queryFileName, $parametri);
 
-    echo '<br/><b>Variabile Volume Scaricato:</b>';
+    //echo '<br/><b>Variabile Volume Scaricato:</b>';
     //var_dump($variabili); 
 
     $dati_acquisiti = array();
@@ -51,12 +51,12 @@ try {
             'data_attivazione' => $record['data_attivazione'],
             'data_disattivazione' => $record['data_disattivazione']        
         );
-        $dati[$categoria] = getDataFromDB($db, $queryFileName, $parametri);
+        $dati[$categoria] = getDataFromDb($db, $queryFileName, $parametri);
 
         $dati_acquisiti = array_merge_recursive($dati_acquisiti, $dati);        
     }
 
-    echo '<br/><b>Dati Acquisiti:</b>';
+    //echo '<br/><b>Dati Acquisiti:</b>';
     //var_dump($dati_acquisiti);
 
     switch ($scarichi[0]['tipo']) {
@@ -67,7 +67,7 @@ try {
             $parametri = array(
                 'scarico' => $scarichi[0]['scarico']
             );
-            $sfiori = getDataFromDB($db, $queryFileName, $parametri);
+            $sfiori = getDataFromDb($db, $queryFileName, $parametri);
 
             $volumi = initVolumi($variabili[0], $dati_acquisiti['livello']);
 
@@ -83,7 +83,7 @@ try {
 
             $volumi = addVolume($volumi);          
 
-            echo '<br/><b>Volumi Sfiorati:</b>';
+            //echo '<br/><b>Volumi Sfiorati:</b>';
             //var_dump($volumi);
 
             break;
@@ -105,14 +105,14 @@ try {
     
     $volumi = filter($volumi, $request['full']);
 
-    echo '<br/><b>Volumi Formattati:</b>';
+    //echo '<br/><b>Volumi Formattati:</b>';
     //var_dump($volumi);
 
-    divideAndPrint($volumi, $request['full'], $request['field']);
+    $printed = divideAndPrint($volumi, $request['full'], $request['field']);
     
-    echo '<br/><br/>Esportazione <b>' . ucfirst($request['field']) . '</b> variabile <b>' . $request['var'] . '</b> dal <b>' . $request['datefrom']->format('d/m/Y') . '</b> al <b>' . $request['dateto']->format('d/m/Y') . '</b> avvenuta con successo.';
+    echo response($request, $printed);
     
 } catch (Throwable $e) {
-    errorHandler($e);
+    echo errorHandler($e);
     exit();    
 }

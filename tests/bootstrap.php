@@ -18,5 +18,5 @@ $_REQUEST['datefrom'] = '01/05/2020';
 $_REQUEST['full'] = 1;
 $_SERVER['SERVER_NAME'] = 'localhost';
 
-include_once __DIR__ . '/../src/tools.php';
+include_once __DIR__ . '/../src/index.php';
 include_once __DIR__ . '/classes/CsvFileIterator.php';
