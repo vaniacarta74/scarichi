@@ -21,12 +21,11 @@ $queryString = "SELECT DISTINCT
                 ORDER BY
                     dati_acquisiti.data_e_ora";
 
-$paramNames = array(
+$paramNames = [
     '?variabile?',
     '?tipo_dato?',
     '?data_iniziale?',
     '?data_finale?',
     '?data_attivazione?',
     '?data_disattivazione?'
-);
-
+];

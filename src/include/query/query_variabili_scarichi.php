@@ -24,7 +24,6 @@ $queryString = "SELECT
                     variabili_scarichi.categoria,
                     variabili_scarichi.data_attivazione";
 
-$paramNames = array(
+$paramNames = [
     '?scarico?'
-);
-
+];

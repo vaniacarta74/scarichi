@@ -7,9 +7,9 @@ try {
     
     $db = 'dbcore';
     $queryFileName = 'query_scarichi';
-    $parametri = array(
+    $parametri = [
         'variabile' => $request['var']
-    );
+    ];
     $scarichi = getDataFromDb($db, $queryFileName, $parametri);
 
     //echo '<br/><b>Variabile Scarico:</b>';
@@ -17,9 +17,9 @@ try {
 
     $db = 'dbcore';
     $queryFileName = 'query_variabili_scarichi';
-    $parametri = array(
+    $parametri = [
         'scarico' => $scarichi[0]['scarico']
-    );
+    ];
     $variabili_scarichi = getDataFromDb($db, $queryFileName, $parametri);
 
     //echo '<br/><b>Variabili Correlate Scarico:</b>';
@@ -27,33 +27,32 @@ try {
 
     $db = $scarichi[0]['db'];
     $queryFileName = 'query_variabili';
-    $parametri = array(
+    $parametri = [
         'variabile' => $scarichi[0]['variabile']
-    );
+    ];
     $variabili = getDataFromDb($db, $queryFileName, $parametri);
 
     //echo '<br/><b>Variabile Volume Scaricato:</b>';
-    //var_dump($variabili); 
+    //var_dump($variabili);
 
-    $dati_acquisiti = array();
-    foreach ($variabili_scarichi as $record) {        
-
-        $dati = array();
+    $dati_acquisiti = [];
+    foreach ($variabili_scarichi as $record) {
+        $dati = [];
         $categoria = $record['categoria'];
 
         $db = $record['db'];
         $queryFileName = 'query_dati_acquisiti';
-        $parametri = array(
+        $parametri = [
             'variabile' => $record['variabile'],
             'tipo_dato' => $record['tipo_dato'],
             'data_iniziale' => $request['datefrom'],
             'data_finale' => $request['dateto'],
             'data_attivazione' => $record['data_attivazione'],
-            'data_disattivazione' => $record['data_disattivazione']        
-        );
+            'data_disattivazione' => $record['data_disattivazione']
+        ];
         $dati[$categoria] = getDataFromDb($db, $queryFileName, $parametri);
 
-        $dati_acquisiti = array_merge_recursive($dati_acquisiti, $dati);        
+        $dati_acquisiti = array_merge_recursive($dati_acquisiti, $dati);
     }
 
     //echo '<br/><b>Dati Acquisiti:</b>';
@@ -64,9 +63,9 @@ try {
 
             $db = 'dbcore';
             $queryFileName = 'query_sfiori';
-            $parametri = array(
+            $parametri = [
                 'scarico' => $scarichi[0]['scarico']
-            );
+            ];
             $sfiori = getDataFromDb($db, $queryFileName, $parametri);
 
             $volumi = initVolumi($variabili[0], $dati_acquisiti['livello']);
@@ -81,7 +80,7 @@ try {
 
             $volumi = addDelta($volumi, 'data_e_ora');
 
-            $volumi = addVolume($volumi);          
+            $volumi = addVolume($volumi);
 
             //echo '<br/><b>Volumi Sfiorati:</b>';
             //var_dump($volumi);
@@ -111,8 +110,7 @@ try {
     $printed = divideAndPrint($volumi, $request['full'], $request['field']);
     
     echo response($request, $printed);
-    
 } catch (Throwable $e) {
     echo errorHandler($e);
-    exit();    
+    exit();
 }

@@ -4,8 +4,8 @@ namespace vaniacarta74\scarichi\tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 
-
-class ToolsTest extends TestCase {
+class ToolsTest extends TestCase
+{
     
     /**
      * coversNothing
@@ -16,8 +16,8 @@ class ToolsTest extends TestCase {
             'standard' => [
                 'request' => [
                     'var' => '30030',
-                    'datefrom' => New \DateTime('2017-01-01 00:00:00'),
-                    'dateto' => New \DateTime('2017-01-02 00:00:00'),
+                    'datefrom' => new \DateTime('2017-01-01 00:00:00'),
+                    'dateto' => new \DateTime('2017-01-02 00:00:00'),
                     'full' => '1',
                     'field' => 'volume'
                 ],
@@ -27,8 +27,8 @@ class ToolsTest extends TestCase {
             'full no print' => [
                 'request' => [
                     'var' => '30030',
-                    'datefrom' => New \DateTime('2017-01-01 00:00:00'),
-                    'dateto' => New \DateTime('2017-01-02 00:00:00'),
+                    'datefrom' => new \DateTime('2017-01-01 00:00:00'),
+                    'dateto' => new \DateTime('2017-01-02 00:00:00'),
                     'full' => '1',
                     'field' => 'volume'
                 ],
@@ -38,19 +38,19 @@ class ToolsTest extends TestCase {
             'only datefrom full print' => [
                 'request' => [
                     'var' => '30030',
-                    'datefrom' => New \DateTime('2020-05-01 00:00:00'),
-                    'dateto' => New \DateTime(),
+                    'datefrom' => new \DateTime('2020-05-01 00:00:00'),
+                    'dateto' => new \DateTime(),
                     'full' => '1',
                     'field' => 'volume'
                 ],
                 'printed' => true,
                 'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/05/2020</b> al <b>' . date('d/m/Y') . '</b> avvenuta con successo. File CSV <b>full</b> esportati.'
-            ],          
+            ],
             'field other full print' => [
                 'request' => [
                     'var' => '30030',
-                    'datefrom' => New \DateTime('2017-01-01 00:00:00'),
-                    'dateto' => New \DateTime('2017-01-02 00:00:00'),
+                    'datefrom' => new \DateTime('2017-01-01 00:00:00'),
+                    'dateto' => new \DateTime('2017-01-02 00:00:00'),
                     'full' => '1',
                     'field' => 'livello'
                 ],
@@ -60,8 +60,8 @@ class ToolsTest extends TestCase {
             'field other no 0 no print' => [
                 'request' => [
                     'var' => '30030',
-                    'datefrom' => New \DateTime('2017-01-01 00:00:00'),
-                    'dateto' => New \DateTime('2017-01-02 00:00:00'),
+                    'datefrom' => new \DateTime('2017-01-01 00:00:00'),
+                    'dateto' => new \DateTime('2017-01-02 00:00:00'),
                     'full' => '0',
                     'field' => 'livello'
                 ],
@@ -97,8 +97,8 @@ class ToolsTest extends TestCase {
             'base' => [
                 'variabile' => '30030',
                 'date' => [
-                    'datefrom' => New \DateTime('2018-01-02 00:15:00'),
-                    'dateto' => New \DateTime('2020-04-01 23:59:59')
+                    'datefrom' => new \DateTime('2018-01-02 00:15:00'),
+                    'dateto' => new \DateTime('2020-04-01 23:59:59')
                 ],
                 'filtered' => false,
                 'field' => 'volume',
@@ -108,8 +108,8 @@ class ToolsTest extends TestCase {
             'altro campo' => [
                 'variabile' => '30030',
                 'date' => [
-                    'datefrom' => New \DateTime('2018-01-02 00:15:00'),
-                    'dateto' => New \DateTime('2020-04-01 23:59:59')
+                    'datefrom' => new \DateTime('2018-01-02 00:15:00'),
+                    'dateto' => new \DateTime('2020-04-01 23:59:59')
                 ],
                 'filtered' => false,
                 'field' => 'livello',
@@ -119,8 +119,8 @@ class ToolsTest extends TestCase {
             'filtered' => [
                 'variabile' => '30030',
                 'date' => [
-                    'datefrom' => New \DateTime('2018-01-02 00:15:00'),
-                    'dateto' => New \DateTime('2020-04-01 23:59:59')
+                    'datefrom' => new \DateTime('2018-01-02 00:15:00'),
+                    'dateto' => new \DateTime('2020-04-01 23:59:59')
                 ],
                 'filtered' => true,
                 'field' => 'volume',
@@ -136,7 +136,7 @@ class ToolsTest extends TestCase {
      * coversNothing
      */
     public function getDataFromDbProvider() : array
-    {        
+    {
         $data = [
             'scarichi' => [
                 'dbase' => 'dbcore',
@@ -166,8 +166,8 @@ class ToolsTest extends TestCase {
                         'db' => 'SSCP_data',
                         'variabile' => 42,
                         'tipo_dato' => 2,
-                        'data_attivazione' => New \DateTime('1970-01-01 00:00:00'),
-                        'data_disattivazione' => New \DateTime('2017-12-09 00:00:00'),
+                        'data_attivazione' => new \DateTime('1970-01-01 00:00:00'),
+                        'data_disattivazione' => new \DateTime('2017-12-09 00:00:00'),
                         'categoria' => 'livello'
                     ],
                     '1' => [
@@ -175,8 +175,8 @@ class ToolsTest extends TestCase {
                         'db' => 'SPT',
                         'variabile' => 165071,
                         'tipo_dato' => 2,
-                        'data_attivazione' => New \DateTime('2017-12-09 00:00:00'),
-                        'data_disattivazione' => New \DateTime('2070-01-01 00:00:00'),
+                        'data_attivazione' => new \DateTime('2017-12-09 00:00:00'),
+                        'data_disattivazione' => new \DateTime('2070-01-01 00:00:00'),
                         'categoria' => 'livello'
                     ]
                 ]
@@ -201,20 +201,20 @@ class ToolsTest extends TestCase {
                 'parametri' => [
                     'variabile' => '165071',
                     'tipo dato' => '2',
-                    'data iniziale' => New \DateTime('2018-01-02 00:00:00'),
-                    'data finale' => New \DateTime('2018-01-02 00:15:0'),
-                    'data attivazione' => New \DateTime('2017-12-09 00:00:00'),
-                    'data disattivazione' => New \DateTime('2070-01-01 00:00:00'),
+                    'data iniziale' => new \DateTime('2018-01-02 00:00:00'),
+                    'data finale' => new \DateTime('2018-01-02 00:15:0'),
+                    'data attivazione' => new \DateTime('2017-12-09 00:00:00'),
+                    'data disattivazione' => new \DateTime('2070-01-01 00:00:00'),
                 ],
                 'expected' => [
                     '0' => [
                         'variabile' => 165071,
                         'valore' => 266.206,
-                        'data_e_ora' => New \DateTime('2018-01-02T00:00:00.000000+0100'),
+                        'data_e_ora' => new \DateTime('2018-01-02T00:00:00.000000+0100'),
                         'tipo_dato' => 2
                     ]
                 ]
-            ],            
+            ],
             'sfiori' => [
                 'dbase' => 'dbcore',
                 'file' => 'query_sfiori',
@@ -249,7 +249,7 @@ class ToolsTest extends TestCase {
                         'denominazione' => 'nome',
                         'db' => 'SSCP_data',
                         'variabile' => 30030,
-                        'tipo' => 'tipo'            
+                        'tipo' => 'tipo'
                     ]
                 ]
             ],
@@ -260,8 +260,8 @@ class ToolsTest extends TestCase {
                         'db' => 'SSCP_data',
                         'variabile' => 42,
                         'tipo dato' => 2,
-                        'data attivazione' => New \DateTime(),
-                        'data disattivazione' => New \DateTime(),
+                        'data attivazione' => new \DateTime(),
+                        'data disattivazione' => new \DateTime(),
                         'categoria' => 'livello'
                     ]
                 ]
@@ -280,11 +280,11 @@ class ToolsTest extends TestCase {
                     'row' => [
                         'variabile' => 165071,
                         'valore' => 273.089,
-                        'data e ora' => New \DateTime(),
+                        'data e ora' => new \DateTime(),
                         'tipo dato' => 2
                     ]
                 ]
-            ],            
+            ],
             'sfiori' => [
                 'rows' => [
                     'row' => [
@@ -330,8 +330,8 @@ class ToolsTest extends TestCase {
                         'db' => 'SSCP_data',
                         'variabile' => 42,
                         'tipo dato' => 2,
-                        'data attivazione' => New \DateTime(),
-                        'data disattivazione' => New \DateTime(),
+                        'data attivazione' => new \DateTime(),
+                        'data disattivazione' => new \DateTime(),
                         'categoria' => 'livello'
                     ]
                 ]
@@ -352,11 +352,11 @@ class ToolsTest extends TestCase {
                     'row' => [
                         'variabile' => 165071,
                         'valore' => 273.089,
-                        'data e ora' => New \DateTime(),
+                        'data e ora' => new \DateTime(),
                         'tipo dato' => 2
                     ]
                 ]
-            ],            
+            ],
             'sfiori' => [
                 'dbase' => 'dbcore',
                 'rowsOut' => [
@@ -448,19 +448,19 @@ class ToolsTest extends TestCase {
                 'parametri' => [
                     'variabile' => '165071',
                     'tipo dato' => '2',
-                    'data iniziale' => New \DateTime(),
-                    'data finale' => New \DateTime(),
-                    'data attivazione' => New \DateTime(),
-                    'data disattivazione' => New \DateTime()
+                    'data iniziale' => new \DateTime(),
+                    'data finale' => new \DateTime(),
+                    'data attivazione' => new \DateTime(),
+                    'data disattivazione' => new \DateTime()
                 ],
                 'localToGMT-1' => true,
                 'output' => [
                     'variabile' => '165071',
                     'tipo dato' => '2',
-                    'data iniziale' => New \DateTime(),
-                    'data finale' => New \DateTime(),
-                    'data attivazione' => New \DateTime(),
-                    'data disattivazione' => New \DateTime()
+                    'data iniziale' => new \DateTime(),
+                    'data finale' => new \DateTime(),
+                    'data attivazione' => new \DateTime(),
+                    'data disattivazione' => new \DateTime()
                 ]
             ],
             'dati acquisiti SPT s->l' => [
@@ -468,19 +468,19 @@ class ToolsTest extends TestCase {
                 'parametri' => [
                     'variabile' => '165071',
                     'tipo dato' => '2',
-                    'data iniziale' => New \DateTime(),
-                    'data finale' => New \DateTime(),
-                    'data attivazione' => New \DateTime(),
-                    'data disattivazione' => New \DateTime()
+                    'data iniziale' => new \DateTime(),
+                    'data finale' => new \DateTime(),
+                    'data attivazione' => new \DateTime(),
+                    'data disattivazione' => new \DateTime()
                 ],
                 'localToGMT-1' => false,
                 'output' => [
                     'variabile' => '165071',
                     'tipo dato' => '2',
-                    'data iniziale' => New \DateTime(),
-                    'data finale' => New \DateTime(),
-                    'data attivazione' => New \DateTime(),
-                    'data disattivazione' => New \DateTime()
+                    'data iniziale' => new \DateTime(),
+                    'data finale' => new \DateTime(),
+                    'data attivazione' => new \DateTime(),
+                    'data disattivazione' => new \DateTime()
                 ]
             ],
             'dati acquisiti SSCP l->s' => [
@@ -488,19 +488,19 @@ class ToolsTest extends TestCase {
                 'parametri' => [
                     'variabile' => '42',
                     'tipo dato' => '2',
-                    'data iniziale' => New \DateTime(),
-                    'data finale' => New \DateTime(),
-                    'data attivazione' => New \DateTime(),
-                    'data disattivazione' => New \DateTime()
+                    'data iniziale' => new \DateTime(),
+                    'data finale' => new \DateTime(),
+                    'data attivazione' => new \DateTime(),
+                    'data disattivazione' => new \DateTime()
                 ],
                 'localToGMT-1' => true,
                 'output' => [
                     'variabile' => '42',
                     'tipo dato' => '2',
-                    'data iniziale' => New \DateTime(),
-                    'data finale' => New \DateTime(),
-                    'data attivazione' => New \DateTime(),
-                    'data disattivazione' => New \DateTime()
+                    'data iniziale' => new \DateTime(),
+                    'data finale' => new \DateTime(),
+                    'data attivazione' => new \DateTime(),
+                    'data disattivazione' => new \DateTime()
                 ]
             ],
             'dati acquisiti SSCP s->l' => [
@@ -508,19 +508,19 @@ class ToolsTest extends TestCase {
                 'parametri' => [
                     'variabile' => '42',
                     'tipo dato' => '2',
-                    'data iniziale' => New \DateTime(),
-                    'data finale' => New \DateTime(),
-                    'data attivazione' => New \DateTime(),
-                    'data disattivazione' => New \DateTime()
+                    'data iniziale' => new \DateTime(),
+                    'data finale' => new \DateTime(),
+                    'data attivazione' => new \DateTime(),
+                    'data disattivazione' => new \DateTime()
                 ],
                 'localToGMT-1' => false,
                 'output' => [
                     'variabile' => '42',
                     'tipo dato' => '2',
-                    'data iniziale' => New \DateTime(),
-                    'data finale' => New \DateTime(),
-                    'data attivazione' => New \DateTime(),
-                    'data disattivazione' => New \DateTime()
+                    'data iniziale' => new \DateTime(),
+                    'data finale' => new \DateTime(),
+                    'data attivazione' => new \DateTime(),
+                    'data disattivazione' => new \DateTime()
                 ]
             ],
             'sfiori l->s' => [
@@ -552,7 +552,7 @@ class ToolsTest extends TestCase {
     /**
      * coversNothing
      */
-    public function utcProvider() : array   
+    public function utcProvider() : array
     {
         $data = [
             'marzo: solare(GMT-1)-> solare(local)' => [
@@ -611,7 +611,7 @@ class ToolsTest extends TestCase {
     /**
      * coversNothing
      */
-    public function queryProvider() : array   
+    public function queryProvider() : array
     {
         $data = [
             'scarichi' => [
@@ -619,28 +619,28 @@ class ToolsTest extends TestCase {
                 'query_scarichi',
                 [
                     '30030'
-                ]                
+                ]
             ],
             'variabili_scarichi' => [
                 'dbcore',
                 'query_variabili_scarichi',
                 [
                     '1'
-                ]                
+                ]
             ],
             'variabili_SSCP' => [
                 'SSCP_data',
                 'query_variabili',
                 [
                     '42'
-                ]                
+                ]
             ],
             'variabili_SPT' => [
                 'SPT',
                 'query_variabili',
                 [
                     '165071'
-                ]                
+                ]
             ],
             'dati_acquisiti' => [
                 'SSCP_data',
@@ -652,14 +652,14 @@ class ToolsTest extends TestCase {
                     '01/02/2020 00:00:00',
                     '01/01/2020 00:00:00',
                     '01/02/2020 00:00:00'
-                ]                
+                ]
             ],
             'sfiori' => [
                 'dbcore',
                 'query_sfiori',
                 [
                     '1'
-                ]                
+                ]
             ]
         ];
     
@@ -669,7 +669,7 @@ class ToolsTest extends TestCase {
     /**
      * coversNothing
      */
-    public function dbNameProvider() : array   
+    public function dbNameProvider() : array
     {
         $data = [
             'dbcore' => [
@@ -695,7 +695,7 @@ class ToolsTest extends TestCase {
     /**
      * coversNothing
      */
-    public function nullProvider() : array   
+    public function nullProvider() : array
     {
         $data = [
             'null' => [
@@ -717,7 +717,7 @@ class ToolsTest extends TestCase {
     /**
      * coversNothing
      */
-    public function datesProvider() : array   
+    public function datesProvider() : array
     {
         $data = [
             'from' => [
@@ -744,11 +744,11 @@ class ToolsTest extends TestCase {
     /**
      * coversNothing
      */
-    public function resultsProvider() : array    
+    public function resultsProvider() : array
     {
-        $data = $this->datesProvider();        
+        $data = $this->datesProvider();
         
-        $res = [            
+        $res = [
             'from' => [
                 '01/01/2020',
                 date('d/m/Y')
@@ -770,7 +770,7 @@ class ToolsTest extends TestCase {
     /**
      * coversNothing
      */
-    public function dateTimesProvider() : array   
+    public function dateTimesProvider() : array
     {
         $data = [
             'times and format' => [
@@ -856,7 +856,7 @@ class ToolsTest extends TestCase {
                     'var' => '30030',
                     'datefrom' => '01/01/2020',
                     'dateto' => '01/02/2020',
-                    'field' => 'livello' 
+                    'field' => 'livello'
                 ]
             ]
         ];
@@ -865,7 +865,7 @@ class ToolsTest extends TestCase {
     }
     
     /**
-     * coversNothing     * 
+     * coversNothing     *
      */
     public function responseUrlProvider() : array
     {
@@ -909,7 +909,7 @@ class ToolsTest extends TestCase {
                     'datefrom' => '01/01/2020',
                     'dateto' => '01/02/2020',
                     'full' => '1',
-                    'field' => 'livello' 
+                    'field' => 'livello'
                 ]
             ]
         ];
@@ -922,7 +922,7 @@ class ToolsTest extends TestCase {
     /**
      * coversNothing
      */
-    public function fieldsProvider() : array    
+    public function fieldsProvider() : array
     {
         $data = [
             'null' => [
@@ -974,7 +974,7 @@ class ToolsTest extends TestCase {
                     'field' => 'volume'
                 ],
                 'volume'
-            ]            
+            ]
         ];
         
         return $data;
@@ -999,7 +999,7 @@ class ToolsTest extends TestCase {
      */
     public function testCheckFilterTrue1() : void
     {
-        $request = array();
+        $request = [];
         
         $this->assertTrue(
             checkFilter($request)
@@ -1012,7 +1012,7 @@ class ToolsTest extends TestCase {
      */
     public function testCheckFilterTrue2() : void
     {
-        $request = array('var' => '30030');
+        $request = ['var' => '30030'];
         
         $this->assertTrue(
             checkFilter($request)
@@ -1025,12 +1025,12 @@ class ToolsTest extends TestCase {
      */
     public function testCheckFilterTrue3() : void
     {
-        $request = array('full' => '1');
+        $request = ['full' => '1'];
         
         $this->assertTrue(
             checkFilter($request)
         );
-    }     
+    }
     
     /**
      * @group tools
@@ -1038,7 +1038,7 @@ class ToolsTest extends TestCase {
      */
     public function testCheckFilterNotTrue() : void
     {
-        $request = array('full' => '0');
+        $request = ['full' => '0'];
         
         $this->assertNotTrue(
             checkFilter($request)
@@ -1051,12 +1051,12 @@ class ToolsTest extends TestCase {
      */
     public function testCheckFilterException() : void
     {
-        $request = array('full' => 'true');
+        $request = ['full' => 'true'];
         
         $this->expectException(\Exception::class);
         
-        checkFilter($request);        
-    } 
+        checkFilter($request);
+    }
     
     /**
      * @group tools
@@ -1077,7 +1077,7 @@ class ToolsTest extends TestCase {
      */
     public function testCheckVariableException2() : void
     {
-        $request = array();
+        $request = [];
         
         $this->expectException(\Exception::class);
         
@@ -1090,7 +1090,7 @@ class ToolsTest extends TestCase {
      */
     public function testCheckVariableException3() : void
     {
-        $request = array('full' => '0');
+        $request = ['full' => '0'];
         
         $this->expectException(\Exception::class);
         
@@ -1103,11 +1103,11 @@ class ToolsTest extends TestCase {
      */
     public function testCheckVariableException4() : void
     {
-        $input = array('var', 'variable', 'variabile');
+        $input = ['var', 'variable', 'variabile'];
         
         $rand_keys = array_rand($input);
         
-        $request = array($input[$rand_keys] => '');
+        $request = [$input[$rand_keys] => ''];
         
         $this->expectException(\Exception::class);
         
@@ -1120,7 +1120,7 @@ class ToolsTest extends TestCase {
      */
     public function testCheckVariableException5() : void
     {
-        $keys = array('var', 'variable', 'variabile');
+        $keys = ['var', 'variable', 'variabile'];
         
         $rand_keys = array_rand($keys);
         
@@ -1128,11 +1128,11 @@ class ToolsTest extends TestCase {
         
         $valueHigh = strval(rand(40000, 999999));
         
-        $values = array($valueLow, $valueHigh);
+        $values = [$valueLow, $valueHigh];
         
         $rand_values = array_rand($values);
         
-        $request = array($keys[$rand_keys] => $values[$rand_values]);
+        $request = [$keys[$rand_keys] => $values[$rand_values]];
         
         $this->expectException(\Exception::class);
         
@@ -1145,17 +1145,17 @@ class ToolsTest extends TestCase {
      */
     public function testCheckVariableIsString() : void
     {
-        $input = array('var', 'variable', 'variabile');
+        $input = ['var', 'variable', 'variabile'];
         
         $rand_keys = array_rand($input);
         
         $value = strval(rand(30000, 39999));
                 
-        $request = array($input[$rand_keys] => $value);
+        $request = [$input[$rand_keys] => $value];
         
-        $this->assertIsString(            
+        $this->assertIsString(
             checkVariable($request)
-        );        
+        );
     }
     
     /**
@@ -1163,13 +1163,13 @@ class ToolsTest extends TestCase {
      * covers checkVariable()
      */
     public function testCheckVariableEquals() : void
-    {                        
-        $request = array('var' => '30030');
+    {
+        $request = ['var' => '30030'];
         
         $this->assertEquals(
             '30030',
             checkVariable($request)
-        );        
+        );
     }
     
     /**
@@ -1232,9 +1232,9 @@ class ToolsTest extends TestCase {
     {
         $date = '31/12/2020';
         
-        $this->assertIsString(            
+        $this->assertIsString(
             formatDate($date)
-        );        
+        );
     }
     
     /**
@@ -1248,7 +1248,7 @@ class ToolsTest extends TestCase {
         $this->assertEquals(
             '2020-12-31',
             formatDate($date)
-        );        
+        );
     }
     
     /**
@@ -1324,9 +1324,9 @@ class ToolsTest extends TestCase {
     {
         $dateTime = '31/12/2020 21:30:00';
         
-        $this->assertIsString(            
+        $this->assertIsString(
             formatDateTime($dateTime)
-        );        
+        );
     }
     
     /**
@@ -1340,16 +1340,16 @@ class ToolsTest extends TestCase {
         $this->assertEquals(
             '2020-12-31 21:30:00',
             formatDateTime($dateTime)
-        );        
+        );
     }
     
     
     
     /**
-     * @group tools 
+     * @group tools
      * covers checkInterval()
      * @dataProvider datesProvider
-     */    
+     */
     public function testCheckIntervalIsArray(?array $data) : void
     {
         $result = checkInterval($data);
@@ -1360,10 +1360,10 @@ class ToolsTest extends TestCase {
     }
     
     /**
-     * @group tools 
+     * @group tools
      * covers checkInterval()
      * @dataProvider datesProvider
-     */ 
+     */
     public function testCheckIntervalArrayHasKey(?array $data) : void
     {
         $result = checkInterval($data);
@@ -1380,10 +1380,10 @@ class ToolsTest extends TestCase {
     }
 
     /**
-     * @group tools 
+     * @group tools
      * covers checkInterval()
      * @dataProvider datesProvider
-     */  
+     */
     public function testCheckIntervalIsObject(?array $data) : void
     {
         $result = checkInterval($data);
@@ -1398,10 +1398,10 @@ class ToolsTest extends TestCase {
     }
 
     /**
-     * @group tools 
+     * @group tools
      * covers checkInterval()
      * @dataProvider datesProvider
-     */  
+     */
     public function testCheckIntervalInstanceOf(?array $data) : void
     {
         $result = checkInterval($data);
@@ -1418,10 +1418,10 @@ class ToolsTest extends TestCase {
     }
     
     /**
-     * @group tools 
+     * @group tools
      * covers checkInterval()
      * @dataProvider resultsProvider
-     */  
+     */
     public function testCheckIntervalEquals(?array $input, string $datafrom, string $datato) : void
     {
         $result = checkInterval($input);
@@ -1434,20 +1434,20 @@ class ToolsTest extends TestCase {
         $this->assertEquals(
             $datato,
             $result['dateto']->format('d/m/Y')
-        ); 
+        );
     }
     
     /**
-     * @group tools 
+     * @group tools
      * covers checkInterval()
-     */  
+     */
     public function testCheckIntervalException() : void
     {
         $input = [];
         
         $this->expectException(\Exception::class);
         
-        checkInterval($input);                      
+        checkInterval($input);
     }
     
     
@@ -1466,12 +1466,12 @@ class ToolsTest extends TestCase {
     }
     
     /**
-     * @group tools 
+     * @group tools
      * covers setDatesTimes()
-     */  
+     */
     public function testSetDatesTimesEquals() : void
     {
-        $input = array('datefrom' => '01/01/2020 21:30:00', 'dateto' => '01/04/2020 21:30:00');
+        $input = ['datefrom' => '01/01/2020 21:30:00', 'dateto' => '01/04/2020 21:30:00'];
         $datafrom = '01/01/2020 21:30:00';
         $datato = '01/04/2020 21:30:00';
         
@@ -1485,7 +1485,7 @@ class ToolsTest extends TestCase {
         $this->assertEquals(
             $datato,
             $result['dateto']->format('d/m/Y H:i:s')
-        ); 
+        );
     }
        
     /**
@@ -1515,7 +1515,7 @@ class ToolsTest extends TestCase {
         $this->assertEquals(
             $expected['var'],
             $actual['var']
-        );        
+        );
     }
     
     /**
@@ -1530,7 +1530,7 @@ class ToolsTest extends TestCase {
         $this->assertEquals(
             $expected['full'],
             $actual['full']
-        );        
+        );
     }
     
     /**
@@ -1545,7 +1545,7 @@ class ToolsTest extends TestCase {
         $this->assertEquals(
             $expected['field'],
             $actual['field']
-        );        
+        );
     }
     
     /**
@@ -1560,12 +1560,12 @@ class ToolsTest extends TestCase {
         $this->assertEquals(
             $expected['datefrom'],
             $actual['datefrom']->format('d/m/Y')
-        ); 
+        );
         
         $this->assertEquals(
             $expected['dateto'],
             $actual['dateto']->format('d/m/Y')
-        ); 
+        );
     }
     
     /**
@@ -1577,20 +1577,20 @@ class ToolsTest extends TestCase {
     {
         $actual = checkField($data);
                 
-        $this->assertEquals($expected, $actual);        
+        $this->assertEquals($expected, $actual);
     }
     
     /**
      * @group tools
      * covers checkField()
      */
-    public function testCheckFieldException() : void  
+    public function testCheckFieldException() : void
     {
         $data = ['field' => 'pippo'];
         
         $this->expectException(\Exception::class);
         
-        checkField($data);           
+        checkField($data);
     }
         
     /**
@@ -1602,7 +1602,7 @@ class ToolsTest extends TestCase {
     {
         $actual = connect($data);
                 
-        $this->assertIsResource($actual);        
+        $this->assertIsResource($actual);
     }
     
     /**
@@ -1616,7 +1616,7 @@ class ToolsTest extends TestCase {
         $this->assertIsResource($actual);
 
         return $actual;
-    }    
+    }
     
     /**
      * @group tools
@@ -1639,7 +1639,7 @@ class ToolsTest extends TestCase {
     public function testQueryIsResource($conn) //: resource
     {
         $fileName = 'query_scarichi';
-        $paramValues = array('30030');
+        $paramValues = ['30030'];
         
         $actual = query($conn, $fileName, $paramValues);
                 
@@ -1656,7 +1656,7 @@ class ToolsTest extends TestCase {
     public function testQueryIsResource1($conn)  //: resource
     {
         $fileName = 'query_scarichi';
-        $paramValues = array('1');
+        $paramValues = ['1'];
         
         $actual = query($conn, $fileName, $paramValues);
                 
@@ -1687,7 +1687,7 @@ class ToolsTest extends TestCase {
     public function testQueryException($conn) : void
     {
         $fileName = 'query_scarichi';
-        $paramValues = array('');
+        $paramValues = [''];
         
         $this->expectException(\Exception::class);
         
@@ -1700,7 +1700,7 @@ class ToolsTest extends TestCase {
      * @depends testQueryIsResource
      */
     public function testFetchSame($stmt) : void
-    {        
+    {
         $expected = [
             0 => [
                 'scarico' => 1,
@@ -1722,8 +1722,8 @@ class ToolsTest extends TestCase {
      * @depends testQueryIsResource1
      */
     public function testFetchSame1($stmt) : void
-    {        
-        $expected = [];        
+    {
+        $expected = [];
         $actual = fetch($stmt);
                 
         $this->assertEquals($expected, $actual);
@@ -1734,12 +1734,12 @@ class ToolsTest extends TestCase {
      * covers fetch()
      */
     public function testFetchError() : void
-    {        
+    {
         $stmt = false;
         
         $this->expectError();
         
-        fetch($stmt);        
+        fetch($stmt);
     }
     
     /**
@@ -1748,7 +1748,7 @@ class ToolsTest extends TestCase {
      * @dataProvider utcProvider
      */
     public function testChangeTimeZoneEquals(string $dateIn, bool $isLocalToUTC, bool $format, string $expected) : void
-    {        
+    {
         $actual = changeTimeZone($dateIn, $isLocalToUTC, $format);
         
         $this->assertEquals($expected, $actual);
@@ -1762,7 +1762,7 @@ class ToolsTest extends TestCase {
      * @dataProvider changeTimeZoneExceptionProvider
      */
     public function testChangeTimeZoneException(string $dateIn) : void
-    {        
+    {
         $isLocalToUTC = true;
         $format = true;
         
@@ -1777,7 +1777,7 @@ class ToolsTest extends TestCase {
      * @dataProvider checkDatesProvider
      */
     public function testCheckDatesEqualsWithDelta(string $db, array $params, bool $isLocalToUTC, array $expecteds) : void
-    {      
+    {
         $actuals = checkDates($db, $params, $isLocalToUTC);
         
         foreach ($expecteds as $key => $value) {
@@ -1789,7 +1789,7 @@ class ToolsTest extends TestCase {
                 $expected = $value;
                 $actual = $actuals[$key];
                 $this->assertEquals($expected, $actual);
-            }            
+            }
         }
         
         foreach ($actuals as $key => $value) {
@@ -1811,7 +1811,7 @@ class ToolsTest extends TestCase {
      */
     public function testCheckDatesEmpty() : void
     {
-        $db = 'SPT';        
+        $db = 'SPT';
         $dates = [];
         $isLocalToUTC = true;
         
@@ -1823,24 +1823,24 @@ class ToolsTest extends TestCase {
     /**
      * @group tools
      * covers datesToString()
-     */    
+     */
     public function testDatesToStringIsString() : void
     {
         $dates = [
-            'data' => New \DateTime()
+            'data' => new \DateTime()
         ];
         
         $format = 'Y-m-d H:i:s';
         
         $actual = datesToString($dates, $format);
         
-        $this->assertIsString($actual['data']);      
+        $this->assertIsString($actual['data']);
     }
     
     /**
      * @group tools
      * covers datesToString()
-     */    
+     */
     public function testDatesToStringIsNotString() : void
     {
         $dates = [
@@ -1857,11 +1857,11 @@ class ToolsTest extends TestCase {
     /**
      * @group tools
      * covers datesToString()
-     */    
+     */
     public function testDatesToStringEquals() : void
     {
         $dates = [
-            'data' => New \DateTime('2020-10-01 23:45:56')
+            'data' => new \DateTime('2020-10-01 23:45:56')
         ];
         
         $format = 'd/m/Y H:i:s';
@@ -1878,14 +1878,14 @@ class ToolsTest extends TestCase {
     /**
      * @group tools
      * covers datesToString()
-     */    
+     */
     public function testDatesToStringException() : void
     {
         $dates = [
-            'data' => New \DateTime('2020-10-01 23:45:56')
+            'data' => new \DateTime('2020-10-01 23:45:56')
         ];
         
-        $format = 'pippo'; 
+        $format = 'pippo';
         
         $this->expectException(\Exception::class);
                 
@@ -1932,7 +1932,7 @@ class ToolsTest extends TestCase {
     
     /**
      * @group tools
-     * covers setToLocal()    
+     * covers setToLocal()
      */
     public function testSetToLocalEmpty() : void
     {
@@ -1941,7 +1941,7 @@ class ToolsTest extends TestCase {
         
         $actual = setToLocal($db, $dati);
         
-        $this->assertEmpty($actual);      
+        $this->assertEmpty($actual);
     }
     
     /**
@@ -1950,7 +1950,7 @@ class ToolsTest extends TestCase {
      * @dataProvider getDataFromDbProvider
      */
     public function testGetDataFromDbEquals(string $db, string $queryFileName, array $parametri, array $expected) : void
-    {        
+    {
         $actual = getDataFromDb($db, $queryFileName, $parametri);
         
         foreach ($expected as $row => $fields) {
@@ -1968,7 +1968,7 @@ class ToolsTest extends TestCase {
     
     /**
      * @group index
-     * covers getDataFromDb() 
+     * covers getDataFromDb()
      */
     public function testGetDataFromDbExceptions()
     {
@@ -1976,7 +1976,7 @@ class ToolsTest extends TestCase {
         $queryFileName = 'query_scarichi';
         $parametri = [
             'variabile' => null
-        ]; 
+        ];
                 
         $this->expectException(\Exception::class);
         
@@ -1985,7 +1985,7 @@ class ToolsTest extends TestCase {
 
     /**
      * @group index
-     * covers getDataFromDb() 
+     * covers getDataFromDb()
      */
     public function testGetDataFromDbEmpty()
     {
@@ -1997,15 +1997,15 @@ class ToolsTest extends TestCase {
                 
         $actual = getDataFromDb($db, $queryFileName, $parametri);
         
-        $this->assertEmpty($actual); 
-    }  
+        $this->assertEmpty($actual);
+    }
     
     /**
      * @group depends
      * covers initVolumi()
      */
     public function testInitVolumiEquals() : array
-    {        
+    {
         $variabili = [
             'id_variabile' => 30030,
             'impianto' => 75,
@@ -2016,13 +2016,13 @@ class ToolsTest extends TestCase {
             '0' => [
                 'variabile' => 165071,
                 'valore' => 266.206,
-                'data_e_ora' => New \DateTime('2018-01-02 00:00:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'tipo_dato' => 2
             ],
             '1' => [
                 'variabile' => 165071,
                 'valore' => 266.140,
-                'data_e_ora' => New \DateTime('2018-01-02 00:15:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'tipo_dato' => 2
             ]
         ];
@@ -2030,12 +2030,12 @@ class ToolsTest extends TestCase {
         $expected = [
             '0' => [
                 'variabile' => 30030,
-                'data_e_ora' => New \DateTime('2018-01-02 00:00:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'tipo_dato' => 1
             ],
             '1' => [
                 'variabile' => 30030,
-                'data_e_ora' => New \DateTime('2018-01-02 00:15:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'tipo_dato' => 1
             ]
         ];
@@ -2053,7 +2053,7 @@ class ToolsTest extends TestCase {
                 $this->assertEquals($value, $actual[$row][$key]);
             }
         }
-        return $actual;        
+        return $actual;
     }
     
     /**
@@ -2061,7 +2061,7 @@ class ToolsTest extends TestCase {
      * covers initVolumi()
      */
     public function testInitVolumiException() : array
-    {        
+    {
         $variabili = [
             'id_variabile' => 30030,
             'impianto' => 75,
@@ -2078,21 +2078,21 @@ class ToolsTest extends TestCase {
     /**
      * @group depends
      * covers addLivello()
-     * @depends testInitVolumiEquals     
+     * @depends testInitVolumiEquals
      */
     public function testAddLivelloEquals(array $volumi) : array
-    {            
+    {
         $dati = [
             '0' => [
                 'variabile' => 165071,
                 'valore' => 266.206,
-                'data_e_ora' => New \DateTime('2018-01-02 00:00:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'tipo_dato' => 2
             ],
             '1' => [
                 'variabile' => 165071,
                 'valore' => 266.140,
-                'data_e_ora' => New \DateTime('2018-01-02 00:15:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'tipo_dato' => 2
             ]
         ];
@@ -2100,13 +2100,13 @@ class ToolsTest extends TestCase {
         $expected = [
             '0' => [
                 'variabile' => 30030,
-                'data_e_ora' => New \DateTime('2018-01-02 00:00:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
                 'tipo_dato' => 1
             ],
             '1' => [
                 'variabile' => 30030,
-                'data_e_ora' => New \DateTime('2018-01-02 00:15:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'livello' => 266.140,
                 'tipo_dato' => 1
             ]
@@ -2134,31 +2134,31 @@ class ToolsTest extends TestCase {
      * @depends testInitVolumiEquals
      */
     public function testAddLivelloException(array $volumi) : array
-    {            
+    {
         $dati = [
             '0' => [
                 'variabile' => 165071,
                 'valore' => 266.206,
-                'data_e_ora' => New \DateTime('2018-01-02 00:00:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'tipo_dato' => 2
             ],
             '1' => [
                 'variabile' => 165071,
                 'valore' => 266.140,
-                'data_e_ora' => New \DateTime('2018-01-02 00:15:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'tipo_dato' => 2
             ],
             '2' => [
                 'variabile' => 165071,
                 'valore' => 266.127,
-                'data_e_ora' => New \DateTime('2018-01-02 00:30:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:30:00'),
                 'tipo_dato' => 2
             ]
         ];
         
         $this->expectException(\Exception::class);
         
-        $actual = addLivello($volumi, $dati);       
+        $actual = addLivello($volumi, $dati);
     }
     
     /**
@@ -2167,25 +2167,25 @@ class ToolsTest extends TestCase {
      * @depends testInitVolumiEquals
      */
     public function testAddLivelloException1(array $volumi) : void
-    {            
+    {
         $dati = [
             '0' => [
                 'variabile' => 165071,
                 'valore' => 266.206,
-                'data_e_ora' => New \DateTime('2018-01-02 00:00:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'tipo_dato' => 2
             ],
             '1' => [
                 'variabile' => 165071,
                 'valore' => 266.140,
-                'data_e_ora' => New \DateTime('2018-01-02 00:30:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:30:00'),
                 'tipo_dato' => 2
             ]
         ];
         
         $this->expectException(\Exception::class);
         
-        $actual = addLivello($volumi, $dati);       
+        $actual = addLivello($volumi, $dati);
     }
     
     /**
@@ -2194,22 +2194,22 @@ class ToolsTest extends TestCase {
      * @depends testAddLivelloEquals
      */
     public function testAddMediaEquals(array $volumi) : array
-    {         
+    {
         $campo = 'livello';
         
         $expected = [
             '0' => [
                 'variabile' => 30030,
-                'data_e_ora' => New \DateTime('2018-01-02 00:00:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
                 'media' => 266.206,
                 'tipo_dato' => 1
             ],
             '1' => [
                 'variabile' => 30030,
-                'data_e_ora' => New \DateTime('2018-01-02 00:15:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'livello' => 266.140,
-                'media' => 266.173,                
+                'media' => 266.173,
                 'tipo_dato' => 1
             ]
         ];
@@ -2236,14 +2236,12 @@ class ToolsTest extends TestCase {
      * @depends testAddLivelloEquals
      */
     public function testAddMediaException(array $volumi) : void
-    {         
+    {
         $campo = 'pippo';
         
         $this->expectException(\Exception::class);
         
         $actual = addMedia($volumi, $campo);
-        
-        
     }
     
     /**
@@ -2252,7 +2250,7 @@ class ToolsTest extends TestCase {
      * @depends testAddMediaEquals
      */
     public function testAddAltezzaEquals(array $volumi) : array
-    {         
+    {
         $quota = 266.180;
         
         $campo = 'media';
@@ -2260,7 +2258,7 @@ class ToolsTest extends TestCase {
         $expected = [
             '0' => [
                 'variabile' => 30030,
-                'data_e_ora' => New \DateTime('2018-01-02 00:00:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
                 'media' => 266.206,
                 'altezza' => 0.026,
@@ -2268,7 +2266,7 @@ class ToolsTest extends TestCase {
             ],
             '1' => [
                 'variabile' => 30030,
-                'data_e_ora' => New \DateTime('2018-01-02 00:15:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'livello' => 266.140,
                 'media' => 266.173,
                 'altezza' => -0.007,
@@ -2298,14 +2296,14 @@ class ToolsTest extends TestCase {
      * @depends testAddMediaEquals
      */
     public function testAddAltezzaException(array $volumi) : array
-    {         
+    {
         $quota = 266.180;
         
         $campo = 'pippo';
         
         $this->expectException(\Exception::class);
         
-        addAltezza($volumi, $quota, $campo); 
+        addAltezza($volumi, $quota, $campo);
     }
     
     /**
@@ -2314,7 +2312,7 @@ class ToolsTest extends TestCase {
      * @depends testAddMediaEquals
      */
     public function testAddAltezzaException1(array $volumi) : array
-    {         
+    {
         $quota = null;
         
         $campo = 'media';
@@ -2330,19 +2328,19 @@ class ToolsTest extends TestCase {
      * @depends testAddAltezzaEquals
      */
     public function testAddPortataEqualsWithDelta(array $volumi) : array
-    {         
-        $specifiche = [            
+    {
+        $specifiche = [
             'scarico' => 1,
             'mi' => 0.47,
             'larghezza' => 40.5,
             'quota' => 276.5,
-            'limite' => 942.67            
+            'limite' => 942.67
         ];
         
         $expected = [
             '0' => [
                 'variabile' => 30030,
-                'data_e_ora' => New \DateTime('2018-01-02 00:00:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
                 'media' => 266.206,
                 'altezza' => 0.026,
@@ -2351,7 +2349,7 @@ class ToolsTest extends TestCase {
             ],
             '1' => [
                 'variabile' => 30030,
-                'data_e_ora' => New \DateTime('2018-01-02 00:15:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'livello' => 266.140,
                 'media' => 266.173,
                 'altezza' => -0.007,
@@ -2382,19 +2380,19 @@ class ToolsTest extends TestCase {
      * @depends testAddAltezzaEquals
      */
     public function testAddPortataEqualsWithDelta1(array $volumi) : void
-    {         
-        $specifiche = [            
+    {
+        $specifiche = [
             'scarico' => 1,
             'mi' => 0.47,
             'larghezza' => 40.5,
             'quota' => 276.5,
-            'limite' => 0.35            
+            'limite' => 0.35
         ];
         
         $expected = [
             '0' => [
                 'variabile' => 30030,
-                'data_e_ora' => New \DateTime('2018-01-02 00:00:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
                 'media' => 266.206,
                 'altezza' => 0.026,
@@ -2403,7 +2401,7 @@ class ToolsTest extends TestCase {
             ],
             '1' => [
                 'variabile' => 30030,
-                'data_e_ora' => New \DateTime('2018-01-02 00:15:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'livello' => 266.140,
                 'media' => 266.173,
                 'altezza' => -0.007,
@@ -2433,8 +2431,8 @@ class ToolsTest extends TestCase {
      * @depends testAddAltezzaEquals
      */
     public function testAddPortataException(array $volumi) : array
-    {         
-        $specifiche = [];    
+    {
+        $specifiche = [];
         
         $this->expectException(\Exception::class);
                 
@@ -2447,13 +2445,13 @@ class ToolsTest extends TestCase {
      * @depends testAddPortataEqualsWithDelta
      */
     public function testAddDeltaEqualsWithDelta(array $volumi) : array
-    {         
+    {
         $campo = 'data_e_ora';
         
         $expected = [
             '0' => [
                 'variabile' => 30030,
-                'data_e_ora' => New \DateTime('2018-01-02 00:00:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
                 'media' => 266.206,
                 'altezza' => 0.026,
@@ -2463,7 +2461,7 @@ class ToolsTest extends TestCase {
             ],
             '1' => [
                 'variabile' => 30030,
-                'data_e_ora' => New \DateTime('2018-01-02 00:15:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'livello' => 266.140,
                 'media' => 266.173,
                 'altezza' => -0.007,
@@ -2495,12 +2493,12 @@ class ToolsTest extends TestCase {
      * @depends testAddPortataEqualsWithDelta
      */
     public function testAddDeltaException(array $volumi) : void
-    {         
+    {
         $campo = 'pippo';
         
         $this->expectException(\Exception::class);
         
-        $actual = addDelta($volumi, $campo);    
+        $actual = addDelta($volumi, $campo);
     }
     
     /**
@@ -2509,12 +2507,12 @@ class ToolsTest extends TestCase {
      * @depends testAddPortataEqualsWithDelta
      */
     public function testAddDeltaException1(array $volumi) : void
-    {         
+    {
         $campo = 'livello';
         
         $this->expectException(\Exception::class);
         
-        $actual = addDelta($volumi, $campo);    
+        $actual = addDelta($volumi, $campo);
     }
     
     /**
@@ -2527,7 +2525,7 @@ class ToolsTest extends TestCase {
         $expected = [
             '0' => [
                 'variabile' => 30030,
-                'data_e_ora' => New \DateTime('2018-01-02 00:00:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
                 'media' => 266.206,
                 'altezza' => 0.026,
@@ -2538,7 +2536,7 @@ class ToolsTest extends TestCase {
             ],
             '1' => [
                 'variabile' => 30030,
-                'data_e_ora' => New \DateTime('2018-01-02 00:15:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'livello' => 266.140,
                 'media' => 266.173,
                 'altezza' => -0.007,
@@ -2574,7 +2572,7 @@ class ToolsTest extends TestCase {
         $data = [
             '0' => [
                 'variabile' => 30030,
-                'data_e_ora' => New \DateTime('2018-01-02 00:00:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
                 'media' => 266.206,
                 'altezza' => 0.026,
@@ -2596,7 +2594,7 @@ class ToolsTest extends TestCase {
         $data = [
             '0' => [
                 'variabile' => 30030,
-                'data_e_ora' => New \DateTime('2018-01-02 00:00:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
                 'media' => 266.206,
                 'altezza' => 0.026,
@@ -2619,7 +2617,7 @@ class ToolsTest extends TestCase {
         $data = [
             '0' => [
                 'variabile' => 30030,
-                'data_e_ora' => New \DateTime('2018-01-02 00:00:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
                 'media' => 266.206,
                 'altezza' => 0.026,
@@ -2646,13 +2644,13 @@ class ToolsTest extends TestCase {
             '0' => [
                 'variabile' => '30030',
                 'valore' => '0',
-                'data_e_ora' => '02/01/2018 00:00:00',     
+                'data_e_ora' => '02/01/2018 00:00:00',
                 'tipo_dato' => '1'
             ],
             '1' => [
-                'variabile' => '30030',                
+                'variabile' => '30030',
                 'valore' => '0',
-                'data_e_ora' => '02/01/2018 00:15:00',                
+                'data_e_ora' => '02/01/2018 00:15:00',
                 'tipo_dato' => '1'
             ]
         ];
@@ -2676,23 +2674,23 @@ class ToolsTest extends TestCase {
     /**
      * @group depends
      * covers format()
-     * @depends testAddVolumeEqualsWithDelta    
+     * @depends testAddVolumeEqualsWithDelta
      */
     public function testFormatEquals1(array $volumi) : void
-    {        
+    {
         $campo = 'altezza';
         
         $expected = [
             '0' => [
                 'variabile' => '30030',
                 'valore' => '0,026',
-                'data_e_ora' => '02/01/2018 00:00:00',     
+                'data_e_ora' => '02/01/2018 00:00:00',
                 'tipo_dato' => '1'
             ],
             '1' => [
-                'variabile' => '30030',                
+                'variabile' => '30030',
                 'valore' => '-0,007',
-                'data_e_ora' => '02/01/2018 00:15:00',                
+                'data_e_ora' => '02/01/2018 00:15:00',
                 'tipo_dato' => '1'
             ]
         ];
@@ -2715,23 +2713,23 @@ class ToolsTest extends TestCase {
     /**
      * @group depends
      * covers format()
-     * @depends testAddVolumeEqualsWithDelta    
+     * @depends testAddVolumeEqualsWithDelta
      */
     public function testFormatEquals2(array $volumi) : array
-    {        
+    {
         $campo = 'delta';
         
         $expected = [
             '0' => [
                 'variabile' => '30030',
                 'valore' => '0',
-                'data_e_ora' => '02/01/2018 00:00:00',     
+                'data_e_ora' => '02/01/2018 00:00:00',
                 'tipo_dato' => '1'
             ],
             '1' => [
-                'variabile' => '30030',                
+                'variabile' => '30030',
                 'valore' => '900',
-                'data_e_ora' => '02/01/2018 00:15:00',                
+                'data_e_ora' => '02/01/2018 00:15:00',
                 'tipo_dato' => '1'
             ]
         ];
@@ -2757,14 +2755,14 @@ class ToolsTest extends TestCase {
      * covers format()
      */
     public function testFormatEquals3() : array
-    {        
+    {
         $campo = 'dummy';
         
         $volumi = [
             '0' => [
                 'variabile' => 30030,
                 'dummy' => 'dummy',
-                'data_e_ora' => New \DateTime('2018-01-02 00:00:00'),
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
                 'media' => 266.206,
                 'altezza' => 0.026,
@@ -2779,7 +2777,7 @@ class ToolsTest extends TestCase {
             '0' => [
                 'variabile' => '30030',
                 'valore' => 'dummy',
-                'data_e_ora' => '02/01/2018 00:00:00',     
+                'data_e_ora' => '02/01/2018 00:00:00',
                 'tipo_dato' => '1'
             ]
         ];
@@ -2803,15 +2801,15 @@ class ToolsTest extends TestCase {
     /**
      * @group depends
      * covers format()
-     * @depends testAddVolumeEqualsWithDelta    
+     * @depends testAddVolumeEqualsWithDelta
      */
     public function testFormatException(array $volumi) : void
-    {        
+    {
         $campo = 'pippo';
         
         $this->expectException(\Exception::class);
         
-        $actual = format($volumi, $campo);       
+        $actual = format($volumi, $campo);
     }
     
     /**
@@ -2827,13 +2825,13 @@ class ToolsTest extends TestCase {
             '0' => [
                 'variabile' => '30030',
                 'valore' => '0',
-                'data_e_ora' => '02/01/2018 00:00:00',     
+                'data_e_ora' => '02/01/2018 00:00:00',
                 'tipo_dato' => '1'
             ],
             '1' => [
-                'variabile' => '30030',                
+                'variabile' => '30030',
                 'valore' => '0',
-                'data_e_ora' => '02/01/2018 00:15:00',                
+                'data_e_ora' => '02/01/2018 00:15:00',
                 'tipo_dato' => '1'
             ]
         ];
@@ -2865,9 +2863,9 @@ class ToolsTest extends TestCase {
         
         $expected = [
             '1' => [
-                'variabile' => '30030',                
+                'variabile' => '30030',
                 'valore' => '900',
-                'data_e_ora' => '02/01/2018 00:15:00',                
+                'data_e_ora' => '02/01/2018 00:15:00',
                 'tipo_dato' => '1'
             ]
         ];
@@ -2910,9 +2908,9 @@ class ToolsTest extends TestCase {
         $full = false;
         $volumi = [
             '0' => [
-                'variabile' => '30030',                
+                'variabile' => '30030',
                 'dummy' => '900',
-                'data_e_ora' => '02/01/2018 00:15:00',                
+                'data_e_ora' => '02/01/2018 00:15:00',
                 'tipo_dato' => '1'
             ]
         ];
@@ -2939,11 +2937,11 @@ class ToolsTest extends TestCase {
      * covers setFile()
      */
     public function testSetFileException() : void
-    {        
+    {
         $variabile = '30030';
         $dates = [
-            'datefrom' => New \DateTime('2018-01-02 00:15:00'),
-            'dateto' => New \DateTime('2020-04-01 23:59:59')
+            'datefrom' => new \DateTime('2018-01-02 00:15:00'),
+            'dateto' => new \DateTime('2020-04-01 23:59:59')
         ];
         $filtered = false;
         $field = 'volume';
@@ -2956,7 +2954,7 @@ class ToolsTest extends TestCase {
     
     /**
      * @group csv
-     * covers printToCSV()    
+     * covers printToCSV()
      */
     public function testPrintToCsvFileExists() : void
     {
@@ -2980,8 +2978,8 @@ class ToolsTest extends TestCase {
                 'data_e_ora' => '25/03/2018 21:00:00',
                 'tipo_dato' => '1',
                 'valore' => '2278,234'
-            ]    
-        ];       
+            ]
+        ];
         
         printToCSV($dati, $fileName);
         
@@ -2990,11 +2988,11 @@ class ToolsTest extends TestCase {
     
     /**
      * @group csv
-     * covers printToCSV()    
+     * covers printToCSV()
      */
     public function testPrintToCsvException() : void
     {
-        $fileName = __DIR__ . '/../pippo/providers/test_locked.csv';
+        $fileName = __DIR__ . '/../pippo/providers/test.csv';
         
         $dati = [
             '0' => [
@@ -3002,7 +3000,7 @@ class ToolsTest extends TestCase {
                 'data_e_ora' => '25/03/2018 20:30:00',
                 'tipo_dato' => '1',
                 'valore' => '2221,930'
-            ]    
+            ]
         ];
         
         $this->expectException(\Exception::class);
@@ -3025,7 +3023,7 @@ class ToolsTest extends TestCase {
     
     /**
      * @group csv
-     * covers printToCSV()    
+     * covers printToCSV()
      * @dataProvider printToCsvProvider
      */
     public function testPrintToCsvEquals() : void
@@ -3076,7 +3074,7 @@ class ToolsTest extends TestCase {
                 'data_e_ora' => '25/03/2018 21:00:00',
                 'tipo_dato' => '1',
                 'valore' => '2278,234'
-            ]    
+            ]
         ];
         
         $expected = CSV . '/Livello_30030_201803252030_201803252045_full.csv';
@@ -3114,7 +3112,7 @@ class ToolsTest extends TestCase {
                 'data_e_ora' => '25/03/2018 21:00:00',
                 'tipo_dato' => '1',
                 'valore' => '2278,234'
-            ]    
+            ]
         ];
         
         $this->expectException(\Exception::class);
@@ -3128,7 +3126,7 @@ class ToolsTest extends TestCase {
      * @depends testFilterEquals
      */
     public function testDivideAndPrintFileExists(array $volumi) : void
-    {        
+    {
         $full = true;
         $field = 'delta';
         $limit = 1;
@@ -3142,7 +3140,7 @@ class ToolsTest extends TestCase {
         
         foreach ($expecteds as $row => $expected) {
             $this->assertFileExists($expected);
-        }       
+        }
     }
     
     /**
@@ -3151,7 +3149,7 @@ class ToolsTest extends TestCase {
      * @depends testFilterEquals
      */
     public function testDivideAndPrintFileExists1(array $volumi) : void
-    {        
+    {
         $full = true;
         $field = 'delta';
         
@@ -3163,15 +3161,15 @@ class ToolsTest extends TestCase {
         
         foreach ($expecteds as $row => $expected) {
             $this->assertFileExists($expected);
-        }       
+        }
     }
     
     /**
      * @group depends
-     * covers divideAndPrint()    
+     * covers divideAndPrint()
      */
     public function testDivideAndPrintFalse() : void
-    {        
+    {
         $full = true;
         $field = 'delta';
         $limit = 100;
@@ -3186,10 +3184,10 @@ class ToolsTest extends TestCase {
     /**
      * @group depends
      * covers divideAndPrint()
-     * @depends testFilterEquals    
+     * @depends testFilterEquals
      */
     public function testDivideAndPrintTrue(array $dati) : void
-    {        
+    {
         $full = true;
         $field = 'delta';
         $limit = 100;
@@ -3202,10 +3200,10 @@ class ToolsTest extends TestCase {
     
     /**
      * @group depends
-     * covers divideAndPrint()    
+     * covers divideAndPrint()
      */
     public function testDivideAndPrintException() : void
-    {        
+    {
         $full = true;
         $field = 'delta';
         $limit = 0;
@@ -3221,7 +3219,7 @@ class ToolsTest extends TestCase {
         
         $this->expectException(\Exception::class);
         
-        divideAndPrint($dati, $full, $field, $limit);               
+        divideAndPrint($dati, $full, $field, $limit);
     }
     
     /**
@@ -3230,12 +3228,12 @@ class ToolsTest extends TestCase {
      */
     public function testCheckNullEquals() : void
     {
-        $input = '30040';        
+        $input = '30040';
         $expected = '30040';
         
         $actual = checkNull($input);
         
-        $this->assertEquals($expected, $actual);        
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -3244,11 +3242,11 @@ class ToolsTest extends TestCase {
      */
     public function testCheckNullException() : void
     {
-        $input = null; 
+        $input = null;
         
         $this->expectException(\Exception::class);
         
-        checkNull($input);      
+        checkNull($input);
     }
     
     /**
@@ -3273,8 +3271,8 @@ class ToolsTest extends TestCase {
         
         $request = [
             'var' => '30030',
-            'datefrom' => New \DateTime('2017-01-01 00:00:00'),
-            'dateto' => New \DateTime('2017-01-02 00:00:00'),
+            'datefrom' => new \DateTime('2017-01-01 00:00:00'),
+            'dateto' => new \DateTime('2017-01-02 00:00:00'),
             'full' => '1'
         ];
         
@@ -3293,8 +3291,8 @@ class ToolsTest extends TestCase {
         
         $request = [
             'var' => '30030',
-            'datefrom' => New \DateTime('2017-01-01 00:00:00'),
-            'dateto' => New \DateTime('2017-01-02 00:00:00'),
+            'datefrom' => new \DateTime('2017-01-01 00:00:00'),
+            'dateto' => new \DateTime('2017-01-02 00:00:00'),
             'full' => '1',
             'field' => 'volume',
             'pippo' => 'pippo'
@@ -3312,17 +3310,15 @@ class ToolsTest extends TestCase {
     
     public function testErrorHandlerIsString() : void
     {
-        try {            
+        try {
             if (true) {
                 throw new \Exception('Test if errorHandler() return a string');
             }
-            
         } catch (\Exception $e) {
-            
             $actual = errorHandler($e);
 
             $this->assertIsString($actual);
-        }        
+        }
     }
     
     /**

@@ -9,7 +9,6 @@ $queryString = "SELECT
                 WHERE
                     id_variabile = ?variabile?";
 
-$paramNames = array(
+$paramNames = [
     '?variabile?'
-);
-
+];

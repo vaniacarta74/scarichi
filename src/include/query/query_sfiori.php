@@ -11,7 +11,6 @@ $queryString = "SELECT
                 WHERE
                     scarico = ?scarico?";
 
-$paramNames = array(
+$paramNames = [
     '?scarico?'
-);
-
+];

@@ -4,8 +4,8 @@ namespace vaniacarta74\scarichi\tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 
-
-class IndexTest extends TestCase {   
+class IndexTest extends TestCase
+{
     
     /**
      * coversNothing
@@ -96,7 +96,7 @@ class IndexTest extends TestCase {
      * @dataProvider indexProvider
      */
     public function testIndexEquals(?string $var, ?string $dateFrom, ?string $dateTo, ?string $full, ?string $field, ?string $expected) : void
-    {        
+    {
         $paramsRaw = [
             'var' => $var,
             'datefrom' => $dateFrom,
@@ -105,7 +105,9 @@ class IndexTest extends TestCase {
             'field' => $field
         ];
         
-        $params = array_filter($paramsRaw, function($value) { return !is_null($value) && $value !== ''; });
+        $params = array_filter($paramsRaw, function ($value) {
+            return !is_null($value) && $value !== '';
+        });
         
         $ch = curl_init();
         
@@ -119,8 +121,8 @@ class IndexTest extends TestCase {
         
         $actual = curl_exec($ch);
         
-        curl_close($ch);       
+        curl_close($ch);
         
-        $this->assertEquals($expected, $actual);      
+        $this->assertEquals($expected, $actual);
     }
 }

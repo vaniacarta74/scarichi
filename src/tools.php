@@ -6,17 +6,17 @@ require_once('php_MSSQL_router.inc.php');
 
 function printErrorInfo(string $functionName) : void
 {
-    $date = New DateTime();
-    echo $date->format('d/m/Y H:i:s') . ': Errore fatale funzione <b>' . $functionName . '()</b><br/>'; 
+    $date = new DateTime();
+    echo $date->format('d/m/Y H:i:s') . ': Errore fatale funzione <b>' . $functionName . '()</b><br/>';
 }
 
 
 function errorHandler(Throwable $e) : string
 {
     $html = '<br/><b>Descrizione Errore:</b><br/>';
-    $html .= 'File: ' . $e->getFile() . '<br/>'; 
-    $html .= 'Linea: ' . $e->getLine() . '<br/>'; 
-    $html .= 'Codice errore: ' . $e->getCode() . '<br/>'; 
+    $html .= 'File: ' . $e->getFile() . '<br/>';
+    $html .= 'Linea: ' . $e->getLine() . '<br/>';
+    $html .= 'Codice errore: ' . $e->getCode() . '<br/>';
     $html .= 'Messaggio di errore: <b>' . $e->getMessage() . '</b><br/>';
     
     $stack = $e->getTraceAsString();
@@ -25,7 +25,7 @@ function errorHandler(Throwable $e) : string
     $html .= '<br/><b>Stack:</b>';
     foreach ($arrStack as $line) {
         $html .= $line . '<br/>';
-    } 
+    }
     return $html;
 }
 
@@ -33,7 +33,7 @@ function errorHandler(Throwable $e) : string
 function checkRequest(?array $request) : array
 {
     try {
-        $variables['var'] = checkVariable($request);    
+        $variables['var'] = checkVariable($request);
         
         $dates = checkInterval($request);
         
@@ -44,12 +44,10 @@ function checkRequest(?array $request) : array
         $checked = array_merge($variables, $dates, $filters, $fields);
         
         return $checked;
-        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
-    
 }
 
 
@@ -57,16 +55,15 @@ function checkVariable(?array $request) : string
 {
     try {
         if (isset($request['var']) || isset($request['variabile']) || isset($request['variable'])) {
-            
-            $paramNames = array('var', 'variabile', 'variable');
-            foreach ($paramNames AS $key) {
-                if (array_key_exists($key, $request)) {                    
+            $paramNames = ['var', 'variabile', 'variable'];
+            foreach ($paramNames as $key) {
+                if (array_key_exists($key, $request)) {
                     $variabile = htmlspecialchars(strip_tags($request[$key]));
                     break;
                 }
             }
             
-            $n_variabile = intval($variabile);    
+            $n_variabile = intval($variabile);
             if ($n_variabile >= 30000 && $n_variabile <= 39999) {
                 return $variabile;
             } else {
@@ -74,7 +71,7 @@ function checkVariable(?array $request) : string
             }
         } else {
             throw new Exception("Parametro variabile non presente nell'url o nome parametro non valido. Usare var, variable o variabile");
-        }        
+        }
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -85,7 +82,6 @@ function checkField(?array $request) : string
 {
     try {
         if (isset($request['field'])) {
-            
             $fieldsNames = [
                 'volume',
                 'livello',
@@ -100,13 +96,12 @@ function checkField(?array $request) : string
             if (in_array($urlField, $fieldsNames)) {
                 $field = $urlField;
             } else {
-                throw new Exception('Nome campo non supportato. Valori ammessi: ' . implode(', ' , $fieldsNames));
-            }    
+                throw new Exception('Nome campo non supportato. Valori ammessi: ' . implode(', ', $fieldsNames));
+            }
         } else {
             $field = 'volume';
-        }        
+        }
         return $field;
-        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -117,8 +112,7 @@ function checkFilter(?array $request) : bool
 {
     try {
         if (isset($request['full'])) {
-            
-            $full = htmlspecialchars(strip_tags($request['full']));           
+            $full = htmlspecialchars(strip_tags($request['full']));
             
             if ($full === '0') {
                 $filtered = true;
@@ -126,14 +120,13 @@ function checkFilter(?array $request) : bool
                 $filtered = false;
             } else {
                 throw new Exception('Valore parametro "full" non ammesso. Scegliere fra 0 e 1');
-            }           
+            }
         } else {
             $filtered = false;
         }
         $notFiltered = !$filtered;
         
         return $notFiltered;
-        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -150,7 +143,7 @@ function formatDate(string $date) : string
         
         if (count($dateParts) !== 3) {
             throw new Exception('Parametro data inserito nel formato errato. Formato richiesto "gg/mm/yyyy"');
-        } 
+        }
 
         $day = intval($dateParts[0]);
         $month = intval($dateParts[1]);
@@ -159,8 +152,8 @@ function formatDate(string $date) : string
         if (checkdate($month, $day, $year)) {
             $formatDate = date('Y-m-d', mktime(0, 0, 0, $month, $day, $year));
             
-            return $formatDate;    
-        } else {        
+            return $formatDate;
+        } else {
             throw new Exception('Data inserita inesistente');
         }
     } catch (Throwable $e) {
@@ -173,10 +166,10 @@ function formatDate(string $date) : string
 function formatDateTime(string $dateTime) : string
 {
     try {
-        $dateTimeParts = explode(' ', $dateTime);        
+        $dateTimeParts = explode(' ', $dateTime);
         if (count($dateTimeParts) !== 2) {
             throw new Exception('Parametro data e ora inserito nel formato errato. Formato richiesto "gg/mm/yyyy hh:ii:ss"');
-        } 
+        }
         
         $dateString = formatDate($dateTimeParts[0]);
         
@@ -200,7 +193,6 @@ function formatDateTime(string $dateTime) : string
         $formatDateTime = date('Y-m-d H:i:s', strtotime($dateTimeString));
         
         return $formatDateTime;
-        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -212,30 +204,23 @@ function checkInterval(?array $request) : array
 {
     try {
         if (isset($request['datefrom']) && isset($request['dateto'])) {
-
-            $dateFrom = formatDate($request['datefrom']);       
-            $dateTo = formatDate($request['dateto']);       
-
+            $dateFrom = formatDate($request['datefrom']);
+            $dateTo = formatDate($request['dateto']);
         } elseif (isset($request['datefrom'])) {
-
             $dateFrom = formatDate($request['datefrom']);
             $dateTo = date('Y-m-d');
-
         } elseif (isset($request['dateto'])) {
-
             $dateFrom = formatDate($request['dateto']);
             $dateTo = date('Y-m-d', strtotime($dateFrom . ' +1 day'));
-
         } else {
             throw new Exception('Parametri intervallo date assenti. Indicare uno o entrambi i parametri "datefrom" e "dateto"');
         }
-        $dateTimeFrom = New DateTime($dateFrom);
-        $dateTimeTo = New DateTime($dateTo);
+        $dateTimeFrom = new DateTime($dateFrom);
+        $dateTimeTo = new DateTime($dateTo);
 
-        $dates = array('datefrom' => $dateTimeFrom, 'dateto' => $dateTimeTo);
+        $dates = ['datefrom' => $dateTimeFrom, 'dateto' => $dateTimeTo];
 
         return $dates;
-        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -249,16 +234,15 @@ function setDateTimes(array $request) : array
         if (count($request) !== 2 && !array_key_exists('datefrom', $request) && !array_key_exists('datefrom', $request)) {
             throw new Exception('Array non valido. Richieste due chiavi: "datefrom" e "dateto"');
         }
-        $dateFrom = formatDateTime($request['datefrom']);       
+        $dateFrom = formatDateTime($request['datefrom']);
         $dateTo = formatDateTime($request['dateto']);
         
-        $dateTimeFrom = New DateTime($dateFrom);
-        $dateTimeTo = New DateTime($dateTo);
+        $dateTimeFrom = new DateTime($dateFrom);
+        $dateTimeTo = new DateTime($dateTo);
 
-        $dates = array('datefrom' => $dateTimeFrom, 'dateto' => $dateTimeTo);
+        $dates = ['datefrom' => $dateTimeFrom, 'dateto' => $dateTimeTo];
 
         return $dates;
-        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -271,28 +255,27 @@ function connect(string $dbName) //: resource
     $n = 2;
     $delay = 40000;
     $serverName = MSSQL_HOST;
-    $connectionInfo = array('Database' => $dbName, 'UID' => MSSQL_USER, 'PWD' => MSSQL_PASSWORD);   
+    $connectionInfo = ['Database' => $dbName, 'UID' => MSSQL_USER, 'PWD' => MSSQL_PASSWORD];
     
     try {
         for ($i=1; $i <= $n; $i++) {
             $conn = sqlsrv_connect($serverName, $connectionInfo);
 
-            if($conn) {
+            if ($conn) {
                 break;
             } else {
                 usleep($delay);
             }
         }
-        if($conn) {
+        if ($conn) {
             return $conn;
         } else {
             throw new Exception(error());
         }
-    }
-    catch (Throwable $e) {
+    } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
-    }   
+    }
 }
 
 
@@ -305,15 +288,15 @@ function query($conn, string $fileName, array $paramValues)
 
         $stmt = sqlsrv_query($conn, $query);
         
-        if ($stmt !== false) {            
-            return $stmt;                    
-        } else {            
+        if ($stmt !== false) {
+            return $stmt;
+        } else {
             throw new Exception(error());
-        } 
+        }
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
-    }   
+    }
 }
 
 
@@ -321,21 +304,20 @@ function fetch($stmt) : ?array
 {
     try {
         $record = 0;
-        while($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
             foreach ($row as $key => $value) {
                 $dati[$record][$key] = $value;
             }
             $record++;
-        }        
+        }
         if (!isset($dati)) {
-            $dati = array();
+            $dati = [];
         }
         return $dati;
-        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
-    } 
+    }
 }
 
 
@@ -345,13 +327,10 @@ function close($conn) : void
         if (!sqlsrv_close($conn)) {
             throw new Exception(error());
         }
-        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
-    } 
-    
-    
+    }
 }
 
 
@@ -366,16 +345,14 @@ function error() : string
 
 function addMedia(array $dati, string $nomeCampo) : array
 {
-    try {       
-        $medie = array();
+    try {
+        $medie = [];
         foreach ($dati as $record => $campi) {
-            
             if (!array_key_exists($nomeCampo, $campi)) {
                 throw new Exception('Campo inesistente. Impossibile eseguirne la media');
             }
             
             foreach ($campi as $campo => $valore) {
-
                 $medie[$record][$campo] = $valore;
 
                 if ($campo === $nomeCampo) {
@@ -383,13 +360,12 @@ function addMedia(array $dati, string $nomeCampo) : array
                         $media = $valore;
                     } else {
                         $media = ($valore + $medie[$record - 1][$campo])/2;
-                    }                
+                    }
                     $medie[$record]['media'] = $media;
                 }
             }
         }
         return $medie;
-        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -400,36 +376,32 @@ function addMedia(array $dati, string $nomeCampo) : array
 function addDelta(array $dati, string $nomeCampo) : array
 {
     try {
-        $delta = array();
+        $delta = [];
         foreach ($dati as $record => $campi) {
-            
             if (!array_key_exists($nomeCampo, $campi)) {
                 throw new Exception('Campo inesistente. Impossibile calcolare il delta temporale');
             }
             
             foreach ($campi as $campo => $valore) {
-
                 $delta[$record][$campo] = $valore;
 
                 if ($campo === $nomeCampo) {
-                    
                     if (!is_a($valore, 'DateTime')) {
                         throw new Exception('Per calcolare il delta temporale è neccessario che gli elementi del campo scelto siano del tipo \'DateTime\'');
                     }
                     
                     if ($record === 0) {
                         $deltaT = 0;
-                    } else {                    
+                    } else {
                         $timestamp0 = $delta[$record - 1][$campo]->getTimestamp();
                         $timestamp1 = $valore->getTimestamp();
-                        $deltaT = $timestamp1 - $timestamp0;                    
-                    }                
+                        $deltaT = $timestamp1 - $timestamp0;
+                    }
                     $delta[$record]['delta'] = $deltaT;
                 }
             }
         }
         return $delta;
-        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -439,26 +411,24 @@ function addDelta(array $dati, string $nomeCampo) : array
 
 function initVolumi(array $variabili, array $dati) : array
 {
-    try {        
+    try {
         if (count($dati) === 0) {
             throw new Exception('Nessun dato presente per le date selezionate');
         }
         
-        $volumi = array();
+        $volumi = [];
         foreach ($dati as $record => $campi) {
-
             $volumi[$record]['variabile'] = $variabili['id_variabile'];
 
             foreach ($campi as $campo => $valore) {
                 if ($campo === 'data_e_ora') {
                     $volumi[$record][$campo] = $valore;
-                }      
+                }
             }
 
             $volumi[$record]['tipo_dato'] = 1;
         }
         return $volumi;
-        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -469,70 +439,65 @@ function initVolumi(array $variabili, array $dati) : array
 function addLivello(array $volumi, array $dati) : array
 {
     try {
-        $livelli = array();
+        $livelli = [];
         if (count($volumi) !== count($dati)) {
             throw new Exception('Array differenti');
         }
         foreach ($volumi as $record => $campi) {
             foreach ($campi as $campo => $valore) {
-                
                 $livelli[$record][$campo] = $valore;
                 
                 if ($campo === 'data_e_ora') {
                     $dato = $dati[$record][$campo];
-                    if ($valore->format('d/m/Y H:i:s') === $dato->format('d/m/Y H:i:s')) {                
+                    if ($valore->format('d/m/Y H:i:s') === $dato->format('d/m/Y H:i:s')) {
                         $livelli[$record]['livello'] = $dati[$record]['valore'];
                     } else {
                         throw new Exception('Date differenti');
                     }
-                }                
-            }            
+                }
+            }
         }
         return $livelli;
-        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
-    }   
+    }
 }
 
 
 function addAltezza(array $dati, ?float $quota, string $nomeCampo) : array
 {
     try {
-        if(!isset($quota)) {
+        if (!isset($quota)) {
             throw new Exception('Quota non definita');
         }
         
-        $altezze = array();
+        $altezze = [];
         foreach ($dati as $record => $campi) {
-            
             if (!array_key_exists($nomeCampo, $campi)) {
                 throw new Exception('Campo inesistente. Impossibile calcolare l\'altezza');
             }
             
             foreach ($campi as $campo => $valore) {
-
                 $altezze[$record][$campo] = $valore;
 
                 if ($campo === $nomeCampo) {
                     $altezze[$record]['altezza'] = $dati[$record][$campo] - $quota;
                 }
-            }            
+            }
         }
         return $altezze;
-        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
-    }   
+    }
 }
 
 
 function addPortata(array $dati, array $specifiche) : array
 {
     try {
-        if(count($specifiche) === 0) {
+        if (count($specifiche) === 0) {
             throw new Exception('Specifiche scarico non definite');
         } else {
             $mi = $specifiche['mi'];
@@ -541,18 +506,16 @@ function addPortata(array $dati, array $specifiche) : array
             $nomeCampo = 'altezza';
         }
         
-        $portate = array();
+        $portate = [];
         foreach ($dati as $record => $campi) {
             foreach ($campi as $campo => $valore) {
-
                 $portate[$record][$campo] = $valore;
 
                 if ($campo === $nomeCampo) {
                     $altezza_sfioro = $dati[$record][$campo];
                 }
             }
-            if($altezza_sfioro > 0) {
-
+            if ($altezza_sfioro > 0) {
                 $portata = $mi * $larghezza_soglia * $altezza_sfioro * sqrt(2 * 9.81 * $altezza_sfioro);
 
                 if ($portata <= $portata_massima) {
@@ -565,7 +528,6 @@ function addPortata(array $dati, array $specifiche) : array
             }
         }
         return $portate;
-        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -576,22 +538,18 @@ function addPortata(array $dati, array $specifiche) : array
 function addVolume(array $dati) : array
 {
     try {
-        $volumi = array();
+        $volumi = [];
         foreach ($dati as $record => $campi) {
-            
             if (!array_key_exists('portata', $campi) || !array_key_exists('delta', $campi)) {
                 throw new Exception('Dati di portata e delta t assenti impossibile calcolare volume scaricato');
             }
             
             foreach ($campi as $campo => $valore) {
-
                 $volumi[$record][$campo] = $valore;
-
             }
             $volumi[$record]['volume'] = $volumi[$record]['portata'] * $volumi[$record]['delta'];
-        }    
+        }
         return $volumi;
-    
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -600,7 +558,7 @@ function addVolume(array $dati) : array
 
 
 function setFile(string $variabile, array $dates, bool $filtered, string $field, string $path) : string
-{    
+{
     try {
         if (!is_dir($path)) {
             throw new Exception('Directory inesistente');
@@ -618,7 +576,6 @@ function setFile(string $variabile, array $dates, bool $filtered, string $field,
         }
         
         return $fileName;
-    
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -627,57 +584,55 @@ function setFile(string $variabile, array $dates, bool $filtered, string $field,
 
 
 function format(array $dati, string $field) : array
-{  
-    $nomiCampi = array(
+{
+    $nomiCampi = [
         'variabile' => 'variabile',
         'valore' => $field,
         'data_e_ora' => 'data_e_ora',
         'tipo_dato' => 'tipo_dato'
-    );
+    ];
     
     try {
-        $formatted = array();
+        $formatted = [];
         foreach ($dati as $record => $campi) {
-            
             if (!array_key_exists($field, $campi)) {
                 throw new Exception('Campo inesistente. Impossibile assegnarlo a \'valore\'');
             }
             
             foreach ($campi as $campo => $valore) {
-                if(in_array($campo, $nomiCampi)) {
-                    foreach($nomiCampi AS $nuovo => $vecchio) {
-                        if($campo === $vecchio) {
-                            if(is_a($valore, 'DateTime')) {
+                if (in_array($campo, $nomiCampi)) {
+                    foreach ($nomiCampi as $nuovo => $vecchio) {
+                        if ($campo === $vecchio) {
+                            if (is_a($valore, 'DateTime')) {
                                 $formatted[$record][$nuovo] = $valore->format('d/m/Y H:i:s');
-                            } elseif(is_numeric($valore)) {
+                            } elseif (is_numeric($valore)) {
                                 if (is_int($valore)) {
                                     $formatted[$record][$nuovo] = number_format($valore, 0, '', '');
                                 } elseif (is_float($valore)) {
                                     $strFloat = number_format($valore, 3, ',', '');
                                     if ($strFloat === '0,000') {
-                                        $strFloat = '0';                                        
+                                        $strFloat = '0';
                                     }
                                     $formatted[$record][$nuovo] = $strFloat;
-                                }                                
+                                }
                             } else {
                                 $formatted[$record][$nuovo] = $valore;
-                            }                        
+                            }
                             break;
                         }
-                    }           
+                    }
                 }
-            }    
-        }    
+            }
+        }
         return $formatted;
-    
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
-}  
+}
 
 
-function changeTimeZone (string $dateIn, bool $isLocalToUTC, bool $format)
+function changeTimeZone(string $dateIn, bool $isLocalToUTC, bool $format)
 {
     try {
         if (!preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (?:2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]$/", $dateIn)) {
@@ -686,11 +641,11 @@ function changeTimeZone (string $dateIn, bool $isLocalToUTC, bool $format)
         
         if ($isLocalToUTC) {
             $zoneIn = 'Europe/Rome';
-            $zoneOut = 'Etc/GMT-1';    
+            $zoneOut = 'Etc/GMT-1';
         } else {
             $zoneIn = 'Etc/GMT-1';
             $zoneOut = 'Europe/Rome';
-        }        
+        }
 
         $dateTime = new DateTime($dateIn, new DateTimeZone($zoneIn));
         $dateTime->setTimezone(new DateTimeZone($zoneOut));
@@ -699,9 +654,8 @@ function changeTimeZone (string $dateIn, bool $isLocalToUTC, bool $format)
             $dateOut = $dateTime->format('d/m/Y H:i:s');
         } else {
             $dateOut = $dateTime;
-        }   
+        }
         return $dateOut;
-        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -711,7 +665,7 @@ function changeTimeZone (string $dateIn, bool $isLocalToUTC, bool $format)
 
 function datesToString(array $dates, string $format) : array
 {
-    try {        
+    try {
         foreach ($dates as $key => $date) {
             if (is_a($date, 'DateTime')) {
                 $formattedDates[$key] = $date->format($format);
@@ -719,13 +673,11 @@ function datesToString(array $dates, string $format) : array
                 if (!DateTime::createFromFormat($format, $formattedDates[$key])) {
                     throw new Exception('Formato data scelto non valido. Utilizzare "d/m/Y H:i:s" o "Y-m-d H:i:s"');
                 }
-                
             } else {
                 $formattedDates[$key] = $date;
             }
-        }    
+        }
         return $formattedDates;
-    
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -736,17 +688,17 @@ function datesToString(array $dates, string $format) : array
 function checkDates(string $db, array $dates, bool $isLocalToUTC) : array
 {
     try {
-        $checkedDates = array();
+        $checkedDates = [];
         foreach ($dates as $key => $date) {
             if (is_a($date, 'DateTime') && ($db === 'SPT')) {
                 $dateString = $date->format('Y-m-d H:i:s');
-                $checkedDates[$key] = changeTimeZone($dateString, $isLocalToUTC, false);                
+                $checkedDates[$key] = changeTimeZone($dateString, $isLocalToUTC, false);
             } else {
                 $checkedDates[$key] = $date;
             }
-        }    
-        return $checkedDates;        
-    // @codeCoverageIgnoreStart    
+        }
+        return $checkedDates;
+        // @codeCoverageIgnoreStart
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -758,12 +710,12 @@ function checkDates(string $db, array $dates, bool $isLocalToUTC) : array
 function setToLocal(string $db, array $dati) : array
 {
     try {
-        $locals = array();
+        $locals = [];
         foreach ($dati as $record => $campi) {
-            $locals[$record] = checkDates($db, $campi, false);        
+            $locals[$record] = checkDates($db, $campi, false);
         }
         return $locals;
-    // @codeCoverageIgnoreStart    
+        // @codeCoverageIgnoreStart
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -780,7 +732,6 @@ function checkNull($value)
             $res = $value;
         }
         return $res;
-    
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -790,7 +741,7 @@ function checkNull($value)
 function getDataFromDb(string $db, string $queryFileName, array $parametri) : array
 {
     try {
-        $data = array();
+        $data = [];
         
         $conn = connect($db);
         
@@ -809,7 +760,6 @@ function getDataFromDb(string $db, string $queryFileName, array $parametri) : ar
         close($conn);
         
         return $data;
-        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -825,22 +775,19 @@ function printToCSV(array $dati, string $fileName) : void
     try {
         $handle = @fopen($fileName, $mode);
         
-        if($handle) {
-            
+        if ($handle) {
             $nomiCampi = array_keys($dati[0]);
 
             fputcsv($handle, $nomiCampi, $delimiter);
 
-            foreach ($dati AS $valori) {
+            foreach ($dati as $valori) {
                 fputcsv($handle, $valori, $delimiter);
-            }       
+            }
 
             fclose($handle);
-            
         } else {
             throw new Exception('Problemi con l\'apertura del file CSV');
         }
-        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -851,7 +798,7 @@ function printToCSV(array $dati, string $fileName) : void
 function divideAndPrint(array $data, bool $full, string $field, ?int $limit = null) : bool
 {
     $limit = $limit ?? MAXRECORD;
-    $filtered = !$full; 
+    $filtered = !$full;
     
     try {
         if ($limit <= 0) {
@@ -861,12 +808,12 @@ function divideAndPrint(array $data, bool $full, string $field, ?int $limit = nu
             $printed = false;
         } else {
             $i = 0;
-            $printableData = array();
-            foreach($data as $record) {
+            $printableData = [];
+            foreach ($data as $record) {
                 if ($i === $limit) {
                     printPart($printableData, $i, $filtered, $field);
                     $i = 0;
-                    $printableData = array();                
+                    $printableData = [];
                 }
                 $printableData[$i] = $record;
                 $i++;
@@ -877,7 +824,6 @@ function divideAndPrint(array $data, bool $full, string $field, ?int $limit = nu
             $printed = true;
         }
         return $printed;
-        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -894,14 +840,13 @@ function printPart(array $printableData, int $i, bool $filtered, string $field) 
         }
         
         $variabile = $printableData[0]['variabile'];
-        $dates = array(
+        $dates = [
             'datefrom' => $printableData[0]['data_e_ora'],
             'dateto' => $printableData[$max]['data_e_ora']
-        );
+        ];
         $dateTimes = setDateTimes($dates);
         $fileName = setFile($variabile, $dateTimes, $filtered, $field, CSV);
         printToCSV($printableData, $fileName);
-        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -910,19 +855,18 @@ function printPart(array $printableData, int $i, bool $filtered, string $field) 
 
 
 function filter(array $dati, bool $full) : array
-{  
+{
     try {
         if ($full) {
             $filteredData = $dati;
         } else {
-            $filteredData = array();
+            $filteredData = [];
             foreach ($dati as $record => $campi) {
-                
-                if(!array_key_exists('valore', $campi)) {
+                if (!array_key_exists('valore', $campi)) {
                     throw new Exception('Campo "valore" su cui eseguire il filtro non presente');
-                }            
+                }
                 
-                $flag = true;             
+                $flag = true;
                 foreach ($campi as $campo => $valore) {
                     if (($campo === 'valore') && ($valore === '0')) {
                         $flag = false;
@@ -932,9 +876,8 @@ function filter(array $dati, bool $full) : array
                     $filteredData[$record] = $campi;
                 }
             }
-        }        
+        }
         return $filteredData;
-    
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -954,16 +897,14 @@ function response(array $request, bool $printed) : string
         
         $html = 'Elaborazione dati <b>' . ucfirst($request['field']) . '</b> variabile <b>' . $request['var'] . '</b> dal <b>' . $request['datefrom']->format('d/m/Y') . '</b> al <b>' . $request['dateto']->format('d/m/Y') . '</b> avvenuta con successo.';
         
-        if($printed) {
+        if ($printed) {
             $html .= ' File CSV <b>' . $type . '</b> esportati.';
         } else {
             $html .= ' Nessun file CSV <b>' . $type . '</b> esportato per mancanza di dati.';
         }
         return $html;
-        
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
-
