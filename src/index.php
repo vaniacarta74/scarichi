@@ -62,11 +62,11 @@ try {
         case 'sfioratore di superficie':
 
             $db = 'dbcore';
-            $queryFileName = 'query_sfiori';
+            $queryFileName = 'query_formule';
             $parametri = [
                 'scarico' => $scarichi[0]['scarico']
             ];
-            $sfiori = getDataFromDb($db, $queryFileName, $parametri);
+            $formule = getDataFromDb($db, $queryFileName, $parametri);
 
             $volumi = initVolumi($variabili[0], $dati_acquisiti['livello']);
 
@@ -74,9 +74,9 @@ try {
 
             $volumi = addMedia($volumi, 'livello');
 
-            $volumi = addAltezza($volumi, $sfiori[0]['quota'], 'media');
+            $volumi = addAltezza($volumi, $formule[0]['quota'], 'media');
 
-            $volumi = addPortata($volumi, $sfiori[0]);
+            $volumi = addPortata($volumi, $formule[0]);
 
             $volumi = addDelta($volumi, 'data_e_ora');
 

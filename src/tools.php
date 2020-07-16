@@ -494,38 +494,35 @@ function addAltezza(array $dati, ?float $quota, string $nomeCampo) : array
 }
 
 
-function addPortata(array $dati, array $specifiche) : array
+function addPortata(array $dati, array $formule) : array
 {
     try {
-        if (count($specifiche) === 0) {
-            throw new Exception('Specifiche scarico non definite');
-        } else {
-            $mi = $specifiche['mi'];
-            $larghezza_soglia = $specifiche['larghezza'];
-            $portata_massima = $specifiche['limite'];
-            $nomeCampo = 'altezza';
+        if (count($formule) === 0) {
+            throw new Exception('Formula scarico non definita');
+        }
+        $tipo = $formule['tipo_formula'];
+        switch ($tipo) {
+            case 'portata sfiorante':
+                $coefficienti = [
+                    'mi' => $formule['mi'],
+                    'larghezza' => $formule['larghezza'],
+                    'limite' => $formule['limite']
+                ];
+                $nomi_campo = ['altezza'];
+                break;
         }
         
         $portate = [];
         foreach ($dati as $record => $campi) {
+            $parametri = [];
             foreach ($campi as $campo => $valore) {
                 $portate[$record][$campo] = $valore;
-
-                if ($campo === $nomeCampo) {
-                    $altezza_sfioro = $dati[$record][$campo];
+                
+                if (in_array($campo, $nomi_campo)) {
+                    $parametri[$campo] = $dati[$record][$campo];
                 }
             }
-            if ($altezza_sfioro > 0) {
-                $portata = $mi * $larghezza_soglia * $altezza_sfioro * sqrt(2 * 9.81 * $altezza_sfioro);
-
-                if ($portata <= $portata_massima) {
-                    $portate[$record]['portata'] = $portata;
-                } else {
-                    $portate[$record]['portata'] = 0;
-                }
-            } else {
-                $portate[$record]['portata'] = 0;
-            }
+            $portate[$record]['portata'] = calcolaPortata($tipo, $coefficienti, $parametri);
         }
         return $portate;
     } catch (Throwable $e) {
@@ -903,6 +900,32 @@ function response(array $request, bool $printed) : string
             $html .= ' Nessun file CSV <b>' . $type . '</b> esportato per mancanza di dati.';
         }
         return $html;
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+function calcolaPortata(string $tipo, array $coefficienti, array $parametri) : float
+{
+    try {
+        switch ($tipo) {
+            case 'portata sfiorante':
+                $altezza_sfioro = $parametri['altezza'];
+                $mi = $coefficienti['mi'];
+                $larghezza_soglia = $coefficienti['larghezza'];
+
+                if ($altezza_sfioro > 0) {
+                    $portata = $mi * $larghezza_soglia * $altezza_sfioro * sqrt(2 * 9.81 * $altezza_sfioro);
+                } else {
+                    $portata = 0;
+                }
+                break;
+            default:
+                throw new Exception('Tipologia di portata non definita');
+                break;
+        }
+        return ($portata <= $coefficienti['limite']) ? $portata : 0;
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;

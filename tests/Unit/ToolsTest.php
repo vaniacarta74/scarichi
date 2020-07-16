@@ -215,18 +215,21 @@ class ToolsTest extends TestCase
                     ]
                 ]
             ],
-            'sfiori' => [
+            'formule' => [
                 'dbase' => 'dbcore',
-                'file' => 'query_sfiori',
+                'file' => 'query_formule',
                 'parametri' => [
                     'scarico' => '1'
                 ],
                 'expected' => [
                     '0' => [
+                        'tipo_formula' => 'portata sfiorante',
                         'scarico' => 1,
                         'mi' => 0.47,
                         'larghezza' => 40.5,
+                        'raggio' => null,
                         'quota' => 276.5,
+                        'velocita' => null,
                         'limite' => 942.67
                     ]
                 ]
@@ -654,9 +657,9 @@ class ToolsTest extends TestCase
                     '01/02/2020 00:00:00'
                 ]
             ],
-            'sfiori' => [
+            'formule' => [
                 'dbcore',
-                'query_sfiori',
+                'query_formule',
                 [
                     '1'
                 ]
@@ -1655,7 +1658,7 @@ class ToolsTest extends TestCase
      */
     public function testQueryIsResource1($conn)  //: resource
     {
-        $fileName = 'query_scarichi';
+        $fileName = 'query_formule';
         $paramValues = ['1'];
         
         $actual = query($conn, $fileName, $paramValues);
@@ -1699,7 +1702,7 @@ class ToolsTest extends TestCase
      * covers fetch()
      * @depends testQueryIsResource
      */
-    public function testFetchSame($stmt) : void
+    public function testFetchEquals($stmt) : void
     {
         $expected = [
             0 => [
@@ -1721,9 +1724,20 @@ class ToolsTest extends TestCase
      * covers fetch()
      * @depends testQueryIsResource1
      */
-    public function testFetchSame1($stmt) : void
+    public function testFetchEquals1($stmt) : void
     {
-        $expected = [];
+        $expected = [
+            0 => [
+                'tipo_formula' => 'portata sfiorante',
+                'scarico' => 1,
+                'mi' => 0.47,
+                'larghezza' => 40.5,
+                'raggio' => null,
+                'quota' => 276.5,
+                'velocita' => null,
+                'limite' => 942.67
+            ]
+        ];
         $actual = fetch($stmt);
                 
         $this->assertEquals($expected, $actual);
@@ -1990,7 +2004,7 @@ class ToolsTest extends TestCase
     public function testGetDataFromDbEmpty()
     {
         $db = 'dbcore';
-        $queryFileName = 'query_sfiori';
+        $queryFileName = 'query_formule';
         $parametri = [
             'scarico' => '999999'
         ];
@@ -2330,6 +2344,7 @@ class ToolsTest extends TestCase
     public function testAddPortataEqualsWithDelta(array $volumi) : array
     {
         $specifiche = [
+            'tipo_formula' => 'portata sfiorante',
             'scarico' => 1,
             'mi' => 0.47,
             'larghezza' => 40.5,
@@ -2382,6 +2397,7 @@ class ToolsTest extends TestCase
     public function testAddPortataEqualsWithDelta1(array $volumi) : void
     {
         $specifiche = [
+            'tipo_formula' => 'portata sfiorante',
             'scarico' => 1,
             'mi' => 0.47,
             'larghezza' => 40.5,
@@ -3332,5 +3348,46 @@ class ToolsTest extends TestCase
         $this->expectError(\Error::class);
         
         close($conn);
+    }
+    
+    /**
+     * @group tools
+     * covers calcolaPortata()
+     */
+    public function testCalcolaPortataEquals() : void
+    {
+        $tipo = 'portata sfiorante';
+        $coefficienti = [
+            'mi' => 0.47,
+            'larghezza' => 0.387,
+            'limite' => 800
+        ];
+        $parametri = [
+            'altezza' => 10
+        ];
+        $expected = 25.478;
+        
+        $actual = calcolaPortata($tipo, $coefficienti, $parametri);
+        
+        $this->assertEqualsWithDelta($expected, $actual, 0.001);
+    }
+    
+    /**
+     * @group tools
+     * covers calcolaPortata()
+     */
+    public function testCalcolaPortataException() : void
+    {
+        $tipo = '';
+        $coefficienti = [
+            'mi' => 0.47,
+            'larghezza' => 0.387,
+            'limite' => 800
+        ];
+        $parametri = ['altezza'];
+        
+        $this->expectException(\Exception::class);
+        
+        calcolaPortata($tipo, $coefficienti, $parametri);
     }
 }
