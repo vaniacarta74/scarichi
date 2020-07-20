@@ -1,7 +1,7 @@
 <?php
 
 $queryString = "SELECT
-                    variabili_scarichi.scarico,
+                    rel_scarichi_variabili.scarico,
                     db.db_name AS db,
                     variabili_scarichi.variabile,
                     variabili_scarichi.tipo_dato,
@@ -17,9 +17,13 @@ $queryString = "SELECT
                     INNER JOIN
                         categorie
                     ON
-                        variabili_scarichi.categoria = categorie.id_categoria       
+                        variabili_scarichi.categoria = categorie.id_categoria
+                    INNER JOIN
+                        rel_scarichi_variabili
+                    ON
+                        rel_scarichi_variabili.variabile = variabili_scarichi.id_variabile_scarico
                 WHERE
-                    variabili_scarichi.scarico = ?scarico?
+                    rel_scarichi_variabili.scarico = ?scarico?
                 ORDER BY
                     variabili_scarichi.categoria,
                     variabili_scarichi.data_attivazione";

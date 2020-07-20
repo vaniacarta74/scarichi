@@ -3,6 +3,7 @@
 $queryString = "SELECT DISTINCT
                     dati_acquisiti.variabile,
                     dati_acquisiti.valore,
+                    variabili.unita_misura,
                     dati_acquisiti.data_e_ora,                    
                     dati_acquisiti.tipo_dato
                 FROM

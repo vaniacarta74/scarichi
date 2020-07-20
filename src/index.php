@@ -57,16 +57,18 @@ try {
 
     //echo '<br/><b>Dati Acquisiti:</b>';
     //var_dump($dati_acquisiti);
+    
+    $dati_uniformati = uniformaCategorie($dati_acquisiti);
+    
+    $db = 'dbcore';
+    $queryFileName = 'query_formule';
+    $parametri = [
+        'scarico' => $scarichi[0]['scarico']
+    ];
+    $formule = getDataFromDb($db, $queryFileName, $parametri);
 
     switch ($scarichi[0]['tipo']) {
         case 'sfioratore di superficie':
-
-            $db = 'dbcore';
-            $queryFileName = 'query_formule';
-            $parametri = [
-                'scarico' => $scarichi[0]['scarico']
-            ];
-            $formule = getDataFromDb($db, $queryFileName, $parametri);
 
             $volumi = initVolumi($variabili[0], $dati_acquisiti['livello']);
 

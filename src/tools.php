@@ -931,3 +931,70 @@ function calcolaPortata(string $tipo, array $coefficienti, array $parametri) : f
         throw $e;
     }
 }
+
+
+function uniformaCategorie(array $dati_acquisiti) : array
+{
+    try {
+        if (count($dati_acquisiti) === 0) {
+            throw new Exception('Nessuna categoria definita');
+        }
+        
+        $uniformati = [];
+        foreach ($dati_acquisiti as $categoria => $dati) {
+            $dati_target = [];
+            $dati_confronto = [];
+            
+            $dati_target[$categoria] = $dati;
+            $dati_confronto = array_diff_key($dati_acquisiti, $dati_target);
+
+            $uniformati[$categoria] = integraDate($dati, $dati_confronto);
+        }
+        return $uniformati;
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function integraDate(array $targets, array $checkers) : array
+{
+    try {
+        if (count($targets) === 0) {
+            throw new Exception('Nessun dato presente nel target, modificare date');
+        }
+        foreach ($checkers as $categoria => $dati) {
+            foreach ($dati as $j => $dato) {
+                $iMax = count($targets) - 1;
+                
+                $prototype = [
+                    $iMax => [
+                        'variabile' => $targets[$iMax]['variabile'],
+                        'valore' => null,
+                        'unita_misura' => $targets[$iMax]['unita_misura'],
+                        'data_e_ora' => $dato['data_e_ora'],
+                        'tipo_dato' => $targets[$iMax]['tipo_dato']
+                    ]
+                ];
+                
+                if ($dato['data_e_ora'] < $targets[0]['data_e_ora']) {
+                    array_splice($targets, 0, 0, $prototype);
+                } elseif ($dato['data_e_ora'] > $targets[$iMax]['data_e_ora']) {
+                    array_splice($targets, count($targets), 0, $prototype);
+                } else {
+                    for ($i = 1; $i <= $iMax; $i++) {
+                        if ($dato['data_e_ora'] > $targets[$i - 1]['data_e_ora'] && $dato['data_e_ora'] < $targets[$i]['data_e_ora']) {
+                            array_splice($targets, $i, 0, $prototype);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return $targets;
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}

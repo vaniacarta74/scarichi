@@ -210,6 +210,7 @@ class ToolsTest extends TestCase
                     '0' => [
                         'variabile' => 165071,
                         'valore' => 266.206,
+                        'unita_misura' => 'm',
                         'data_e_ora' => new \DateTime('2018-01-02T00:00:00.000000+0100'),
                         'tipo_dato' => 2
                     ]
@@ -3240,7 +3241,7 @@ class ToolsTest extends TestCase
     
     /**
      * @group tools
-     * covers checkNull
+     * covers checkNull()
      */
     public function testCheckNullEquals() : void
     {
@@ -3254,7 +3255,7 @@ class ToolsTest extends TestCase
     
     /**
      * @group tools
-     * covers checkNull
+     * covers checkNull()
      */
     public function testCheckNullException() : void
     {
@@ -3321,7 +3322,7 @@ class ToolsTest extends TestCase
     
     /**
      * @group error
-     * covers errorHandler
+     * covers errorHandler()
      */
     
     public function testErrorHandlerIsString() : void
@@ -3389,5 +3390,758 @@ class ToolsTest extends TestCase
         $this->expectException(\Exception::class);
         
         calcolaPortata($tipo, $coefficienti, $parametri);
+    }
+    
+    /**
+     * @group tools
+     * covers integraDate()
+     */
+    public function testIntegraDateEquals() : void
+    {
+        $target = [
+            '0' => [
+                'variabile' => 1067,
+                'valore' => 17.3,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                'tipo_dato' => 2
+            ],
+            '1' => [
+                'variabile' => 1067,
+                'valore' => 18.3,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                'tipo_dato' => 2
+            ],
+            '2' => [
+                'variabile' => 1067,
+                'valore' => 19.3,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                'tipo_dato' => 2
+            ]
+        ];
+        
+        $checkers = [
+            'livello valle' => [
+                '0' => [
+                    'variabile' => 42,
+                    'valore' => 27.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 42,
+                    'valore' => 27.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 42,
+                    'valore' => 37.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '3' => [
+                    'variabile' => 42,
+                    'valore' => 47.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'manovra' => [
+                '0' => [
+                    'variabile' => 30033,
+                    'valore' => 0,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '1' => [
+                    'variabile' => 30033,
+                    'valore' => 0.5,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '2' => [
+                    'variabile' => 30033,
+                    'valore' => 1,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '3' => [
+                    'variabile' => 30033,
+                    'valore' => 0.5,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                    'tipo_dato' => 1
+                ]
+            ]
+        ];
+        
+        $expected = [
+            '0' => [
+                'variabile' => 1067,
+                'valore' => null,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                'tipo_dato' => 2
+            ],
+            '1' => [
+                'variabile' => 1067,
+                'valore' => 17.3,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                'tipo_dato' => 2
+            ],
+            '2' => [
+                'variabile' => 1067,
+                'valore' => null,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                'tipo_dato' => 2
+            ],
+            '3' => [
+                'variabile' => 1067,
+                'valore' => null,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                'tipo_dato' => 2
+            ],
+            '4' => [
+                'variabile' => 1067,
+                'valore' => 18.3,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                'tipo_dato' => 2
+            ],
+            '5' => [
+                'variabile' => 1067,
+                'valore' => 19.3,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                'tipo_dato' => 2
+            ],
+            '6' => [
+                'variabile' => 1067,
+                'valore' => null,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                'tipo_dato' => 2
+            ],
+            '7' => [
+                'variabile' => 1067,
+                'valore' => null,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                'tipo_dato' => 2
+            ]
+        ];
+        
+        $actual = integraDate($target, $checkers);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($expected[$row][$key], $value);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($value, $actual[$row][$key]);
+            }
+        }
+    }
+    
+    /**
+     * @group tools
+     * covers integraDate()
+     */
+    public function testIntegraDateEquals1() : void
+    {
+        $target = [
+            '0' => [
+                'variabile' => 1067,
+                'valore' => 17.3,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                'tipo_dato' => 2
+            ]
+        ];
+        
+        $checkers = [
+            'livello valle' => [
+                '0' => [
+                    'variabile' => 42,
+                    'valore' => 27.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 42,
+                    'valore' => 37.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 42,
+                    'valore' => 47.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'manovra' => [
+                '0' => [
+                    'variabile' => 30033,
+                    'valore' => 0,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '1' => [
+                    'variabile' => 30033,
+                    'valore' => 0.5,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '2' => [
+                    'variabile' => 30033,
+                    'valore' => 1,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '3' => [
+                    'variabile' => 30033,
+                    'valore' => 0.5,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                    'tipo_dato' => 1
+                ]
+            ]
+        ];
+        
+        $expected = [
+            '0' => [
+                'variabile' => 1067,
+                'valore' => null,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                'tipo_dato' => 2
+            ],
+            '1' => [
+                'variabile' => 1067,
+                'valore' => 17.3,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                'tipo_dato' => 2
+            ],
+            '2' => [
+                'variabile' => 1067,
+                'valore' => null,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                'tipo_dato' => 2
+            ],
+            '3' => [
+                'variabile' => 1067,
+                'valore' => null,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                'tipo_dato' => 2
+            ],
+            '4' => [
+                'variabile' => 1067,
+                'valore' => null,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                'tipo_dato' => 2
+            ],
+            '5' => [
+                'variabile' => 1067,
+                'valore' => null,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                'tipo_dato' => 2
+            ],
+            '6' => [
+                'variabile' => 1067,
+                'valore' => null,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                'tipo_dato' => 2
+            ]
+        ];
+        
+        $actual = integraDate($target, $checkers);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($expected[$row][$key], $value);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($value, $actual[$row][$key]);
+            }
+        }
+    }
+    
+    /**
+     * @group tools
+     * covers integraDate()
+     */
+    public function testIntegraDateException() : void
+    {
+        $target = [];
+        
+        $checkers = [
+            'livello valle' => [
+                '0' => [
+                    'variabile' => 42,
+                    'valore' => 27.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 42,
+                    'valore' => 37.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 42,
+                    'valore' => 47.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'manovra' => [
+                '0' => [
+                    'variabile' => 30033,
+                    'valore' => 0,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '1' => [
+                    'variabile' => 30033,
+                    'valore' => 0.5,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '2' => [
+                    'variabile' => 30033,
+                    'valore' => 1,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '3' => [
+                    'variabile' => 30033,
+                    'valore' => 0.5,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                    'tipo_dato' => 1
+                ]
+            ]
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        integraDate($target, $checkers);
+    }
+    
+    /**
+     * @group index
+     * covers uniformaCategorie()
+     */
+    public function testUniformaCategorieEquals() : void
+    {
+        $dati_acquisiti = [
+            'livello monte' => [
+                '0' => [
+                    'variabile' => 1067,
+                    'valore' => 17.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 1067,
+                    'valore' => 18.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 1067,
+                    'valore' => 19.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'livello valle' => [
+                '0' => [
+                    'variabile' => 42,
+                    'valore' => 17.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 42,
+                    'valore' => 27.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 42,
+                    'valore' => 37.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '3' => [
+                    'variabile' => 42,
+                    'valore' => 47.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'manovra' => [
+                '0' => [
+                    'variabile' => 30033,
+                    'valore' => 0,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '1' => [
+                    'variabile' => 30033,
+                    'valore' => 0.5,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '2' => [
+                    'variabile' => 30033,
+                    'valore' => 1,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '3' => [
+                    'variabile' => 30033,
+                    'valore' => 0.5,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                    'tipo_dato' => 1
+                ]
+            ]
+        ];
+        
+        $expected = [
+            'livello monte' => [
+                '0' => [
+                    'variabile' => 1067,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 1067,
+                    'valore' => 17.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 1067,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '3' => [
+                    'variabile' => 1067,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '4' => [
+                    'variabile' => 1067,
+                    'valore' => 18.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '5' => [
+                    'variabile' => 1067,
+                    'valore' => 19.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '6' => [
+                    'variabile' => 1067,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '7' => [
+                    'variabile' => 1067,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'livello valle' => [
+                '0' => [
+                    'variabile' => 42,
+                    'valore' => 17.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 42,
+                    'valore' => 27.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 42,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '3' => [
+                    'variabile' => 42,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '4' => [
+                    'variabile' => 42,
+                    'valore' => 37.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '5' => [
+                    'variabile' => 42,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '6' => [
+                    'variabile' => 42,
+                    'valore' => 47.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '7' => [
+                    'variabile' => 42,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'manovra' => [
+                '0' => [
+                    'variabile' => 30033,
+                    'valore' => null,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '1' => [
+                    'variabile' => 30033,
+                    'valore' => null,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '2' => [
+                    'variabile' => 30033,
+                    'valore' => 0,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '3' => [
+                    'variabile' => 30033,
+                    'valore' => 0.5,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '4' => [
+                    'variabile' => 30033,
+                    'valore' => null,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '5' => [
+                    'variabile' => 30033,
+                    'valore' => null,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '6' => [
+                    'variabile' => 30033,
+                    'valore' => 1,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '7' => [
+                    'variabile' => 30033,
+                    'valore' => 0.5,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                    'tipo_dato' => 1
+                ]
+            ]
+        ];
+        
+        $actual = uniformaCategorie($dati_acquisiti);
+        
+        foreach ($actual as $categoria => $dati) {
+            foreach ($dati as $row => $fields) {
+                foreach ($fields as $key => $value) {
+                    $this->assertEquals($expected[$categoria][$row][$key], $value);
+                }
+            }
+        }
+        
+        foreach ($expected as $categoria => $dati) {
+            foreach ($dati as $row => $fields) {
+                foreach ($fields as $key => $value) {
+                    $this->assertEquals($value, $actual[$categoria][$row][$key]);
+                }
+            }
+        }
+    }
+    
+    /**
+     * @group index
+     * covers uniformaCategorie()
+     */
+    public function testUniformaCategorieEquals1() : void
+    {
+        $dati_acquisiti = [
+            'livello' => [
+                '0' => [
+                    'variabile' => 1067,
+                    'valore' => 17.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 1067,
+                    'valore' => 18.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 1067,
+                    'valore' => 19.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 2
+                ]
+            ]
+        ];
+        
+        $expected = [
+            'livello' => [
+                '0' => [
+                    'variabile' => 1067,
+                    'valore' => 17.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 1067,
+                    'valore' => 18.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 1067,
+                    'valore' => 19.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 2
+                ]
+            ]
+        ];
+        
+        $actual = uniformaCategorie($dati_acquisiti);
+        
+        foreach ($actual as $categoria => $dati) {
+            foreach ($dati as $row => $fields) {
+                foreach ($fields as $key => $value) {
+                    $this->assertEquals($expected[$categoria][$row][$key], $value);
+                }
+            }
+        }
+        
+        foreach ($expected as $categoria => $dati) {
+            foreach ($dati as $row => $fields) {
+                foreach ($fields as $key => $value) {
+                    $this->assertEquals($value, $actual[$categoria][$row][$key]);
+                }
+            }
+        }
+    }
+    
+    /**
+     * @group index
+     * covers uniformaCategorie()
+     */
+    public function testUniformaCategorieException() : void
+    {
+        $dati_acquisiti = [];
+        
+        $this->expectException(\Exception::class);
+        
+        uniformaCategorie($dati_acquisiti);
     }
 }
