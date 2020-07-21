@@ -4171,14 +4171,14 @@ class ToolsTest extends TestCase
                 ],
                 '2' => [
                     'variabile' => 1067,
-                    'valore' => null,
+                    'valore' => 17.55,
                     'unita_misura' => 'mslm',
                     'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
                     'tipo_dato' => 2
                 ],
                 '3' => [
                     'variabile' => 1067,
-                    'valore' => null,
+                    'valore' => 18.05,
                     'unita_misura' => 'mslm',
                     'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
                     'tipo_dato' => 2
@@ -4229,14 +4229,14 @@ class ToolsTest extends TestCase
                 ],
                 '2' => [
                     'variabile' => 42,
-                    'valore' => null,
+                    'valore' => 29.8,
                     'unita_misura' => 'mslm',
                     'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
                     'tipo_dato' => 2
                 ],
                 '3' => [
                     'variabile' => 42,
-                    'valore' => null,
+                    'valore' => 34.8,
                     'unita_misura' => 'mslm',
                     'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
                     'tipo_dato' => 2
@@ -4250,7 +4250,7 @@ class ToolsTest extends TestCase
                 ],
                 '5' => [
                     'variabile' => 42,
-                    'valore' => null,
+                    'valore' => 43.967,
                     'unita_misura' => 'mslm',
                     'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
                     'tipo_dato' => 2
@@ -4335,7 +4335,7 @@ class ToolsTest extends TestCase
         foreach ($actual as $categoria => $dati) {
             foreach ($dati as $row => $fields) {
                 foreach ($fields as $key => $value) {
-                    $this->assertEquals($expected[$categoria][$row][$key], $value);
+                    $this->assertEqualsWithDelta($expected[$categoria][$row][$key], $value, 0.001);
                 }
             }
         }
@@ -4343,7 +4343,7 @@ class ToolsTest extends TestCase
         foreach ($expected as $categoria => $dati) {
             foreach ($dati as $row => $fields) {
                 foreach ($fields as $key => $value) {
-                    $this->assertEquals($value, $actual[$categoria][$row][$key]);
+                    $this->assertEqualsWithDelta($value, $actual[$categoria][$row][$key], 0.001);
                 }
             }
         }
@@ -4979,5 +4979,82 @@ class ToolsTest extends TestCase
         $this->expectException(\Exception::class);
         
         riempiNull($input);
+    }
+    
+    /**
+     * covers interpolaNull().
+     * @group tools
+     */
+    public function testInterpolaNullException() : void
+    {
+        $input = [
+            '0' => [
+                'variabile' => 1067,
+                'valore' => null,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                'tipo_dato' => 2
+            ],
+            '1' => [
+                'variabile' => 1067,
+                'valore' => 17.3,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                'tipo_dato' => 2
+            ],
+            '2' => [
+                'variabile' => 1067,
+                'valore' => 19.3,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                'tipo_dato' => 2
+            ]
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        interpolaNull($input);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function interpolaProvider() : array
+    {
+        $dati = [
+            [10, 20, 10, 20, 15, 15],
+            [0, 10, 0, 20, 15, 30],
+            [10, 0, 20, 0, 15, 30],
+            [-10, -20, 10, 20, 15, -15],
+            [10, 20, -10, -20, -15, 15],
+            [17.3, 23.5, 13.5, 44.9, 17.6, 15.019]
+        ];
+        
+        return $dati;
+    }
+    
+    /**
+     * covers interpola().
+     * @group tools
+     * @dataProvider interpolaProvider
+     */
+    public function testInterpolaEqualsWithDelta($x1, $x2, $y1, $y2, $x, $expected) : void
+    {
+        $actual = interpola($x1, $x2, $y1, $y2, $x);
+        
+        $this->assertEqualsWithDelta($expected, $actual, 0.001);
+    }
+    
+    /**
+     * covers interpola().
+     * @group tools
+     */
+    public function testInterpolaException() : void
+    {
+        $x = [10, 10, 10, 20, 15];
+        
+        $this->expectException(\Exception::class);
+        
+        interpola($x[0], $x[1], $x[2], $x[3], $x[4]);
     }
 }

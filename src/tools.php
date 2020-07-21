@@ -1013,7 +1013,7 @@ function completaDati(array $dati_uniformi) : array
             if ($categoria === 'manovra') {
                 $completi[$categoria] = riempiNull($completi[$categoria]);
             } else {
-//                $completi[$categoria] = interpolaNull($completi[$categoria]);
+                $completi[$categoria] = interpolaNull($completi[$categoria]);
             }
         }
         return $completi;
@@ -1125,6 +1125,67 @@ function riempiNull(array $dati) : array
             }
         }
         return $pieni;
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function interpolaNull(array $dati) : array
+{
+    try {
+        $interpolati = [];
+        $iMax = count($dati) - 1;
+        
+        foreach ($dati as $record => $campi) {
+            foreach ($campi as $key => $valore) {
+                if ($key === 'valore') {
+                    if (isset($valore)) {
+                        $interpolati[$record][$key] = $valore;
+                        $r1 = $record;
+                    } else {
+                        if (isset($r1)) {
+                            $r2 = $r1 + 1;
+                            while (!isset($dati[$r2][$key]) && $r2 < $iMax) {
+                                $r2++;
+                            }
+                            $x1 = $dati[$r1]['data_e_ora']->getTimestamp();
+                            $y1 = $dati[$r1][$key];
+                            
+                            $x2 = $dati[$r2]['data_e_ora']->getTimestamp();
+                            $y2 = $dati[$r2][$key];
+                            
+                            $x = $dati[$record]['data_e_ora']->getTimestamp();
+                            $y = interpola($x1, $x2, $y1, $y2, $x);
+                            
+                            $interpolati[$record][$key] = $y;
+                        } else {
+                            throw new Exception('Nessun valore di riferimento trovato');
+                        }
+                    }
+                } else {
+                    $interpolati[$record][$key] = $valore;
+                }
+            }
+        }
+        return $interpolati;
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function interpola(float $x1, float $x2, float $y1, float $y2, float $x) : float
+{
+    try {
+        if ($x2 === $x1) {
+            throw new Exception('Divisione per zero');
+        } else {
+            $y = ($x - $x1) / ($x2 - $x1) * ($y2 - $y1) + $y1;
+        }
+        return $y;
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
