@@ -60,6 +60,8 @@ try {
     
     $dati_uniformati = uniformaCategorie($dati_acquisiti);
     
+    $dati_completi = completaDati($dati_uniformati);
+    
     $db = 'dbcore';
     $queryFileName = 'query_formule';
     $parametri = [

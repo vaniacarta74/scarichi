@@ -998,3 +998,135 @@ function integraDate(array $targets, array $checkers) : array
         throw $e;
     }
 }
+    
+    
+function completaDati(array $dati_uniformi) : array
+{
+    try {
+        if (count($dati_uniformi) === 0) {
+            throw new Exception('Nessuna categoria definita');
+        }
+        
+        $completi = [];
+        foreach ($dati_uniformi as $categoria => $dati) {
+            $completi[$categoria] = riempiCode($dati);
+            if ($categoria === 'manovra') {
+                $completi[$categoria] = riempiNull($completi[$categoria]);
+            } else {
+//                $completi[$categoria] = interpolaNull($completi[$categoria]);
+            }
+        }
+        return $completi;
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function riempiCode(array $dati) : array
+{
+    try {
+        $boundaries = [];
+        $capi = trovaCapi($dati);
+
+        foreach ($dati as $record => $campi) {
+            foreach ($campi as $key => $valore) {
+                if ($key === 'valore') {
+                    if ($record < $capi['testa']['id']) {
+                        $boundaries[$record][$key] = $capi['testa']['valore'];
+                    } elseif ($record > $capi['coda']['id']) {
+                        $boundaries[$record][$key] = $capi['coda']['valore'];
+                    } else {
+                        $boundaries[$record][$key] = $valore;
+                    }
+                } else {
+                    $boundaries[$record][$key] = $valore;
+                }
+            }
+        }
+        return $boundaries;
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function trovaCapi(array $dati) : array
+{
+    try {
+        $capi = [];
+        $iMax = count($dati) - 1;
+        if (isset($dati[0]['valore']) && isset($dati[$iMax]['valore'])) {
+            $testa = [
+                'id' => 0,
+                'valore' => $dati[0]['valore']
+            ];
+            $coda = [
+                'id' => $iMax,
+                'valore' => $dati[$iMax]['valore']
+            ];
+        } else {
+            foreach ($dati as $record => $campi) {
+                foreach ($campi as $key => $valore) {
+                    if ($key === 'valore' && isset($valore)) {
+                        if (!isset($testa)) {
+                            $testa = [
+                                'id' => $record,
+                                'valore' => $valore
+                            ];
+                        }
+                        $coda = [
+                            'id' => $record,
+                            'valore' => $valore
+                        ];
+                    }
+                }
+            }
+        }
+        if (isset($testa) && isset($coda)) {
+            $capi = [
+                'testa' => $testa,
+                'coda' => $coda
+            ];
+        } else {
+            throw new Exception('Nessun valore di riferimento trovato');
+        }
+        return $capi;
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function riempiNull(array $dati) : array
+{
+    try {
+        $pieni = [];
+        
+        foreach ($dati as $record => $campi) {
+            foreach ($campi as $key => $valore) {
+                if ($key === 'valore') {
+                    if (isset($valore)) {
+                        $pieni[$record][$key] = $valore;
+                        $prev = $valore;
+                    } else {
+                        if (isset($prev)) {
+                            $pieni[$record][$key] = $prev;
+                        } else {
+                            throw new Exception('Nessun valore di riferimento trovato');
+                        }
+                    }
+                } else {
+                    $pieni[$record][$key] = $valore;
+                }
+            }
+        }
+        return $pieni;
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
