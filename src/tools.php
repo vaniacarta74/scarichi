@@ -436,28 +436,30 @@ function initVolumi(array $variabili, array $dati) : array
 }
 
 
-function addLivello(array $volumi, array $dati) : array
+function addCategoria(array $volumi, array $dati_completi, string $categoria) : array
 {
     try {
-        $livelli = [];
+        $categorie = [];
+        $dati = $dati_completi[$categoria];
         if (count($volumi) !== count($dati)) {
             throw new Exception('Array differenti');
         }
         foreach ($volumi as $record => $campi) {
             foreach ($campi as $campo => $valore) {
-                $livelli[$record][$campo] = $valore;
+                $categorie[$record][$campo] = $valore;
                 
                 if ($campo === 'data_e_ora') {
                     $dato = $dati[$record][$campo];
                     if ($valore->format('d/m/Y H:i:s') === $dato->format('d/m/Y H:i:s')) {
-                        $livelli[$record]['livello'] = $dati[$record]['valore'];
+                        //$categorie[$record][$categoria] = $dati[$record]['valore'];
+                        $categorie[$record][$categoria] = convertiUnita($dati[$record], $categoria);
                     } else {
                         throw new Exception('Date differenti');
                     }
                 }
             }
         }
-        return $livelli;
+        return $categorie;
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -509,6 +511,15 @@ function addPortata(array $dati, array $formule) : array
                     'limite' => $formule['limite']
                 ];
                 $nomi_campo = ['altezza'];
+                break;
+            case 'portata scarico superficie rettangolare con velocita':
+                $coefficienti = [
+                    'mi' => $formule['mi'],
+                    'larghezza' => $formule['larghezza'],
+                    'limite' => $formule['limite'],
+                    'velocita' => $formule['velocita']
+                ];
+                $nomi_campo = ['altezza', 'manovra'];
                 break;
         }
         
@@ -909,6 +920,7 @@ function response(array $request, bool $printed) : string
 function calcolaPortata(string $tipo, array $coefficienti, array $parametri) : float
 {
     try {
+        $g = 9.81;
         switch ($tipo) {
             case 'portata sfiorante':
                 $altezza_sfioro = $parametri['altezza'];
@@ -916,7 +928,21 @@ function calcolaPortata(string $tipo, array $coefficienti, array $parametri) : f
                 $larghezza_soglia = $coefficienti['larghezza'];
 
                 if ($altezza_sfioro > 0) {
-                    $portata = $mi * $larghezza_soglia * $altezza_sfioro * sqrt(2 * 9.81 * $altezza_sfioro);
+                    $portata = $mi * $larghezza_soglia * $altezza_sfioro * sqrt(2 * $g * $altezza_sfioro);
+                } else {
+                    $portata = 0;
+                }
+                break;
+            case 'portata scarico superficie rettangolare con velocita':
+                $altezza_sfioro = $parametri['altezza'];
+                $apertura_paratoia = $parametri['manovra'];
+                $mi = $coefficienti['mi'];
+                $larghezza_soglia = $coefficienti['larghezza'];
+                $velocita = $coefficienti['velocita'];
+                $altezza_cinetica = ($velocita ** 2) / (2 * $g);
+
+                if ($altezza_sfioro > 0) {
+                    $portata = $apertura_paratoia * $mi * $larghezza_soglia * sqrt(2 * $g) * (sqrt(($altezza_sfioro + $altezza_cinetica) ** 3) - sqrt($altezza_cinetica ** 3));
                 } else {
                     $portata = 0;
                 }
@@ -1186,6 +1212,41 @@ function interpola(float $x1, float $x2, float $y1, float $y2, float $x) : float
             $y = ($x - $x1) / ($x2 - $x1) * ($y2 - $y1) + $y1;
         }
         return $y;
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function convertiUnita(array $dati, string $categoria) : float
+{
+    try {
+        if (array_key_exists('unita_misura', $dati) && array_key_exists('valore', $dati)) {
+            $unita = $dati['unita_misura'];
+            $valore = $dati['valore'];
+        } else {
+            throw new Exception('Conversione non riuscita: valore o unita di misura non trovati');
+        }
+        switch ($categoria) {
+            case 'manovra':
+                switch ($unita) {
+                    case '%':
+                        $converted = $valore / 100;
+                        break;
+                    case 'cm':
+                        $converted = $valore / 100;
+                        break;
+                    default:
+                        $converted = $valore;
+                        break;
+                }
+                break;
+            default:
+                $converted = $valore;
+                break;
+        }
+        return $converted;
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;

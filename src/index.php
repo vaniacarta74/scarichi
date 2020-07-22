@@ -72,9 +72,9 @@ try {
     switch ($scarichi[0]['tipo']) {
         case 'sfioratore di superficie':
 
-            $volumi = initVolumi($variabili[0], $dati_acquisiti['livello']);
+            $volumi = initVolumi($variabili[0], $dati_completi['livello']);
 
-            $volumi = addLivello($volumi, $dati_acquisiti['livello']);
+            $volumi = addCategoria($volumi, $dati_completi, 'livello');
 
             $volumi = addMedia($volumi, 'livello');
 
@@ -91,6 +91,22 @@ try {
 
             break;
         case 'scarico di superficie':
+            
+            $volumi = initVolumi($variabili[0], $dati_completi['livello']);
+            
+            $volumi = addCategoria($volumi, $dati_completi, 'livello');
+            
+            $volumi = addMedia($volumi, 'livello');
+            
+            $volumi = addCategoria($volumi, $dati_completi, 'manovra');
+            
+            $volumi = addAltezza($volumi, $formule[0]['quota'], 'media');
+
+            $volumi = addPortata($volumi, $formule[0]);
+
+            $volumi = addDelta($volumi, 'data_e_ora');
+
+            $volumi = addVolume($volumi);
 
             break;
         case 'scarico di mezzofondo':

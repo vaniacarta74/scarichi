@@ -2092,25 +2092,31 @@ class ToolsTest extends TestCase
     
     /**
      * @group depends
-     * covers addLivello()
+     * covers addCategoria()
      * @depends testInitVolumiEquals
      */
-    public function testAddLivelloEquals(array $volumi) : array
+    public function testAddCategoriaEquals(array $volumi) : array
     {
         $dati = [
-            '0' => [
-                'variabile' => 165071,
-                'valore' => 266.206,
-                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
-                'tipo_dato' => 2
-            ],
-            '1' => [
-                'variabile' => 165071,
-                'valore' => 266.140,
-                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
-                'tipo_dato' => 2
+            'livello' => [
+                '0' => [
+                    'variabile' => 165071,
+                    'valore' => 266.206,
+                    'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                    'unita_misura' => 'mslm',
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 165071,
+                    'valore' => 266.140,
+                    'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                    'unita_misura' => 'mslm',
+                    'tipo_dato' => 2
+                ]
             ]
         ];
+        
+        $categoria = 'livello';
         
         $expected = [
             '0' => [
@@ -2127,7 +2133,7 @@ class ToolsTest extends TestCase
             ]
         ];
         
-        $actual = addLivello($volumi, $dati);
+        $actual = addCategoria($volumi, $dati, $categoria);
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
@@ -2145,68 +2151,81 @@ class ToolsTest extends TestCase
     
     /**
      * @group depends
-     * covers addLivello()
+     * covers addCategoria()
      * @depends testInitVolumiEquals
      */
-    public function testAddLivelloException(array $volumi) : array
+    public function testAddCategoriaException(array $volumi) : array
     {
         $dati = [
-            '0' => [
-                'variabile' => 165071,
-                'valore' => 266.206,
-                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
-                'tipo_dato' => 2
-            ],
-            '1' => [
-                'variabile' => 165071,
-                'valore' => 266.140,
-                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
-                'tipo_dato' => 2
-            ],
-            '2' => [
-                'variabile' => 165071,
-                'valore' => 266.127,
-                'data_e_ora' => new \DateTime('2018-01-02 00:30:00'),
-                'tipo_dato' => 2
+            'livello' => [
+                '0' => [
+                    'variabile' => 165071,
+                    'valore' => 266.206,
+                    'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                    'unita_misura' => 'mslm',
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 165071,
+                    'valore' => 266.140,
+                    'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                    'unita_misura' => 'mslm',
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 165071,
+                    'valore' => 266.127,
+                    'data_e_ora' => new \DateTime('2018-01-02 00:30:00'),
+                    'unita_misura' => 'mslm',
+                    'tipo_dato' => 2
+                ]
             ]
         ];
         
+        $categoria = 'livello';
+        
         $this->expectException(\Exception::class);
         
-        $actual = addLivello($volumi, $dati);
+        $actual = addCategoria($volumi, $dati, $categoria);
     }
     
     /**
      * @group depends
-     * covers addLivello()
+     * covers addCategoria()
      * @depends testInitVolumiEquals
      */
-    public function testAddLivelloException1(array $volumi) : void
+    public function testAddCategoriaException1(array $volumi) : void
     {
         $dati = [
-            '0' => [
-                'variabile' => 165071,
-                'valore' => 266.206,
-                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
-                'tipo_dato' => 2
-            ],
-            '1' => [
-                'variabile' => 165071,
-                'valore' => 266.140,
-                'data_e_ora' => new \DateTime('2018-01-02 00:30:00'),
-                'tipo_dato' => 2
+            'livello' => [
+                '0' => [
+                    'variabile' => 165071,
+                    'valore' => 266.206,
+                    'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                    'unita_misura' => 'mslm',
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 165071,
+                    'valore' => 266.140,
+                    'data_e_ora' => new \DateTime('2018-01-02 00:30:00'),
+                    'unita_misura' => 'mslm',
+                    'tipo_dato' => 2
+                ]
             ]
         ];
         
+        $categoria = 'livello';
+        
         $this->expectException(\Exception::class);
         
-        $actual = addLivello($volumi, $dati);
+        $actual = addCategoria($volumi, $dati, $categoria);
     }
     
     /**
      * @group depends
      * covers addMedia()
-     * @depends testAddLivelloEquals
+     * @depends testAddCategoriaEquals
      */
     public function testAddMediaEquals(array $volumi) : array
     {
@@ -2248,7 +2267,7 @@ class ToolsTest extends TestCase
     /**
      * @group depends
      * covers addMedia()
-     * @depends testAddLivelloEquals
+     * @depends testAddCategoriaEquals
      */
     public function testAddMediaException(array $volumi) : void
     {
@@ -2391,8 +2410,8 @@ class ToolsTest extends TestCase
     }
     
     /**
+     * covers addPortata().
      * @group depends
-     * covers addPortata()
      * @depends testAddAltezzaEquals
      */
     public function testAddPortataEqualsWithDelta1(array $volumi) : void
@@ -2419,6 +2438,83 @@ class ToolsTest extends TestCase
             '1' => [
                 'variabile' => 30030,
                 'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media' => 266.173,
+                'altezza' => -0.007,
+                'portata' => 0,
+                'tipo_dato' => 1
+            ]
+        ];
+        
+        $actual = addPortata($volumi, $specifiche);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+            }
+        }
+    }
+    
+    /**
+     * covers addPortata().
+     * @group depends
+     * @depends testAddAltezzaEquals
+     */
+    public function testAddPortataEqualsWithDelta2() : void
+    {
+        $volumi = [
+            '0' => [
+                'variabile' => 30050,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media' => 266.206,
+                'altezza' => 0.026,
+                'tipo_dato' => 1,
+                'manovra' => 1
+            ],
+            '1' => [
+                'variabile' => 30050,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media' => 266.173,
+                'altezza' => -0.007,
+                'tipo_dato' => 1,
+                'manovra' => 1
+            ]
+        ];
+        
+        $specifiche = [
+            'tipo_formula' => 'portata scarico superficie rettangolare con velocita',
+            'scarico' => 22,
+            'mi' => 0.47,
+            'larghezza' => 158.61,
+            'quota' => 16,05,
+            'limite' => 2000,
+            'velocita' => 0.8
+        ];
+        
+        $expected = [
+            '0' => [
+                'variabile' => 30050,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'manovra' => 1,
+                'livello' => 266.206,
+                'media' => 266.206,
+                'altezza' => 0.026,
+                'portata' => 2.741,
+                'tipo_dato' => 1
+                
+            ],
+            '1' => [
+                'variabile' => 30050,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'manovra' => 1,
                 'livello' => 266.140,
                 'media' => 266.173,
                 'altezza' => -0.007,
@@ -3352,22 +3448,63 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group tools
-     * covers calcolaPortata()
+     * @coversNothing
      */
-    public function testCalcolaPortataEquals() : void
+    public function calcolaPortataProvider() : array
     {
-        $tipo = 'portata sfiorante';
-        $coefficienti = [
-            'mi' => 0.47,
-            'larghezza' => 0.387,
-            'limite' => 800
+        $dati = [
+            'sfioro' => [
+                'tipo' => 'portata sfiorante',
+                'coefficienti' => [
+                    'mi' => 0.47,
+                    'larghezza' => 0.387,
+                    'limite' => 800
+                ],
+                'parametri' => [
+                    'altezza' => 10
+                ],
+                'expected' => 25.478
+            ],
+            'superficie velocita' => [
+                'tipo' => 'portata scarico superficie rettangolare con velocita',
+                'coefficienti' => [
+                    'mi' => 0.47,
+                    'larghezza' => 158.61,
+                    'limite' => 2000,
+                    'velocita' => 0.8
+                ],
+                'parametri' => [
+                    'altezza' => 3,
+                    'manovra' => 1
+                ],
+                'expected' => 1741.8875
+            ],
+            'superficie velocita fuori scala' => [
+                'tipo' => 'portata scarico superficie rettangolare con velocita',
+                'coefficienti' => [
+                    'mi' => 0.47,
+                    'larghezza' => 158.61,
+                    'limite' => 2000,
+                    'velocita' => 0.8
+                ],
+                'parametri' => [
+                    'altezza' => -0.3,
+                    'manovra' => 1
+                ],
+                'expected' => 0
+            ]
         ];
-        $parametri = [
-            'altezza' => 10
-        ];
-        $expected = 25.478;
         
+        return $dati;
+    }
+    
+    /**
+     * covers calcolaPortata()
+     * @group tools
+     * @dataProvider calcolaPortataProvider
+     */
+    public function testCalcolaPortataEqualsWithDelta(string $tipo, array $coefficienti, array $parametri, float $expected) : void
+    {
         $actual = calcolaPortata($tipo, $coefficienti, $parametri);
         
         $this->assertEqualsWithDelta($expected, $actual, 0.001);
@@ -5038,7 +5175,7 @@ class ToolsTest extends TestCase
      * @group tools
      * @dataProvider interpolaProvider
      */
-    public function testInterpolaEqualsWithDelta($x1, $x2, $y1, $y2, $x, $expected) : void
+    public function testInterpolaEqualsWithDelta(float $x1, float $x2, float $y1, float $y2, float $x, float $expected) : void
     {
         $actual = interpola($x1, $x2, $y1, $y2, $x);
         
@@ -5056,5 +5193,77 @@ class ToolsTest extends TestCase
         $this->expectException(\Exception::class);
         
         interpola($x[0], $x[1], $x[2], $x[3], $x[4]);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function convertiUnitaProvider() : array
+    {
+        $dati = [
+            'manovra %' => [
+                'dati' => [
+                    'unita_misura' => '%',
+                    'valore' => 100
+                ],
+                'categoria' => 'manovra',
+                'expected' => 1
+            ],
+            'livello' => [
+                'dati' => [
+                    'unita_misura' => 'mslm',
+                    'valore' => 17.3467
+                ],
+                'categoria' => 'livello',
+                'expected' => 17.3467
+            ],
+            'manovra cm' => [
+                'dati' => [
+                    'unita_misura' => 'cm',
+                    'valore' => 234
+                ],
+                'categoria' => 'manovra',
+                'expected' => 2.34
+            ],
+            'manovra m' => [
+                'dati' => [
+                    'unita_misura' => 'm',
+                    'valore' => 2.34
+                ],
+                'categoria' => 'manovra',
+                'expected' => 2.34
+            ]
+        ];
+        
+        return $dati;
+    }
+    
+    /**
+     * covers convertiUnita()
+     * @group tools
+     * @dataProvider convertiUnitaProvider
+     */
+    public function testConvertiUnitaWithDelta(array $dati, string $categoria, float $expected) : void
+    {
+        $actual = convertiUnita($dati, $categoria);
+        
+        $this->assertEqualsWithDelta($expected, $actual, 0.001);
+    }
+    
+    /**
+     * covers convertiUnita()
+     * @group tools
+     */
+    public function testConvertiUnitaException() : void
+    {
+        $dati = [
+            'unita_di_misura' => '%',
+            'valore' => 100
+        ];
+        $categoria = 'manovra';
+        
+        $this->expectException(\Exception::class);
+        
+        convertiUnita($dati, $categoria);
     }
 }
