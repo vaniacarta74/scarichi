@@ -148,7 +148,6 @@ class ToolsTest extends TestCase
                     '0' => [
                         'scarico' => 1,
                         'denominazione' => 'Diga Flumineddu - Sfioratore di superficie',
-                        'db' => 'SSCP_data',
                         'variabile' => 30030,
                         'tipo' => 'sfioratore di superficie'
                     ]
@@ -166,8 +165,8 @@ class ToolsTest extends TestCase
                         'db' => 'SSCP_data',
                         'variabile' => 42,
                         'tipo_dato' => 2,
-                        'data_attivazione' => new \DateTime('1970-01-01 00:00:00'),
-                        'data_disattivazione' => new \DateTime('2017-12-09 00:00:00'),
+                        'data_attivazione' => new \DateTime('1970-01-01 00:00:00', new \DateTimeZone('Europe/Rome')),
+                        'data_disattivazione' => new \DateTime('2017-12-09 00:00:00', new \DateTimeZone('Europe/Rome')),
                         'categoria' => 'livello'
                     ],
                     '1' => [
@@ -264,8 +263,8 @@ class ToolsTest extends TestCase
                         'db' => 'SSCP_data',
                         'variabile' => 42,
                         'tipo dato' => 2,
-                        'data attivazione' => new \DateTime(),
-                        'data disattivazione' => new \DateTime(),
+                        'data attivazione' => new \DateTime('now', new \DateTimeZone('Europe/Rome')),
+                        'data disattivazione' => new \DateTime('now', new \DateTimeZone('Europe/Rome')),
                         'categoria' => 'livello'
                     ]
                 ]
@@ -334,8 +333,8 @@ class ToolsTest extends TestCase
                         'db' => 'SSCP_data',
                         'variabile' => 42,
                         'tipo dato' => 2,
-                        'data attivazione' => new \DateTime(),
-                        'data disattivazione' => new \DateTime(),
+                        'data attivazione' => new \DateTime('now', new \DateTimeZone('Europe/Rome')),
+                        'data disattivazione' => new \DateTime('now', new \DateTimeZone('Europe/Rome')),
                         'categoria' => 'livello'
                     ]
                 ]
@@ -563,48 +562,56 @@ class ToolsTest extends TestCase
                 'input' => '2020-03-29 01:59:59',
                 'locToGMT-1' => false,
                 'd/m/Y' => true,
+                'set' => true,
                 'output' => '29/03/2020 01:59:59'
             ],
             'marzo: solare(GMT-1)-> legale(local)' => [
                 'input' => '2020-03-29 02:00:00',
                 'locToGMT-1' => false,
                 'd/m/Y' => true,
+                'set' => true,
                 'output' => '29/03/2020 03:00:00'
             ],
             'ottobre: solare(GMT-1)-> legale(local)' => [
                 'input' => '2020-10-25 01:59:59',
                 'locToGMT-1' => false,
                 'd/m/Y' => true,
+                'set' => true,
                 'output' => '25/10/2020 02:59:59'
             ],
             'ottobre: solare(GMT-1)-> solare(local)' => [
                 'input' => '2020-10-25 02:00:00',
                 'locToGMT-1' => false,
                 'd/m/Y' => true,
+                'set' => true,
                 'output' => '25/10/2020 02:00:00'
             ],
             'marzo: solare(local)-> solare(GMT-1)' => [
                 'input' => '2020-03-29 01:59:59',
                 'locToGMT-1' => true,
                 'd/m/Y' => true,
+                'set' => true,
                 'output' => '29/03/2020 01:59:59'
             ],
             'marzo: legale(local)-> solare(GMT-1)' => [
                 'input' => '2020-03-29 03:00:00',
                 'locToGMT-1' => true,
                 'd/m/Y' => true,
+                'set' => true,
                 'output' => '29/03/2020 02:00:00'
             ],
             'ottobre: legale(local)-> solare(GMT-1)' => [
                 'input' => '2020-10-25 01:59:59',
                 'locToGMT-1' => true,
                 'd/m/Y' => true,
+                'set' => true,
                 'output' => '25/10/2020 00:59:59'
             ],
             'ottobre: solare(local)-> solare(GMT-1)' => [
                 'input' => '2020-10-25 02:00:00',
                 'locToGMT-1' => true,
                 'd/m/Y' => true,
+                'set' => true,
                 'output' => '25/10/2020 02:00:00'
             ]
         ];
@@ -1709,7 +1716,6 @@ class ToolsTest extends TestCase
             0 => [
                 'scarico' => 1,
                 'denominazione' => 'Diga Flumineddu - Sfioratore di superficie',
-                'db' => 'SSCP_data',
                 'variabile' => 30030,
                 'tipo' => 'sfioratore di superficie'
             ]
@@ -1762,9 +1768,9 @@ class ToolsTest extends TestCase
      * covers changeTimeZone()
      * @dataProvider utcProvider
      */
-    public function testChangeTimeZoneEquals(string $dateIn, bool $isLocalToUTC, bool $format, string $expected) : void
+    public function testChangeTimeZoneEquals(string $dateIn, bool $isLocalToUTC, bool $format, bool $set, string $expected) : void
     {
-        $actual = changeTimeZone($dateIn, $isLocalToUTC, $format);
+        $actual = changeTimeZone($dateIn, $isLocalToUTC, $format, $set);
         
         $this->assertEquals($expected, $actual);
     }
@@ -1780,10 +1786,11 @@ class ToolsTest extends TestCase
     {
         $isLocalToUTC = true;
         $format = true;
+        $set = true;
         
         $this->expectException(\Exception::class);
         
-        changeTimeZone($dateIn, $isLocalToUTC, $format);
+        changeTimeZone($dateIn, $isLocalToUTC, $format, $set);
     }
     
     /**
@@ -1964,19 +1971,35 @@ class ToolsTest extends TestCase
      * covers getDataFromDb()
      * @dataProvider getDataFromDbProvider
      */
-    public function testGetDataFromDbEquals(string $db, string $queryFileName, array $parametri, array $expected) : void
+    public function testGetDataFromDbEquals(string $db, string $queryFileName, array $parametri, array $expecteds) : void
     {
-        $actual = getDataFromDb($db, $queryFileName, $parametri);
-        
-        foreach ($expected as $row => $fields) {
+        $actuals = getDataFromDb($db, $queryFileName, $parametri);
+
+        foreach ($expecteds as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEquals($value, $actual[$row][$key]);
+                if (is_a($value, 'DateTime') && is_a($actuals[$row][$key], 'DateTime')) {
+                    $expected = $value->getTimestamp();
+                    $actual = $actuals[$row][$key]->getTimestamp();
+                    $this->assertEqualsWithDelta($expected, $actual, 3600);
+                } else {
+                    $expected = $value;
+                    $actual = $actuals[$row][$key];
+                    $this->assertEquals($expected, $actual);
+                }
             }
         }
         
-        foreach ($actual as $row => $fields) {
+        foreach ($actuals as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEquals($expected[$row][$key], $value);
+                if (is_a($value, 'DateTime') && is_a($expecteds[$row][$key], 'DateTime')) {
+                    $expected = $expecteds[$row][$key]->getTimestamp();
+                    $actual = $value->getTimestamp();
+                    $this->assertEqualsWithDelta($expected, $actual, 3600);
+                } else {
+                    $expected = $expecteds[$row][$key];
+                    $actual = $value;
+                    $this->assertEquals($expected, $actual);
+                }
             }
         }
     }
@@ -2464,7 +2487,6 @@ class ToolsTest extends TestCase
     /**
      * covers addPortata().
      * @group depends
-     * @depends testAddAltezzaEquals
      */
     public function testAddPortataEqualsWithDelta2() : void
     {
@@ -2490,11 +2512,11 @@ class ToolsTest extends TestCase
         ];
         
         $specifiche = [
-            'tipo_formula' => 'portata scarico superficie rettangolare con velocita',
+            'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
             'scarico' => 22,
             'mi' => 0.47,
             'larghezza' => 158.61,
-            'quota' => 16,05,
+            'quota' => 16.05,
             'limite' => 2000,
             'velocita' => 0.8
         ];
@@ -2515,6 +2537,81 @@ class ToolsTest extends TestCase
                 'variabile' => 30050,
                 'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'manovra' => 1,
+                'livello' => 266.140,
+                'media' => 266.173,
+                'altezza' => -0.007,
+                'portata' => 0,
+                'tipo_dato' => 1
+            ]
+        ];
+        
+        $actual = addPortata($volumi, $specifiche);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+            }
+        }
+    }
+    
+    /**
+     * covers addPortata().
+     * @group depends
+     */
+    public function testAddPortataEqualsWithDelta3() : void
+    {
+        $volumi = [
+            '0' => [
+                'variabile' => 30051,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media' => 266.206,
+                'altezza' => 0.026,
+                'tipo_dato' => 1,
+                'manovra' => 0.4
+            ],
+            '1' => [
+                'variabile' => 30051,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media' => 266.173,
+                'altezza' => -0.007,
+                'tipo_dato' => 1,
+                'manovra' => 0.4
+            ]
+        ];
+        
+        $specifiche = [
+            'tipo_formula' => 'portata scarico a sezione rettangolare ad apertura lineare',
+            'scarico' => 23,
+            'mi' => 0.85,
+            'larghezza' => 2.8,
+            'quota' => 213,
+            'limite' => 2000
+        ];
+        
+        $expected = [
+            '0' => [
+                'variabile' => 30051,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'manovra' => 0.4,
+                'livello' => 266.206,
+                'media' => 266.206,
+                'altezza' => 0.026,
+                'portata' => 0.679,
+                'tipo_dato' => 1
+                
+            ],
+            '1' => [
+                'variabile' => 30051,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'manovra' => 0.4,
                 'livello' => 266.140,
                 'media' => 266.173,
                 'altezza' => -0.007,
@@ -3454,8 +3551,8 @@ class ToolsTest extends TestCase
     {
         $dati = [
             'sfioro' => [
-                'tipo' => 'portata sfiorante',
-                'coefficienti' => [
+                'formule' => [
+                    'tipo_formula' => 'portata sfiorante',
                     'mi' => 0.47,
                     'larghezza' => 0.387,
                     'limite' => 800
@@ -3466,11 +3563,11 @@ class ToolsTest extends TestCase
                 'expected' => 25.478
             ],
             'superficie velocita' => [
-                'tipo' => 'portata scarico superficie rettangolare con velocita',
-                'coefficienti' => [
+                'formule' => [
+                    'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
                     'mi' => 0.47,
                     'larghezza' => 158.61,
-                    'limite' => 2000,
+                    'limite' => 2379.27,
                     'velocita' => 0.8
                 ],
                 'parametri' => [
@@ -3480,16 +3577,68 @@ class ToolsTest extends TestCase
                 'expected' => 1741.8875
             ],
             'superficie velocita fuori scala' => [
-                'tipo' => 'portata scarico superficie rettangolare con velocita',
-                'coefficienti' => [
+                'formule' => [
+                    'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
                     'mi' => 0.47,
                     'larghezza' => 158.61,
-                    'limite' => 2000,
+                    'limite' => 2379.27,
                     'velocita' => 0.8
                 ],
                 'parametri' => [
                     'altezza' => -0.3,
                     'manovra' => 1
+                ],
+                'expected' => 0
+            ],
+            'mezzofondo lineare' => [
+                'formule' => [
+                    'tipo_formula' => 'portata scarico a sezione rettangolare ad apertura lineare',
+                    'mi' => 0.85,
+                    'larghezza' => 2.8,
+                    'limite' => 189.34
+                ],
+                'parametri' => [
+                    'altezza' => 1,
+                    'manovra' => 0.40
+                ],
+                'expected' => 4.217
+            ],
+            'mezzofondo lineare fuori scala' => [
+                'formule' => [
+                    'tipo_formula' => 'portata scarico a sezione rettangolare ad apertura lineare',
+                    'mi' => 0.85,
+                    'larghezza' => 2.8,
+                    'limite' => 189.34
+                ],
+                'parametri' => [
+                    'altezza' => -1,
+                    'manovra' => 0.40
+                ],
+                'expected' => 0
+            ],
+            'by-pass' => [
+                'formule' => [
+                    'tipo_formula' => 'portata scarico a sezione circolare e apertura percentuale',
+                    'mi' => 0.9,
+                    'raggio' => 0.1,
+                    'limite' => 0.75
+                ],
+                'parametri' => [
+                    'altezza' => 10,
+                    'manovra' => 0.50
+                ],
+                'expected' => 0.19792
+            ],
+            'by-pass fuori scala' => [
+                'formule' => [
+                    'tipo_formula' => 'portata scarico a sezione circolare e apertura percentuale',
+                    'mi' => 0.9,
+                    'raggio' => 0.1,
+                    'limite' => 0.75
+                ],
+                'parametri' => [
+                    'altezza' => -10,
+                    'manovra' => 0.50
                 ],
                 'expected' => 0
             ]
@@ -3503,9 +3652,9 @@ class ToolsTest extends TestCase
      * @group tools
      * @dataProvider calcolaPortataProvider
      */
-    public function testCalcolaPortataEqualsWithDelta(string $tipo, array $coefficienti, array $parametri, float $expected) : void
+    public function testCalcolaPortataEqualsWithDelta(array $formule, array $parametri, float $expected) : void
     {
-        $actual = calcolaPortata($tipo, $coefficienti, $parametri);
+        $actual = calcolaPortata($formule, $parametri);
         
         $this->assertEqualsWithDelta($expected, $actual, 0.001);
     }
@@ -3516,8 +3665,8 @@ class ToolsTest extends TestCase
      */
     public function testCalcolaPortataException() : void
     {
-        $tipo = '';
-        $coefficienti = [
+        $formule = [
+            'tipo_formula' => '',
             'mi' => 0.47,
             'larghezza' => 0.387,
             'limite' => 800
@@ -3526,7 +3675,7 @@ class ToolsTest extends TestCase
         
         $this->expectException(\Exception::class);
         
-        calcolaPortata($tipo, $coefficienti, $parametri);
+        calcolaPortata($formule, $parametri);
     }
     
     /**
@@ -4268,6 +4417,326 @@ class ToolsTest extends TestCase
                 }
             }
         }
+    }
+    
+    /**
+     * @group index
+     * covers uniformaCategorie()
+     */
+    public function testUniformaCategorieEquals2() : array
+    {
+        $dati_acquisiti = [
+            'livello' => [
+                '0' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '3' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '4' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '5' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '6' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 03:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '7' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 03:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '8' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'manovra' => [
+                '0' => [
+                    'variabile' => 30033,
+                    'valore' => 0,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 0:59:00'),
+                    'tipo_dato' => 1
+                ],
+                '1' => [
+                    'variabile' => 30033,
+                    'valore' => 0,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:11:00'),
+                    'tipo_dato' => 1
+                ],
+                '2' => [
+                    'variabile' => 30033,
+                    'valore' => 0,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '3' => [
+                    'variabile' => 30033,
+                    'valore' => 0,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:59:00'),
+                    'tipo_dato' => 1
+                ],
+                '4' => [
+                    'variabile' => 30033,
+                    'valore' => 0,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 03:59:00'),
+                    'tipo_dato' => 1
+                ]
+            ]
+        ];
+        
+        $expected = [
+            'livello' => [
+                '0' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 1067,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 0:59:00'),
+                    'tipo_dato' => 2
+                ],
+                '3' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '4' => [
+                    'variabile' => 1067,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:11:00'),
+                    'tipo_dato' => 2
+                ],
+                '5' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '6' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '7' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '8' => [
+                    'variabile' => 1067,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:59:00'),
+                    'tipo_dato' => 2
+                ],
+                '9' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 03:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '10' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 03:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '11' => [
+                    'variabile' => 1067,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 03:59:00'),
+                    'tipo_dato' => 2
+                ],
+                '12' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'manovra' => [
+                '0' => [
+                    'variabile' => 30033,
+                    'valore' => null,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '1' => [
+                    'variabile' => 30033,
+                    'valore' => null,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '2' => [
+                    'variabile' => 30033,
+                    'valore' => 0,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 0:59:00'),
+                    'tipo_dato' => 1
+                ],
+                '3' => [
+                    'variabile' => 30033,
+                    'valore' => null,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '4' => [
+                    'variabile' => 30033,
+                    'valore' => 0,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:11:00'),
+                    'tipo_dato' => 1
+                ],
+                '5' => [
+                    'variabile' => 30033,
+                    'valore' => null,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '6' => [
+                    'variabile' => 30033,
+                    'valore' => null,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '7' => [
+                    'variabile' => 30033,
+                    'valore' => null,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '8' => [
+                    'variabile' => 30033,
+                    'valore' => 0,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:59:00'),
+                    'tipo_dato' => 1
+                ],
+                '9' => [
+                    'variabile' => 30033,
+                    'valore' => null,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 03:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '10' => [
+                    'variabile' => 30033,
+                    'valore' => null,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 03:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '11' => [
+                    'variabile' => 30033,
+                    'valore' => 0,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 03:59:00'),
+                    'tipo_dato' => 1
+                ],
+                '12' => [
+                    'variabile' => 30033,
+                    'valore' => null,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 1
+                ]
+            ],
+        ];
+        
+        $actual = uniformaCategorie($dati_acquisiti);
+        
+        foreach ($actual as $categoria => $dati) {
+            foreach ($dati as $row => $fields) {
+                foreach ($fields as $key => $value) {
+                    $this->assertEquals($expected[$categoria][$row][$key], $value);
+                }
+            }
+        }
+        
+        foreach ($expected as $categoria => $dati) {
+            foreach ($dati as $row => $fields) {
+                foreach ($fields as $key => $value) {
+                    $this->assertEquals($value, $actual[$categoria][$row][$key]);
+                }
+            }
+        }
+        return $actual;
     }
     
     /**
@@ -5265,5 +5734,265 @@ class ToolsTest extends TestCase
         $this->expectException(\Exception::class);
         
         convertiUnita($dati, $categoria);
+    }
+    
+    /**
+     * @group index
+     * covers eraseDoubleDate()
+     */
+    public function testEraseDoubleDateEquals() : array
+    {
+        $dati_acquisiti = [
+            'livello monte' => [
+                '0' => [
+                    'variabile' => 1067,
+                    'valore' => 17.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 1067,
+                    'valore' => 18.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 1067,
+                    'valore' => 19.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'livello valle' => [
+                '0' => [
+                    'variabile' => 42,
+                    'valore' => 17.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 42,
+                    'valore' => 27.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 42,
+                    'valore' => 37.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '3' => [
+                    'variabile' => 42,
+                    'valore' => 57.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '4' => [
+                    'variabile' => 42,
+                    'valore' => 47.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'manovra' => [
+                '0' => [
+                    'variabile' => 30033,
+                    'valore' => 0,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '1' => [
+                    'variabile' => 30033,
+                    'valore' => 0.5,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '2' => [
+                    'variabile' => 30033,
+                    'valore' => 1,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '3' => [
+                    'variabile' => 30033,
+                    'valore' => 0.5,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                    'tipo_dato' => 1
+                ]
+            ]
+        ];
+        
+        $expected = [
+            'livello monte' => [
+                '0' => [
+                    'variabile' => 1067,
+                    'valore' => 17.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 1067,
+                    'valore' => 18.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'livello valle' => [
+                '0' => [
+                    'variabile' => 42,
+                    'valore' => 17.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 42,
+                    'valore' => 27.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 42,
+                    'valore' => 47.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'manovra' => [
+                '0' => [
+                    'variabile' => 30033,
+                    'valore' => 0,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '1' => [
+                    'variabile' => 30033,
+                    'valore' => 1,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '2' => [
+                    'variabile' => 30033,
+                    'valore' => 0.5,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                    'tipo_dato' => 1
+                ]
+            ]
+        ];
+        
+        $actual = eraseDoubleDate($dati_acquisiti);
+        
+        foreach ($actual as $categoria => $dati) {
+            foreach ($dati as $row => $fields) {
+                foreach ($fields as $key => $value) {
+                    $this->assertEquals($expected[$categoria][$row][$key], $value);
+                }
+            }
+        }
+        
+        foreach ($expected as $categoria => $dati) {
+            foreach ($dati as $row => $fields) {
+                foreach ($fields as $key => $value) {
+                    $this->assertEquals($value, $actual[$categoria][$row][$key]);
+                }
+            }
+        }
+        return $actual;
+    }
+    
+    /**
+     * covers eraseDoubleDate().
+     * @group index
+     */
+    public function testEraseDoubleDateException() : void
+    {
+        $dati_acquisiti = [];
+        
+        $this->expectException(\Exception::class);
+        
+        eraseDoubleDate($dati_acquisiti);
+    }
+    
+    /**
+     * covers changeDate().
+     * @group tools
+     */
+    public function testChangeDateEquals() : void
+    {
+        $dati = [
+            'pluto' => 'pippo',
+            'topolino' => new \DateTime('2020-12-31 00:30:00'),
+            'paperino' => 313
+        ];
+        
+        $expected = [
+            'pluto' => 'pippo',
+            'topolino' => '31/12/2020 00:30:00',
+            'paperino' => 313
+        ];
+        
+        $actual = changeDate($dati);
+        
+        foreach ($actual as $key => $value) {
+            $this->assertEquals($expected[$key], $value);
+        }
+        
+        foreach ($expected as $key => $value) {
+            $this->assertEquals($value, $actual[$key]);
+        }
+    }
+    
+    /**
+     * @group csv
+     * covers debugOnCSV()
+     */
+    public function testDebugOnCsvFileExists() : void
+    {
+        $fileName = 'test_debug';
+        
+        $dati = [
+            '0' => [
+                'variabile' => '30030',
+                'data_e_ora' => new \DateTime('2020-12-31 20:30:00'),
+                'tipo_dato' => '1',
+                'valore' => '2221,930'
+            ],
+            '1' => [
+                'variabile' => '30030',
+                'data_e_ora' => new \DateTime('2020-12-31 20:45:00'),
+                'tipo_dato' => '1',
+                'valore' => '2250,234'
+            ],
+            '2' => [
+                'variabile' => '30030',
+                'data_e_ora' => new \DateTime('2020-12-31 21:00:00'),
+                'tipo_dato' => '1',
+                'valore' => '2278,234'
+            ]
+        ];
+        
+        debugOnCSV($dati, $fileName);
+        
+        $this->assertFileExists($fileName);
     }
 }

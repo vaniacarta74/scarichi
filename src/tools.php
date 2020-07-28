@@ -1,4 +1,12 @@
 <?php
+/**
+ * Progetto scarichi funzioni di utilità.
+ *
+ * In questo file sono contenute tutte le funzioni utilizzate nel file index.php per il calcolo del volume
+ * scaricato da un invaso attraverso un particolare organo di scarico.
+ *
+ * @author Vania Carta
+ */
 
 require_once(__DIR__ . '/config/config.php');
 require_once('php_MSSQL_router.inc.php');
@@ -451,7 +459,6 @@ function addCategoria(array $volumi, array $dati_completi, string $categoria) : 
                 if ($campo === 'data_e_ora') {
                     $dato = $dati[$record][$campo];
                     if ($valore->format('d/m/Y H:i:s') === $dato->format('d/m/Y H:i:s')) {
-                        //$categorie[$record][$categoria] = $dati[$record]['valore'];
                         $categorie[$record][$categoria] = convertiUnita($dati[$record], $categoria);
                     } else {
                         throw new Exception('Date differenti');
@@ -502,27 +509,7 @@ function addPortata(array $dati, array $formule) : array
         if (count($formule) === 0) {
             throw new Exception('Formula scarico non definita');
         }
-        $tipo = $formule['tipo_formula'];
-        switch ($tipo) {
-            case 'portata sfiorante':
-                $coefficienti = [
-                    'mi' => $formule['mi'],
-                    'larghezza' => $formule['larghezza'],
-                    'limite' => $formule['limite']
-                ];
-                $nomi_campo = ['altezza'];
-                break;
-            case 'portata scarico superficie rettangolare con velocita':
-                $coefficienti = [
-                    'mi' => $formule['mi'],
-                    'larghezza' => $formule['larghezza'],
-                    'limite' => $formule['limite'],
-                    'velocita' => $formule['velocita']
-                ];
-                $nomi_campo = ['altezza', 'manovra'];
-                break;
-        }
-        
+        $nomi_campo = ['altezza', 'manovra'];
         $portate = [];
         foreach ($dati as $record => $campi) {
             $parametri = [];
@@ -533,7 +520,7 @@ function addPortata(array $dati, array $formule) : array
                     $parametri[$campo] = $dati[$record][$campo];
                 }
             }
-            $portate[$record]['portata'] = calcolaPortata($tipo, $coefficienti, $parametri);
+            $portate[$record]['portata'] = calcolaPortata($formule, $parametri);
         }
         return $portate;
     } catch (Throwable $e) {
@@ -640,7 +627,7 @@ function format(array $dati, string $field) : array
 }
 
 
-function changeTimeZone(string $dateIn, bool $isLocalToUTC, bool $format)
+function changeTimeZone(string $dateIn, bool $isLocalToUTC, bool $format, bool $set)
 {
     try {
         if (!preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (?:2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]$/", $dateIn)) {
@@ -656,7 +643,9 @@ function changeTimeZone(string $dateIn, bool $isLocalToUTC, bool $format)
         }
 
         $dateTime = new DateTime($dateIn, new DateTimeZone($zoneIn));
-        $dateTime->setTimezone(new DateTimeZone($zoneOut));
+        if ($set) {
+            $dateTime->setTimezone(new DateTimeZone($zoneOut));
+        }
 
         if ($format) {
             $dateOut = $dateTime->format('d/m/Y H:i:s');
@@ -698,9 +687,13 @@ function checkDates(string $db, array $dates, bool $isLocalToUTC) : array
     try {
         $checkedDates = [];
         foreach ($dates as $key => $date) {
-            if (is_a($date, 'DateTime') && ($db === 'SPT')) {
+            if (is_a($date, 'DateTime')) {
                 $dateString = $date->format('Y-m-d H:i:s');
-                $checkedDates[$key] = changeTimeZone($dateString, $isLocalToUTC, false);
+                if ($db === 'SPT') {
+                    $checkedDates[$key] = changeTimeZone($dateString, $isLocalToUTC, false, true);
+                } else {
+                    $checkedDates[$key] = changeTimeZone($dateString, true, false, false);
+                }
             } else {
                 $checkedDates[$key] = $date;
             }
@@ -744,6 +737,26 @@ function checkNull($value)
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
+}
+
+function changeDate(array $values) : array
+{
+    try {
+        $res = [];
+        foreach ($values as $key => $value) {
+            if (is_a($value, 'DateTime')) {
+                $res[$key] = $value->format('d/m/Y H:i:s');
+            } else {
+                $res[$key] = $value;
+            }
+        }
+        return $res;
+        // @codeCoverageIgnoreStart
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+    // @codeCoverageIgnoreEnd
 }
 
 function getDataFromDb(string $db, string $queryFileName, array $parametri) : array
@@ -917,32 +930,58 @@ function response(array $request, bool $printed) : string
     }
 }
 
-function calcolaPortata(string $tipo, array $coefficienti, array $parametri) : float
+function calcolaPortata(array $formule, array $parametri) : float
 {
     try {
         $g = 9.81;
+        $tipo = $formule['tipo_formula'];
         switch ($tipo) {
             case 'portata sfiorante':
-                $altezza_sfioro = $parametri['altezza'];
-                $mi = $coefficienti['mi'];
-                $larghezza_soglia = $coefficienti['larghezza'];
+                $altezza_idrostatica = $parametri['altezza'];
+                $mi = $formule['mi'];
+                $larghezza_soglia = $formule['larghezza'];
 
-                if ($altezza_sfioro > 0) {
-                    $portata = $mi * $larghezza_soglia * $altezza_sfioro * sqrt(2 * $g * $altezza_sfioro);
+                if ($altezza_idrostatica > 0) {
+                    $portata = $mi * $larghezza_soglia * $altezza_idrostatica * sqrt(2 * $g * $altezza_idrostatica);
                 } else {
                     $portata = 0;
                 }
                 break;
-            case 'portata scarico superficie rettangolare con velocita':
-                $altezza_sfioro = $parametri['altezza'];
+            case 'portata scarico a sezione rettangolare con velocita e apertura percentuale':
+                $altezza_idrostatica = $parametri['altezza'];
                 $apertura_paratoia = $parametri['manovra'];
-                $mi = $coefficienti['mi'];
-                $larghezza_soglia = $coefficienti['larghezza'];
-                $velocita = $coefficienti['velocita'];
+                $mi = $formule['mi'];
+                $larghezza_soglia = $formule['larghezza'];
+                $velocita = $formule['velocita'];
                 $altezza_cinetica = ($velocita ** 2) / (2 * $g);
 
-                if ($altezza_sfioro > 0) {
-                    $portata = $apertura_paratoia * $mi * $larghezza_soglia * sqrt(2 * $g) * (sqrt(($altezza_sfioro + $altezza_cinetica) ** 3) - sqrt($altezza_cinetica ** 3));
+                if ($altezza_idrostatica > 0) {
+                    $portata = $mi * $larghezza_soglia * $apertura_paratoia * sqrt(2 * $g) * (sqrt(($altezza_idrostatica + $altezza_cinetica) ** 3) - sqrt($altezza_cinetica ** 3));
+                } else {
+                    $portata = 0;
+                }
+                break;
+            case 'portata scarico a sezione rettangolare ad apertura lineare':
+                $altezza_idrostatica = $parametri['altezza'];
+                $apertura_paratoia = $parametri['manovra'];
+                $mi = $formule['mi'];
+                $larghezza_soglia = $formule['larghezza'];
+                
+                if ($altezza_idrostatica > 0) {
+                    $portata = $mi * $larghezza_soglia * $apertura_paratoia * sqrt(2 * $g * $altezza_idrostatica);
+                } else {
+                    $portata = 0;
+                }
+                break;
+            case 'portata scarico a sezione circolare e apertura percentuale':
+                $altezza_idrostatica = $parametri['altezza'];
+                $apertura_paratoia = $parametri['manovra'];
+                $mi = $formule['mi'];
+                $raggio = $formule['raggio'];
+                $area_sezione = pi() * $raggio ** 2;
+                
+                if ($altezza_idrostatica > 0) {
+                    $portata = $mi * $area_sezione * $apertura_paratoia * sqrt(2 * $g * $altezza_idrostatica);
                 } else {
                     $portata = 0;
                 }
@@ -951,7 +990,7 @@ function calcolaPortata(string $tipo, array $coefficienti, array $parametri) : f
                 throw new Exception('Tipologia di portata non definita');
                 break;
         }
-        return ($portata <= $coefficienti['limite']) ? $portata : 0;
+        return ($portata <= $formule['limite']) ? $portata : 0;
     } catch (Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
@@ -1251,4 +1290,43 @@ function convertiUnita(array $dati, string $categoria) : float
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
+}
+
+
+function eraseDoubleDate(array $dati_acquisiti) : array
+{
+    try {
+        if (count($dati_acquisiti) === 0) {
+            throw new Exception('Nessuna categoria definita');
+        }
+        
+        $erased = [];
+        foreach ($dati_acquisiti as $categoria => $dati) {
+            $erased[$categoria][] = $dati[0];
+            $iMax = count($dati) - 1;
+            for ($i = 1; $i <= $iMax; $i++) {
+                if ($dati[$i]['data_e_ora'] != $dati[$i - 1]['data_e_ora']) {
+                    $erased[$categoria][] = $dati[$i];
+                }
+            }
+        }
+        return $erased;
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function debugOnCSV(array $dati, string $fileName) : void
+{
+    try {
+        $changedDatas = array_map('changeDate', $dati);
+        printToCSV($changedDatas, CSV . '/' . $fileName . '.csv');
+        // @codeCoverageIgnoreStart
+    } catch (Throwable $e) {
+        printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+    // @codeCoverageIgnoreEnd
 }

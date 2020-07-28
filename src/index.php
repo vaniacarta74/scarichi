@@ -12,9 +12,6 @@ try {
     ];
     $scarichi = getDataFromDb($db, $queryFileName, $parametri);
 
-    //echo '<br/><b>Variabile Scarico:</b>';
-    //var_dump($scarichi);
-
     $db = 'dbcore';
     $queryFileName = 'query_variabili_scarichi';
     $parametri = [
@@ -22,18 +19,12 @@ try {
     ];
     $variabili_scarichi = getDataFromDb($db, $queryFileName, $parametri);
 
-    //echo '<br/><b>Variabili Correlate Scarico:</b>';
-    //var_dump($variabili_scarichi);
-
-    $db = $scarichi[0]['db'];
+    $db = 'SSCP_data';
     $queryFileName = 'query_variabili';
     $parametri = [
         'variabile' => $scarichi[0]['variabile']
     ];
     $variabili = getDataFromDb($db, $queryFileName, $parametri);
-
-    //echo '<br/><b>Variabile Volume Scaricato:</b>';
-    //var_dump($variabili);
 
     $dati_acquisiti = [];
     foreach ($variabili_scarichi as $record) {
@@ -54,11 +45,10 @@ try {
 
         $dati_acquisiti = array_merge_recursive($dati_acquisiti, $dati);
     }
-
-    //echo '<br/><b>Dati Acquisiti:</b>';
-    //var_dump($dati_acquisiti);
     
-    $dati_uniformati = uniformaCategorie($dati_acquisiti);
+    $dati_ripuliti = eraseDoubleDate($dati_acquisiti);
+
+    $dati_uniformati = uniformaCategorie($dati_ripuliti);
     
     $dati_completi = completaDati($dati_uniformati);
     
@@ -86,9 +76,6 @@ try {
 
             $volumi = addVolume($volumi);
 
-            //echo '<br/><b>Volumi Sfiorati:</b>';
-            //var_dump($volumi);
-
             break;
         case 'scarico di superficie':
             
@@ -110,9 +97,60 @@ try {
 
             break;
         case 'scarico di mezzofondo':
+            
+            $volumi = initVolumi($variabili[0], $dati_completi['livello']);
+            
+            $volumi = addCategoria($volumi, $dati_completi, 'livello');
+            
+            $volumi = addMedia($volumi, 'livello');
+            
+            $volumi = addCategoria($volumi, $dati_completi, 'manovra');
+            
+            $volumi = addAltezza($volumi, $formule[0]['quota'], 'media');
 
+            $volumi = addPortata($volumi, $formule[0]);
+
+            $volumi = addDelta($volumi, 'data_e_ora');
+
+            $volumi = addVolume($volumi);
+            
             break;
         case 'scarico di fondo':
+            
+            $volumi = initVolumi($variabili[0], $dati_completi['livello']);
+            
+            $volumi = addCategoria($volumi, $dati_completi, 'livello');
+            
+            $volumi = addMedia($volumi, 'livello');
+            
+            $volumi = addCategoria($volumi, $dati_completi, 'manovra');
+            
+            $volumi = addAltezza($volumi, $formule[0]['quota'], 'media');
+
+            $volumi = addPortata($volumi, $formule[0]);
+
+            $volumi = addDelta($volumi, 'data_e_ora');
+
+            $volumi = addVolume($volumi);
+
+            break;
+        case 'scarico by-pass':
+            
+            $volumi = initVolumi($variabili[0], $dati_completi['livello']);
+            
+            $volumi = addCategoria($volumi, $dati_completi, 'livello');
+            
+            $volumi = addMedia($volumi, 'livello');
+            
+            $volumi = addCategoria($volumi, $dati_completi, 'manovra');
+            
+            $volumi = addAltezza($volumi, $formule[0]['quota'], 'media');
+
+            $volumi = addPortata($volumi, $formule[0]);
+
+            $volumi = addDelta($volumi, 'data_e_ora');
+
+            $volumi = addVolume($volumi);
 
             break;
         case 'galleria':
@@ -123,9 +161,6 @@ try {
     $volumi = format($volumi, $request['field']);
     
     $volumi = filter($volumi, $request['full']);
-
-    //echo '<br/><b>Volumi Formattati:</b>';
-    //var_dump($volumi);
 
     $printed = divideAndPrint($volumi, $request['full'], $request['field']);
     
