@@ -3576,7 +3576,7 @@ class ToolsTest extends TestCase
                 ],
                 'expected' => 1741.8875
             ],
-            'superficie velocita fuori scala' => [
+            'superficie velocita sotto soglia' => [
                 'formule' => [
                     'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
                     'mi' => 0.47,
@@ -3603,7 +3603,7 @@ class ToolsTest extends TestCase
                 ],
                 'expected' => 4.217
             ],
-            'mezzofondo lineare fuori scala' => [
+            'mezzofondo lineare sotto soglia' => [
                 'formule' => [
                     'tipo_formula' => 'portata scarico a sezione rettangolare ad apertura lineare',
                     'mi' => 0.85,
@@ -3629,7 +3629,7 @@ class ToolsTest extends TestCase
                 ],
                 'expected' => 0.19792
             ],
-            'by-pass fuori scala' => [
+            'by-pass sotto soglia' => [
                 'formule' => [
                     'tipo_formula' => 'portata scarico a sezione circolare e apertura percentuale',
                     'mi' => 0.9,
@@ -3639,6 +3639,62 @@ class ToolsTest extends TestCase
                 'parametri' => [
                     'altezza' => -10,
                     'manovra' => 0.50
+                ],
+                'expected' => 0
+            ],
+            'ventola' => [
+                'formule' => [
+                    'tipo_formula' => 'portata ventola',
+                    'mi' => 0.48,
+                    'larghezza' => 10,
+                    'altezza' => 2,
+                    'angolo' => 60,
+                    'limite' => 139,217
+                ],
+                'parametri' => [
+                    'altezza' => 1,
+                    'manovra' => 45 / 180 * pi()
+                ],
+                'expected' => 79.1638
+            ],
+            'ventola sotto soglia' => [
+                'formule' => [
+                    'tipo_formula' => 'portata ventola',
+                    'mi' => 0.48,
+                    'larghezza' => 10,
+                    'altezza' => 2,
+                    'angolo' => 60,
+                    'limite' => 139,217
+                ],
+                'parametri' => [
+                    'altezza' => -1.5,
+                    'manovra' => 45 / 180 * pi()
+                ],
+                'expected' => 0
+            ],
+            'saracinesca' => [
+                'formule' => [
+                    'tipo_formula' => 'portata saracinesca',
+                    'mi' => 0.9,
+                    'raggio' => 0.45,
+                    'limite' => 15.26
+                ],
+                'parametri' => [
+                    'altezza' => 30,
+                    'manovra' => 0.6
+                ],
+                'expected' => 9.7883
+            ],
+            'saracinesca sotto soglia' => [
+                'formule' => [
+                    'tipo_formula' => 'portata saracinesca',
+                    'mi' => 0.9,
+                    'raggio' => 0.45,
+                    'limite' => 15.26
+                ],
+                'parametri' => [
+                    'altezza' => 0.4,
+                    'manovra' => 0.9
                 ],
                 'expected' => 0
             ]
@@ -5701,6 +5757,14 @@ class ToolsTest extends TestCase
                 ],
                 'categoria' => 'manovra',
                 'expected' => 2.34
+            ],
+            'manovra gradi' => [
+                'dati' => [
+                    'unita_misura' => 'gradi',
+                    'valore' => 60
+                ],
+                'categoria' => 'manovra',
+                'expected' => 1.04719
             ]
         ];
         

@@ -986,6 +986,40 @@ function calcolaPortata(array $formule, array $parametri) : float
                     $portata = 0;
                 }
                 break;
+            case 'portata ventola':
+                $altezza_idrostatica = $parametri['altezza'];
+                $rad_ventola = $parametri['manovra'];
+                $mi = $formule['mi'];
+                $larghezza = $formule['larghezza'];
+                $angolo_max = $formule['angolo'];
+                $rad_max = $angolo_max / 180 * pi();
+                $altezza_max = $formule['altezza'];
+                $profondita_ventola = $altezza_max / sin($rad_max);
+                $apertura_ventola = $altezza_max - $profondita_ventola * sin($rad_max - $rad_ventola);
+                $tirante = $altezza_idrostatica + $apertura_ventola;
+                
+                if ($tirante > 0) {
+                    $portata = $mi * $larghezza * $tirante * sqrt(2 * $g * $tirante);
+                } else {
+                    $portata = 0;
+                }
+                break;
+            case 'portata saracinesca':
+                $altezza_idrostatica = $parametri['altezza'];
+                $altezza_saracinesca = $parametri['manovra'];
+                $mi = $formule['mi'];
+                $raggio = $formule['raggio'];
+                $k = ($raggio - $altezza_saracinesca) / $raggio;
+                $rad_angolo = 2 * acos($k);
+                $area_scarico = ($rad_angolo - sin($rad_angolo)) * ($raggio ** 2) / 2;
+                $tirante = $altezza_idrostatica - ($altezza_saracinesca / 2);
+                
+                if ($tirante > 0) {
+                    $portata = $mi * $area_scarico * sqrt(2 * $g * $tirante);
+                } else {
+                    $portata = 0;
+                }
+                break;
             default:
                 throw new Exception('Tipologia di portata non definita');
                 break;
@@ -1275,6 +1309,9 @@ function convertiUnita(array $dati, string $categoria) : float
                         break;
                     case 'cm':
                         $converted = $valore / 100;
+                        break;
+                    case 'gradi':
+                        $converted = $valore / 180 * pi();
                         break;
                     default:
                         $converted = $valore;
