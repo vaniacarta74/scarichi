@@ -226,7 +226,11 @@ class ToolsTest extends TestCase
                         'tipo_formula' => 'portata sfiorante',
                         'scarico' => 1,
                         'mi' => 0.47,
+                        'scabrosita' => null,
+                        'lunghezza' => null,
                         'larghezza' => 40.5,
+                        'altezza' => null,
+                        'angolo' => null,
                         'raggio' => null,
                         'quota' => 276.5,
                         'velocita' => null,
@@ -1738,7 +1742,11 @@ class ToolsTest extends TestCase
                 'tipo_formula' => 'portata sfiorante',
                 'scarico' => 1,
                 'mi' => 0.47,
+                'scabrosita' => null,
+                'lunghezza' => null,
                 'larghezza' => 40.5,
+                'altezza' => null,
+                'angolo' => null,
                 'raggio' => null,
                 'quota' => 276.5,
                 'velocita' => null,
@@ -2259,14 +2267,14 @@ class ToolsTest extends TestCase
                 'variabile' => 30030,
                 'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
-                'media' => 266.206,
+                'media livello' => 266.206,
                 'tipo_dato' => 1
             ],
             '1' => [
                 'variabile' => 30030,
                 'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'livello' => 266.140,
-                'media' => 266.173,
+                'media livello' => 266.173,
                 'tipo_dato' => 1
             ]
         ];
@@ -2308,16 +2316,21 @@ class ToolsTest extends TestCase
      */
     public function testAddAltezzaEquals(array $volumi) : array
     {
-        $quota = 266.180;
-        
-        $campo = 'media';
+        $specifiche = [
+            'tipo_formula' => 'portata sfiorante',
+            'scarico' => 1,
+            'mi' => 0.47,
+            'larghezza' => 40.5,
+            'quota' => 266.180,
+            'limite' => 942.67
+        ];
         
         $expected = [
             '0' => [
                 'variabile' => 30030,
                 'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
-                'media' => 266.206,
+                'media livello' => 266.206,
                 'altezza' => 0.026,
                 'tipo_dato' => 1
             ],
@@ -2325,13 +2338,88 @@ class ToolsTest extends TestCase
                 'variabile' => 30030,
                 'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'livello' => 266.140,
-                'media' => 266.173,
+                'media livello' => 266.173,
                 'altezza' => -0.007,
                 'tipo_dato' => 1
             ]
         ];
         
-        $actual = addAltezza($volumi, $quota, $campo);
+        $actual = addAltezza($volumi, $specifiche);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($expected[$row][$key], $value);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($value, $actual[$row][$key]);
+            }
+        }
+        return $actual;
+    }
+    
+    /**
+     * @group depends
+     * covers addAltezza()
+     */
+    public function testAddAltezzaEquals1() : array
+    {
+        $volumi = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media livello' => 265,
+                'livello valle' => 266.206,
+                'media livello valle' => 261,
+                'tipo_dato' => 1
+            ],
+            '1' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media livello' => 265,
+                'livello valle' => 266.206,
+                'media livello valle' => 258,
+                'tipo_dato' => 1
+            ]
+        ];
+        
+        $specifiche = [
+            'tipo_formula' => 'portata galleria',
+            'scarico' => 1,
+            'mi' => 0.47,
+            'larghezza' => 40.5,
+            'quota' => 260,
+            'limite' => 942.67
+        ];
+        
+        $expected = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media livello' => 265,
+                'livello valle' => 266.206,
+                'media livello valle' => 261,
+                'altezza' => 4,
+                'tipo_dato' => 1
+            ],
+            '1' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media livello' => 265,
+                'livello valle' => 266.206,
+                'media livello valle' => 258,
+                'altezza' => 5,
+                'tipo_dato' => 1
+            ]
+        ];
+        
+        $actual = addAltezza($volumi, $specifiche);
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
@@ -2354,29 +2442,11 @@ class ToolsTest extends TestCase
      */
     public function testAddAltezzaException(array $volumi) : array
     {
-        $quota = 266.180;
-        
-        $campo = 'pippo';
+        $specifiche = [];
         
         $this->expectException(\Exception::class);
         
-        addAltezza($volumi, $quota, $campo);
-    }
-    
-    /**
-     * @group depends
-     * covers addAltezza()
-     * @depends testAddMediaEquals
-     */
-    public function testAddAltezzaException1(array $volumi) : array
-    {
-        $quota = null;
-        
-        $campo = 'media';
-        
-        $this->expectException(\Exception::class);
-        
-        addAltezza($volumi, $quota, $campo);
+        addAltezza($volumi, $specifiche);
     }
     
     /**
@@ -2400,7 +2470,7 @@ class ToolsTest extends TestCase
                 'variabile' => 30030,
                 'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
-                'media' => 266.206,
+                'media livello' => 266.206,
                 'altezza' => 0.026,
                 'portata' => 0.353,
                 'tipo_dato' => 1
@@ -2409,7 +2479,7 @@ class ToolsTest extends TestCase
                 'variabile' => 30030,
                 'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'livello' => 266.140,
-                'media' => 266.173,
+                'media livello' => 266.173,
                 'altezza' => -0.007,
                 'portata' => 0,
                 'tipo_dato' => 1
@@ -2453,7 +2523,7 @@ class ToolsTest extends TestCase
                 'variabile' => 30030,
                 'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
-                'media' => 266.206,
+                'media livello' => 266.206,
                 'altezza' => 0.026,
                 'portata' => 0,
                 'tipo_dato' => 1
@@ -2462,7 +2532,7 @@ class ToolsTest extends TestCase
                 'variabile' => 30030,
                 'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'livello' => 266.140,
-                'media' => 266.173,
+                'media livello' => 266.173,
                 'altezza' => -0.007,
                 'portata' => 0,
                 'tipo_dato' => 1
@@ -2495,7 +2565,7 @@ class ToolsTest extends TestCase
                 'variabile' => 30050,
                 'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
-                'media' => 266.206,
+                'media livello' => 266.206,
                 'altezza' => 0.026,
                 'tipo_dato' => 1,
                 'manovra' => 1
@@ -2504,7 +2574,7 @@ class ToolsTest extends TestCase
                 'variabile' => 30050,
                 'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'livello' => 266.140,
-                'media' => 266.173,
+                'media livello' => 266.173,
                 'altezza' => -0.007,
                 'tipo_dato' => 1,
                 'manovra' => 1
@@ -2527,7 +2597,7 @@ class ToolsTest extends TestCase
                 'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'manovra' => 1,
                 'livello' => 266.206,
-                'media' => 266.206,
+                'media livello' => 266.206,
                 'altezza' => 0.026,
                 'portata' => 2.741,
                 'tipo_dato' => 1
@@ -2538,7 +2608,7 @@ class ToolsTest extends TestCase
                 'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'manovra' => 1,
                 'livello' => 266.140,
-                'media' => 266.173,
+                'media livello' => 266.173,
                 'altezza' => -0.007,
                 'portata' => 0,
                 'tipo_dato' => 1
@@ -2571,7 +2641,7 @@ class ToolsTest extends TestCase
                 'variabile' => 30051,
                 'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
-                'media' => 266.206,
+                'media livello' => 266.206,
                 'altezza' => 0.026,
                 'tipo_dato' => 1,
                 'manovra' => 0.4
@@ -2580,7 +2650,7 @@ class ToolsTest extends TestCase
                 'variabile' => 30051,
                 'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'livello' => 266.140,
-                'media' => 266.173,
+                'media livello' => 266.173,
                 'altezza' => -0.007,
                 'tipo_dato' => 1,
                 'manovra' => 0.4
@@ -2602,7 +2672,7 @@ class ToolsTest extends TestCase
                 'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'manovra' => 0.4,
                 'livello' => 266.206,
-                'media' => 266.206,
+                'media livello' => 266.206,
                 'altezza' => 0.026,
                 'portata' => 0.679,
                 'tipo_dato' => 1
@@ -2613,7 +2683,7 @@ class ToolsTest extends TestCase
                 'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'manovra' => 0.4,
                 'livello' => 266.140,
-                'media' => 266.173,
+                'media livello' => 266.173,
                 'altezza' => -0.007,
                 'portata' => 0,
                 'tipo_dato' => 1
@@ -2663,7 +2733,7 @@ class ToolsTest extends TestCase
                 'variabile' => 30030,
                 'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
-                'media' => 266.206,
+                'media livello' => 266.206,
                 'altezza' => 0.026,
                 'portata' => 0.353,
                 'delta' => 0,
@@ -2673,7 +2743,7 @@ class ToolsTest extends TestCase
                 'variabile' => 30030,
                 'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'livello' => 266.140,
-                'media' => 266.173,
+                'media livello' => 266.173,
                 'altezza' => -0.007,
                 'portata' => 0,
                 'delta' => 900,
@@ -2737,7 +2807,7 @@ class ToolsTest extends TestCase
                 'variabile' => 30030,
                 'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
-                'media' => 266.206,
+                'media livello' => 266.206,
                 'altezza' => 0.026,
                 'portata' => 0.353,
                 'delta' => 0,
@@ -2748,7 +2818,7 @@ class ToolsTest extends TestCase
                 'variabile' => 30030,
                 'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'livello' => 266.140,
-                'media' => 266.173,
+                'media livello' => 266.173,
                 'altezza' => -0.007,
                 'portata' => 0,
                 'delta' => 900,
@@ -2784,7 +2854,7 @@ class ToolsTest extends TestCase
                 'variabile' => 30030,
                 'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
-                'media' => 266.206,
+                'media livello' => 266.206,
                 'altezza' => 0.026,
                 'tipo_dato' => 1
             ]
@@ -2806,7 +2876,7 @@ class ToolsTest extends TestCase
                 'variabile' => 30030,
                 'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
-                'media' => 266.206,
+                'media livello' => 266.206,
                 'altezza' => 0.026,
                 'delta' => 900,
                 'tipo_dato' => 1
@@ -2829,7 +2899,7 @@ class ToolsTest extends TestCase
                 'variabile' => 30030,
                 'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'livello' => 266.206,
-                'media' => 266.206,
+                'media livello' => 266.206,
                 'altezza' => 0.026,
                 'portata' => 12.98,
                 'tipo_dato' => 1
@@ -3695,6 +3765,57 @@ class ToolsTest extends TestCase
                 'parametri' => [
                     'altezza' => 0.4,
                     'manovra' => 0.9
+                ],
+                'expected' => 0
+            ],
+            'galleria' => [
+                'formule' => [
+                    'tipo_formula' => 'portata galleria',
+                    'scabrosita' => 0.1,
+                    'lunghezza' => 6890,
+                    'angolo' => 301,
+                    'raggio' => 1.25,
+                    'quota' => 264.18,
+                    'limite' => 266.247
+                ],
+                'parametri' => [
+                    'livello' => 270,
+                    'altezza' => 5,
+                    'manovra' => 2
+                ],
+                'expected' => 6.713206
+            ],
+            'galleria sbocco libero' => [
+                'formule' => [
+                    'tipo_formula' => 'portata galleria',
+                    'scabrosita' => 0.1,
+                    'lunghezza' => 6890,
+                    'angolo' => 301,
+                    'raggio' => 1.25,
+                    'quota' => 264.18,
+                    'limite' => 266.247
+                ],
+                'parametri' => [
+                    'livello' => 270,
+                    'altezza' => 5.82,
+                    'manovra' => 2
+                ],
+                'expected' => 7.2428
+            ],
+            'galleria moto a pelo libero' => [
+                'formule' => [
+                    'tipo_formula' => 'portata galleria',
+                    'scabrosita' => 0.1,
+                    'lunghezza' => 6890,
+                    'angolo' => 301,
+                    'raggio' => 1.25,
+                    'quota' => 264.18,
+                    'limite' => 266.247
+                ],
+                'parametri' => [
+                    'livello' => 266,
+                    'altezza' => 1.82,
+                    'manovra' => 2
                 ],
                 'expected' => 0
             ]

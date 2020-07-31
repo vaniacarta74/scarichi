@@ -68,7 +68,7 @@ try {
 
             $volumi = addMedia($volumi, 'livello');
 
-            $volumi = addAltezza($volumi, $formule[0]['quota'], 'media');
+            $volumi = addAltezza($volumi, $formule[0]);
 
             $volumi = addPortata($volumi, $formule[0]);
 
@@ -87,7 +87,7 @@ try {
             
             $volumi = addCategoria($volumi, $dati_completi, 'manovra');
             
-            $volumi = addAltezza($volumi, $formule[0]['quota'], 'media');
+            $volumi = addAltezza($volumi, $formule[0]);
 
             $volumi = addPortata($volumi, $formule[0]);
 
@@ -106,7 +106,7 @@ try {
             
             $volumi = addCategoria($volumi, $dati_completi, 'manovra');
             
-            $volumi = addAltezza($volumi, $formule[0]['quota'], 'media');
+            $volumi = addAltezza($volumi, $formule[0]);
 
             $volumi = addPortata($volumi, $formule[0]);
 
@@ -125,7 +125,7 @@ try {
             
             $volumi = addCategoria($volumi, $dati_completi, 'manovra');
             
-            $volumi = addAltezza($volumi, $formule[0]['quota'], 'media');
+            $volumi = addAltezza($volumi, $formule[0]);
 
             $volumi = addPortata($volumi, $formule[0]);
 
@@ -144,7 +144,7 @@ try {
             
             $volumi = addCategoria($volumi, $dati_completi, 'manovra');
             
-            $volumi = addAltezza($volumi, $formule[0]['quota'], 'media');
+            $volumi = addAltezza($volumi, $formule[0]);
 
             $volumi = addPortata($volumi, $formule[0]);
 
@@ -154,6 +154,26 @@ try {
 
             break;
         case 'galleria':
+            
+            $volumi = initVolumi($variabili[0], $dati_completi['livello']);
+            
+            $volumi = addCategoria($volumi, $dati_completi, 'livello');
+            
+            $volumi = addMedia($volumi, 'livello');
+            
+            $volumi = addCategoria($volumi, $dati_completi, 'livello valle');
+            
+            $volumi = addMedia($volumi, 'livello valle');
+            
+            $volumi = addCategoria($volumi, $dati_completi, 'manovra');
+            
+            $volumi = addAltezza($volumi, $formule[0]);
+
+            $volumi = addPortata($volumi, $formule[0]);
+
+            $volumi = addDelta($volumi, 'data_e_ora');
+
+            $volumi = addVolume($volumi);
 
             break;
     }

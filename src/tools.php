@@ -369,7 +369,7 @@ function addMedia(array $dati, string $nomeCampo) : array
                     } else {
                         $media = ($valore + $medie[$record - 1][$campo])/2;
                     }
-                    $medie[$record]['media'] = $media;
+                    $medie[$record]['media ' . $nomeCampo] = $media;
                 }
             }
         }
@@ -474,24 +474,38 @@ function addCategoria(array $volumi, array $dati_completi, string $categoria) : 
 }
 
 
-function addAltezza(array $dati, ?float $quota, string $nomeCampo) : array
+function addAltezza(array $dati, array $formule) : array
 {
     try {
-        if (!isset($quota)) {
-            throw new Exception('Quota non definita');
+        if (count($formule) === 0) {
+            throw new Exception('Formula scarico non definita');
         }
-        
+        $quota = $formule['quota'];
+        $nomeCampo = 'media livello';
+        $nomeCampoAux = 'media livello valle';
         $altezze = [];
         foreach ($dati as $record => $campi) {
-            if (!array_key_exists($nomeCampo, $campi)) {
-                throw new Exception('Campo inesistente. Impossibile calcolare l\'altezza');
-            }
-            
-            foreach ($campi as $campo => $valore) {
-                $altezze[$record][$campo] = $valore;
-
-                if ($campo === $nomeCampo) {
-                    $altezze[$record]['altezza'] = $dati[$record][$campo] - $quota;
+            if (!array_key_exists($nomeCampoAux, $campi)) {
+                foreach ($campi as $campo => $valore) {
+                    $altezze[$record][$campo] = $valore;
+                    if ($campo === $nomeCampo) {
+                        $altezze[$record]['altezza'] = $dati[$record][$campo] - $quota;
+                    }
+                }
+            } else {
+                foreach ($campi as $campo => $valore) {
+                    $altezze[$record][$campo] = $valore;
+                    if ($campo === $nomeCampo) {
+                        $livelloMonte = $dati[$record][$campo];
+                    }
+                    if ($campo === $nomeCampoAux) {
+                        $livelloValle = $dati[$record][$campo];
+                    }
+                }
+                if ($livelloValle > $quota) {
+                    $altezze[$record]['altezza'] = $livelloMonte - $livelloValle;
+                } else {
+                    $altezze[$record]['altezza'] = $livelloMonte - $quota;
                 }
             }
         }
@@ -509,7 +523,7 @@ function addPortata(array $dati, array $formule) : array
         if (count($formule) === 0) {
             throw new Exception('Formula scarico non definita');
         }
-        $nomi_campo = ['altezza', 'manovra'];
+        $nomi_campo = ['livello', 'altezza', 'manovra'];
         $portate = [];
         foreach ($dati as $record => $campi) {
             $parametri = [];
@@ -1016,6 +1030,43 @@ function calcolaPortata(array $formule, array $parametri) : float
                 
                 if ($tirante > 0) {
                     $portata = $mi * $area_scarico * sqrt(2 * $g * $tirante);
+                } else {
+                    $portata = 0;
+                }
+                break;
+            case 'portata galleria':
+                $livello_monte = $parametri['livello'];
+                $altezza_idrostatica = $parametri['altezza'];
+                $altezza_saracinesca = $parametri['manovra'];
+                
+                $scabrosita = $formule['scabrosita'];
+                $lunghezza_galleria = $formule['lunghezza'];
+                $raggio = $formule['raggio'];
+                $quota = $formule['quota'];
+                $angolo_limite = $formule['angolo'];
+                $quota_limite = $formule['limite'];
+                
+                $R = $raggio / 2;
+                $chi = 87 / (1 + $scabrosita / sqrt($R));
+                $J = $altezza_idrostatica / $lunghezza_galleria;
+                $area = pi() * $raggio ** 2;
+                
+                $portata_base = $chi * $area * sqrt($R * $J);
+                
+                $rad_limite = $angolo_limite / 180 * pi();
+                $altezza_saracinesca_limite = $raggio * (1 - cos($rad_limite / 2));
+                $area_limite = ($rad_limite - sin($rad_limite)) * ($raggio ** 2) / 2;
+                $arco_limite = $rad_limite * $raggio;
+                $R_limite = $area_limite / $arco_limite;
+                $chi_limite = 87 / (1 + $scabrosita / sqrt($R_limite));
+                $J_limite = ($quota_limite - $quota) / $lunghezza_galleria;
+                
+                $portata_limite = $chi_limite * $area_limite * sqrt($R_limite * $J_limite);
+                
+                $energia_limite = $altezza_saracinesca_limite + (($portata_limite ** 2) / (2 * $g * $area_limite ** 2));
+                                
+                if ($livello_monte > $quota_limite) {
+                    $portata = $portata_base * $altezza_saracinesca / $energia_limite;
                 } else {
                     $portata = 0;
                 }
