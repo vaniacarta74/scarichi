@@ -1,8 +1,55 @@
 <?php
-
 namespace vaniacarta74\scarichi\tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+
+use function vaniacarta74\scarichi\src\checkFilter as checkFilter;
+use function vaniacarta74\scarichi\src\checkVariable as checkVariable;
+use function vaniacarta74\scarichi\src\formatDate as formatDate;
+use function vaniacarta74\scarichi\src\formatDateTime as formatDateTime;
+use function vaniacarta74\scarichi\src\checkInterval as checkInterval;
+use function vaniacarta74\scarichi\src\setDateTimes as setDateTimes;
+use function vaniacarta74\scarichi\src\checkRequest as checkRequest;
+use function vaniacarta74\scarichi\src\checkField as checkField;
+use function vaniacarta74\scarichi\src\connect as connect;
+use function vaniacarta74\scarichi\src\query as query;
+use function vaniacarta74\scarichi\src\fetch as fetch;
+use function vaniacarta74\scarichi\src\changeTimeZone as changeTimeZone;
+use function vaniacarta74\scarichi\src\checkDates as checkDates;
+use function vaniacarta74\scarichi\src\datesToString as datesToString;
+use function vaniacarta74\scarichi\src\setToLocal as setToLocal;
+use function vaniacarta74\scarichi\src\getDataFromDb as getDataFromDb;
+use function vaniacarta74\scarichi\src\initVolumi as initVolumi;
+use function vaniacarta74\scarichi\src\addCategoria as addCategoria;
+use function vaniacarta74\scarichi\src\addMedia as addMedia;
+use function vaniacarta74\scarichi\src\addAltezza as addAltezza;
+use function vaniacarta74\scarichi\src\addPortata as addPortata;
+use function vaniacarta74\scarichi\src\addDelta as addDelta;
+use function vaniacarta74\scarichi\src\addVolume as addVolume;
+use function vaniacarta74\scarichi\src\format as format;
+use function vaniacarta74\scarichi\src\setFile as setFile;
+use function vaniacarta74\scarichi\src\printToCSV as printToCSV;
+use function vaniacarta74\scarichi\src\printPart as printPart;
+use function vaniacarta74\scarichi\src\divideAndPrint as divideAndPrint;
+use function vaniacarta74\scarichi\src\checkNull as checkNull;
+use function vaniacarta74\scarichi\src\response as response;
+use function vaniacarta74\scarichi\src\errorHandler as errorHandler;
+use function vaniacarta74\scarichi\src\close as close;
+use function vaniacarta74\scarichi\src\calcolaPortata as calcolaPortata;
+use function vaniacarta74\scarichi\src\integraDate as integraDate;
+use function vaniacarta74\scarichi\src\uniformaCategorie as uniformaCategorie;
+use function vaniacarta74\scarichi\src\completaDati as completaDati;
+use function vaniacarta74\scarichi\src\trovaCapi as trovaCapi;
+use function vaniacarta74\scarichi\src\riempiCode as riempiCode;
+use function vaniacarta74\scarichi\src\riempiNull as riempiNull;
+use function vaniacarta74\scarichi\src\interpolaNull as interpolaNull;
+use function vaniacarta74\scarichi\src\interpola as interpola;
+use function vaniacarta74\scarichi\src\convertiUnita as convertiUnita;
+use function vaniacarta74\scarichi\src\eraseDoubleDate as eraseDoubleDate;
+use function vaniacarta74\scarichi\src\changeDate as changeDate;
+use function vaniacarta74\scarichi\src\filter as filter;
+use function vaniacarta74\scarichi\src\debugOnCSV as debugOnCSV;
+
 
 class ToolsTest extends TestCase
 {
@@ -1004,7 +1051,7 @@ class ToolsTest extends TestCase
         $request = null;
         
         $this->assertTrue(
-            checkFilter($request)
+                checkFilter($request)
         );
     }
     

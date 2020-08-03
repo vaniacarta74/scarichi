@@ -1,4 +1,5 @@
 <?php
+namespace vaniacarta74\scarichi\src\config;
 
 define('CSV', __DIR__ . '/../csv');
 define('MAXRECORD', 10000);

@@ -7,6 +7,7 @@
  *
  * @author Vania Carta
  */
+namespace vaniacarta74\scarichi\src;
 
 require_once(__DIR__ . '/config/config.php');
 require_once('php_MSSQL_router.inc.php');
@@ -14,12 +15,12 @@ require_once('php_MSSQL_router.inc.php');
 
 function printErrorInfo(string $functionName) : void
 {
-    $date = new DateTime();
+    $date = new \DateTime();
     echo $date->format('d/m/Y H:i:s') . ': Errore fatale funzione <b>' . $functionName . '()</b><br/>';
 }
 
 
-function errorHandler(Throwable $e) : string
+function errorHandler(\Throwable $e) : string
 {
     $html = '<br/><b>Descrizione Errore:</b><br/>';
     $html .= 'File: ' . $e->getFile() . '<br/>';
@@ -52,7 +53,7 @@ function checkRequest(?array $request) : array
         $checked = array_merge($variables, $dates, $filters, $fields);
         
         return $checked;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -75,12 +76,12 @@ function checkVariable(?array $request) : string
             if ($n_variabile >= 30000 && $n_variabile <= 39999) {
                 return $variabile;
             } else {
-                throw new Exception('Variabile non analizzabile. Valori ammessi compresi fra 30000 e 39999');
+                throw new \Exception('Variabile non analizzabile. Valori ammessi compresi fra 30000 e 39999');
             }
         } else {
-            throw new Exception("Parametro variabile non presente nell'url o nome parametro non valido. Usare var, variable o variabile");
+            throw new \Exception("Parametro variabile non presente nell'url o nome parametro non valido. Usare var, variable o variabile");
         }
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -104,13 +105,13 @@ function checkField(?array $request) : string
             if (in_array($urlField, $fieldsNames)) {
                 $field = $urlField;
             } else {
-                throw new Exception('Nome campo non supportato. Valori ammessi: ' . implode(', ', $fieldsNames));
+                throw new \Exception('Nome campo non supportato. Valori ammessi: ' . implode(', ', $fieldsNames));
             }
         } else {
             $field = 'volume';
         }
         return $field;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -127,7 +128,7 @@ function checkFilter(?array $request) : bool
             } elseif ($full === '1') {
                 $filtered = false;
             } else {
-                throw new Exception('Valore parametro "full" non ammesso. Scegliere fra 0 e 1');
+                throw new \Exception('Valore parametro "full" non ammesso. Scegliere fra 0 e 1');
             }
         } else {
             $filtered = false;
@@ -135,7 +136,7 @@ function checkFilter(?array $request) : bool
         $notFiltered = !$filtered;
         
         return $notFiltered;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -150,7 +151,7 @@ function formatDate(string $date) : string
         $dateParts = explode('/', $cleanDate);
         
         if (count($dateParts) !== 3) {
-            throw new Exception('Parametro data inserito nel formato errato. Formato richiesto "gg/mm/yyyy"');
+            throw new \Exception('Parametro data inserito nel formato errato. Formato richiesto "gg/mm/yyyy"');
         }
 
         $day = intval($dateParts[0]);
@@ -162,9 +163,9 @@ function formatDate(string $date) : string
             
             return $formatDate;
         } else {
-            throw new Exception('Data inserita inesistente');
+            throw new \Exception('Data inserita inesistente');
         }
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -176,14 +177,14 @@ function formatDateTime(string $dateTime) : string
     try {
         $dateTimeParts = explode(' ', $dateTime);
         if (count($dateTimeParts) !== 2) {
-            throw new Exception('Parametro data e ora inserito nel formato errato. Formato richiesto "gg/mm/yyyy hh:ii:ss"');
+            throw new \Exception('Parametro data e ora inserito nel formato errato. Formato richiesto "gg/mm/yyyy hh:ii:ss"');
         }
         
         $dateString = formatDate($dateTimeParts[0]);
         
         $timeParts = explode(':', $dateTimeParts[1]);
         if (count($timeParts) !== 3) {
-            throw new Exception('Parametro data e ora inserito nel formato errato. Formato ora richiesto "hh:ii:ss"');
+            throw new \Exception('Parametro data e ora inserito nel formato errato. Formato ora richiesto "hh:ii:ss"');
         }
 
         $hours = intval($timeParts[0]);
@@ -191,7 +192,7 @@ function formatDateTime(string $dateTime) : string
         $seconds = intval($timeParts[2]);
         
         if ($hours < 0 || $hours > 24 || $minutes < 0 || $minutes > 60 || $seconds < 0 || $seconds > 60) {
-            throw new Exception('Ora inesistente');
+            throw new \Exception('Ora inesistente');
         }
         
         $timeString = date('H:i:s', mktime($hours, $minutes, $seconds));
@@ -201,7 +202,7 @@ function formatDateTime(string $dateTime) : string
         $formatDateTime = date('Y-m-d H:i:s', strtotime($dateTimeString));
         
         return $formatDateTime;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -221,15 +222,15 @@ function checkInterval(?array $request) : array
             $dateFrom = formatDate($request['dateto']);
             $dateTo = date('Y-m-d', strtotime($dateFrom . ' +1 day'));
         } else {
-            throw new Exception('Parametri intervallo date assenti. Indicare uno o entrambi i parametri "datefrom" e "dateto"');
+            throw new \Exception('Parametri intervallo date assenti. Indicare uno o entrambi i parametri "datefrom" e "dateto"');
         }
-        $dateTimeFrom = new DateTime($dateFrom);
-        $dateTimeTo = new DateTime($dateTo);
+        $dateTimeFrom = new \DateTime($dateFrom);
+        $dateTimeTo = new \DateTime($dateTo);
 
         $dates = ['datefrom' => $dateTimeFrom, 'dateto' => $dateTimeTo];
 
         return $dates;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -240,18 +241,18 @@ function setDateTimes(array $request) : array
 {
     try {
         if (count($request) !== 2 && !array_key_exists('datefrom', $request) && !array_key_exists('datefrom', $request)) {
-            throw new Exception('Array non valido. Richieste due chiavi: "datefrom" e "dateto"');
+            throw new \Exception('Array non valido. Richieste due chiavi: "datefrom" e "dateto"');
         }
         $dateFrom = formatDateTime($request['datefrom']);
         $dateTo = formatDateTime($request['dateto']);
         
-        $dateTimeFrom = new DateTime($dateFrom);
-        $dateTimeTo = new DateTime($dateTo);
+        $dateTimeFrom = new \DateTime($dateFrom);
+        $dateTimeTo = new \DateTime($dateTo);
 
         $dates = ['datefrom' => $dateTimeFrom, 'dateto' => $dateTimeTo];
 
         return $dates;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -278,9 +279,9 @@ function connect(string $dbName) //: resource
         if ($conn) {
             return $conn;
         } else {
-            throw new Exception(error());
+            throw new \Exception(error());
         }
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -290,7 +291,7 @@ function connect(string $dbName) //: resource
 function query($conn, string $fileName, array $paramValues)
 {
     try {
-        include __DIR__ . '/include/query/' . $fileName . '.php';
+        include __DIR__ . '/inc/query/' . $fileName . '.php';
 
         $query = str_replace($paramNames, $paramValues, $queryString);
 
@@ -299,9 +300,9 @@ function query($conn, string $fileName, array $paramValues)
         if ($stmt !== false) {
             return $stmt;
         } else {
-            throw new Exception(error());
+            throw new \Exception(error());
         }
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -322,7 +323,7 @@ function fetch($stmt) : ?array
             $dati = [];
         }
         return $dati;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -333,9 +334,9 @@ function close($conn) : void
 {
     try {
         if (!sqlsrv_close($conn)) {
-            throw new Exception(error());
+            throw new \Exception(error());
         }
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -357,7 +358,7 @@ function addMedia(array $dati, string $nomeCampo) : array
         $medie = [];
         foreach ($dati as $record => $campi) {
             if (!array_key_exists($nomeCampo, $campi)) {
-                throw new Exception('Campo inesistente. Impossibile eseguirne la media');
+                throw new \Exception('Campo inesistente. Impossibile eseguirne la media');
             }
             
             foreach ($campi as $campo => $valore) {
@@ -374,7 +375,7 @@ function addMedia(array $dati, string $nomeCampo) : array
             }
         }
         return $medie;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -387,7 +388,7 @@ function addDelta(array $dati, string $nomeCampo) : array
         $delta = [];
         foreach ($dati as $record => $campi) {
             if (!array_key_exists($nomeCampo, $campi)) {
-                throw new Exception('Campo inesistente. Impossibile calcolare il delta temporale');
+                throw new \Exception('Campo inesistente. Impossibile calcolare il delta temporale');
             }
             
             foreach ($campi as $campo => $valore) {
@@ -395,7 +396,7 @@ function addDelta(array $dati, string $nomeCampo) : array
 
                 if ($campo === $nomeCampo) {
                     if (!is_a($valore, 'DateTime')) {
-                        throw new Exception('Per calcolare il delta temporale è neccessario che gli elementi del campo scelto siano del tipo \'DateTime\'');
+                        throw new \Exception('Per calcolare il delta temporale è neccessario che gli elementi del campo scelto siano del tipo \'DateTime\'');
                     }
                     
                     if ($record === 0) {
@@ -410,7 +411,7 @@ function addDelta(array $dati, string $nomeCampo) : array
             }
         }
         return $delta;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -421,7 +422,7 @@ function initVolumi(array $variabili, array $dati) : array
 {
     try {
         if (count($dati) === 0) {
-            throw new Exception('Nessun dato presente per le date selezionate');
+            throw new \Exception('Nessun dato presente per le date selezionate');
         }
         
         $volumi = [];
@@ -437,7 +438,7 @@ function initVolumi(array $variabili, array $dati) : array
             $volumi[$record]['tipo_dato'] = 1;
         }
         return $volumi;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -450,7 +451,7 @@ function addCategoria(array $volumi, array $dati_completi, string $categoria) : 
         $categorie = [];
         $dati = $dati_completi[$categoria];
         if (count($volumi) !== count($dati)) {
-            throw new Exception('Array differenti');
+            throw new \Exception('Array differenti');
         }
         foreach ($volumi as $record => $campi) {
             foreach ($campi as $campo => $valore) {
@@ -461,13 +462,13 @@ function addCategoria(array $volumi, array $dati_completi, string $categoria) : 
                     if ($valore->format('d/m/Y H:i:s') === $dato->format('d/m/Y H:i:s')) {
                         $categorie[$record][$categoria] = convertiUnita($dati[$record], $categoria);
                     } else {
-                        throw new Exception('Date differenti');
+                        throw new \Exception('Date differenti');
                     }
                 }
             }
         }
         return $categorie;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -478,7 +479,7 @@ function addAltezza(array $dati, array $formule) : array
 {
     try {
         if (count($formule) === 0) {
-            throw new Exception('Formula scarico non definita');
+            throw new \Exception('Formula scarico non definita');
         }
         $quota = $formule['quota'];
         $nomeCampo = 'media livello';
@@ -510,7 +511,7 @@ function addAltezza(array $dati, array $formule) : array
             }
         }
         return $altezze;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -521,7 +522,7 @@ function addPortata(array $dati, array $formule) : array
 {
     try {
         if (count($formule) === 0) {
-            throw new Exception('Formula scarico non definita');
+            throw new \Exception('Formula scarico non definita');
         }
         $nomi_campo = ['livello', 'altezza', 'manovra'];
         $portate = [];
@@ -537,7 +538,7 @@ function addPortata(array $dati, array $formule) : array
             $portate[$record]['portata'] = calcolaPortata($formule, $parametri);
         }
         return $portate;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -550,7 +551,7 @@ function addVolume(array $dati) : array
         $volumi = [];
         foreach ($dati as $record => $campi) {
             if (!array_key_exists('portata', $campi) || !array_key_exists('delta', $campi)) {
-                throw new Exception('Dati di portata e delta t assenti impossibile calcolare volume scaricato');
+                throw new \Exception('Dati di portata e delta t assenti impossibile calcolare volume scaricato');
             }
             
             foreach ($campi as $campo => $valore) {
@@ -559,7 +560,7 @@ function addVolume(array $dati) : array
             $volumi[$record]['volume'] = $volumi[$record]['portata'] * $volumi[$record]['delta'];
         }
         return $volumi;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -570,7 +571,7 @@ function setFile(string $variabile, array $dates, bool $filtered, string $field,
 {
     try {
         if (!is_dir($path)) {
-            throw new Exception('Directory inesistente');
+            throw new \Exception('Directory inesistente');
         }
         
         $dateFrom = $dates['datefrom']->format('YmdHi');
@@ -585,7 +586,7 @@ function setFile(string $variabile, array $dates, bool $filtered, string $field,
         }
         
         return $fileName;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -605,7 +606,7 @@ function format(array $dati, string $field) : array
         $formatted = [];
         foreach ($dati as $record => $campi) {
             if (!array_key_exists($field, $campi)) {
-                throw new Exception('Campo inesistente. Impossibile assegnarlo a \'valore\'');
+                throw new \Exception('Campo inesistente. Impossibile assegnarlo a \'valore\'');
             }
             
             foreach ($campi as $campo => $valore) {
@@ -634,7 +635,7 @@ function format(array $dati, string $field) : array
             }
         }
         return $formatted;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -645,7 +646,7 @@ function changeTimeZone(string $dateIn, bool $isLocalToUTC, bool $format, bool $
 {
     try {
         if (!preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (?:2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]$/", $dateIn)) {
-            throw new Exception('Inserire la data nel formato Y-m-d H:i:s');
+            throw new \Exception('Inserire la data nel formato Y-m-d H:i:s');
         }
         
         if ($isLocalToUTC) {
@@ -656,9 +657,9 @@ function changeTimeZone(string $dateIn, bool $isLocalToUTC, bool $format, bool $
             $zoneOut = 'Europe/Rome';
         }
 
-        $dateTime = new DateTime($dateIn, new DateTimeZone($zoneIn));
+        $dateTime = new \DateTime($dateIn, new \DateTimeZone($zoneIn));
         if ($set) {
-            $dateTime->setTimezone(new DateTimeZone($zoneOut));
+            $dateTime->setTimezone(new \DateTimeZone($zoneOut));
         }
 
         if ($format) {
@@ -667,7 +668,7 @@ function changeTimeZone(string $dateIn, bool $isLocalToUTC, bool $format, bool $
             $dateOut = $dateTime;
         }
         return $dateOut;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -681,15 +682,15 @@ function datesToString(array $dates, string $format) : array
             if (is_a($date, 'DateTime')) {
                 $formattedDates[$key] = $date->format($format);
                 
-                if (!DateTime::createFromFormat($format, $formattedDates[$key])) {
-                    throw new Exception('Formato data scelto non valido. Utilizzare "d/m/Y H:i:s" o "Y-m-d H:i:s"');
+                if (!\DateTime::createFromFormat($format, $formattedDates[$key])) {
+                    throw new \Exception('Formato data scelto non valido. Utilizzare "d/m/Y H:i:s" o "Y-m-d H:i:s"');
                 }
             } else {
                 $formattedDates[$key] = $date;
             }
         }
         return $formattedDates;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -714,7 +715,7 @@ function checkDates(string $db, array $dates, bool $isLocalToUTC) : array
         }
         return $checkedDates;
         // @codeCoverageIgnoreStart
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -731,7 +732,7 @@ function setToLocal(string $db, array $dati) : array
         }
         return $locals;
         // @codeCoverageIgnoreStart
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -742,12 +743,12 @@ function checkNull($value)
 {
     try {
         if (is_null($value)) {
-            throw new Exception('Valore parametro non valido o nullo');
+            throw new \Exception('Valore parametro non valido o nullo');
         } else {
             $res = $value;
         }
         return $res;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -766,7 +767,7 @@ function changeDate(array $values) : array
         }
         return $res;
         // @codeCoverageIgnoreStart
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -780,7 +781,7 @@ function getDataFromDb(string $db, string $queryFileName, array $parametri) : ar
         
         $conn = connect($db);
         
-        $checkedParams = array_map('checkNull', $parametri);
+        $checkedParams = array_map('\vaniacarta74\scarichi\src\checkNull', $parametri);
         
         $checkedDateParams = checkDates($db, $checkedParams, true);
         
@@ -795,7 +796,7 @@ function getDataFromDb(string $db, string $queryFileName, array $parametri) : ar
         close($conn);
         
         return $data;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -821,9 +822,9 @@ function printToCSV(array $dati, string $fileName) : void
 
             fclose($handle);
         } else {
-            throw new Exception('Problemi con l\'apertura del file CSV');
+            throw new \Exception('Problemi con l\'apertura del file CSV');
         }
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -837,7 +838,7 @@ function divideAndPrint(array $data, bool $full, string $field, ?int $limit = nu
     
     try {
         if ($limit <= 0) {
-            throw new Exception('Impostare un numero massimo di record da esportare almeno uguale ad 1');
+            throw new \Exception('Impostare un numero massimo di record da esportare almeno uguale ad 1');
         }
         if (count($data) === 0) {
             $printed = false;
@@ -859,7 +860,7 @@ function divideAndPrint(array $data, bool $full, string $field, ?int $limit = nu
             $printed = true;
         }
         return $printed;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -871,7 +872,7 @@ function printPart(array $printableData, int $i, bool $filtered, string $field) 
     try {
         $max = $i - 1;
         if (!array_key_exists($max, $printableData)) {
-            throw new Exception('Indice array in stampa non definito');
+            throw new \Exception('Indice array in stampa non definito');
         }
         
         $variabile = $printableData[0]['variabile'];
@@ -882,7 +883,7 @@ function printPart(array $printableData, int $i, bool $filtered, string $field) 
         $dateTimes = setDateTimes($dates);
         $fileName = setFile($variabile, $dateTimes, $filtered, $field, CSV);
         printToCSV($printableData, $fileName);
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -898,7 +899,7 @@ function filter(array $dati, bool $full) : array
             $filteredData = [];
             foreach ($dati as $record => $campi) {
                 if (!array_key_exists('valore', $campi)) {
-                    throw new Exception('Campo "valore" su cui eseguire il filtro non presente');
+                    throw new \Exception('Campo "valore" su cui eseguire il filtro non presente');
                 }
                 
                 $flag = true;
@@ -913,7 +914,7 @@ function filter(array $dati, bool $full) : array
             }
         }
         return $filteredData;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -925,7 +926,7 @@ function response(array $request, bool $printed) : string
         $keys = array_flip(['var', 'datefrom', 'dateto', 'full', 'field']);
         
         if (array_diff_key($request, $keys) || array_diff_key($keys, $request)) {
-            throw new Exception('Parametri mancanti');
+            throw new \Exception('Parametri mancanti');
         }
         
         $type = $request['full'] ? 'full' : 'senza zeri';
@@ -938,7 +939,7 @@ function response(array $request, bool $printed) : string
             $html .= ' Nessun file CSV <b>' . $type . '</b> esportato per mancanza di dati.';
         }
         return $html;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -1072,11 +1073,11 @@ function calcolaPortata(array $formule, array $parametri) : float
                 }
                 break;
             default:
-                throw new Exception('Tipologia di portata non definita');
+                throw new \Exception('Tipologia di portata non definita');
                 break;
         }
         return ($portata <= $formule['limite']) ? $portata : 0;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -1087,7 +1088,7 @@ function uniformaCategorie(array $dati_acquisiti) : array
 {
     try {
         if (count($dati_acquisiti) === 0) {
-            throw new Exception('Nessuna categoria definita');
+            throw new \Exception('Nessuna categoria definita');
         }
         
         $uniformati = [];
@@ -1101,7 +1102,7 @@ function uniformaCategorie(array $dati_acquisiti) : array
             $uniformati[$categoria] = integraDate($dati, $dati_confronto);
         }
         return $uniformati;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -1112,7 +1113,7 @@ function integraDate(array $targets, array $checkers) : array
 {
     try {
         if (count($targets) === 0) {
-            throw new Exception('Nessun dato presente nel target, modificare date');
+            throw new \Exception('Nessun dato presente nel target, modificare date');
         }
         foreach ($checkers as $categoria => $dati) {
             foreach ($dati as $j => $dato) {
@@ -1143,7 +1144,7 @@ function integraDate(array $targets, array $checkers) : array
             }
         }
         return $targets;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -1154,7 +1155,7 @@ function completaDati(array $dati_uniformi) : array
 {
     try {
         if (count($dati_uniformi) === 0) {
-            throw new Exception('Nessuna categoria definita');
+            throw new \Exception('Nessuna categoria definita');
         }
         
         $completi = [];
@@ -1167,7 +1168,7 @@ function completaDati(array $dati_uniformi) : array
             }
         }
         return $completi;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -1196,7 +1197,7 @@ function riempiCode(array $dati) : array
             }
         }
         return $boundaries;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -1241,10 +1242,10 @@ function trovaCapi(array $dati) : array
                 'coda' => $coda
             ];
         } else {
-            throw new Exception('Nessun valore di riferimento trovato');
+            throw new \Exception('Nessun valore di riferimento trovato');
         }
         return $capi;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -1266,7 +1267,7 @@ function riempiNull(array $dati) : array
                         if (isset($prev)) {
                             $pieni[$record][$key] = $prev;
                         } else {
-                            throw new Exception('Nessun valore di riferimento trovato');
+                            throw new \Exception('Nessun valore di riferimento trovato');
                         }
                     }
                 } else {
@@ -1275,7 +1276,7 @@ function riempiNull(array $dati) : array
             }
         }
         return $pieni;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -1311,7 +1312,7 @@ function interpolaNull(array $dati) : array
                             
                             $interpolati[$record][$key] = $y;
                         } else {
-                            throw new Exception('Nessun valore di riferimento trovato');
+                            throw new \Exception('Nessun valore di riferimento trovato');
                         }
                     }
                 } else {
@@ -1320,7 +1321,7 @@ function interpolaNull(array $dati) : array
             }
         }
         return $interpolati;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -1331,12 +1332,12 @@ function interpola(float $x1, float $x2, float $y1, float $y2, float $x) : float
 {
     try {
         if ($x2 === $x1) {
-            throw new Exception('Divisione per zero');
+            throw new \Exception('Divisione per zero');
         } else {
             $y = ($x - $x1) / ($x2 - $x1) * ($y2 - $y1) + $y1;
         }
         return $y;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -1350,7 +1351,7 @@ function convertiUnita(array $dati, string $categoria) : float
             $unita = $dati['unita_misura'];
             $valore = $dati['valore'];
         } else {
-            throw new Exception('Conversione non riuscita: valore o unita di misura non trovati');
+            throw new \Exception('Conversione non riuscita: valore o unita di misura non trovati');
         }
         switch ($categoria) {
             case 'manovra':
@@ -1374,7 +1375,7 @@ function convertiUnita(array $dati, string $categoria) : float
                 break;
         }
         return $converted;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -1385,7 +1386,7 @@ function eraseDoubleDate(array $dati_acquisiti) : array
 {
     try {
         if (count($dati_acquisiti) === 0) {
-            throw new Exception('Nessuna categoria definita');
+            throw new \Exception('Nessuna categoria definita');
         }
         
         $erased = [];
@@ -1399,7 +1400,7 @@ function eraseDoubleDate(array $dati_acquisiti) : array
             }
         }
         return $erased;
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }
@@ -1409,10 +1410,10 @@ function eraseDoubleDate(array $dati_acquisiti) : array
 function debugOnCSV(array $dati, string $fileName) : void
 {
     try {
-        $changedDatas = array_map('changeDate', $dati);
+        $changedDatas = array_map('\vaniacarta74\scarichi\src\changeDate', $dati);
         printToCSV($changedDatas, CSV . '/' . $fileName . '.csv');
         // @codeCoverageIgnoreStart
-    } catch (Throwable $e) {
+    } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);
         throw $e;
     }

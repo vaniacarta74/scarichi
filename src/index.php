@@ -1,4 +1,23 @@
 <?php
+namespace vaniacarta74\scarichi\src;
+
+use function vaniacarta74\scarichi\src\checkRequest as checkRequest;
+use function vaniacarta74\scarichi\src\getDataFromDb as getDataFromDb;
+use function vaniacarta74\scarichi\src\initVolumi as initVolumi;
+use function vaniacarta74\scarichi\src\addCategoria as addCategoria;
+use function vaniacarta74\scarichi\src\addMedia as addMedia;
+use function vaniacarta74\scarichi\src\addAltezza as addAltezza;
+use function vaniacarta74\scarichi\src\addPortata as addPortata;
+use function vaniacarta74\scarichi\src\addDelta as addDelta;
+use function vaniacarta74\scarichi\src\addVolume as addVolume;
+use function vaniacarta74\scarichi\src\format as format;
+use function vaniacarta74\scarichi\src\divideAndPrint as divideAndPrint;
+use function vaniacarta74\scarichi\src\response as response;
+use function vaniacarta74\scarichi\src\errorHandler as errorHandler;
+use function vaniacarta74\scarichi\src\uniformaCategorie as uniformaCategorie;
+use function vaniacarta74\scarichi\src\completaDati as completaDati;
+use function vaniacarta74\scarichi\src\eraseDoubleDate as eraseDoubleDate;
+use function vaniacarta74\scarichi\src\filter as filter;
 
 try {
     require_once(__DIR__ . '/tools.php');

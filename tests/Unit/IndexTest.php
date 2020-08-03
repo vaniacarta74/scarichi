@@ -1,5 +1,4 @@
 <?php
-
 namespace vaniacarta74\scarichi\tests\Unit;
 
 use PHPUnit\Framework\TestCase;

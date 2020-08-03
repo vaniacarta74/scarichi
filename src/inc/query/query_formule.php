@@ -1,4 +1,5 @@
 <?php
+namespace vaniacarta74\scarichi\src\config\inc\query;
 
 $queryString = "SELECT
                     tipi_formula.tipo_formula,
