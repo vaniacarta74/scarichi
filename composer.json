@@ -1,0 +1,39 @@
+{
+    "name": "vaniacarta74/scarichi",
+    "description": "Applicazione per il calcolo dei volumi scaricati da una diga in base alle serie storiche dei livelli invaso e delle manovre degli organi di scarico.",
+    "version": "1.1.0",
+    "minimum-stability": "stable",
+    "type": "library",
+    "keywords": ["volumi scaricati", "dighe"],    
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vania Carta",
+            "email": "vania.carta@me.com"
+        }
+    ],
+    "support": {
+        "source": "https://github.com/vaniacarta74/scarichi",
+        "issues": "https://github.com/vaniacarta74/scarichi/issues"
+    },
+    "require": {
+        "php": "^7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.5"
+    },
+    "autoload": {
+        "files": [
+            "src/tools.php",
+            "src/config/config.php"            
+        ],
+        "psr-4": {
+            "vaniacarta74\\scarichi\\": "src/" 
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "vaniacarta74\\scarichi\\tests\\": "tests/" 
+        }
+    }
+}

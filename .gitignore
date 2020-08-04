@@ -1,0 +1,6 @@
+/src/csv/
+/tests/log/
+/.php_cs.cache
+/.php_cs.dist
+/docs/
+/vendor/

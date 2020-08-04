@@ -1,0 +1,186 @@
+Tools (vaniacarta74\scarichi\tests\Unit\Tools)
+ [x] Check filter true
+ [x] Check filter true
+ [x] Check filter true
+ [x] Check filter true
+ [x] Check filter not true
+ [x] Check variable exception
+ [x] Check variable exception
+ [x] Check variable exception
+ [x] Check variable exception
+ [x] Check variable exception
+ [x] Check variable is string
+ [x] Check variable equals
+ [x] Format date exception
+ [x] Format date exception
+ [x] Format date exception
+ [x] Format date exception
+ [x] Format date is string
+ [x] Format date equals
+ [x] Format date time exception
+ [x] Format date time exception
+ [x] Format date time exception
+ [x] Format date time exception
+ [x] Format date time is string
+ [x] Format date time equals
+ [x] Check interval is array with data set "null"
+ [x] Check interval is array with data set "void array"
+ [x] Check interval is array with data set "altre chiavi"
+ [x] Check interval is array with data set "from"
+ [x] Check interval is array with data set "to"
+ [x] Check interval is array with data set "from and to"
+ [x] Check interval array has key with data set "null"
+ [x] Check interval array has key with data set "void array"
+ [x] Check interval array has key with data set "altre chiavi"
+ [x] Check interval array has key with data set "from"
+ [x] Check interval array has key with data set "to"
+ [x] Check interval array has key with data set "from and to"
+ [x] Check interval is object with data set "null"
+ [x] Check interval is object with data set "void array"
+ [x] Check interval is object with data set "altre chiavi"
+ [x] Check interval is object with data set "from"
+ [x] Check interval is object with data set "to"
+ [x] Check interval is object with data set "from and to"
+ [x] Check interval instance of with data set "null"
+ [x] Check interval instance of with data set "void array"
+ [x] Check interval instance of with data set "altre chiavi"
+ [x] Check interval instance of with data set "from"
+ [x] Check interval instance of with data set "to"
+ [x] Check interval instance of with data set "from and to"
+ [x] Check interval equals with data set "null"
+ [x] Check interval equals with data set "void array"
+ [x] Check interval equals with data set "altre chiavi"
+ [x] Check interval equals with data set "from"
+ [x] Check interval equals with data set "to"
+ [x] Check interval equals with data set "from and to"
+ [x] Set dates times exception with data set "null"
+ [x] Set dates times exception with data set "void array"
+ [x] Set dates times exception with data set "altre chiavi"
+ [x] Set dates times exception with data set "from"
+ [x] Set dates times exception with data set "to"
+ [x] Set dates times exception with data set "from and to"
+ [x] Set dates times exception with data set "times en format"
+ [x] Set dates times exception with data set "date error"
+ [x] Set dates times exception with data set "time error"
+ [x] Set dates times equals
+ [x] Check request exception with data set "null"
+ [x] Check request exception with data set "void array"
+ [x] Check request exception with data set "altre chiavi"
+ [x] Check request exception with data set "from"
+ [x] Check request exception with data set "to"
+ [x] Check request exception with data set "from and to"
+ [x] Check request exception with data set "times en format"
+ [x] Check request exception with data set "date error"
+ [x] Check request exception with data set "time error"
+ [x] Check request exception with data set "no var"
+ [x] Check request exception with data set "complete bad var"
+ [x] Check request equals with data set "complete"
+ [x] Check request equals with data set "only var"
+ [x] Check request equals with data set "alias var"
+ [x] Check request equals with data set "field"
+ [x] Check request equals with data set "complete"
+ [x] Check request equals with data set "only var"
+ [x] Check request equals with data set "alias var"
+ [x] Check request equals with data set "field"
+ [x] Check request equals with data set "complete"
+ [x] Check request equals with data set "only var"
+ [x] Check request equals with data set "alias var"
+ [x] Check request equals with data set "field"
+ [x] Check request equals with data set "complete"
+ [x] Check request equals with data set "only var"
+ [x] Check request equals with data set "alias var"
+ [x] Check request equals with data set "field"
+ [x] Check field equals with data set "null"
+ [x] Check field equals with data set "void array"
+ [x] Check field equals with data set "altre chiavi"
+ [x] Check field equals with data set "livello"
+ [x] Check field equals with data set "portata"
+ [x] Check field equals with data set "media"
+ [x] Check field equals with data set "delta"
+ [x] Check field equals with data set "altezza"
+ [x] Check field equals with data set "volume"
+ [x] Check field equals with data set "not present"
+ [x] Connect is resource with data set "dbcore"
+ [x] Connect is resource with data set "spt"
+ [x] Connect is resource with data set "sscp_data"
+ [x] Connect is resource with data set "dbutz"
+ [x] Connect is resource with data set "dbumd"
+ [x] Connect is resource
+ [x] Connect exception
+ [x] Query is resource
+ [x] Query is resource
+ [x] Query is resource with data set "scarichi"
+ [x] Query is resource with data set "variabili_scarichi"
+ [x] Query is resource with data set "variabili_SSCP"
+ [x] Query is resource with data set "variabili_SPT"
+ [x] Query is resource with data set "dati_acquisiti"
+ [x] Query is resource with data set "sfiori"
+ [x] Query exception
+ [x] Fetch same
+ [x] Fetch same
+ [x] Change time zone equals with data set "marzo: solare(GMT-1)-> solare(local)"
+ [x] Change time zone equals with data set "marzo: solare(GMT-1)-> legale(local)"
+ [x] Change time zone equals with data set "ottobre: solare(GMT-1)-> legale(local)"
+ [x] Change time zone equals with data set "ottobre: solare(GMT-1)-> solare(local)"
+ [x] Change time zone equals with data set "marzo: solare(local)-> solare(GMT-1)"
+ [x] Change time zone equals with data set "marzo: legale(local)-> solare(GMT-1)"
+ [x] Change time zone equals with data set "ottobre: legale(local)-> solare(GMT-1)"
+ [x] Change time zone equals with data set "ottobre: solare(local)-> solare(GMT-1)"
+ [x] Check dates equals with delta with data set "scarichi l->s"
+ [x] Check dates equals with delta with data set "scarichi s->l"
+ [x] Check dates equals with delta with data set "variabili scarichi l->s"
+ [x] Check dates equals with delta with data set "variabili scarichi s->l"
+ [x] Check dates equals with delta with data set "variabili l->s"
+ [x] Check dates equals with delta with data set "variabili s->l"
+ [x] Check dates equals with delta with data set "dati acquisiti SPT l->s"
+ [x] Check dates equals with delta with data set "dati acquisiti SPT s->l"
+ [x] Check dates equals with delta with data set "dati acquisiti SSCP l->s"
+ [x] Check dates equals with delta with data set "dati acquisiti SSCP s->l"
+ [x] Check dates equals with delta with data set "sfiori l->s"
+ [x] Check dates equals with delta with data set "sfiori s->l"
+ [x] Dates to string is string
+ [x] Dates to string is not string
+ [x] Set to local equals with delta with data set "scarichi"
+ [x] Set to local equals with delta with data set "variabili scarichi"
+ [x] Set to local equals with delta with data set "variabili"
+ [x] Set to local equals with delta with data set "dati acquisiti"
+ [x] Set to local equals with delta with data set "sfiori"
+ [x] Set to local empty
+ [x] Get data from d b equals with data set "scarichi"
+ [x] Get data from d b equals with data set "variabili scarichi"
+ [x] Get data from d b equals with data set "variabili"
+ [x] Get data from d b equals with data set "dati acquisiti"
+ [x] Get data from d b equals with data set "sfiori"
+ [x] Init volumi equals
+ [x] Add livello equals
+ [x] Add livello exception
+ [x] Add livello exception
+ [x] Add media equals
+ [x] Add media exception
+ [x] Add altezza equals
+ [x] Add altezza exception
+ [x] Add portata equals with delta
+ [x] Add portata equals with delta
+ [x] Add delta equals with delta
+ [x] Add delta exception
+ [x] Add delta exception
+ [x] Add volume equals with delta
+ [x] Format equals
+ [x] Format equals
+ [x] Format equals
+ [x] Format exception
+ [x] Filter equals
+ [x] Filter equals
+ [x] Filter empty
+ [x] Set file equals with data set "base"
+ [x] Set file equals with data set "altro campo"
+ [x] Set file equals with data set "filtered"
+ [x] Print to csv file exists
+ [x] Print to csv equals with data set #0
+ [x] Print to csv equals with data set #1
+ [x] Print to csv equals with data set #2
+ [x] Print to csv equals with data set #3
+ [x] Print part
+ [x] Divide and print file exists
+ [x] Divide and print file exists
+
