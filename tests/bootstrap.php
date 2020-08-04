@@ -3,7 +3,7 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
- * 
+ *
  * @author vania
  */
 namespace vaniacarta74\scarichi\tests;
@@ -17,5 +17,4 @@ $_REQUEST['datefrom'] = '01/05/2020';
 $_REQUEST['full'] = 1;
 $_SERVER['SERVER_NAME'] = 'localhost';
 
-include_once __DIR__ . '/../src/index.php';
-include_once __DIR__ . '/classes/CsvFileIterator.php';
+require __DIR__ . '/../vendor/autoload.php';

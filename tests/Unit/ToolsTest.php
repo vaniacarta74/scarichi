@@ -3,53 +3,52 @@ namespace vaniacarta74\scarichi\tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 
-use function vaniacarta74\scarichi\src\checkFilter as checkFilter;
-use function vaniacarta74\scarichi\src\checkVariable as checkVariable;
-use function vaniacarta74\scarichi\src\formatDate as formatDate;
-use function vaniacarta74\scarichi\src\formatDateTime as formatDateTime;
-use function vaniacarta74\scarichi\src\checkInterval as checkInterval;
-use function vaniacarta74\scarichi\src\setDateTimes as setDateTimes;
-use function vaniacarta74\scarichi\src\checkRequest as checkRequest;
-use function vaniacarta74\scarichi\src\checkField as checkField;
-use function vaniacarta74\scarichi\src\connect as connect;
-use function vaniacarta74\scarichi\src\query as query;
-use function vaniacarta74\scarichi\src\fetch as fetch;
-use function vaniacarta74\scarichi\src\changeTimeZone as changeTimeZone;
-use function vaniacarta74\scarichi\src\checkDates as checkDates;
-use function vaniacarta74\scarichi\src\datesToString as datesToString;
-use function vaniacarta74\scarichi\src\setToLocal as setToLocal;
-use function vaniacarta74\scarichi\src\getDataFromDb as getDataFromDb;
-use function vaniacarta74\scarichi\src\initVolumi as initVolumi;
-use function vaniacarta74\scarichi\src\addCategoria as addCategoria;
-use function vaniacarta74\scarichi\src\addMedia as addMedia;
-use function vaniacarta74\scarichi\src\addAltezza as addAltezza;
-use function vaniacarta74\scarichi\src\addPortata as addPortata;
-use function vaniacarta74\scarichi\src\addDelta as addDelta;
-use function vaniacarta74\scarichi\src\addVolume as addVolume;
-use function vaniacarta74\scarichi\src\format as format;
-use function vaniacarta74\scarichi\src\setFile as setFile;
-use function vaniacarta74\scarichi\src\printToCSV as printToCSV;
-use function vaniacarta74\scarichi\src\printPart as printPart;
-use function vaniacarta74\scarichi\src\divideAndPrint as divideAndPrint;
-use function vaniacarta74\scarichi\src\checkNull as checkNull;
-use function vaniacarta74\scarichi\src\response as response;
-use function vaniacarta74\scarichi\src\errorHandler as errorHandler;
-use function vaniacarta74\scarichi\src\close as close;
-use function vaniacarta74\scarichi\src\calcolaPortata as calcolaPortata;
-use function vaniacarta74\scarichi\src\integraDate as integraDate;
-use function vaniacarta74\scarichi\src\uniformaCategorie as uniformaCategorie;
-use function vaniacarta74\scarichi\src\completaDati as completaDati;
-use function vaniacarta74\scarichi\src\trovaCapi as trovaCapi;
-use function vaniacarta74\scarichi\src\riempiCode as riempiCode;
-use function vaniacarta74\scarichi\src\riempiNull as riempiNull;
-use function vaniacarta74\scarichi\src\interpolaNull as interpolaNull;
-use function vaniacarta74\scarichi\src\interpola as interpola;
-use function vaniacarta74\scarichi\src\convertiUnita as convertiUnita;
-use function vaniacarta74\scarichi\src\eraseDoubleDate as eraseDoubleDate;
-use function vaniacarta74\scarichi\src\changeDate as changeDate;
-use function vaniacarta74\scarichi\src\filter as filter;
-use function vaniacarta74\scarichi\src\debugOnCSV as debugOnCSV;
-
+use function vaniacarta74\scarichi\checkFilter as checkFilter;
+use function vaniacarta74\scarichi\checkVariable as checkVariable;
+use function vaniacarta74\scarichi\formatDate as formatDate;
+use function vaniacarta74\scarichi\formatDateTime as formatDateTime;
+use function vaniacarta74\scarichi\checkInterval as checkInterval;
+use function vaniacarta74\scarichi\setDateTimes as setDateTimes;
+use function vaniacarta74\scarichi\checkRequest as checkRequest;
+use function vaniacarta74\scarichi\checkField as checkField;
+use function vaniacarta74\scarichi\connect as connect;
+use function vaniacarta74\scarichi\query as query;
+use function vaniacarta74\scarichi\fetch as fetch;
+use function vaniacarta74\scarichi\changeTimeZone as changeTimeZone;
+use function vaniacarta74\scarichi\checkDates as checkDates;
+use function vaniacarta74\scarichi\datesToString as datesToString;
+use function vaniacarta74\scarichi\setToLocal as setToLocal;
+use function vaniacarta74\scarichi\getDataFromDb as getDataFromDb;
+use function vaniacarta74\scarichi\initVolumi as initVolumi;
+use function vaniacarta74\scarichi\addCategoria as addCategoria;
+use function vaniacarta74\scarichi\addMedia as addMedia;
+use function vaniacarta74\scarichi\addAltezza as addAltezza;
+use function vaniacarta74\scarichi\addPortata as addPortata;
+use function vaniacarta74\scarichi\addDelta as addDelta;
+use function vaniacarta74\scarichi\addVolume as addVolume;
+use function vaniacarta74\scarichi\format as format;
+use function vaniacarta74\scarichi\setFile as setFile;
+use function vaniacarta74\scarichi\printToCSV as printToCSV;
+use function vaniacarta74\scarichi\printPart as printPart;
+use function vaniacarta74\scarichi\divideAndPrint as divideAndPrint;
+use function vaniacarta74\scarichi\checkNull as checkNull;
+use function vaniacarta74\scarichi\response as response;
+use function vaniacarta74\scarichi\errorHandler as errorHandler;
+use function vaniacarta74\scarichi\close as close;
+use function vaniacarta74\scarichi\calcolaPortata as calcolaPortata;
+use function vaniacarta74\scarichi\integraDate as integraDate;
+use function vaniacarta74\scarichi\uniformaCategorie as uniformaCategorie;
+use function vaniacarta74\scarichi\completaDati as completaDati;
+use function vaniacarta74\scarichi\trovaCapi as trovaCapi;
+use function vaniacarta74\scarichi\riempiCode as riempiCode;
+use function vaniacarta74\scarichi\riempiNull as riempiNull;
+use function vaniacarta74\scarichi\interpolaNull as interpolaNull;
+use function vaniacarta74\scarichi\interpola as interpola;
+use function vaniacarta74\scarichi\convertiUnita as convertiUnita;
+use function vaniacarta74\scarichi\eraseDoubleDate as eraseDoubleDate;
+use function vaniacarta74\scarichi\changeDate as changeDate;
+use function vaniacarta74\scarichi\filter as filter;
+use function vaniacarta74\scarichi\debugOnCSV as debugOnCSV;
 
 class ToolsTest extends TestCase
 {
@@ -1051,7 +1050,7 @@ class ToolsTest extends TestCase
         $request = null;
         
         $this->assertTrue(
-                checkFilter($request)
+            checkFilter($request)
         );
     }
     

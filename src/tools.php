@@ -7,9 +7,8 @@
  *
  * @author Vania Carta
  */
-namespace vaniacarta74\scarichi\src;
+namespace vaniacarta74\scarichi;
 
-require_once(__DIR__ . '/config/config.php');
 require_once('php_MSSQL_router.inc.php');
 
 
@@ -781,7 +780,7 @@ function getDataFromDb(string $db, string $queryFileName, array $parametri) : ar
         
         $conn = connect($db);
         
-        $checkedParams = array_map('\vaniacarta74\scarichi\src\checkNull', $parametri);
+        $checkedParams = array_map('\vaniacarta74\scarichi\checkNull', $parametri);
         
         $checkedDateParams = checkDates($db, $checkedParams, true);
         
@@ -1410,7 +1409,7 @@ function eraseDoubleDate(array $dati_acquisiti) : array
 function debugOnCSV(array $dati, string $fileName) : void
 {
     try {
-        $changedDatas = array_map('\vaniacarta74\scarichi\src\changeDate', $dati);
+        $changedDatas = array_map('\vaniacarta74\scarichi\changeDate', $dati);
         printToCSV($changedDatas, CSV . '/' . $fileName . '.csv');
         // @codeCoverageIgnoreStart
     } catch (\Throwable $e) {
