@@ -2,6 +2,7 @@
 namespace vaniacarta74\Scarichi\tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+use vaniacarta74\Scarichi\tests\classes\CsvFileIterator;
 
 use function vaniacarta74\Scarichi\checkFilter as checkFilter;
 use function vaniacarta74\Scarichi\checkVariable as checkVariable;
@@ -3338,11 +3339,11 @@ class ToolsTest extends TestCase
      * @group csv
      * coversNothing
      */
-    public function printToCsvProvider() : \vaniacarta74\Scarichi\tests\classes\CsvFileIterator
+    public function printToCsvProvider() : CsvFileIterator
     {
         $fileName = __DIR__ . '/../providers/test.csv';
         
-        $iterator = new \vaniacarta74\Scarichi\tests\classes\CsvFileIterator($fileName);
+        $iterator = new CsvFileIterator($fileName);
         
         return $iterator;
     }
