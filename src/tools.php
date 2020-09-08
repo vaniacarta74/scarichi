@@ -9,6 +9,8 @@
  */
 namespace vaniacarta74\Scarichi;
 
+use vaniacarta74\Scarichi\Utility;
+
 require_once('php_MSSQL_router.inc.php');
 
 
@@ -53,7 +55,8 @@ function checkRequest(?array $request) : array
         
         return $checked;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        //printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
