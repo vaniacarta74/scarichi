@@ -1,5 +1,5 @@
 <?php
-namespace vaniacarta74\scarichi;
+namespace vaniacarta74\Scarichi;
 
 require __DIR__ . '/../vendor/autoload.php';
 

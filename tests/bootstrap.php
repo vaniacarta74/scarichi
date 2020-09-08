@@ -6,7 +6,7 @@
  *
  * @author vania
  */
-namespace vaniacarta74\scarichi\tests;
+namespace vaniacarta74\Scarichi\tests;
 
 // TODO: check include path
 ini_set('include_path', '/var/www/html/include');

@@ -7,7 +7,7 @@
  *
  * @author Vania Carta
  */
-namespace vaniacarta74\scarichi;
+namespace vaniacarta74\Scarichi;
 
 require_once('php_MSSQL_router.inc.php');
 
@@ -780,7 +780,7 @@ function getDataFromDb(string $db, string $queryFileName, array $parametri) : ar
         
         $conn = connect($db);
         
-        $checkedParams = array_map('\vaniacarta74\scarichi\checkNull', $parametri);
+        $checkedParams = array_map('\vaniacarta74\Scarichi\checkNull', $parametri);
         
         $checkedDateParams = checkDates($db, $checkedParams, true);
         
@@ -1406,11 +1406,13 @@ function eraseDoubleDate(array $dati_acquisiti) : array
 }
 
 
-function debugOnCSV(array $dati, string $fileName) : void
+function debugOnCSV(array $dati, string $fileName) : string
 {
     try {
-        $changedDatas = array_map('\vaniacarta74\scarichi\changeDate', $dati);
-        printToCSV($changedDatas, CSV . '/' . $fileName . '.csv');
+        $filePath = CSV . '/' . $fileName . '.csv';
+        $changedDatas = array_map('\vaniacarta74\Scarichi\changeDate', $dati);
+        printToCSV($changedDatas, $filePath);
+        return $filePath;
         // @codeCoverageIgnoreStart
     } catch (\Throwable $e) {
         printErrorInfo(__FUNCTION__);

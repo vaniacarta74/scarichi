@@ -1,5 +1,5 @@
 <?php
-namespace vaniacarta74\scarichi\inc\query;
+namespace vaniacarta74\Scarichi\inc\query;
 
 $queryString = "SELECT
                     scarico,
