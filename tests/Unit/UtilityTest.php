@@ -23,7 +23,7 @@ class UtilityTest extends TestCase
     public function testPrintErrorInfo() : void
     {
         $dateTime = new \DateTime();
-        $date = $dateTime->format('d/m/Y H:i:s');        
+        $date = $dateTime->format('d/m/Y H:i:s');
         $functionName = 'pippo';
         
         $expected = $date . ': Errore fatale funzione <b>' . $functionName . '()</b><br/>';
@@ -31,5 +31,5 @@ class UtilityTest extends TestCase
         $actual = Utility::printErrorInfo($functionName);
         
         $this->assertEquals($expected, $actual);
-    }   
+    }
 }

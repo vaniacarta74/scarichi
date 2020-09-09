@@ -8,13 +8,25 @@
 namespace vaniacarta74\Scarichi;
 
 /**
- * Description of Scarichi
+ * Classe di utilità.
  *
- * @author Vania
+ * Nella classe Utility sono contenuti i metodi di utilità utilizzati nelle
+ * altre classi delle API del progetto Scarichi.
+ *
+ * @author Vania Carta
  */
 class Utility
 {
-    
+    /**
+     * Stampa il nome della funzione che ha generato l'errore.
+     *
+     * Il metodo printErrorInfo() viene chiamato nel caso una funzione abbia
+     * generato un errore. Restituisce una stringa con il nome della funzione e
+     * la data e l'ora.
+     *
+     * @param string $functionName
+     * @return string
+     */
     public static function printErrorInfo(string $functionName) : string
     {
         $date = new \DateTime();
