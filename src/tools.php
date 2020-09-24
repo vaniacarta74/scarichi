@@ -7,7 +7,9 @@
  *
  * @author Vania Carta
  */
-namespace vaniacarta74\scarichi;
+namespace vaniacarta74\Scarichi;
+
+use vaniacarta74\Scarichi\Utility;
 
 require_once('php_MSSQL_router.inc.php');
 
@@ -53,7 +55,7 @@ function checkRequest(?array $request) : array
         
         return $checked;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -81,7 +83,7 @@ function checkVariable(?array $request) : string
             throw new \Exception("Parametro variabile non presente nell'url o nome parametro non valido. Usare var, variable o variabile");
         }
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -111,7 +113,7 @@ function checkField(?array $request) : string
         }
         return $field;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -136,7 +138,7 @@ function checkFilter(?array $request) : bool
         
         return $notFiltered;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -165,7 +167,7 @@ function formatDate(string $date) : string
             throw new \Exception('Data inserita inesistente');
         }
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -202,7 +204,7 @@ function formatDateTime(string $dateTime) : string
         
         return $formatDateTime;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -230,7 +232,7 @@ function checkInterval(?array $request) : array
 
         return $dates;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -252,7 +254,7 @@ function setDateTimes(array $request) : array
 
         return $dates;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -281,7 +283,7 @@ function connect(string $dbName) //: resource
             throw new \Exception(error());
         }
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -302,7 +304,7 @@ function query($conn, string $fileName, array $paramValues)
             throw new \Exception(error());
         }
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -323,7 +325,7 @@ function fetch($stmt) : ?array
         }
         return $dati;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -336,7 +338,7 @@ function close($conn) : void
             throw new \Exception(error());
         }
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -375,7 +377,7 @@ function addMedia(array $dati, string $nomeCampo) : array
         }
         return $medie;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -411,7 +413,7 @@ function addDelta(array $dati, string $nomeCampo) : array
         }
         return $delta;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -438,7 +440,7 @@ function initVolumi(array $variabili, array $dati) : array
         }
         return $volumi;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -468,7 +470,7 @@ function addCategoria(array $volumi, array $dati_completi, string $categoria) : 
         }
         return $categorie;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -511,7 +513,7 @@ function addAltezza(array $dati, array $formule) : array
         }
         return $altezze;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -538,7 +540,7 @@ function addPortata(array $dati, array $formule) : array
         }
         return $portate;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -560,7 +562,33 @@ function addVolume(array $dati) : array
         }
         return $volumi;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function setPath(string $variabile, string $path) : string
+{
+    try {
+        if (!is_dir($path)) {
+            throw new \Exception('Directory inesistente');
+        }
+        
+        $mode = 0777;
+        $recursive = true;
+        $pathName = $path . '/v' . $variabile;
+        
+        if (!file_exists($pathName)) {
+            if (!mkdir($pathName, $mode, $recursive)) {
+                //@codeCoverageIgnoreStart
+                throw new \Exception('Impossibile creare directory');
+                //@codeCoverageIgnoreEnd
+            }
+        }
+        return $pathName;
+    } catch (\Throwable $e) {
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -586,7 +614,7 @@ function setFile(string $variabile, array $dates, bool $filtered, string $field,
         
         return $fileName;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -635,7 +663,7 @@ function format(array $dati, string $field) : array
         }
         return $formatted;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -668,7 +696,7 @@ function changeTimeZone(string $dateIn, bool $isLocalToUTC, bool $format, bool $
         }
         return $dateOut;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -690,7 +718,7 @@ function datesToString(array $dates, string $format) : array
         }
         return $formattedDates;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -715,7 +743,7 @@ function checkDates(string $db, array $dates, bool $isLocalToUTC) : array
         return $checkedDates;
         // @codeCoverageIgnoreStart
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
     // @codeCoverageIgnoreEnd
@@ -732,7 +760,7 @@ function setToLocal(string $db, array $dati) : array
         return $locals;
         // @codeCoverageIgnoreStart
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
     // @codeCoverageIgnoreEnd
@@ -748,7 +776,7 @@ function checkNull($value)
         }
         return $res;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -767,7 +795,7 @@ function changeDate(array $values) : array
         return $res;
         // @codeCoverageIgnoreStart
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
     // @codeCoverageIgnoreEnd
@@ -780,7 +808,7 @@ function getDataFromDb(string $db, string $queryFileName, array $parametri) : ar
         
         $conn = connect($db);
         
-        $checkedParams = array_map('\vaniacarta74\scarichi\checkNull', $parametri);
+        $checkedParams = array_map('\vaniacarta74\Scarichi\checkNull', $parametri);
         
         $checkedDateParams = checkDates($db, $checkedParams, true);
         
@@ -796,7 +824,7 @@ function getDataFromDb(string $db, string $queryFileName, array $parametri) : ar
         
         return $data;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -824,7 +852,7 @@ function printToCSV(array $dati, string $fileName) : void
             throw new \Exception('Problemi con l\'apertura del file CSV');
         }
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -860,7 +888,7 @@ function divideAndPrint(array $data, bool $full, string $field, ?int $limit = nu
         }
         return $printed;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -880,10 +908,11 @@ function printPart(array $printableData, int $i, bool $filtered, string $field) 
             'dateto' => $printableData[$max]['data_e_ora']
         ];
         $dateTimes = setDateTimes($dates);
-        $fileName = setFile($variabile, $dateTimes, $filtered, $field, CSV);
+        $path = setPath($variabile, CSV);
+        $fileName = setFile($variabile, $dateTimes, $filtered, $field, $path);
         printToCSV($printableData, $fileName);
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -914,7 +943,7 @@ function filter(array $dati, bool $full) : array
         }
         return $filteredData;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -939,7 +968,7 @@ function response(array $request, bool $printed) : string
         }
         return $html;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1077,7 +1106,7 @@ function calcolaPortata(array $formule, array $parametri) : float
         }
         return ($portata <= $formule['limite']) ? $portata : 0;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1102,7 +1131,7 @@ function uniformaCategorie(array $dati_acquisiti) : array
         }
         return $uniformati;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1144,7 +1173,7 @@ function integraDate(array $targets, array $checkers) : array
         }
         return $targets;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1168,7 +1197,7 @@ function completaDati(array $dati_uniformi) : array
         }
         return $completi;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1197,7 +1226,7 @@ function riempiCode(array $dati) : array
         }
         return $boundaries;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1245,7 +1274,7 @@ function trovaCapi(array $dati) : array
         }
         return $capi;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1276,7 +1305,7 @@ function riempiNull(array $dati) : array
         }
         return $pieni;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1321,7 +1350,7 @@ function interpolaNull(array $dati) : array
         }
         return $interpolati;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1337,7 +1366,7 @@ function interpola(float $x1, float $x2, float $y1, float $y2, float $x) : float
         }
         return $y;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1375,7 +1404,7 @@ function convertiUnita(array $dati, string $categoria) : float
         }
         return $converted;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1400,20 +1429,22 @@ function eraseDoubleDate(array $dati_acquisiti) : array
         }
         return $erased;
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
 
 
-function debugOnCSV(array $dati, string $fileName) : void
+function debugOnCSV(array $dati, string $fileName) : string
 {
     try {
-        $changedDatas = array_map('\vaniacarta74\scarichi\changeDate', $dati);
-        printToCSV($changedDatas, CSV . '/' . $fileName . '.csv');
+        $filePath = CSV . '/' . $fileName . '.csv';
+        $changedDatas = array_map('\vaniacarta74\Scarichi\changeDate', $dati);
+        printToCSV($changedDatas, $filePath);
+        return $filePath;
         // @codeCoverageIgnoreStart
     } catch (\Throwable $e) {
-        printErrorInfo(__FUNCTION__);
+        echo Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
     // @codeCoverageIgnoreEnd

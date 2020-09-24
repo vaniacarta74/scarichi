@@ -1,54 +1,56 @@
 <?php
-namespace vaniacarta74\scarichi\tests\Unit;
+namespace vaniacarta74\Scarichi\tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+use vaniacarta74\Scarichi\tests\classes\CsvFileIterator;
 
-use function vaniacarta74\scarichi\checkFilter as checkFilter;
-use function vaniacarta74\scarichi\checkVariable as checkVariable;
-use function vaniacarta74\scarichi\formatDate as formatDate;
-use function vaniacarta74\scarichi\formatDateTime as formatDateTime;
-use function vaniacarta74\scarichi\checkInterval as checkInterval;
-use function vaniacarta74\scarichi\setDateTimes as setDateTimes;
-use function vaniacarta74\scarichi\checkRequest as checkRequest;
-use function vaniacarta74\scarichi\checkField as checkField;
-use function vaniacarta74\scarichi\connect as connect;
-use function vaniacarta74\scarichi\query as query;
-use function vaniacarta74\scarichi\fetch as fetch;
-use function vaniacarta74\scarichi\changeTimeZone as changeTimeZone;
-use function vaniacarta74\scarichi\checkDates as checkDates;
-use function vaniacarta74\scarichi\datesToString as datesToString;
-use function vaniacarta74\scarichi\setToLocal as setToLocal;
-use function vaniacarta74\scarichi\getDataFromDb as getDataFromDb;
-use function vaniacarta74\scarichi\initVolumi as initVolumi;
-use function vaniacarta74\scarichi\addCategoria as addCategoria;
-use function vaniacarta74\scarichi\addMedia as addMedia;
-use function vaniacarta74\scarichi\addAltezza as addAltezza;
-use function vaniacarta74\scarichi\addPortata as addPortata;
-use function vaniacarta74\scarichi\addDelta as addDelta;
-use function vaniacarta74\scarichi\addVolume as addVolume;
-use function vaniacarta74\scarichi\format as format;
-use function vaniacarta74\scarichi\setFile as setFile;
-use function vaniacarta74\scarichi\printToCSV as printToCSV;
-use function vaniacarta74\scarichi\printPart as printPart;
-use function vaniacarta74\scarichi\divideAndPrint as divideAndPrint;
-use function vaniacarta74\scarichi\checkNull as checkNull;
-use function vaniacarta74\scarichi\response as response;
-use function vaniacarta74\scarichi\errorHandler as errorHandler;
-use function vaniacarta74\scarichi\close as close;
-use function vaniacarta74\scarichi\calcolaPortata as calcolaPortata;
-use function vaniacarta74\scarichi\integraDate as integraDate;
-use function vaniacarta74\scarichi\uniformaCategorie as uniformaCategorie;
-use function vaniacarta74\scarichi\completaDati as completaDati;
-use function vaniacarta74\scarichi\trovaCapi as trovaCapi;
-use function vaniacarta74\scarichi\riempiCode as riempiCode;
-use function vaniacarta74\scarichi\riempiNull as riempiNull;
-use function vaniacarta74\scarichi\interpolaNull as interpolaNull;
-use function vaniacarta74\scarichi\interpola as interpola;
-use function vaniacarta74\scarichi\convertiUnita as convertiUnita;
-use function vaniacarta74\scarichi\eraseDoubleDate as eraseDoubleDate;
-use function vaniacarta74\scarichi\changeDate as changeDate;
-use function vaniacarta74\scarichi\filter as filter;
-use function vaniacarta74\scarichi\debugOnCSV as debugOnCSV;
+use function vaniacarta74\Scarichi\checkFilter as checkFilter;
+use function vaniacarta74\Scarichi\checkVariable as checkVariable;
+use function vaniacarta74\Scarichi\formatDate as formatDate;
+use function vaniacarta74\Scarichi\formatDateTime as formatDateTime;
+use function vaniacarta74\Scarichi\checkInterval as checkInterval;
+use function vaniacarta74\Scarichi\setDateTimes as setDateTimes;
+use function vaniacarta74\Scarichi\checkRequest as checkRequest;
+use function vaniacarta74\Scarichi\checkField as checkField;
+use function vaniacarta74\Scarichi\connect as connect;
+use function vaniacarta74\Scarichi\query as query;
+use function vaniacarta74\Scarichi\fetch as fetch;
+use function vaniacarta74\Scarichi\changeTimeZone as changeTimeZone;
+use function vaniacarta74\Scarichi\checkDates as checkDates;
+use function vaniacarta74\Scarichi\datesToString as datesToString;
+use function vaniacarta74\Scarichi\setToLocal as setToLocal;
+use function vaniacarta74\Scarichi\getDataFromDb as getDataFromDb;
+use function vaniacarta74\Scarichi\initVolumi as initVolumi;
+use function vaniacarta74\Scarichi\addCategoria as addCategoria;
+use function vaniacarta74\Scarichi\addMedia as addMedia;
+use function vaniacarta74\Scarichi\addAltezza as addAltezza;
+use function vaniacarta74\Scarichi\addPortata as addPortata;
+use function vaniacarta74\Scarichi\addDelta as addDelta;
+use function vaniacarta74\Scarichi\addVolume as addVolume;
+use function vaniacarta74\Scarichi\format as format;
+use function vaniacarta74\Scarichi\setPath as setPath;
+use function vaniacarta74\Scarichi\setFile as setFile;
+use function vaniacarta74\Scarichi\printToCSV as printToCSV;
+use function vaniacarta74\Scarichi\printPart as printPart;
+use function vaniacarta74\Scarichi\divideAndPrint as divideAndPrint;
+use function vaniacarta74\Scarichi\checkNull as checkNull;
+use function vaniacarta74\Scarichi\response as response;
+use function vaniacarta74\Scarichi\errorHandler as errorHandler;
+use function vaniacarta74\Scarichi\close as close;
+use function vaniacarta74\Scarichi\calcolaPortata as calcolaPortata;
+use function vaniacarta74\Scarichi\integraDate as integraDate;
+use function vaniacarta74\Scarichi\uniformaCategorie as uniformaCategorie;
+use function vaniacarta74\Scarichi\completaDati as completaDati;
+use function vaniacarta74\Scarichi\trovaCapi as trovaCapi;
+use function vaniacarta74\Scarichi\riempiCode as riempiCode;
+use function vaniacarta74\Scarichi\riempiNull as riempiNull;
+use function vaniacarta74\Scarichi\interpolaNull as interpolaNull;
+use function vaniacarta74\Scarichi\interpola as interpola;
+use function vaniacarta74\Scarichi\convertiUnita as convertiUnita;
+use function vaniacarta74\Scarichi\eraseDoubleDate as eraseDoubleDate;
+use function vaniacarta74\Scarichi\changeDate as changeDate;
+use function vaniacarta74\Scarichi\filter as filter;
+use function vaniacarta74\Scarichi\debugOnCSV as debugOnCSV;
 
 class ToolsTest extends TestCase
 {
@@ -3248,6 +3250,58 @@ class ToolsTest extends TestCase
     
     /**
      * @group depends
+     * covers setPath()
+     */
+    public function testSetPathEquals() : string
+    {
+        $variabile = 'Test';
+        $path = CSV;
+        
+        $expected = CSV . '/v' . $variabile;
+        
+        $actual = setPath($variabile, $path);
+        
+        $this->assertEquals($expected, $actual);
+        
+        return $variabile;
+    }
+    
+    /**
+     * @group depends
+     * covers setPath()
+     * @depends testSetPathEquals
+     */
+    public function testSetPathEquals2($variabile) : void
+    {
+        $path = CSV;
+        
+        $expected = CSV . '/v' . $variabile;
+        
+        $actual = setPath($variabile, $path);
+        
+        $this->assertEquals($expected, $actual);
+        
+        rmdir($actual);
+    }
+    
+    /**
+     * @group depends
+     * covers setPath()
+     */
+    public function testSetPathException() : void
+    {
+        $variabile = '30030';
+        $path = 'pippo';
+        
+        $this->expectException(\Exception::class);
+        
+        setPath($variabile, $path);
+    }
+    
+    
+        
+    /**
+     * @group depends
      * covers setFile()
      * @dataProvider setFileProvider
      */
@@ -3338,11 +3392,11 @@ class ToolsTest extends TestCase
      * @group csv
      * coversNothing
      */
-    public function printToCsvProvider() : \vaniacarta74\scarichi\tests\classes\CsvFileIterator
+    public function printToCsvProvider() : CsvFileIterator
     {
         $fileName = __DIR__ . '/../providers/test.csv';
         
-        $iterator = new \vaniacarta74\scarichi\tests\classes\CsvFileIterator($fileName);
+        $iterator = new CsvFileIterator($fileName);
         
         return $iterator;
     }
@@ -3403,7 +3457,7 @@ class ToolsTest extends TestCase
             ]
         ];
         
-        $expected = CSV . '/Livello_30030_201803252030_201803252045_full.csv';
+        $expected = CSV . '/v30030/Livello_30030_201803252030_201803252045_full.csv';
         
         printPart($dati, $i, $filtered, $field);
         
@@ -3458,8 +3512,8 @@ class ToolsTest extends TestCase
         $limit = 1;
         
         $expecteds = [
-            CSV . '/Delta_30030_201801020000_201801020000_full.csv',
-            CSV . '/Delta_30030_201801020015_201801020015_full.csv',
+            CSV . '/v30030/Delta_30030_201801020000_201801020000_full.csv',
+            CSV . '/v30030/Delta_30030_201801020015_201801020015_full.csv',
         ];
         
         divideAndPrint($volumi, $full, $field, $limit);
@@ -3480,7 +3534,7 @@ class ToolsTest extends TestCase
         $field = 'delta';
         
         $expecteds = [
-            CSV . '/Delta_30030_201801020000_201801020015_full.csv'
+            CSV . '/v30030/Delta_30030_201801020000_201801020015_full.csv'
         ];
         
         divideAndPrint($volumi, $full, $field);
@@ -6222,8 +6276,8 @@ class ToolsTest extends TestCase
             ]
         ];
         
-        debugOnCSV($dati, $fileName);
+        $filePath = debugOnCSV($dati, $fileName);
         
-        $this->assertFileExists($fileName);
+        $this->assertFileExists($filePath);
     }
 }

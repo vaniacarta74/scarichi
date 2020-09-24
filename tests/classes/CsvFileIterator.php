@@ -7,7 +7,7 @@
  *
  * @author vania
  */
-namespace vaniacarta74\scarichi\tests\classes;
+namespace vaniacarta74\Scarichi\tests\classes;
 
 class CsvFileIterator implements \Iterator
 {
