@@ -568,6 +568,32 @@ function addVolume(array $dati) : array
 }
 
 
+function setPath(string $variabile, string $path) : string
+{
+    try {
+        if (!is_dir($path)) {
+            throw new \Exception('Directory inesistente');
+        }
+        
+        $mode = 0777;
+        $recursive = true;
+        $pathName = $path . '/v' . $variabile;
+        
+        if (!file_exists($pathName)) {
+            if (!mkdir($pathName, $mode, $recursive)) {
+                //@codeCoverageIgnoreStart
+                throw new \Exception('Impossibile creare directory');
+                //@codeCoverageIgnoreEnd
+            }
+        }
+        return $pathName;
+    } catch (\Throwable $e) {
+        echo Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
 function setFile(string $variabile, array $dates, bool $filtered, string $field, string $path) : string
 {
     try {
@@ -882,7 +908,8 @@ function printPart(array $printableData, int $i, bool $filtered, string $field) 
             'dateto' => $printableData[$max]['data_e_ora']
         ];
         $dateTimes = setDateTimes($dates);
-        $fileName = setFile($variabile, $dateTimes, $filtered, $field, CSV);
+        $path = setPath($variabile, CSV);
+        $fileName = setFile($variabile, $dateTimes, $filtered, $field, $path);
         printToCSV($printableData, $fileName);
     } catch (\Throwable $e) {
         echo Utility::printErrorInfo(__FUNCTION__);

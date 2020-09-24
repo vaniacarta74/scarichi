@@ -28,6 +28,7 @@ use function vaniacarta74\Scarichi\addPortata as addPortata;
 use function vaniacarta74\Scarichi\addDelta as addDelta;
 use function vaniacarta74\Scarichi\addVolume as addVolume;
 use function vaniacarta74\Scarichi\format as format;
+use function vaniacarta74\Scarichi\setPath as setPath;
 use function vaniacarta74\Scarichi\setFile as setFile;
 use function vaniacarta74\Scarichi\printToCSV as printToCSV;
 use function vaniacarta74\Scarichi\printPart as printPart;
@@ -3249,6 +3250,58 @@ class ToolsTest extends TestCase
     
     /**
      * @group depends
+     * covers setPath()
+     */
+    public function testSetPathEquals() : string
+    {
+        $variabile = 'Test';
+        $path = CSV;
+        
+        $expected = CSV . '/v' . $variabile;
+        
+        $actual = setPath($variabile, $path);
+        
+        $this->assertEquals($expected, $actual);
+        
+        return $variabile;
+    }
+    
+    /**
+     * @group depends
+     * covers setPath()
+     * @depends testSetPathEquals
+     */
+    public function testSetPathEquals2($variabile) : void
+    {
+        $path = CSV;
+        
+        $expected = CSV . '/v' . $variabile;
+        
+        $actual = setPath($variabile, $path);
+        
+        $this->assertEquals($expected, $actual);
+        
+        rmdir($actual);
+    }
+    
+    /**
+     * @group depends
+     * covers setPath()
+     */
+    public function testSetPathException() : void
+    {
+        $variabile = '30030';
+        $path = 'pippo';
+        
+        $this->expectException(\Exception::class);
+        
+        setPath($variabile, $path);
+    }
+    
+    
+        
+    /**
+     * @group depends
      * covers setFile()
      * @dataProvider setFileProvider
      */
@@ -3404,7 +3457,7 @@ class ToolsTest extends TestCase
             ]
         ];
         
-        $expected = CSV . '/Livello_30030_201803252030_201803252045_full.csv';
+        $expected = CSV . '/v30030/Livello_30030_201803252030_201803252045_full.csv';
         
         printPart($dati, $i, $filtered, $field);
         
@@ -3459,8 +3512,8 @@ class ToolsTest extends TestCase
         $limit = 1;
         
         $expecteds = [
-            CSV . '/Delta_30030_201801020000_201801020000_full.csv',
-            CSV . '/Delta_30030_201801020015_201801020015_full.csv',
+            CSV . '/v30030/Delta_30030_201801020000_201801020000_full.csv',
+            CSV . '/v30030/Delta_30030_201801020015_201801020015_full.csv',
         ];
         
         divideAndPrint($volumi, $full, $field, $limit);
@@ -3481,7 +3534,7 @@ class ToolsTest extends TestCase
         $field = 'delta';
         
         $expecteds = [
-            CSV . '/Delta_30030_201801020000_201801020015_full.csv'
+            CSV . '/v30030/Delta_30030_201801020000_201801020015_full.csv'
         ];
         
         divideAndPrint($volumi, $full, $field);
