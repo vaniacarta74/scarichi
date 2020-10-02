@@ -51,6 +51,7 @@ use function vaniacarta74\Scarichi\eraseDoubleDate as eraseDoubleDate;
 use function vaniacarta74\Scarichi\changeDate as changeDate;
 use function vaniacarta74\Scarichi\filter as filter;
 use function vaniacarta74\Scarichi\debugOnCSV as debugOnCSV;
+use function vaniacarta74\Scarichi\getComposerValue as getComposerValue;
 
 class ToolsTest extends TestCase
 {
@@ -6279,5 +6280,66 @@ class ToolsTest extends TestCase
         $filePath = debugOnCSV($dati, $fileName);
         
         $this->assertFileExists($filePath);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function getComposerValueProvider() : array
+    {
+        $data = [
+            'level0.0' => [                
+                'param_0' => 'version',
+                'param_1' => null,
+                'param_2' => null
+            ],
+            'level1.0' => [                
+                'param_0' => 'source',
+                'param_1' => 'support',
+                'param_2' => null
+            ],
+            'level1.1' => [                
+                'param_0' => '1',
+                'param_1' => 'keywords',
+                'param_2' => null
+            ],
+            'level2.0' => [                
+                'param_0' => '0',
+                'param_1' => 'files',
+                'param_2' => 'autoload'
+            ],
+            'level2.1' => [                
+                'param_0' => 'name',
+                'param_1' => '0',
+                'param_2' => 'authors'
+            ]            
+        ];
+        
+        return $data;
+    }    
+    
+    /**
+     * @group php-cli
+     * covers getComposerValues()
+     * @dataProvider GetComposerValueProvider
+     */
+    public function testGetComposerValueIsString($level0, $level1, $level2) : void
+    {
+        $actual = getComposerValue($level0, $level1, $level2);
+                
+        $this->assertIsString($actual);
+    }
+    
+    /**
+     * @group php-cli
+     * covers getComposerValues()
+     */
+    public function testGetComposerValueException() : void
+    {
+        $key = 'pippo';
+        
+        $this->expectException(\Exception::class);
+        
+        getComposerValue($key);
     }
 }

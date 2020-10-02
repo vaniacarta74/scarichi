@@ -1449,3 +1449,203 @@ function debugOnCSV(array $dati, string $fileName) : string
     }
     // @codeCoverageIgnoreEnd
 }
+
+
+function getMessage(string $destination, string $type) : string
+{
+    try {
+        $version = getJsonValue(__DIR__ . '/../composer.json', 'version');
+        $author = getJsonValue(__DIR__ . '/../composer.json', 'name', '0', 'authors');
+        $header = 'scarichi ' . $version .  ' by ' . $author . ' and contributors';
+        
+        if ($destination === 'cli') {
+            $eol = PHP_EOL;
+        } else {
+            $eol = '<br/>';
+        }  
+                
+        switch ($type) {
+            case 'redirect':
+                $message = $header . $eol;
+                $message .= 'Utilizzare il terminale.' . $eol;
+                $message .= 'Sintassi help:' . $eol;
+                $message .= '[user@localhost ~]# php scarichi.php -h' . $eol;
+                break;
+            case 'version':                
+                $message = $header . $eol;
+                break;
+            case 'default':                
+                $message = $header . $eol;
+                $message .= 'Exec: php scarichi.php -V ALL -f YEAR -t NOW -c V' . $eol;                
+                break;
+            case 'help':
+                $description = getJsonValue(__DIR__ . '/../composer.json', 'description');
+                $offset = getJsonValue(__DIR__ . '/config/help.json', 'offset', 'properties');                
+                $parameters = getJsonValue(__DIR__ . '/config/help.json', 'parameters');
+                   
+                $help = getHelpLines($parameters);
+                $maxLen = getMaxLenght($help);
+                $console = formatHelp($help, $offset, $maxLen, $eol);
+                
+                $message = $header . $eol;
+                $message .= $description . $eol;
+                $message .= $eol;
+                $message .= 'Usage: php scarichi.php [args...]' . $eol;
+                $message .= $console;
+                $message .= $eol;
+                break;
+        }   
+        return $message;
+    } catch (\Throwable $e) {
+        echo Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function getJsonValue(string $path, string $key, ?string $level1 = null, ?string $level2 = null)
+{        
+    try {
+        $string = @file_get_contents($path);        
+        $json = json_decode($string, true);
+        
+        if ($level2) {
+            $jsonArray = $json[$level2][$level1];
+        } elseif ($level1) {
+            $jsonArray = $json[$level1];
+        } else {
+            $jsonArray = $json;
+        }
+        
+        if (is_array($jsonArray) && array_key_exists($key, $jsonArray)) {
+            $response = $jsonArray[$key];
+        } else {
+            throw new \Exception('Problemi con il file json. Rivedere i parametri');
+        }
+        return $response;
+    } catch (\Throwable $e) {
+        echo Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function getHelpLines(array $parameters) : array
+{
+    try {
+        $i = 0;
+        $lines = [];            
+        foreach ($parameters as $properties) {
+            
+            $params = formatParameter($properties, 'params');
+            $default = formatParameter($properties, 'default');
+            $variables = formatParameter($properties, 'variables');
+            $costants = formatParameter($properties, 'costants');
+            $option = formatParameter([$variables, $costants], 'options');
+            
+            $input = $params . $default . $option;
+            
+            foreach ($properties['descriptions'] as $key => $text) {
+                if ($key === 0) {
+                    $lines[$i]['param'] = $input;
+                } else {
+                    $lines[$i]['param'] = '';
+                }
+                $lines[$i]['text'] = $text;
+                $i++;
+            }                    
+        }
+        return $lines;
+    } catch (\Throwable $e) {
+        echo Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function formatParameter(array $properties, string $key) : string
+{
+    try {
+        switch ($key) {
+            case 'params':
+                $formatted = '-' . $properties['short'] . ' --' . $properties['long'];
+                break;
+            case 'default':
+                if ($properties['default'] !== "") {
+                    $formatted = '[=' . $properties['default'] . ']';
+                } else {
+                    $formatted = '';
+                }
+                break;
+            case 'variables':
+                if (count($properties['options']['variables'])) {
+                    $prefixeds = preg_filter('/^/', '<', $properties['options']['variables']);
+                    $postfixeds = preg_filter('/$/', '>', $prefixeds);
+                    $formatted = implode(',', $postfixeds);                    
+                } else {
+                    $formatted = '';
+                }
+                break;
+            case 'costants':
+                if (count($properties['options']['costants'])) {
+                    $formatted = implode('|', $properties['options']['costants']);                    
+                } else {
+                    $formatted = '';
+                }
+                break;
+            case 'options':
+                if ($properties[0] !== '' && $properties[1] !== '') {
+                    $formatted = ' ' . implode('|', $properties);                    
+                } elseif ($properties[0] !== '') {
+                    $formatted = ' ' . $properties[0];
+                } elseif ($properties[1] !== '') {
+                    $formatted = ' ' . $properties[1];
+                } else {
+                    $formatted = '';
+                }
+                break; 
+        }        
+        return $formatted;
+    } catch (\Throwable $e) {
+        echo Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function getMaxLenght(array &$help) : int
+{
+    try {
+        $maxLen = 0;
+        foreach ($help as $line => $values) {
+            $newLen = strlen($values['param']);
+            $help[$line]['paramLen'] = $newLen;
+
+            $textLen = strlen($values['text']);
+            $help[$line]['textLen'] = $textLen;
+
+            if ($newLen > $maxLen) {
+               $maxLen = $newLen; 
+            }
+        }
+        return $maxLen;
+    } catch (\Throwable $e) {
+        echo Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function formatHelp(array $help, int $offset, int $maxLen, string $eol) : string
+{
+    try {
+        $message = '';
+        foreach ($help as $line => $values) {
+            $message .= str_pad($values['param'], $values['paramLen'] + $offset, ' ', STR_PAD_LEFT) . str_pad($values['text'], $values['textLen'] + $maxLen - $values['paramLen'] + $offset, ' ', STR_PAD_LEFT) . $eol;
+        }
+        return $message;
+    } catch (\Throwable $e) {
+        echo Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}        
