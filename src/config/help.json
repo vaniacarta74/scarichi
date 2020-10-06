@@ -1,6 +1,6 @@
 {
     "properties": {
-        "offset": "3"
+        "offset": "7"
     },
     "parameters": [
         {
@@ -40,19 +40,6 @@
             },
             "descriptions": [
                 "Esegue il calcolo con i parametri di default."
-            ]
-        },
-        {
-            "name": "no zero",
-            "short": "n",
-            "long": "nozero",
-            "default": "",
-            "options": {
-                "variables": [],
-                "costants": []
-            },
-            "descriptions": [
-                "Esporta solo i valori diversi da zero."
             ]
         },
         {
@@ -129,6 +116,23 @@
             "descriptions": [
                 "Esporta i dati di volume(V), livello(L), media(M)",
                 "delta(D), altezza(H) o portata(Q). Default V."
+            ]
+        },
+        {
+            "name": "no zero",
+            "short": "n",
+            "long": "nozero",
+            "default": "FALSE",
+            "options": {
+                "variables": [],
+                "costants": [
+                    "TRUE",
+                    "FALSE"
+                ]
+            },
+            "descriptions": [
+                "Esporta solo i valori diversi da zero (TRUE) o",
+                "tutti i valori (FALSE). Default FALSE."
             ]
         }
     ]

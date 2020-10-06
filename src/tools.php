@@ -55,7 +55,7 @@ function checkRequest(?array $request) : array
         
         return $checked;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -75,7 +75,7 @@ function checkVariable(?array $request) : string
             
             $n_variabile = intval($variabile);
             if ($n_variabile >= 30000 && $n_variabile <= 39999) {
-                return $variabile;
+                return $n_variabile;
             } else {
                 throw new \Exception('Variabile non analizzabile. Valori ammessi compresi fra 30000 e 39999');
             }
@@ -83,7 +83,7 @@ function checkVariable(?array $request) : string
             throw new \Exception("Parametro variabile non presente nell'url o nome parametro non valido. Usare var, variable o variabile");
         }
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -113,7 +113,7 @@ function checkField(?array $request) : string
         }
         return $field;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -138,7 +138,7 @@ function checkFilter(?array $request) : bool
         
         return $notFiltered;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -167,7 +167,7 @@ function formatDate(string $date) : string
             throw new \Exception('Data inserita inesistente');
         }
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -204,7 +204,7 @@ function formatDateTime(string $dateTime) : string
         
         return $formatDateTime;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -232,7 +232,7 @@ function checkInterval(?array $request) : array
 
         return $dates;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -254,7 +254,7 @@ function setDateTimes(array $request) : array
 
         return $dates;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -283,7 +283,7 @@ function connect(string $dbName) //: resource
             throw new \Exception(error());
         }
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -304,7 +304,7 @@ function query($conn, string $fileName, array $paramValues)
             throw new \Exception(error());
         }
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -325,7 +325,7 @@ function fetch($stmt) : ?array
         }
         return $dati;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -338,7 +338,7 @@ function close($conn) : void
             throw new \Exception(error());
         }
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -377,7 +377,7 @@ function addMedia(array $dati, string $nomeCampo) : array
         }
         return $medie;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -413,7 +413,7 @@ function addDelta(array $dati, string $nomeCampo) : array
         }
         return $delta;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -440,7 +440,7 @@ function initVolumi(array $variabili, array $dati) : array
         }
         return $volumi;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -470,7 +470,7 @@ function addCategoria(array $volumi, array $dati_completi, string $categoria) : 
         }
         return $categorie;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -513,7 +513,7 @@ function addAltezza(array $dati, array $formule) : array
         }
         return $altezze;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -540,7 +540,7 @@ function addPortata(array $dati, array $formule) : array
         }
         return $portate;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -562,7 +562,7 @@ function addVolume(array $dati) : array
         }
         return $volumi;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -588,7 +588,7 @@ function setPath(string $variabile, string $path) : string
         }
         return $pathName;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -614,7 +614,7 @@ function setFile(string $variabile, array $dates, bool $filtered, string $field,
         
         return $fileName;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -663,7 +663,7 @@ function format(array $dati, string $field) : array
         }
         return $formatted;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -696,7 +696,7 @@ function changeTimeZone(string $dateIn, bool $isLocalToUTC, bool $format, bool $
         }
         return $dateOut;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -718,7 +718,7 @@ function datesToString(array $dates, string $format) : array
         }
         return $formattedDates;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -743,7 +743,7 @@ function checkDates(string $db, array $dates, bool $isLocalToUTC) : array
         return $checkedDates;
         // @codeCoverageIgnoreStart
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
     // @codeCoverageIgnoreEnd
@@ -760,7 +760,7 @@ function setToLocal(string $db, array $dati) : array
         return $locals;
         // @codeCoverageIgnoreStart
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
     // @codeCoverageIgnoreEnd
@@ -776,7 +776,7 @@ function checkNull($value)
         }
         return $res;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -795,7 +795,7 @@ function changeDate(array $values) : array
         return $res;
         // @codeCoverageIgnoreStart
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
     // @codeCoverageIgnoreEnd
@@ -824,7 +824,7 @@ function getDataFromDb(string $db, string $queryFileName, array $parametri) : ar
         
         return $data;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -852,7 +852,7 @@ function printToCSV(array $dati, string $fileName) : void
             throw new \Exception('Problemi con l\'apertura del file CSV');
         }
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -888,7 +888,7 @@ function divideAndPrint(array $data, bool $full, string $field, ?int $limit = nu
         }
         return $printed;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -912,7 +912,7 @@ function printPart(array $printableData, int $i, bool $filtered, string $field) 
         $fileName = setFile($variabile, $dateTimes, $filtered, $field, $path);
         printToCSV($printableData, $fileName);
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -943,7 +943,7 @@ function filter(array $dati, bool $full) : array
         }
         return $filteredData;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -968,7 +968,7 @@ function response(array $request, bool $printed) : string
         }
         return $html;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1106,7 +1106,7 @@ function calcolaPortata(array $formule, array $parametri) : float
         }
         return ($portata <= $formule['limite']) ? $portata : 0;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1131,7 +1131,7 @@ function uniformaCategorie(array $dati_acquisiti) : array
         }
         return $uniformati;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1173,7 +1173,7 @@ function integraDate(array $targets, array $checkers) : array
         }
         return $targets;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1197,7 +1197,7 @@ function completaDati(array $dati_uniformi) : array
         }
         return $completi;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1226,7 +1226,7 @@ function riempiCode(array $dati) : array
         }
         return $boundaries;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1274,7 +1274,7 @@ function trovaCapi(array $dati) : array
         }
         return $capi;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1305,7 +1305,7 @@ function riempiNull(array $dati) : array
         }
         return $pieni;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1350,7 +1350,7 @@ function interpolaNull(array $dati) : array
         }
         return $interpolati;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1366,7 +1366,7 @@ function interpola(float $x1, float $x2, float $y1, float $y2, float $x) : float
         }
         return $y;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1404,7 +1404,7 @@ function convertiUnita(array $dati, string $categoria) : float
         }
         return $converted;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1429,7 +1429,7 @@ function eraseDoubleDate(array $dati_acquisiti) : array
         }
         return $erased;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1444,7 +1444,7 @@ function debugOnCSV(array $dati, string $fileName) : string
         return $filePath;
         // @codeCoverageIgnoreStart
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
     // @codeCoverageIgnoreEnd
@@ -1458,6 +1458,8 @@ function getMessage(string $destination, string $type) : string
         $author = getJsonValue(__DIR__ . '/../composer.json', 'name', '0', 'authors');
         $header = 'scarichi ' . $version .  ' by ' . $author . ' and contributors';
         
+        $command = 'php scarichi.php';
+        
         if ($destination === 'cli') {
             $eol = PHP_EOL;
         } else {
@@ -1469,14 +1471,14 @@ function getMessage(string $destination, string $type) : string
                 $message = $header . $eol;
                 $message .= 'Utilizzare il terminale.' . $eol;
                 $message .= 'Sintassi help:' . $eol;
-                $message .= '[user@localhost ~]# php scarichi.php -h' . $eol;
+                $message .= '[user@localhost ~]# ' . $command . ' -h' . $eol;
                 break;
             case 'version':                
                 $message = $header . $eol;
                 break;
             case 'default':                
                 $message = $header . $eol;
-                $message .= 'Exec: php scarichi.php -V ALL -f YEAR -t NOW -c V' . $eol;                
+                $message .= 'Exec: ' . $command . ' -V ALL -f YEAR -t NOW -c V -n FALSE' . $eol;                
                 break;
             case 'help':
                 $description = getJsonValue(__DIR__ . '/../composer.json', 'description');
@@ -1490,14 +1492,24 @@ function getMessage(string $destination, string $type) : string
                 $message = $header . $eol;
                 $message .= $description . $eol;
                 $message .= $eol;
-                $message .= 'Usage: php scarichi.php [args...]' . $eol;
+                $message .= 'Usage: ' . $command . ' [-h|-v|-d] ' . $eol;
+                $message .= '       ' . $command . ' -V [options] -f [options] -t [options] -c [options] -n [options]' . $eol;
+                $message .= $eol;
                 $message .= $console;
                 $message .= $eol;
+                break;
+            case 'ok':                
+                $message = $header . $eol;
+                $message .= 'Exec: ' . $command . ' -V -f -t -c -n' . $eol;                
+                break;
+            case 'error':                
+                $message = $header . $eol;
+                $message .= 'Parametri errati o insufficienti. Per info digitare: ' . $command . ' -h' . $eol;                
                 break;
         }   
         return $message;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1524,7 +1536,7 @@ function getJsonValue(string $path, string $key, ?string $level1 = null, ?string
         }
         return $response;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1557,7 +1569,7 @@ function getHelpLines(array $parameters) : array
         }
         return $lines;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1607,7 +1619,7 @@ function formatParameter(array $properties, string $key) : string
         }        
         return $formatted;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1630,7 +1642,7 @@ function getMaxLenght(array &$help) : int
         }
         return $maxLen;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }
@@ -1645,7 +1657,42 @@ function formatHelp(array $help, int $offset, int $maxLen, string $eol) : string
         }
         return $message;
     } catch (\Throwable $e) {
-        echo Utility::printErrorInfo(__FUNCTION__);
+        Utility::printErrorInfo(__FUNCTION__);
         throw $e;
     }
 }        
+
+function setVariables(array $arguments) : array
+{
+    try {        
+        $keyParam = array_search('-V', $arguments);
+        $keyValue = $keyParam + 1;
+        $otherParam = ['-f', '-t', '-c', '-n'];
+        
+        if (array_key_exists($keyValue, $arguments) && !in_array($arguments[$keyValue], $otherParam)) {
+            if (preg_match('/^[0-9]{5}([,][0-9]{5})*$/', $arguments[$keyValue], $matches)) {
+                $varRaw = explode(',', $matches[0]);
+                foreach ($varRaw as $variable) {
+                    $request['var'] = $variable;
+                    try {
+                        $variables[] = checkVariable($request);
+                    } catch (\Throwable $e){
+                        Utility::errorHandler($e);
+                    }                
+                }
+                if (!isset($variables)) {
+                    throw new \Exception('Variabili selezionate non valide');
+                }
+            } else {
+                throw new \Exception('Formato serie variabili errato. Utilizzare la virgola come separatore (es. 30030,30040,30050)');
+            }           
+        } else {
+            $variables = ['ALL'];
+        }
+        
+        return $variables;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
