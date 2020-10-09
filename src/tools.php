@@ -92,21 +92,19 @@ function checkField(?array $request) : string
 {
     try {
         if (isset($request['field'])) {
-            $fieldsNames = [
-                'volume',
-                'livello',
-                'portata',
-                'media',
-                'delta',
-                'altezza'
-            ];
+            $options = getJsonArray(__DIR__ . '/config/help.json', 'options', 'field', 'parameters');
+            $fieldsNames = $options['alias'];
+            $shortNames = $options['costants'];
             
             $urlField = strtolower(htmlspecialchars(strip_tags($request['field'])));
+            $urlShort = strtoupper($urlField);
             
             if (in_array($urlField, $fieldsNames)) {
                 $field = $urlField;
+            } elseif (in_array($urlShort, $shortNames)) {
+                $field = $fieldsNames[array_search($urlShort, $shortNames)];                
             } else {
-                throw new \Exception('Nome campo non supportato. Valori ammessi: ' . implode(', ', $fieldsNames));
+                throw new \Exception('Nome campo non supportato. Valori ammessi: ' . implode(', ', $fieldsNames) . ' o ' . implode(', ', $shortNames));
             }
         } else {
             $field = 'volume';
@@ -705,6 +703,7 @@ function changeTimeZone(string $dateIn, bool $isLocalToUTC, bool $format, bool $
 function datesToString(array $dates, string $format) : array
 {
     try {
+        $formattedDates = [];
         foreach ($dates as $key => $date) {
             if (is_a($date, 'DateTime')) {
                 $formattedDates[$key] = $date->format($format);
@@ -1451,11 +1450,11 @@ function debugOnCSV(array $dati, string $fileName) : string
 }
 
 
-function getMessage(string $destination, string $type) : string
+function getMessage(array $composer, array $help, string $destination, string $type) : string
 {
     try {
-        $version = getJsonValue(__DIR__ . '/../composer.json', 'version');
-        $author = getJsonValue(__DIR__ . '/../composer.json', 'name', '0', 'authors');
+        $version = $composer['version'];
+        $author = $composer['authors'][0]['name'];
         $header = 'scarichi ' . $version .  ' by ' . $author . ' and contributors';
         
         $command = 'php scarichi.php';
@@ -1481,13 +1480,13 @@ function getMessage(string $destination, string $type) : string
                 $message .= 'Exec: ' . $command . ' -V ALL -f YEAR -t NOW -c V -n FALSE' . $eol;                
                 break;
             case 'help':
-                $description = getJsonValue(__DIR__ . '/../composer.json', 'description');
-                $offset = getJsonValue(__DIR__ . '/config/help.json', 'offset', 'properties');                
-                $parameters = getJsonValue(__DIR__ . '/config/help.json', 'parameters');
+                $description = $composer['description'];
+                $offset = $help['global']['offset'];
+                $parameters = $help['parameters'];
                    
-                $help = getHelpLines($parameters);
-                $maxLen = getMaxLenght($help);
-                $console = formatHelp($help, $offset, $maxLen, $eol);
+                $helpLines = getHelpLines($parameters);
+                $maxLen = getMaxLenght($helpLines);
+                $console = formatHelp($helpLines, $offset, $maxLen, $eol);
                 
                 $message = $header . $eol;
                 $message .= $description . $eol;
@@ -1500,7 +1499,6 @@ function getMessage(string $destination, string $type) : string
                 break;
             case 'ok':                
                 $message = $header . $eol;
-                $message .= 'Exec: ' . $command . ' -V -f -t -c -n' . $eol;                
                 break;
             case 'error':                
                 $message = $header . $eol;
@@ -1515,13 +1513,16 @@ function getMessage(string $destination, string $type) : string
 }
 
 
-function getJsonValue(string $path, string $key, ?string $level1 = null, ?string $level2 = null)
+function getJsonArray(string $path, ?string $key = null, ?string $level1 = null, ?string $level2 = null, ?string $level3 = null) : array
 {        
     try {
+        $response = [];
         $string = @file_get_contents($path);        
         $json = json_decode($string, true);
         
-        if ($level2) {
+        if ($level3) {
+            $jsonArray = $json[$level3][$level2][$level1];
+        } elseif ($level2) {
             $jsonArray = $json[$level2][$level1];
         } elseif ($level1) {
             $jsonArray = $json[$level1];
@@ -1529,10 +1530,18 @@ function getJsonValue(string $path, string $key, ?string $level1 = null, ?string
             $jsonArray = $json;
         }
         
-        if (is_array($jsonArray) && array_key_exists($key, $jsonArray)) {
-            $response = $jsonArray[$key];
+        if ($key) {
+            if (is_array($jsonArray) && array_key_exists($key, $jsonArray)) {
+                if (is_array($jsonArray[$key])) {
+                    $response = $jsonArray[$key];
+                } else {
+                    $response[] = $jsonArray[$key];
+                }                
+            } else {
+                throw new \Exception('Problemi con il file json. Rivedere i parametri');
+            }
         } else {
-            throw new \Exception('Problemi con il file json. Rivedere i parametri');
+            $response = $jsonArray;
         }
         return $response;
     } catch (\Throwable $e) {
@@ -1662,15 +1671,29 @@ function formatHelp(array $help, int $offset, int $maxLen, string $eol) : string
     }
 }        
 
-function setVariables(array $arguments) : array
+
+function setVariables(array $parameters, array $arguments) : array
 {
     try {        
-        $keyParam = array_search('-V', $arguments);
+        $short = getProperty($parameters, 'variabile', 'short');
+        $long = getProperty($parameters, 'variabile', 'long');
+        $default = getProperty($parameters, 'variabile', 'default');
+        $regex = getProperty($parameters, 'variabile', 'regex');
+        if (array_search('--' . $long, $arguments)) {
+            $keyParam = array_search('--' . $long, $arguments);
+        } elseif (array_search('-' . $short, $arguments)) {
+            $keyParam = array_search('-' . $short, $arguments);
+        }
         $keyValue = $keyParam + 1;
-        $otherParam = ['-f', '-t', '-c', '-n'];
+        if ($keyValue < count($arguments)) {
+            $paramValue = $arguments[$keyValue];        
+        }
+        $otherShortParams = getProperties($parameters, 'short', 'type', 'group', 'short', $short, '-');
+        $otherLongParams = getProperties($parameters, 'long', 'type', 'group', 'long', $long, '--');
+        $otherParams = array_merge($otherShortParams, $otherLongParams);
         
-        if (array_key_exists($keyValue, $arguments) && !in_array($arguments[$keyValue], $otherParam)) {
-            if (preg_match('/^[0-9]{5}([,][0-9]{5})*$/', $arguments[$keyValue], $matches)) {
+        if (isset($paramValue) && !in_array($paramValue, $otherParams)) {
+            if (preg_match($regex, $paramValue, $matches)) {
                 $varRaw = explode(',', $matches[0]);
                 foreach ($varRaw as $variable) {
                     $request['var'] = $variable;
@@ -1683,14 +1706,401 @@ function setVariables(array $arguments) : array
                 if (!isset($variables)) {
                     throw new \Exception('Variabili selezionate non valide');
                 }
+            } elseif (preg_match('/^(' . $default . ')$/', $paramValue)) {
+                $variables[] = $default;
             } else {
                 throw new \Exception('Formato serie variabili errato. Utilizzare la virgola come separatore (es. 30030,30040,30050)');
             }           
         } else {
-            $variables = ['ALL'];
+            $variables[] = $default;
         }
+        if ($variables[0] === $default) {
+            $arrVar = selectAllVar();
+        } else {
+            $arrVar = $variables;
+        }
+        return $arrVar;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function selectAllVar() : array
+{
+    try {
+        $data = getDataFromDb('SSCP_data', 'query_variabili_ALL', []);       
         
+        foreach ($data as $record => $fields) {
+            foreach ($fields as $field => $variable) {
+                $variables[] = '' . $variable . '';
+            }
+        }        
         return $variables;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function setDate(array $parameters, string $paramName, array $arguments) : string
+{
+    try {        
+        $short = getProperty($parameters, $paramName, 'short');
+        $long = getProperty($parameters, $paramName, 'long');
+        $default = getProperty($parameters, $paramName, 'default');
+        $regex = getProperty($parameters, $paramName, 'regex');
+        if (array_search('--' . $long, $arguments)) {
+            $keyParam = array_search('--' . $long, $arguments);
+        } elseif (array_search('-' . $short, $arguments)) {
+            $keyParam = array_search('-' . $short, $arguments);
+        }
+        $keyValue = $keyParam + 1;
+        if ($keyValue < count($arguments)) {
+            $paramValue = $arguments[$keyValue];        
+        }
+        $otherShortParams = getProperties($parameters, 'short', 'type', 'group', 'short', $short, '-');
+        $otherLongParams = getProperties($parameters, 'long', 'type', 'group', 'long', $long, '--');
+        $otherParams = array_merge($otherShortParams, $otherLongParams);
+        
+        if (isset($paramValue) && !in_array($paramValue, $otherParams)) {
+            if (preg_match($regex, $paramValue, $matches)) {
+                try {
+                    $date = formatDate($matches[0]);
+                } catch (\Throwable $e){
+                    Utility::errorHandler($e);
+                }                 
+                if (!isset($date)) {
+                    throw new \Exception('Data non valida. Indicare una data reale (es. 01/01/2020)');
+                }
+            } elseif (preg_match('/^(' . $default . ')$/', $paramValue)) {
+                $date = $default;
+            } else {
+                throw new \Exception('Formato data errato. Utilizzare il formato "dd/mm/yyyy"');
+            }           
+        } else {
+            $date = $default;
+        }        
+        return $date;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function getProperty(array $parameters, string $paramName, string $propertyName) : string
+{
+    try {
+        $property = '';
+        foreach ($parameters as $key => $properties) {
+            if ($properties['name'] === $paramName) {
+                $property = $parameters[$key][$propertyName];
+                break;
+            }
+        }        
+        return $property;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function getProperties(array $parameters, string $propertyName, ?string $filterInName = null, ?string $filterInValue = null, ?string $filterOutName = null, ?string $filterOutValue = null, ?string $prefix = '') : array
+{
+    try {
+        $group = [];
+        foreach ($parameters as $key => $properties) {
+            if ($filterInName && $filterInValue && $filterOutName && $filterOutValue) {
+                if ($properties[$filterInName] === $filterInValue && $properties[$filterOutName] !== $filterOutValue) {
+                    $group[] = $prefix . $parameters[$key][$propertyName];                
+                }
+            } elseif ($filterInName && $filterInValue) {
+                if ($properties[$filterInName] === $filterInValue) {
+                    $group[] = $prefix . $parameters[$key][$propertyName];                
+                }
+            } elseif ($filterOutName && $filterOutValue) {
+                if ($properties[$filterOutName] !== $filterOutValue) {
+                    $group[] = $prefix . $parameters[$key][$propertyName];                
+                }
+            } else {
+                $group[] = $prefix . $parameters[$key][$propertyName];
+            }
+        }        
+        return $group;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function getAssocProperties(array $parameters, string $propertyName) : array
+{
+    try {
+        $group = [];
+        foreach ($parameters as $properties) {
+            $group[$properties['name']] = $properties[$propertyName];
+        }        
+        return $group;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function allParameterSet(array $parameters, array $arguments) : bool
+{
+    try {
+        $response = true;
+        foreach ($parameters as $properties) {
+            if ($properties['type'] === 'group') {
+                $short = '-' . $properties['short'];
+                $long = '--' . $properties['long'];
+                if (!in_array($short, $arguments) && !in_array($long, $arguments)) {
+                    $response = false;
+                    break;
+                }
+            }
+        }
+        return $response;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function setParameter(array $parameters, string $paramName, array $arguments) : array
+{
+    try {        
+        $short = getProperty($parameters, $paramName, 'short');
+        $long = getProperty($parameters, $paramName, 'long');
+        $default = getProperty($parameters, $paramName, 'default');
+        $regex = getProperty($parameters, $paramName, 'regex');
+        if (array_search('--' . $long, $arguments)) {
+            $keyParam = array_search('--' . $long, $arguments);
+        } elseif (array_search('-' . $short, $arguments)) {
+            $keyParam = array_search('-' . $short, $arguments);
+        }
+        $keyValue = $keyParam + 1;
+        if ($keyValue < count($arguments)) {
+            $paramValue = $arguments[$keyValue];        
+        }
+        $otherShortParams = getProperties($parameters, 'short', 'type', 'group', 'short', $short, '-');
+        $otherLongParams = getProperties($parameters, 'long', 'type', 'group', 'long', $long, '--');
+        $otherParams = array_merge($otherShortParams, $otherLongParams);
+        
+        if (isset($paramValue) && !in_array($paramValue, $otherParams)) {
+            $values = checkParameter($paramName, $paramValue, $regex, $default);          
+        } else {
+            $values[] = $default;
+        }        
+        return $values;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function checkParameter(string $paramName, string $paramValue, string $regex, string $default) : array
+{
+    try {        
+        $values = [];
+        if (preg_match($regex, $paramValue, $matches)) {
+            switch ($paramName) {
+                case 'variabile':
+                    $varRaw = explode(',', $matches[0]);
+                    foreach ($varRaw as $variable) {
+                        $request['var'] = $variable;
+                        try {
+                            $values[] = checkVariable($request);
+                        } catch (\Throwable $e){
+                            Utility::errorHandler($e);
+                        }                
+                    }
+                    break;
+                case 'datefrom':
+                case 'dateto':
+                    try {
+                        $values[] = formatDate($matches[0]);
+                    } catch (\Throwable $e){
+                        Utility::errorHandler($e);
+                    }             
+                    break;
+                case 'campo':
+                    try {
+                        $request['field'] = $matches[0];
+                        $values[] = checkField($request);
+                    } catch (\Throwable $e){
+                        Utility::errorHandler($e);
+                    }             
+                    break;
+                case 'no zero':
+                    try {
+                        $request['full'] = filter_var($matches[0], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+                        $values[] = checkFilter($request);
+                    } catch (\Throwable $e){
+                        Utility::errorHandler($e);
+                    }             
+                    break;
+                default:
+                    $values[] = $matches[0];
+                    break;
+            }
+            if (count($values) === 0) {
+                throw new \Exception('Valori parametro "' . $paramName . '" non ammissibili.');
+            }
+        } elseif (preg_match('/^(' . $default . ')$/', $paramValue)) {
+            $values[] = $default;
+        } else {
+            throw new \Exception('Formato parametro "' . $paramName . '" errato.');
+        }          
+        return $values;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function setDefault(array $parameters, string $paramName) : array
+{
+    try {       
+        $values[] = getProperty($parameters, $paramName, 'default');
+        return $values;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function setParameters(array $parameters, array $arguments, bool $isDefault) : array
+{
+    try {       
+        $values = [];
+        $names = getProperties($parameters, 'name', 'type', 'group');
+        foreach ($names As $paramName) {
+            if ($isDefault) {
+                $values[$paramName][] = getProperty($parameters, $paramName, 'default');
+            } else {
+                $values[$paramName] = setParameter($parameters, $paramName, $arguments);
+            }            
+        }        
+        return $values;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function fillParameters(array $parameters, array $values) : array
+{
+    try {       
+        foreach ($values as $parameter => $rawValues) {
+            switch ($parameter) {
+                case 'variabile':
+                    if ($rawValues[0] === $parameters['var']['default']) {
+                        $postVars['var'] = selectAllVar(); 
+                    } else {
+                        $postVars['var'] = $rawValues;
+                    }
+                    break;
+                case 'datefrom':
+                    if ($rawValues[0] === $parameters['datefrom']['default']) {
+                        $dateto = $values['dateto'][0];
+                        if ($dateto === $parameters['dateto']['default']) {
+                            $dateTimeTo = new \DateTime();
+                        } else {
+                            $dateTimeTo = new \DateTime($dateto);
+                        }
+                        $yearInt = new \DateInterval('P1Y');                        
+                        $dateTimeFrom = $dateTimeTo->sub($yearInt);
+                    } else {
+                        $dateTimeFrom = new \DateTime($rawValues[0]);                        
+                    }
+                    $postVars['datefrom'] = $dateTimeFrom->format('d/m/Y');
+                    break;
+                case 'dateto':
+                    if ($rawValues[0] === $parameters['dateto']['default']) {
+                        $dateTimeTo = new \DateTime();
+                    } else {
+                        $dateTimeTo = new \DateTime($rawValues[0]);                        
+                    }
+                    $postVars['dateto'] = $dateTimeTo->format('d/m/Y');
+                    break;
+                case 'campo':
+                    $default = $parameters['field']['default'];                    
+                    if ($rawValues[0] === $default) {
+                        $options = $parameters['field']['options'];
+                        $key = array_search($default, $options['costants']);
+                        $postVars['field'] = $options['alias'][$key];
+                    } else {
+                        $postVars['field'] = $rawValues[0];                        
+                    }
+                    break;
+                case 'no zero':                    
+                    $postVars['full'] = filter_var($rawValues[0], FILTER_VALIDATE_BOOLEAN) ? '0' : '1';
+                    break;
+            }     
+        }        
+        return $postVars;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function setPostParameters(array $filledValues) : array
+{
+    try {       
+        foreach ($filledValues['var'] as $key => $value) {
+            $postParams[$key]['var'] = $value;
+            $postParams[$key]['datefrom'] = $filledValues['datefrom'];
+            $postParams[$key]['dateto'] = $filledValues['dateto'];
+            $postParams[$key]['full'] = $filledValues['full'];
+            $postParams[$key]['field'] = $filledValues['field'];
+        }   
+        return $postParams;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__);
+        throw $e;
+    }
+}
+
+
+function goCurl(array $postParams, string $url) : string
+{
+    try {
+        $message = '';
+        $i = 1;
+        foreach ($postParams as $key => $params) {        
+            $ch = curl_init();
+        
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HEADER, false);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+            $report = curl_exec($ch);
+
+            curl_close($ch);
+            
+            $message .= $i . ') ' . $params['var'] . ': ' . htmlspecialchars(strip_tags($report)) . PHP_EOL;
+            $i++;
+        }
+        return $message;
     } catch (\Throwable $e) {
         Utility::printErrorInfo(__FUNCTION__);
         throw $e;

@@ -9,49 +9,42 @@ namespace vaniacarta74\Scarichi;
 
 require __DIR__ . '/../vendor/autoload.php';
 
+$url = "http://localhost/telecontrollo/scarichi/github/src/index.php";
+
 //$argc = 7;
-//$argv = ['scarichi.php', '-V', '30030,30040,30050', '-f', '-t', '-c', '-n'];
+//$argv = ['scarichi.php', '-V', '30030,30040', '-f', '-t', '-c', '-n'];
 
 try {
+    $composer = getJsonArray(__DIR__ . '/../composer.json');
+    $help = getJsonArray(__DIR__ . '/config/help.json');
+    $parameters = $help['parameters'];
+    $names = getProperties($parameters, 'name', 'type', 'group');
+    $shorts = getAssocProperties($parameters, 'short');
+    $longs = getAssocProperties($parameters, 'long');
+    
     if (!isset($argv)) {
-        $message = getMessage('www', 'redirect');
+        $message = getMessage($composer, $help, 'www', 'redirect');
     } else {
-        if ($argc === 1 || ($argc === 2 && ($argv[1] === '-h' || $argv[1] === '--help'))) {
-            $message = getMessage('cli', 'help'); 
-        } elseif ($argc === 2 && ($argv[1] === '-v' || $argv[1] === '--version')) {
-            $message = getMessage('cli', 'version');
-        } elseif ($argc === 2 && ($argv[1] === '-d' || $argv[1] === '--default')) {
-            $message = getMessage('cli', 'default');
-            
-            $now = new \DateTime();
-            $yearInt = new \DateInterval('P1Y');
-            $dateTo = $now->format('d/m/Y');
-            $lastYear = $now->sub($yearInt);
-            $dateFrom = $lastYear->format('d/m/Y');            
-            
-            $paramsRaw = [
-                'var' => 'ALL',
-                'datefrom' => $dateFrom,
-                'dateto' => $dateTo,
-                'full' => '1',
-                'field' => 'volume'
-            ];            
-            
-        } elseif ($argc >= 6 && in_array('-V', $argv) && in_array('-f', $argv) && in_array('-t', $argv) && in_array('-c', $argv) && in_array('-n', $argv)) {
-            $message = getMessage('cli', 'ok');
-
-            $variables = setVariables($argv);
-            foreach ($variables as $key => $value) {
-                echo $key . ': ' . $value . PHP_EOL;
-            }
+        if ($argc === 1 || ($argc === 2 && ($argv[1] === '-' . $shorts['help'] || $argv[1] === '--' . $longs['help']))) {
+            $message = getMessage($composer, $help, 'cli', 'help'); 
+        } elseif ($argc === 2 && ($argv[1] === '-' . $shorts['version'] || $argv[1] === '--' . $longs['version'])) {
+            $message = getMessage($composer, $help, 'cli', 'version');
+        } elseif ($argc === 2 && ($argv[1] === '-' . $shorts['default'] || $argv[1] === '--' . $longs['default'])) {
+            $message = getMessage($composer, $help, 'cli', 'default');
+            $values = setParameters($parameters, $argv, true);
+        } elseif ($argc >= 6 && allParameterSet($parameters, $argv)) {            
+            $message = getMessage($composer, $help, 'cli', 'ok');            
+            $values = setParameters($parameters, $argv, false);
         } else {
-            $message = getMessage('cli', 'error');            
+            $message = getMessage($composer, $help, 'cli', 'error');            
         }
     }
-    echo $message;
-    foreach ($argv as $key => $value) {
-        echo $key . ': ' . $value . PHP_EOL;
-    }    
+    if (isset($values)) {
+        $filledValues = fillParameters($parameters, $values);
+        $postParams = setPostParameters($filledValues);
+        $message .= goCurl($postParams, $url);
+    }   
+    echo $message;        
 } catch (\Throwable $e) {
     Utility::errorHandler($e);
     exit();
