@@ -1,0 +1,179 @@
+{
+    "global": {
+        "offset": "7"
+    },
+    "parameters": {
+        "help": {
+            "name": "help",
+            "short": "h",
+            "long": "help",
+            "default": "",
+            "options": {
+                "variables": [],
+                "costants": [],
+                "alias": []
+            },
+            "regex": "",
+            "descriptions": [
+                "Stampa questo help."
+            ],
+            "type": "single"
+        },
+        "version": {
+            "name": "version",
+            "short": "v",
+            "long": "version",
+            "default": "",
+            "options": {
+                "variables": [],
+                "costants": [],
+                "alias": []
+            },
+            "regex": "",
+            "descriptions": [
+                "Stampa il numero di versione."
+            ],
+            "type": "single"
+        },
+        "default": {
+            "name": "default",
+            "short": "d",
+            "long": "default",
+            "default": "",
+            "options": {
+                "variables": [],
+                "costants": [],
+                "alias": []
+            },
+            "regex": "",
+            "descriptions": [
+                "Esegue il calcolo con i parametri di default."
+            ],
+            "type": "single"
+        },
+        "var": {
+            "name": "variabile",
+            "short": "V",
+            "long": "var",
+            "default": "ALL",
+            "options": {
+                "variables": [
+                    "var1",
+                    "var2"
+                ],
+                "costants": [
+                    "ALL"
+                ],
+                "alias": [
+                    "tutti"
+                ]
+            },
+            "regex": "\/^[0-9]{5}([,][0-9]{5})*$\/",
+            "descriptions": [
+                "Esegue il calcolo per ciascuna delle variabili",
+                "<var> o per tutte (ALL). Default ALL."
+            ],
+            "type": "group"
+        },
+        "datefrom": {
+            "name": "datefrom",
+            "short": "f",
+            "long": "from",
+            "default": "YEAR",
+            "options": {
+                "variables": [
+                    "data"
+                ],
+                "costants": [
+                    "YEAR"
+                ],
+                "alias": [
+                    "anno"
+                ]
+            },
+            "regex": "\/^[0-9]{2}[\\/][0-9]{2}[\\/][0-9]{4}$\/",
+            "descriptions": [
+                "Esegue il calcolo a partire da <data> o per",
+                "un\\'anno (YEAR). Default YEAR."
+            ],
+            "type": "group"
+        },
+        "dateto": {
+            "name": "dateto",
+            "short": "t",
+            "long": "to",
+            "default": "NOW",
+            "options": {
+                "variables": [
+                    "data"
+                ],
+                "costants": [
+                    "NOW"
+                ],
+                "alias": [
+                    "oggi"
+                ]
+            },
+            "regex": "\/^[0-9]{2}[\\/][0-9]{2}[\\/][0-9]{4}$\/",
+            "descriptions": [
+                "Esegue il calcolo sino a <data> o sino ad oggi",
+                "(NOW). Default NOW."
+            ],
+            "type": "group"
+        },
+        "field": {
+            "name": "campo",
+            "short": "c",
+            "long": "campo",
+            "default": "V",
+            "options": {
+                "variables": [],
+                "costants": [
+                    "V",
+                    "L",
+                    "M",
+                    "D",
+                    "H",
+                    "Q"
+                ],
+                "alias": [
+                    "volume",
+                    "livello",
+                    "media",
+                    "delta",
+                    "altezza",
+                    "portata"
+                ]  
+            },
+            "regex": "\/^[V|L|M|D|H|Q]$\/",
+            "descriptions": [
+                "Esporta i dati di volume(V), livello(L), media(M)",
+                "delta(D), altezza(H) o portata(Q). Default V."
+            ],
+            "type": "group"
+        },
+        "full": {
+            "name": "no zero",
+            "short": "n",
+            "long": "nozero",
+            "default": "FALSE",
+            "options": {
+                "variables": [],
+                "costants": [
+                    "TRUE",
+                    "FALSE"
+                ],
+                "alias": [
+                    "1",
+                    "0"
+                ]
+            },
+            "regex": "\/^((TRUE)|(FALSE))$\/",
+            "descriptions": [
+                "Esporta solo i valori diversi da zero (TRUE) o",
+                "tutti i valori (FALSE). Default FALSE."
+            ],
+            "type": "group"
+        }
+    }
+}
