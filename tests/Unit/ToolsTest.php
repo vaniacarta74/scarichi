@@ -51,7 +51,7 @@ use function vaniacarta74\Scarichi\eraseDoubleDate as eraseDoubleDate;
 use function vaniacarta74\Scarichi\changeDate as changeDate;
 use function vaniacarta74\Scarichi\filter as filter;
 use function vaniacarta74\Scarichi\debugOnCSV as debugOnCSV;
-use function vaniacarta74\Scarichi\getComposerValue as getComposerValue;
+use function vaniacarta74\Scarichi\getJsonArray as getJsonArray;
 
 class ToolsTest extends TestCase
 {
@@ -1036,6 +1036,12 @@ class ToolsTest extends TestCase
             'volume' => [
                 [
                     'field' => 'volume'
+                ],
+                'volume'
+            ],
+            'volume' => [
+                [
+                    'field' => 'V'
                 ],
                 'volume'
             ]
@@ -6285,61 +6291,163 @@ class ToolsTest extends TestCase
     /**
      * @coversNothing
      */
-    public function getComposerValueProvider() : array
+    public function getJsonArrayIsStringProvider() : array
     {
+        $path1 = __DIR__ . '/../../composer.json';
+        $path2 = __DIR__ . '/../../src/config/help.json';
+        
         $data = [
-            'level0.0' => [                
+            'level0.0' => [
+                'path' => $path1,
                 'param_0' => 'version',
                 'param_1' => null,
-                'param_2' => null
+                'param_2' => null,
+                'param_3' => null,
+                'param_4' => null
             ],
-            'level1.0' => [                
+            'level1.0' => [
+                'path' => $path1,
                 'param_0' => 'source',
                 'param_1' => 'support',
-                'param_2' => null
+                'param_2' => null,
+                'param_3' => null,
+                'param_4' => null
             ],
-            'level1.1' => [                
+            'level1.1' => [
+                'path' => $path1,
                 'param_0' => '1',
                 'param_1' => 'keywords',
-                'param_2' => null
+                'param_2' => null,
+                'param_3' => null,
+                'param_4' => null
             ],
-            'level2.0' => [                
+            'level2.0' => [
+                'path' => $path1,
                 'param_0' => '0',
                 'param_1' => 'files',
-                'param_2' => 'autoload'
+                'param_2' => 'autoload',
+                'param_3' => null,
+                'param_4' => null
             ],
-            'level2.1' => [                
+            'level2.1' => [
+                'path' => $path1,
                 'param_0' => 'name',
                 'param_1' => '0',
-                'param_2' => 'authors'
-            ]            
+                'param_2' => 'authors',
+                'param_3' => null,
+                'param_4' => null
+            ],
+            'level3.0' => [                
+                'path' => $path2,
+                'param_0' => '0',
+                'param_1' => 'descriptions',
+                'param_2' => 'field',
+                'param_3' => 'parameters',
+                'param_4' => null                
+            ],
+            'level4.0' => [                
+                'path' => $path2,
+                'param_0' => '0',      
+                'param_1' => 'costants',        
+                'param_2' => 'options',
+                'param_3' => 'field',
+                'param_4' => 'parameters'
+            ]
         ];
         
         return $data;
-    }    
-    
+    }
+
+
     /**
-     * @group php-cli
-     * covers getComposerValues()
-     * @dataProvider GetComposerValueProvider
+     * @coversNothing
      */
-    public function testGetComposerValueIsString($level0, $level1, $level2) : void
+    public function getJsonArrayIsArrayProvider() : array
     {
-        $actual = getComposerValue($level0, $level1, $level2);
-                
-        $this->assertIsString($actual);
+        $path1 = __DIR__ . '/../../composer.json';
+        $path2 = __DIR__ . '/../../src/config/help.json';
+        
+        $data = [
+            'only path' => [
+                'path' => $path1,
+                'param_0' => null,
+                'param_1' => null,
+                'param_2' => null,
+                'param_3' => null,
+                'param_4' => null
+            ],
+            'level0' => [
+                'path' => $path1,
+                'param_0' => 'support',
+                'param_1' => null,
+                'param_2' => null,
+                'param_3' => null,
+                'param_4' => null
+            ],
+            'level1' => [
+                'path' => $path1,
+                'param_0' => 'files',
+                'param_1' => 'autoload',
+                'param_2' => null,
+                'param_3' => null,
+                'param_4' => null
+            ],
+            'level2' => [
+                'path' => $path2,
+                'param_0' => 'descriptions',
+                'param_1' => 'field',
+                'param_2' => 'parameters',
+                'param_3' => null,
+                'param_4' => null
+            ],
+            'level3' => [                
+                'path' => $path2,
+                'param_0' => 'costants',
+                'param_1' => 'options',
+                'param_2' => 'field',
+                'param_3' => 'parameters',
+                'param_4' => null                
+            ]
+        ];
+        
+        return $data;
     }
     
     /**
      * @group php-cli
-     * covers getComposerValues()
+     * covers getJsonArray()
+     * @dataProvider getJsonArrayIsStringProvider
      */
-    public function testGetComposerValueException() : void
+    public function testGetJsonArrayIsString($path, $level0, $level1, $level2, $level3, $level4) : void
     {
+        $actual = getJsonArray($path, $level0, $level1, $level2, $level3, $level4);
+        
+        $this->assertIsString($actual[0]);
+    }
+    
+    /**
+     * @group php-cli
+     * covers getJsonArray()
+     * @dataProvider getJsonArrayIsArrayProvider
+     */
+    public function testGetJsonArrayIsArray($path, $level0, $level1, $level2, $level3, $level4) : void
+    {
+        $actual = getJsonArray($path, $level0, $level1, $level2, $level3, $level4);
+        
+        $this->assertIsArray($actual);
+    }
+    
+    /**
+     * @group php-cli
+     * covers getJsonArray()
+     */
+    public function testGetJsonArrayException() : void
+    {
+        $path = __DIR__ . '/../../composer.json';
         $key = 'pippo';
         
         $this->expectException(\Exception::class);
         
-        getComposerValue($key);
+        getJsonArray($path, $key);
     }
 }

@@ -43,9 +43,10 @@ try {
         $filledValues = fillParameters($parameters, $values);
         $postParams = setPostParameters($filledValues);
         $message .= goCurl($postParams, $url);
-    }   
+    }
+    $message .= get_current_user();
     echo $message;        
 } catch (\Throwable $e) {
-    Utility::errorHandler($e);
+    Utility::errorHandler($e, DEBUG_LEVEL);
     exit();
 }

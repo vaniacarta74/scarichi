@@ -1,7 +1,7 @@
 {
     "name": "vaniacarta74/scarichi",
     "description": "Applicazione per il calcolo dei volumi scaricati da una diga in base alle serie storiche dei livelli invaso e delle manovre degli organi di scarico",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "minimum-stability": "stable",
     "type": "library",
     "keywords": ["volumi scaricati", "dighe"],    

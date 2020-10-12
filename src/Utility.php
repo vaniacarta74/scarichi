@@ -29,11 +29,11 @@ class Utility
      * @param string $functionName
      * @return void
      */
-    public static function printErrorInfo(string $functionName) : void
+    public static function printErrorInfo(string $functionName, int $debug_level) : void
     {
         $date = new \DateTime();
         $date->setTimezone(new \DateTimeZone('Europe/Rome'));
-        switch (DEBUG_LEVEL) {
+        switch ($debug_level) {
             case 0:
                 break;
             case 1:
@@ -47,9 +47,9 @@ class Utility
         }       
     }
     
-    public static function errorHandler(\Throwable $e) : void
+    public static function errorHandler(\Throwable $e, int $debug_level) : void
     {
-        switch (DEBUG_LEVEL) {
+        switch ($debug_level) {
             case 0:
                 break;
             case 1:
@@ -89,7 +89,7 @@ class Utility
                 foreach ($arrStack as $line) {
                     $message .= $line . '<br/>';
                 }
-                echo $message;
+                echo $message;                
                 break;
         }         
     }

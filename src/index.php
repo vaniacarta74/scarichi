@@ -185,8 +185,8 @@ try {
 
     $printed = divideAndPrint($volumi, $request['full'], $request['field']);
     
-    echo response($request, $printed);
+    echo response($request, $printed);    
 } catch (\Throwable $e) {
-    Utility::errorHandler($e);
+    Utility::errorHandler($e, DEBUG_LEVEL);
     exit();
 }
