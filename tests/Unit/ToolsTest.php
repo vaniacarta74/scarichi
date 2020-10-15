@@ -35,7 +35,6 @@ use function vaniacarta74\Scarichi\printPart as printPart;
 use function vaniacarta74\Scarichi\divideAndPrint as divideAndPrint;
 use function vaniacarta74\Scarichi\checkNull as checkNull;
 use function vaniacarta74\Scarichi\response as response;
-use function vaniacarta74\Scarichi\errorHandler as errorHandler;
 use function vaniacarta74\Scarichi\close as close;
 use function vaniacarta74\Scarichi\calcolaPortata as calcolaPortata;
 use function vaniacarta74\Scarichi\integraDate as integraDate;
@@ -52,6 +51,18 @@ use function vaniacarta74\Scarichi\changeDate as changeDate;
 use function vaniacarta74\Scarichi\filter as filter;
 use function vaniacarta74\Scarichi\debugOnCSV as debugOnCSV;
 use function vaniacarta74\Scarichi\getJsonArray as getJsonArray;
+use function vaniacarta74\Scarichi\getSubArray as getSubArray;
+use function vaniacarta74\Scarichi\getHelpLines as getHelpLines;
+use function vaniacarta74\Scarichi\formatParams as formatParams;
+use function vaniacarta74\Scarichi\formatDefault as formatDefault;
+use function vaniacarta74\Scarichi\formatVariables as formatVariables;
+use function vaniacarta74\Scarichi\formatCostants as formatCostants;
+use function vaniacarta74\Scarichi\formatOptions as formatOptions;
+use function vaniacarta74\Scarichi\getMaxLenght as getMaxLenght;
+use function vaniacarta74\Scarichi\formatDescriptions as formatDescriptions;
+use function vaniacarta74\Scarichi\formatShort as formatShort;
+use function vaniacarta74\Scarichi\formatLong as formatLong;
+use function vaniacarta74\Scarichi\formatPardef as formatPardef;
 
 class ToolsTest extends TestCase
 {
@@ -3689,25 +3700,7 @@ class ToolsTest extends TestCase
         
         response($request, $printed);
     }
-    
-    /**
-     * @group error
-     * covers errorHandler()
-     */
-    
-    public function testErrorHandlerIsString() : void
-    {
-        try {
-            if (true) {
-                throw new \Exception('Test if errorHandler() return a string');
-            }
-        } catch (\Exception $e) {
-            $actual = errorHandler($e);
-
-            $this->assertIsString($actual);
-        }
-    }
-    
+        
     /**
      * @group tools
      * covers close()
@@ -6299,59 +6292,38 @@ class ToolsTest extends TestCase
         $data = [
             'level0.0' => [
                 'path' => $path1,
-                'param_0' => 'version',
-                'param_1' => null,
-                'param_2' => null,
-                'param_3' => null,
-                'param_4' => null
+                'keys' => null,
+                'deepKey' => 'version'
             ],
             'level1.0' => [
                 'path' => $path1,
-                'param_0' => 'source',
-                'param_1' => 'support',
-                'param_2' => null,
-                'param_3' => null,
-                'param_4' => null
+                'keys' => ['support'],
+                'deepKey' => 'source'
             ],
             'level1.1' => [
                 'path' => $path1,
-                'param_0' => '1',
-                'param_1' => 'keywords',
-                'param_2' => null,
-                'param_3' => null,
-                'param_4' => null
+                'keys' => ['keywords'],
+                'deepKey' => '1'
             ],
             'level2.0' => [
                 'path' => $path1,
-                'param_0' => '0',
-                'param_1' => 'files',
-                'param_2' => 'autoload',
-                'param_3' => null,
-                'param_4' => null
+                'keys' => ['autoload','files'],
+                'deepKey' => '0'
             ],
             'level2.1' => [
                 'path' => $path1,
-                'param_0' => 'name',
-                'param_1' => '0',
-                'param_2' => 'authors',
-                'param_3' => null,
-                'param_4' => null
+                'keys' => ['authors','0'],
+                'deepKey' => 'name'
             ],
             'level3.0' => [                
                 'path' => $path2,
-                'param_0' => '0',
-                'param_1' => 'descriptions',
-                'param_2' => 'field',
-                'param_3' => 'parameters',
-                'param_4' => null                
+                'keys' => ['parameters','field','descriptions'],
+                'deepKey' => '0'
             ],
             'level4.0' => [                
                 'path' => $path2,
-                'param_0' => '0',      
-                'param_1' => 'costants',        
-                'param_2' => 'options',
-                'param_3' => 'field',
-                'param_4' => 'parameters'
+                'keys' => ['parameters','field','options','costants'],
+                'deepKey' => '0'
             ]
         ];
         
@@ -6370,43 +6342,28 @@ class ToolsTest extends TestCase
         $data = [
             'only path' => [
                 'path' => $path1,
-                'param_0' => null,
-                'param_1' => null,
-                'param_2' => null,
-                'param_3' => null,
-                'param_4' => null
+                'keys' => null,
+                'deepKey' => null
             ],
             'level0' => [
                 'path' => $path1,
-                'param_0' => 'support',
-                'param_1' => null,
-                'param_2' => null,
-                'param_3' => null,
-                'param_4' => null
+                'keys' => ['support'],
+                'deepKey' => null
             ],
             'level1' => [
                 'path' => $path1,
-                'param_0' => 'files',
-                'param_1' => 'autoload',
-                'param_2' => null,
-                'param_3' => null,
-                'param_4' => null
+                'keys' => ['autoload','files'],
+                'deepKey' => null
             ],
             'level2' => [
                 'path' => $path2,
-                'param_0' => 'descriptions',
-                'param_1' => 'field',
-                'param_2' => 'parameters',
-                'param_3' => null,
-                'param_4' => null
+                'keys' => ['parameters','field','descriptions'],
+                'deepKey' => null
             ],
             'level3' => [                
                 'path' => $path2,
-                'param_0' => 'costants',
-                'param_1' => 'options',
-                'param_2' => 'field',
-                'param_3' => 'parameters',
-                'param_4' => null                
+                'keys' => ['parameters','field','options','costants'],
+                'deepKey' => null
             ]
         ];
         
@@ -6418,9 +6375,9 @@ class ToolsTest extends TestCase
      * covers getJsonArray()
      * @dataProvider getJsonArrayIsStringProvider
      */
-    public function testGetJsonArrayIsString($path, $level0, $level1, $level2, $level3, $level4) : void
+    public function testGetJsonArrayIsString($path, $keys, $deepKey) : void
     {
-        $actual = getJsonArray($path, $level0, $level1, $level2, $level3, $level4);
+        $actual = getJsonArray($path, $keys, $deepKey);
         
         $this->assertIsString($actual[0]);
     }
@@ -6430,9 +6387,9 @@ class ToolsTest extends TestCase
      * covers getJsonArray()
      * @dataProvider getJsonArrayIsArrayProvider
      */
-    public function testGetJsonArrayIsArray($path, $level0, $level1, $level2, $level3, $level4) : void
+    public function testGetJsonArrayIsArray($path, $keys, $deepKey) : void
     {
-        $actual = getJsonArray($path, $level0, $level1, $level2, $level3, $level4);
+        $actual = getJsonArray($path, $keys, $deepKey);
         
         $this->assertIsArray($actual);
     }
@@ -6444,10 +6401,761 @@ class ToolsTest extends TestCase
     public function testGetJsonArrayException() : void
     {
         $path = __DIR__ . '/../../composer.json';
-        $key = 'pippo';
+        $deepKey = 'pippo';
         
         $this->expectException(\Exception::class);
         
-        getJsonArray($path, $key);
+        getJsonArray($path, null, $deepKey);
+    }
+    
+    /**
+     * @group php-cli
+     * covers getJsonArray()
+     */
+    public function testGetJsonArrayDeepKeyException() : void
+    {
+        $path = __DIR__ . '/../../composer.json';
+        $keys = ['autoload'];
+        $deepKey = 'files';
+        
+        $this->expectException(\Exception::class);
+        
+        getJsonArray($path, $keys, $deepKey);
+    }
+
+    /**
+     * @coversNothing
+     */
+    public function getSubArrayProvider() : array
+    {
+        $array = [
+            'parameters' => [
+                'field' => [
+                    'options' => [
+                        'costants' => ['V','L','M']
+                    ]
+                ],
+                'help' => [
+                    'name' => 'help'
+                ]
+            ]
+        ];
+        
+        $data = [
+            'level1' => [
+                'master' => $array,
+                'keys' => ['parameters'],
+                'expected' => [
+                    'field' => [
+                        'options' => [
+                            'costants' => ['V','L','M']
+                        ]
+                    ],
+                    'help' => [
+                        'name' => 'help'
+                    ]
+                ]
+            ],
+            'level2' => [
+                'master' => $array,
+                'keys' => ['parameters','field'],
+                'expected' => [
+                    'options' => [
+                        'costants' => ['V','L','M']
+                    ]
+                ]
+            ],
+            'level3' => [
+                'master' => $array,
+                'keys' => ['parameters','field','options'],
+                'expected' => [
+                    'costants' => ['V','L','M']
+                ]
+            ],
+            'level4' => [
+                'master' => $array,
+                'keys' => ['parameters','field','options','costants'],
+                'expected' => ['V','L','M']
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group php-cli
+     * covers getSubArray()
+     * @dataProvider getSubArrayProvider
+     */
+    public function testGetSubArrayEquals($master, $keys, $expected) : void
+    {
+        $actual = getSubArray($master, $keys);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group php-cli
+     * covers getSubArray()
+     */
+    public function testGetSubArrayException() : void
+    {
+        $master = [
+            'parameters' => [
+                'field' => [
+                    'options' => [
+                        'costants' => ['V','L','M']
+                    ]
+                ],
+                'help' => [
+                    'name' => 'help'
+                ]
+            ]
+        ];
+        $keys = ['autoload'];
+        
+        $this->expectException(\Exception::class);
+        
+        getSubArray($master, $keys);
+    }
+    
+    /**
+     * @group test
+     * covers getHelpLines()
+     */
+    public function testGetHelpLinesMultiEquals() : void
+    {
+        $parameters = [
+            "var" => [
+                "name" => "variabile",
+                "short" => "V",
+                "long" => "var",
+                "default" => "ALL",
+                "options" => [
+                    "variables" => [
+                        "var1",
+                        "var2"
+                    ],
+                    "costants" => [
+                        "ALL"
+                    ],
+                    "alias" => [
+                        "tutti"
+                    ]
+                ],
+                "regex" => "\/^[0-9]{5}([,][0-9]{5})*$\/",
+                "descriptions" => [
+                    "Esegue il calcolo per ciascuna delle variabili",
+                    "<var> o per tutte (ALL). Default ALL."
+                ],
+                "type" => "group"
+            ]
+        ];
+        
+        $sections = [
+            "params",
+            "default",
+            "descriptions"
+        ];            
+        
+        $expected = [
+            [
+                "params" => "-V --var",
+                "default" => "[=ALL]",
+                "descriptions" => "Esegue il calcolo per ciascuna delle variabili"
+            ],
+            [
+                "params" => "",
+                "default" => "",
+                "descriptions" => "<var> o per tutte (ALL). Default ALL."                
+            ]
+        ];
+        
+        $actual = getHelpLines($parameters, $sections);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers getHelpLines()
+     */
+    public function testGetHelpLinesSingleEquals() : void
+    {
+        $parameters = [
+            "var" => [
+                "name" => "variabile",
+                "short" => "V",
+                "long" => "var",
+                "default" => "ALL",
+                "options" => [
+                    "variables" => [
+                        "var1",
+                        "var2"
+                    ],
+                    "costants" => [
+                        "ALL"
+                    ],
+                    "alias" => [
+                        "tutti"
+                    ]
+                ],
+                "regex" => "\/^[0-9]{5}([,][0-9]{5})*$\/",
+                "descriptions" => [
+                    "Esegue il calcolo per ciascuna delle variabili",
+                    "<var> o per tutte (ALL). Default ALL."
+                ],
+                "type" => "group"
+            ]
+        ];
+        
+        $sections = [
+                "params",
+                "descriptions",
+                "default"
+        ];            
+        
+        $expected = [
+            [
+                "params" => "-V --var",                
+                "descriptions" => "Esegue il calcolo per ciascuna delle variabili <var> o per tutte (ALL). Default ALL.",
+                "default" => "[=ALL]"
+            ]
+        ];
+        
+        $actual = getHelpLines($parameters, $sections);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers getHelpLines()
+     */
+    public function testGetHelpLinesParametersException() : void
+    {
+        $parameters = [];
+        $sections = [
+            "params",
+            "default",
+            "descriptions"
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        getHelpLines($parameters, $sections);
+    }
+    
+    /**
+     * @group test
+     * covers getHelpLines()
+     */
+    public function testGetHelpLinesSectionsException() : void
+    {
+        $parameters = ['pippo'];
+        $sections = [];
+        
+        $this->expectException(\Exception::class);
+        
+        getHelpLines($parameters, $sections);
+    }
+    
+    /**
+     * @group test
+     * covers formatParams()
+     */
+    public function testFormatParamsEquals() : void
+    {
+        $properties = [            
+                "short" => "V",
+                "long" => "var"
+        ];
+        
+        $expected = "-V --var";
+         
+        $actual = formatParams($properties);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers formatParams()
+     */
+    public function testFormatParamsException() : void
+    {
+        $properties = [            
+                "short" => "",
+                "long" => "va"
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formatParams($properties);
+    }
+    
+    /**
+     * @group test
+     * covers formatDefault()
+     */
+    public function testFormatDefaultEquals() : void
+    {
+        $properties = [            
+                "default" => "ALL"
+        ];
+        
+        $expected = "[=ALL]";
+         
+        $actual = formatDefault($properties);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers formatDefault()
+     */
+    public function testFormatDefaultVoidEquals() : void
+    {
+        $properties = [            
+                "default" => ""
+        ];
+        
+        $expected = "";
+         
+        $actual = formatDefault($properties);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers formatDefault()
+     */
+    public function testFormatDefaultException() : void
+    {
+        $properties = [            
+                "pippo" => "V"
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formatDefault($properties);
+    }
+    
+    /**
+     * @group test
+     * covers formatDefault()
+     */
+    public function testFormatDefaultRegexException() : void
+    {
+        $properties = [            
+                "default" => "v"
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formatDefault($properties);
+    }
+    
+    /**
+     * @group test
+     * covers formatVariables()
+     */
+    public function testFormatVariablesEquals() : void
+    {
+        $properties = [            
+            "options" => [
+                "variables" => ['30030','30040']
+            ]
+        ];
+        
+        $expected = "<30030>,<30040>";
+         
+        $actual = formatVariables($properties);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers formatVariables()
+     */
+    public function testFormatVariablesVoidEquals() : void
+    {
+        $properties = [            
+            "options" => [
+                "variables" => []
+            ]
+        ];
+        
+        $expected = "";
+         
+        $actual = formatVariables($properties);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers formatVariables()
+     */
+    public function testFormatVariablesException() : void
+    {
+        $properties = [            
+            "options" => [
+                "pippo" => ['30030','30040']
+            ]
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formatVariables($properties);
+    }
+    
+    /**
+     * @group test
+     * covers formatCostants()
+     */
+    public function testFormatCostantsEquals() : void
+    {
+        $properties = [            
+            "options" => [
+                "costants" => ['TRUE','FALSE']
+            ]
+        ];
+        
+        $expected = "TRUE|FALSE";
+         
+        $actual = formatCostants($properties);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers formatCostants()
+     */
+    public function testFormatCostantsVoidEquals() : void
+    {
+        $properties = [            
+            "options" => [
+                "costants" => []
+            ]
+        ];
+        
+        $expected = "";
+         
+        $actual = formatCostants($properties);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers formatCostants()
+     */
+    public function testFormatCostantsException() : void
+    {
+        $properties = [            
+            "options" => [
+                "pippo" => ['TRUE','FALSE']
+            ]
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formatCostants($properties);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function formatOptionsProvider() : array
+    {
+        $data = [
+            'full' => [
+                'properties' => [            
+                    "options" => [
+                        "variables" => ['var1'],
+                        "costants" => ['V']
+                    ]
+                ],
+                'expected' => "<var1>|V"
+            ],
+            'full multi' => [
+                'properties' => [            
+                    "options" => [
+                        "variables" => ['var1','var2'],
+                        "costants" => ['V','M','Q']
+                    ]
+                ],
+                'expected' => "<var1>,<var2>|V|M|Q"
+            ],
+            'only variables' => [
+                'properties' => [            
+                    "options" => [
+                        "variables" => ['var1','var2'],
+                        "costants" => []
+                    ]
+                ],
+                'expected' => "<var1>,<var2>"
+            ],
+            'only costants' => [
+                'properties' => [            
+                    "options" => [
+                        "variables" => [],
+                        "costants" => ['V','M','Q']
+                    ]
+                ],
+                'expected' => "V|M|Q"
+            ],
+            'no options' => [
+                'properties' => [            
+                    "options" => [
+                        "variables" => [],
+                        "costants" => []
+                    ]
+                ],
+                'expected' => ""
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers formatOptions()
+     * @dataProvider formatOptionsProvider
+     */
+    public function testFormatOptionsEquals($properties, $expected) : void
+    {
+        $actual = formatOptions($properties);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function formatOptionsExceptionsProvider() : array
+    {
+        $data = [
+            'variables exception' => [
+                'properties' => [            
+                    "options" => [
+                        "variables" => ['','var2'],
+                        "costants" => ['V']
+                    ]
+                ]
+            ],
+            'costants exception1' => [
+                'properties' => [            
+                    "options" => [
+                        "variables" => ['var1','var2'],
+                        "costants" => ['v','m','q']
+                    ]
+                ]
+            ],
+            'costants exception2' => [
+                'properties' => [            
+                    "options" => [
+                        "variables" => ['var1','var2'],
+                        "costants" => ['','M','Q']
+                    ]
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers formatOptions()
+     * @dataProvider formatOptionsExceptionsProvider
+     */
+    public function testFormatOptionsExceptions($parameters) : void
+    {
+        $this->expectException(\Exception::class);
+        
+        formatOptions($parameters);
+    }
+    
+    /**
+     * @group test
+     * covers formatDescriptions()
+     */
+    public function testFormatDescriptionsEquals() : void
+    {
+        $properties = [            
+            "descriptions" => [
+                "pippo",
+                "pluto",
+                "paperino"
+            ]
+        ];
+        
+        $expected = "pippo pluto paperino";
+         
+        $actual = formatDescriptions($properties);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers formatDescriptions()
+     */
+    public function testFormatDescriptionsVoidEquals() : void
+    {
+        $properties = [            
+            "descriptions" => []
+        ];
+        
+        $expected = "";
+         
+        $actual = formatDescriptions($properties);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers formatDescriptions()
+     */
+    public function testFormatDescriptionsException() : void
+    {
+        $properties = [            
+            "options" => [
+                "pippo",
+                "pluto",
+                "paperino"
+            ]
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formatDescriptions($properties);
+    }
+    
+    /**
+     * @group test
+     * covers formatShort()
+     */
+    public function testFormatShortEquals() : void
+    {
+        $properties = [            
+            "short" => "h"
+        ];
+        
+        $expected = "-h";
+         
+        $actual = formatShort($properties);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+      
+    /**
+     * @group test
+     * covers formatShort()
+     */
+    public function testFormatShortException() : void
+    {
+        $properties = [            
+            "short" => "ha"
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formatShort($properties);
+    }
+    
+    /**
+     * @group test
+     * covers formatLong()
+     */
+    public function testFormatLongEquals() : void
+    {
+        $properties = [            
+            "long" => "version"
+        ];
+        
+        $expected = "--version";
+         
+        $actual = formatLong($properties);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+      
+    /**
+     * @group test
+     * covers formatLong()
+     */
+    public function testFormatLongException() : void
+    {
+        $properties = [            
+            "long" => "to"
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formatLong($properties);
+    }
+    
+    /**
+     * @group test
+     * covers formatPardef()
+     */
+    public function testFormatPardefEquals() : void
+    {
+        $properties = [
+            "short" => "f",
+            "long" => "field",
+            "default" => "V"
+        ];
+        
+        $expected = "-f --field[=V]";
+         
+        $actual = formatPardef($properties);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers formatPardef()
+     */
+    public function testFormatPardefVoidEquals() : void
+    {
+        $properties = [
+            "short" => "f",
+            "long" => "field",
+            "default" => ""
+        ];
+        
+        $expected = "-f --field";
+         
+        $actual = formatPardef($properties);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+      
+    /**
+     * @group test
+     * covers formatPardef()
+     */
+    public function testFormatPardefException() : void
+    {
+        $properties = [
+            "short" => "f",
+            "long" => "field",
+            "default" => "v"
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formatPardef($properties);
     }
 }

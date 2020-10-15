@@ -14,25 +14,6 @@ use vaniacarta74\Scarichi\Utility;
 require_once('php_MSSQL_router.inc.php');
 
 
-function errorHandler(\Throwable $e) : string
-{
-    $html = '<br/><b>Descrizione Errore:</b><br/>';
-    $html .= 'File: ' . $e->getFile() . '<br/>';
-    $html .= 'Linea: ' . $e->getLine() . '<br/>';
-    $html .= 'Codice errore: ' . $e->getCode() . '<br/>';
-    $html .= 'Messaggio di errore: <b>' . $e->getMessage() . '</b><br/>';
-    
-    $stack = $e->getTraceAsString();
-    $arrStack = explode('#', $stack);
-    
-    $html .= '<br/><b>Stack:</b>';
-    foreach ($arrStack as $line) {
-        $html .= $line . '<br/>';
-    }
-    return $html;
-}
-
-
 function checkRequest(?array $request) : array
 {
     try {
@@ -85,7 +66,7 @@ function checkField(?array $request) : string
 {
     try {
         if (isset($request['field'])) {
-            $options = getJsonArray(__DIR__ . '/config/help.json', 'options', 'field', 'parameters');
+            $options = getJsonArray(__DIR__ . '/config/help.json', ['parameters','field','options']);
             $fieldsNames = $options['alias'];
             $shortNames = $options['costants'];
             
@@ -1474,18 +1455,14 @@ function getMessage(array $composer, array $help, string $destination, string $t
                 break;
             case 'help':
                 $description = $composer['description'];
-                $offset = $help['global']['offset'];
-                $parameters = $help['parameters'];
-                   
-                $helpLines = getHelpLines($parameters);
-                $maxLen = getMaxLenght($helpLines);
-                $console = formatHelp($helpLines, $offset, $maxLen, $eol);
+                $console = setConsole($help, $eol);
                 
                 $message = $header . $eol;
                 $message .= $description . $eol;
                 $message .= $eol;
-                $message .= 'Usage: ' . $command . ' [-h|-v|-d] ' . $eol;
-                $message .= '       ' . $command . ' -V [options] -f [options] -t [options] -c [options] -n [options]' . $eol;
+                $message .= 'Usage:' . $eol;
+                $message .= '  ' . $command . ' [-h|-v|-d] ' . $eol;
+                $message .= '  ' . $command . ' -V [options] -f [options] -t [options] -c [options] -n [options]' . $eol;
                 $message .= $eol;
                 $message .= $console;
                 $message .= $eol;
@@ -1506,31 +1483,46 @@ function getMessage(array $composer, array $help, string $destination, string $t
 }
 
 
-function getJsonArray(string $path, ?string $key = null, ?string $level1 = null, ?string $level2 = null, ?string $level3 = null, ?string $level4 = null) : array
+function getSubArray(array $master, array $keys) : array
+{
+    try {
+        $key = $keys[0];
+        $subKeys = array_slice($keys, 1);
+        if (array_key_exists($key, $master)) {
+            if (count($subKeys) > 0) {    
+                $subArray = getSubArray($master[$key], $subKeys);
+            } else {
+                $subArray = $master[$key];
+            }
+        } else {
+            throw new \Exception('Problemi con il file json. Chiave inesistente');
+        }                
+        return $subArray;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function getJsonArray(string $path, ?array $keys = null, ?string $deepKey = null) : array
 {        
     try {
         $response = [];
         $string = @file_get_contents($path);        
         $json = json_decode($string, true);
         
-        if ($level4) {
-            $jsonArray = $json[$level4][$level3][$level2][$level1];
-        } elseif ($level3) {
-            $jsonArray = $json[$level3][$level2][$level1];
-        } elseif ($level2) {
-            $jsonArray = $json[$level2][$level1];
-        } elseif ($level1) {
-            $jsonArray = $json[$level1];
+        if ($keys !== null) {
+            $jsonArray = getSubArray($json, $keys);
         } else {
             $jsonArray = $json;
-        }
-        
-        if ($key !== null) {
-            if (is_array($jsonArray) && array_key_exists($key, $jsonArray)) {
-                if (is_array($jsonArray[$key])) {
-                    $response = $jsonArray[$key];
+        }        
+        if ($deepKey !== null) {
+            if (is_array($jsonArray) && array_key_exists($deepKey, $jsonArray)) {
+                if (is_array($jsonArray[$deepKey])) {
+                    throw new \Exception('Problemi con il file json. Parametro deepKey usato impropriamente');
                 } else {
-                    $response[] = $jsonArray[$key];
+                    $response[] = $jsonArray[$deepKey];
                 }                
             } else {
                 throw new \Exception('Problemi con il file json. Rivedere i parametri');
@@ -1546,31 +1538,36 @@ function getJsonArray(string $path, ?string $key = null, ?string $level1 = null,
 }
 
 
-function getHelpLines(array $parameters) : array
+function getHelpLines(array $parameters, array $sections) : array
 {
-    try {
+    try {        
         $i = 0;
-        $lines = [];            
-        foreach ($parameters as $properties) {
-            
-            $params = formatParameter($properties, 'params');
-            $default = formatParameter($properties, 'default');
-            $variables = formatParameter($properties, 'variables');
-            $costants = formatParameter($properties, 'costants');
-            $option = formatParameter([$variables, $costants], 'options');
-            
-            $input = $params . $default . $option;
-            
-            foreach ($properties['descriptions'] as $key => $text) {
-                if ($key === 0) {
-                    $lines[$i]['param'] = $input;
-                } else {
-                    $lines[$i]['param'] = '';
+        $lines = [];
+        $jMax = count($sections) - 1;
+        if (count($parameters) === 0 || $jMax < 0) {
+            throw new \Exception('Parametri o sezioni non definite');
+        } 
+        foreach ($parameters as $properties) {          
+            $cellText[$i] = fillLineSections($properties, $sections);
+            if ($sections[$jMax] === 'descriptions') {
+                foreach ($properties['descriptions'] as $key => $text) {                
+                    for ($j = 0; $j < $jMax; $j++) {
+                        if ($key === 0) {
+                            $lines[$i][$sections[$j]] = $cellText[$i][$j];
+                        } else {
+                            $lines[$i][$sections[$j]] = '';
+                        }
+                    }                
+                    $lines[$i][$sections[$jMax]] = $text;
+                    $i++;
                 }
-                $lines[$i]['text'] = $text;
+            } else {
+                foreach ($sections as $key => $secName) {
+                    $lines[$i][$secName] = $cellText[$i][$key];                    
+                }
                 $i++;
-            }                    
-        }
+            }
+        }        
         return $lines;
     } catch (\Throwable $e) {
         Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -1579,48 +1576,39 @@ function getHelpLines(array $parameters) : array
 }
 
 
-function formatParameter(array $properties, string $key) : string
+function fillLineSections(array $properties, array $sections) : array
 {
     try {
-        switch ($key) {
-            case 'params':
-                $formatted = '-' . $properties['short'] . ' --' . $properties['long'];
-                break;
-            case 'default':
-                if ($properties['default'] !== "") {
-                    $formatted = '[=' . $properties['default'] . ']';
-                } else {
-                    $formatted = '';
-                }
-                break;
-            case 'variables':
-                if (count($properties['options']['variables'])) {
-                    $prefixeds = preg_filter('/^/', '<', $properties['options']['variables']);
-                    $postfixeds = preg_filter('/$/', '>', $prefixeds);
-                    $formatted = implode(',', $postfixeds);                    
-                } else {
-                    $formatted = '';
-                }
-                break;
-            case 'costants':
-                if (count($properties['options']['costants'])) {
-                    $formatted = implode('|', $properties['options']['costants']);                    
-                } else {
-                    $formatted = '';
-                }
-                break;
-            case 'options':
-                if ($properties[0] !== '' && $properties[1] !== '') {
-                    $formatted = ' ' . implode('|', $properties);                    
-                } elseif ($properties[0] !== '') {
-                    $formatted = ' ' . $properties[0];
-                } elseif ($properties[1] !== '') {
-                    $formatted = ' ' . $properties[1];
-                } else {
-                    $formatted = '';
-                }
-                break; 
-        }        
+        foreach ($sections as $secName) {
+            $function = __NAMESPACE__ . '\format' . ucfirst($secName);
+            if (is_callable($function)) {
+                $cellsText[] = call_user_func(__NAMESPACE__ . '\format' . ucfirst($secName), $properties);
+            } else {
+                throw new \Exception('Nome sezione non ammesso');
+            }
+        }       
+        return $cellsText;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function formatDescriptions(array $properties) : string
+{
+    try {
+        if (!array_key_exists('descriptions', $properties)) {
+            throw new \Exception('Proprieta "descriptions" non definita');
+        }
+        $formatted = '';
+        foreach ($properties['descriptions'] as $key => $text) {                
+            if ($key === 0) {
+                $formatted .= $text; 
+            } else {
+                $formatted .= ' ' . $text; 
+            }                               
+        }                
         return $formatted;
     } catch (\Throwable $e) {
         Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -1629,22 +1617,14 @@ function formatParameter(array $properties, string $key) : string
 }
 
 
-function getMaxLenght(array &$help) : int
+function formatShort(array $properties) : string
 {
     try {
-        $maxLen = 0;
-        foreach ($help as $line => $values) {
-            $newLen = strlen($values['param']);
-            $help[$line]['paramLen'] = $newLen;
-
-            $textLen = strlen($values['text']);
-            $help[$line]['textLen'] = $textLen;
-
-            if ($newLen > $maxLen) {
-               $maxLen = $newLen; 
-            }
+        if (!array_key_exists('short', $properties) || !preg_match('/^[a-zA-Z]$/', $properties['short'])) {
+            throw new \Exception('Proprieta "short" non definita o definita in modo errato');
         }
-        return $maxLen;
+        $formatted = '-' . $properties['short'];                
+        return $formatted;
     } catch (\Throwable $e) {
         Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
@@ -1652,73 +1632,193 @@ function getMaxLenght(array &$help) : int
 }
 
 
-function formatHelp(array $help, int $offset, int $maxLen, string $eol) : string
+function formatLong(array $properties) : string
 {
     try {
-        $message = '';
-        foreach ($help as $line => $values) {
-            $message .= str_pad($values['param'], $values['paramLen'] + $offset, ' ', STR_PAD_LEFT) . str_pad($values['text'], $values['textLen'] + $maxLen - $values['paramLen'] + $offset, ' ', STR_PAD_LEFT) . $eol;
+        if (!array_key_exists('long', $properties) || !preg_match('/^[a-z]{3,}$/', $properties['long'])) {
+            throw new \Exception('Proprieta "long" non definita o definita in modo errato');
         }
+        $formatted = '--' . $properties['long'];
+        return $formatted;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function formatParams(array $properties) : string
+{
+    try {
+        $short = formatShort($properties);
+        $long = formatLong($properties);
+        if (!preg_match('/^[-][a-zA-Z]$/', $short) || !preg_match('/^[-]{2}[a-z]{3,}$/', $long)) {
+            //@codeCoverageIgnoreStart
+            throw new \Exception('Proprieta "short" o "long" non definita correttamente');
+            //@codeCoverageIgnoreEnd
+        }
+        $formatted = $short . ' ' . $long;
+        return $formatted;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function formatDefault(array $properties) : string
+{
+    try {
+        if (!array_key_exists('default', $properties) || ($properties['default'] !== '' && !preg_match('/^[A-Z]+$/', $properties['default']))) {
+            throw new \Exception('Proprieta "default" non definita o non definita correttamente');
+        }
+        if ($properties['default'] !== "") {
+            $formatted = '[=' . $properties['default'] . ']';
+        } else {
+            $formatted = '';
+        }
+        return $formatted;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function formatPardef(array $properties) : string
+{
+    try {
+        $params = formatParams($properties);
+        $default = formatDefault($properties);
+        if ((!preg_match('/^[-][a-zA-Z]\s[-]{2}[a-z]{3,}$/', $params)) || ($default !== '' && !preg_match('/^[\[][=][A-Z]+[\]]$/', $default))) {
+            //@codeCoverageIgnoreStart
+            throw new \Exception('Formato parametri di default errato');
+            //@codeCoverageIgnoreEnd
+        }        
+        $formatted = $params . $default;                   
+        return $formatted;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function formatVariables(array $properties) : string
+{
+    try {
+        if (!array_key_exists('options', $properties) || !array_key_exists('variables', $properties['options'])) {
+            throw new \Exception('Proprieta "variables" non definita');
+        }
+        if (count($properties['options']['variables']) > 0) {
+            $prefixeds = preg_filter('/^/', '<', $properties['options']['variables']);
+            $postfixeds = preg_filter('/$/', '>', $prefixeds);
+            $formatted = implode(',', $postfixeds);                    
+        } else {
+            $formatted = '';
+        }
+        return $formatted;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function formatCostants(array $properties) : string
+{
+    try {
+        if (!array_key_exists('options', $properties) || !array_key_exists('costants', $properties['options'])) {
+            throw new \Exception('Proprieta "costants" non definita');
+        }
+        if (count($properties['options']['costants']) > 0) {
+            $formatted = implode('|', $properties['options']['costants']);                    
+        } else {
+            $formatted = '';
+        }                    
+        return $formatted;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function formatOptions(array $properties) : string
+{
+    try {
+        $variables = formatVariables($properties);
+        $costants = formatCostants($properties);
+        if (($variables !== '' && !preg_match('/^[<](\w)+[>]([,][<](\w)+[>])*$/', $variables)) || ($costants !== '' && !preg_match('/^([A-Z])+([|]([A-Z])+)*$/', $costants))) {
+            throw new \Exception('Formato opzioni errato');
+        }
+        if ($variables !== '' && $costants !== '') {
+            $formatted = $variables . '|' . $costants;                    
+        } elseif ($variables !== '') {
+            $formatted = $variables;
+        } elseif ($costants !== '') {
+            $formatted = $costants;
+        } else {
+            $formatted = '';
+        }                    
+        return $formatted;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function getMaxLenght(array $help, string $key) : int
+{
+    try {
+        foreach ($help as $line => $values) {
+            if (array_key_exists($key, $values)) {
+                $lenghts[] = strlen($values[$key]);                
+            } else {
+                throw new \Exception('Lunghezza stringa non registrata');
+            }            
+        }         
+        return max($lenghts);
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+  
+
+function setConsole(array $help, string $eol) : string
+{
+    try {
+        $parameters = $help['parameters'];
+        $global = $help['global'];
+        $sections = $global['sections'];
+        $offset = $global['offset'];                
+        
+        $helpLines = getHelpLines($parameters, $sections);
+        
+        $message = '';
+        foreach ($helpLines as $lineSections) {
+            $idSec = 0;
+            $gap = 0;
+            foreach ($lineSections as $secName => $secText) {
+                $secLenght = strlen($secText);
+                if ($idSec > 0) {
+                    $i = $idSec - 1;
+                    $prevSecMaxLen = getMaxLenght($helpLines, $sections[$i]);
+                    $prevSecLen = strLen($lineSections[$sections[$i]]);
+                    $gap = $prevSecMaxLen - $prevSecLen;     
+                }                
+                $message .= str_pad($secText, $secLenght + $gap + $offset, ' ', STR_PAD_LEFT);
+                $idSec++;
+            }
+            $message .= $eol;
+        }        
         return $message;
     } catch (\Throwable $e) {
         Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
-    }
-}        
-
-
-function setVariables(array $parameters, array $arguments) : array
-{
-    try {        
-        $short = getProperty($parameters, 'variabile', 'short');
-        $long = getProperty($parameters, 'variabile', 'long');
-        $default = getProperty($parameters, 'variabile', 'default');
-        $regex = getProperty($parameters, 'variabile', 'regex');
-        if (array_search('--' . $long, $arguments)) {
-            $keyParam = array_search('--' . $long, $arguments);
-        } elseif (array_search('-' . $short, $arguments)) {
-            $keyParam = array_search('-' . $short, $arguments);
-        }
-        $keyValue = $keyParam + 1;
-        if ($keyValue < count($arguments)) {
-            $paramValue = $arguments[$keyValue];        
-        }
-        $otherShortParams = getProperties($parameters, 'short', 'type', 'group', 'short', $short, '-');
-        $otherLongParams = getProperties($parameters, 'long', 'type', 'group', 'long', $long, '--');
-        $otherParams = array_merge($otherShortParams, $otherLongParams);
-        
-        if (isset($paramValue) && !in_array($paramValue, $otherParams)) {
-            if (preg_match($regex, $paramValue, $matches)) {
-                $varRaw = explode(',', $matches[0]);
-                foreach ($varRaw as $variable) {
-                    $request['var'] = $variable;
-                    try {
-                        $variables[] = checkVariable($request);
-                    } catch (\Throwable $e){
-                        Utility::errorHandler($e, DEBUG_LEVEL);
-                    }                
-                }
-                if (!isset($variables)) {
-                    throw new \Exception('Variabili selezionate non valide');
-                }
-            } elseif (preg_match('/^(' . $default . ')$/', $paramValue)) {
-                $variables[] = $default;
-            } else {
-                throw new \Exception('Formato serie variabili errato. Utilizzare la virgola come separatore (es. 30030,30040,30050)');
-            }           
-        } else {
-            $variables[] = $default;
-        }
-        if ($variables[0] === $default) {
-            $arrVar = selectAllVar();
-        } else {
-            $arrVar = $variables;
-        }
-        return $arrVar;
-    } catch (\Throwable $e) {
-        Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-        throw $e;
-    }
+    }    
 }
 
 
@@ -1733,52 +1833,6 @@ function selectAllVar() : array
             }
         }        
         return $variables;
-    } catch (\Throwable $e) {
-        Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-        throw $e;
-    }
-}
-
-
-function setDate(array $parameters, string $paramName, array $arguments) : string
-{
-    try {        
-        $short = getProperty($parameters, $paramName, 'short');
-        $long = getProperty($parameters, $paramName, 'long');
-        $default = getProperty($parameters, $paramName, 'default');
-        $regex = getProperty($parameters, $paramName, 'regex');
-        if (array_search('--' . $long, $arguments)) {
-            $keyParam = array_search('--' . $long, $arguments);
-        } elseif (array_search('-' . $short, $arguments)) {
-            $keyParam = array_search('-' . $short, $arguments);
-        }
-        $keyValue = $keyParam + 1;
-        if ($keyValue < count($arguments)) {
-            $paramValue = $arguments[$keyValue];        
-        }
-        $otherShortParams = getProperties($parameters, 'short', 'type', 'group', 'short', $short, '-');
-        $otherLongParams = getProperties($parameters, 'long', 'type', 'group', 'long', $long, '--');
-        $otherParams = array_merge($otherShortParams, $otherLongParams);
-        
-        if (isset($paramValue) && !in_array($paramValue, $otherParams)) {
-            if (preg_match($regex, $paramValue, $matches)) {
-                try {
-                    $date = formatDate($matches[0]);
-                } catch (\Throwable $e){
-                    Utility::errorHandler($e, DEBUG_LEVEL);
-                }                 
-                if (!isset($date)) {
-                    throw new \Exception('Data non valida. Indicare una data reale (es. 01/01/2020)');
-                }
-            } elseif (preg_match('/^(' . $default . ')$/', $paramValue)) {
-                $date = $default;
-            } else {
-                throw new \Exception('Formato data errato. Utilizzare il formato "dd/mm/yyyy"');
-            }           
-        } else {
-            $date = $default;
-        }        
-        return $date;
     } catch (\Throwable $e) {
         Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
@@ -1916,7 +1970,7 @@ function checkParameter(string $paramName, string $paramValue, string $regex, st
                         try {
                             $values[] = checkVariable($request);
                         } catch (\Throwable $e){
-                            Utility::errorHandler($e, DEBUG_LEVEL);
+                            Utility::errorHandler($e, DEBUG_LEVEL, true);
                         }                
                     }
                     break;
@@ -1925,7 +1979,7 @@ function checkParameter(string $paramName, string $paramValue, string $regex, st
                     try {
                         $values[] = formatDate($matches[0]);
                     } catch (\Throwable $e){
-                        Utility::errorHandler($e, DEBUG_LEVEL);
+                        Utility::errorHandler($e, DEBUG_LEVEL, true);
                     }             
                     break;
                 case 'campo':
@@ -1933,7 +1987,7 @@ function checkParameter(string $paramName, string $paramValue, string $regex, st
                         $request['field'] = $matches[0];
                         $values[] = checkField($request);
                     } catch (\Throwable $e){
-                        Utility::errorHandler($e, DEBUG_LEVEL);
+                        Utility::errorHandler($e, DEBUG_LEVEL, true);
                     }             
                     break;
                 case 'no zero':
@@ -1941,7 +1995,7 @@ function checkParameter(string $paramName, string $paramValue, string $regex, st
                         $request['full'] = filter_var($matches[0], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
                         $values[] = checkFilter($request);
                     } catch (\Throwable $e){
-                        Utility::errorHandler($e, DEBUG_LEVEL);
+                        Utility::errorHandler($e, DEBUG_LEVEL, true);
                     }             
                     break;
                 default:

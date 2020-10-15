@@ -11,8 +11,8 @@ require __DIR__ . '/../vendor/autoload.php';
 
 $url = "http://localhost/telecontrollo/scarichi/github/src/index.php";
 
-//$argc = 7;
-//$argv = ['scarichi.php', '-V', '30030,30040', '-f', '-t', '-c', '-n'];
+//$argc = 2;
+//$argv = ['scarichi.php', '-h'];
 
 try {
     $composer = getJsonArray(__DIR__ . '/../composer.json');
@@ -44,9 +44,8 @@ try {
         $postParams = setPostParameters($filledValues);
         $message .= goCurl($postParams, $url);
     }
-    $message .= get_current_user();
     echo $message;        
 } catch (\Throwable $e) {
-    Utility::errorHandler($e, DEBUG_LEVEL);
+    Utility::errorHandler($e, DEBUG_LEVEL, true);
     exit();
 }

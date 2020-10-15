@@ -1,6 +1,22 @@
 {
     "global": {
-        "offset": "7"
+        "section_types": [
+            "short",
+            "long",
+            "params",
+            "default",
+            "pardef",
+            "variables",
+            "costants",
+            "options",
+            "descriptions"
+        ],
+        "sections": [            
+            "pardef",
+            "options",
+            "descriptions"
+        ],
+        "offset": "2"
     },
     "parameters": {
         "help": {
@@ -78,7 +94,7 @@
         "datefrom": {
             "name": "datefrom",
             "short": "f",
-            "long": "from",
+            "long": "datefrom",
             "default": "YEAR",
             "options": {
                 "variables": [
@@ -101,7 +117,7 @@
         "dateto": {
             "name": "dateto",
             "short": "t",
-            "long": "to",
+            "long": "dateto",
             "default": "NOW",
             "options": {
                 "variables": [

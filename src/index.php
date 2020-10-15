@@ -187,6 +187,6 @@ try {
     
     echo response($request, $printed);    
 } catch (\Throwable $e) {
-    Utility::errorHandler($e, DEBUG_LEVEL);
+    Utility::errorHandler($e, DEBUG_LEVEL, false);
     exit();
 }
