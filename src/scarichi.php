@@ -17,29 +17,13 @@ $url = "http://localhost/telecontrollo/scarichi/github/src/index.php";
 try {
     $composer = getJsonArray(__DIR__ . '/../composer.json');
     $help = getJsonArray(__DIR__ . '/config/help.json');
-    $parameters = $help['parameters'];
-    $names = getProperties($parameters, 'name', 'type', 'group');
-    $shorts = getAssocProperties($parameters, 'short');
-    $longs = getAssocProperties($parameters, 'long');
+    $parameters = $help['parameters'];   
+
+    $type = shuntTypes($parameters, $argv);
+    $message = getMessage($composer, $help, $type);
+    $values = setParameters($parameters, $argv, $type);
     
-    if (!isset($argv)) {
-        $message = getMessage($composer, $help, 'www', 'redirect');
-    } else {
-        if ($argc === 1 || ($argc === 2 && ($argv[1] === '-' . $shorts['help'] || $argv[1] === '--' . $longs['help']))) {
-            $message = getMessage($composer, $help, 'cli', 'help'); 
-        } elseif ($argc === 2 && ($argv[1] === '-' . $shorts['version'] || $argv[1] === '--' . $longs['version'])) {
-            $message = getMessage($composer, $help, 'cli', 'version');
-        } elseif ($argc === 2 && ($argv[1] === '-' . $shorts['default'] || $argv[1] === '--' . $longs['default'])) {
-            $message = getMessage($composer, $help, 'cli', 'default');
-            $values = setParameters($parameters, $argv, true);
-        } elseif ($argc >= 6 && allParameterSet($parameters, $argv)) {            
-            $message = getMessage($composer, $help, 'cli', 'ok');            
-            $values = setParameters($parameters, $argv, false);
-        } else {
-            $message = getMessage($composer, $help, 'cli', 'error');            
-        }
-    }
-    if (isset($values)) {
+    if (count($values) > 0) {
         $filledValues = fillParameters($parameters, $values);
         $postParams = setPostParameters($filledValues);
         $message .= goCurl($postParams, $url);

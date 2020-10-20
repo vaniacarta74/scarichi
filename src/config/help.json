@@ -1,4 +1,5 @@
 {
+    "command": "php scarichi.php",
     "global": {
         "section_types": [
             "short",

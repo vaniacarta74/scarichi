@@ -2,7 +2,8 @@
 namespace vaniacarta74\Scarichi\config;
 
 define('MAXRECORD', 10000);
-define('DEBUG_LEVEL', 2);
+define('DEBUG_LEVEL', 1);
+define('MAKESUBDIR', true);
 define('LOG_PATH', __DIR__ . '/../../tests/log');
 
 ini_set('memory_limit', '2048M');

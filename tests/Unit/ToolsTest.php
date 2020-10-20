@@ -58,11 +58,37 @@ use function vaniacarta74\Scarichi\formatDefault as formatDefault;
 use function vaniacarta74\Scarichi\formatVariables as formatVariables;
 use function vaniacarta74\Scarichi\formatCostants as formatCostants;
 use function vaniacarta74\Scarichi\formatOptions as formatOptions;
-use function vaniacarta74\Scarichi\getMaxLenght as getMaxLenght;
 use function vaniacarta74\Scarichi\formatDescriptions as formatDescriptions;
 use function vaniacarta74\Scarichi\formatShort as formatShort;
 use function vaniacarta74\Scarichi\formatLong as formatLong;
 use function vaniacarta74\Scarichi\formatPardef as formatPardef;
+use function vaniacarta74\Scarichi\fillLineSections as fillLineSections;
+use function vaniacarta74\Scarichi\getMaxLenght as getMaxLenght;
+use function vaniacarta74\Scarichi\setConsole as setConsole;
+use function vaniacarta74\Scarichi\setHeader as setHeader;
+use function vaniacarta74\Scarichi\setMsgHtml as setMsgHtml;
+use function vaniacarta74\Scarichi\setMsgVersion as setMsgVersion;
+use function vaniacarta74\Scarichi\setMsgDefault as setMsgDefault;
+use function vaniacarta74\Scarichi\setMsgHelp as setMsgHelp;
+use function vaniacarta74\Scarichi\setMsgOk as setMsgOk;
+use function vaniacarta74\Scarichi\setMsgError as setMsgError;
+use function vaniacarta74\Scarichi\getMessage as getMessage;
+use function vaniacarta74\Scarichi\propertyToString as propertyToString;
+use function vaniacarta74\Scarichi\stringsToString as stringsToString;
+use function vaniacarta74\Scarichi\getProperties as getProperties;
+use function vaniacarta74\Scarichi\filterProperties as filterProperties;
+use function vaniacarta74\Scarichi\selectAllQuery as selectAllQuery;
+use function vaniacarta74\Scarichi\allParameterSet as allParameterSet;
+use function vaniacarta74\Scarichi\checkCliVar as checkCliVar;
+use function vaniacarta74\Scarichi\checkCliDatefrom as checkCliDatefrom;
+use function vaniacarta74\Scarichi\checkCliDateto as checkCliDateto;
+use function vaniacarta74\Scarichi\checkCliField as checkCliField;
+use function vaniacarta74\Scarichi\checkCliFull as checkCliFull;
+use function vaniacarta74\Scarichi\checkParameter as checkParameter;
+use function vaniacarta74\Scarichi\setParameter as setParameter;
+use function vaniacarta74\Scarichi\shuntTypes as shuntTypes;
+use function vaniacarta74\Scarichi\setParameters as setParameters;
+
 
 class ToolsTest extends TestCase
 {
@@ -3270,37 +3296,56 @@ class ToolsTest extends TestCase
      * @group depends
      * covers setPath()
      */
-    public function testSetPathEquals() : string
+    public function testSetPathNoSubEquals() : void
     {
-        $variabile = 'Test';
+        $variabile = 'Test';        
         $path = CSV;
+        $makeDir = false;
         
-        $expected = CSV . '/v' . $variabile;
+        $expected = CSV;
         
-        $actual = setPath($variabile, $path);
+        $actual = setPath($variabile, $path, $makeDir);
         
         $this->assertEquals($expected, $actual);
-        
-        return $variabile;
     }
     
     /**
      * @group depends
      * covers setPath()
-     * @depends testSetPathEquals
      */
-    public function testSetPathEquals2($variabile) : void
+    public function testSetPathSubEquals() : string
     {
+        $variabile = 'Test';
         $path = CSV;
+        $makeDir = true;
         
         $expected = CSV . '/v' . $variabile;
         
-        $actual = setPath($variabile, $path);
+        $actual = setPath($variabile, $path, $makeDir);
+        
+        $this->assertEquals($expected, $actual);
+        
+        return $variabile;
+    }   
+    
+    /**
+     * @group depends
+     * covers setPath()
+     * @depends testSetPathSubEquals
+     */
+    public function testSetPathSubEquals2($variabile) : void
+    {
+        $path = CSV;
+        $makeDir = true;
+        
+        $expected = CSV . '/v' . $variabile;
+        
+        $actual = setPath($variabile, $path, $makeDir);
         
         $this->assertEquals($expected, $actual);
         
         rmdir($actual);
-    }
+    }   
     
     /**
      * @group depends
@@ -3310,10 +3355,11 @@ class ToolsTest extends TestCase
     {
         $variabile = '30030';
         $path = 'pippo';
+        $makeDir = true;
         
         $this->expectException(\Exception::class);
         
-        setPath($variabile, $path);
+        setPath($variabile, $path, $makeDir);
     }
     
     
@@ -7157,5 +7203,2271 @@ class ToolsTest extends TestCase
         $this->expectException(\Exception::class);
         
         formatPardef($properties);
+    }
+    
+    /**
+     * @group test
+     * covers fillLineSections()
+     */
+    public function testFillLineSectionsEquals() : void
+    {
+        $properties = [
+            "short" => "V",
+            "long" => "var",
+            "default" => "ALL",
+            "options" => [
+                "variables" => [
+                    "var1",
+                    "var2"
+                ],
+                "costants" => [
+                    "ALL",
+                    "TRUE"
+                ]
+            ],
+            "descriptions" => [
+                "Esegue il calcolo per ciascuna delle variabili",
+                "<var> o per tutte (ALL). Default ALL."
+            ]
+        ];
+        
+        $sections = [
+            "short",
+            "long",
+            "params",
+            "default",
+            "pardef",
+            "variables",
+            "costants",
+            "options",
+            "descriptions"
+        ];
+        
+        $expected = [
+            "-V",
+            "--var",
+            "-V --var",
+            "[=ALL]",
+            "-V --var[=ALL]",
+            "<var1>,<var2>",
+            "ALL|TRUE",
+            "<var1>,<var2>|ALL|TRUE",
+            "Esegue il calcolo per ciascuna delle variabili <var> o per tutte (ALL). Default ALL."
+        ];
+         
+        $actual = fillLineSections($properties, $sections);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group test
+     * covers fillLineSections()
+     */
+    public function testFillLineSectionsSecExceptions() : void
+    {
+        $properties = [
+            "short" => "V",
+            "long" => "var",
+            "default" => "ALL",
+            "options" => [
+                "variables" => [
+                    "var1",
+                    "var2"
+                ],
+                "costants" => [
+                    "ALL"
+                ]
+            ],
+            "descriptions" => [
+                "Esegue il calcolo per ciascuna delle variabili",
+                "<var> o per tutte (ALL). Default ALL."
+            ]
+        ];
+        
+        $sections = ["pippo"];
+        
+        $this->expectException(\Exception::class);
+        
+        fillLineSections($properties, $sections);
+    } 
+    
+    /**
+     * @group test
+     * covers fillLineSections()
+     */
+    public function testFillLineSectionsProExceptions() : void
+    {
+        $properties = [];
+        
+        $sections = [
+            "short",
+            "long",
+            "params",
+            "default",
+            "pardef",
+            "variables",
+            "costants",
+            "options",
+            "descriptions"
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        fillLineSections($properties, $sections);
+    }  
+    
+    /**
+     * @group test
+     * covers getMaxLenght()
+     */
+    public function testGetMaxLenghtEquals() : void
+    {
+        $help = [
+            [
+                "params" => "-V --var",
+                "default" => "[=ALL]",
+                "descriptions" => "Esegue il calcolo per ciascuna delle variabili"
+            ],
+            [
+                "params" => "",
+                "default" => "",
+                "descriptions" => "<var> o per tutte (ALL). Default ALL."                
+            ]
+        ];
+        
+        $key = "descriptions";
+        
+        $expected = 46;
+         
+        $actual = getMaxLenght($help, $key);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group test
+     * covers getMaxLenght()
+     */
+    public function testGetMaxLenghtKeyExceptions() : void
+    {
+        $help = [
+            [
+                "params" => "-V --var",
+                "default" => "[=ALL]",
+                "descriptions" => "Esegue il calcolo per ciascuna delle variabili"
+            ],
+            [
+                "params" => "",
+                "default" => "",
+                "descriptions" => "<var> o per tutte (ALL). Default ALL."                
+            ]
+        ];
+        
+        $key = "pippo";
+        
+        $this->expectException(\Exception::class);
+        
+        getMaxLenght($help, $key);
+    }
+    
+    /**
+     * @group test
+     * covers getMaxLenght()
+     */
+    public function testGetMaxLenghtArrayExceptions() : void
+    {
+        $help = [];
+        
+        $key = "descriptions";
+        
+        $this->expectException(\Exception::class);
+        
+        getMaxLenght($help, $key);
+    }
+    
+    /**
+     * @group test
+     * covers getMaxLenght()
+     */
+    public function testSetConsoleEquals() : void
+    {
+        $help = [
+            "global" => [                
+                "sections" => [            
+                    "short",
+                    "long",
+                    "params",
+                    "default",
+                    "pardef",
+                    "variables",
+                    "costants",
+                    "options",
+                    "descriptions"
+                ],
+                "offset" => "2"
+            ],
+            "parameters" => [
+                "help" => [
+                    "short" => "h",
+                    "long" => "help",
+                    "default" => "",
+                    "options" => [
+                        "variables" => [],
+                        "costants" => []
+                    ],
+                    "descriptions" => [
+                        "Stampa questo help."
+                    ]
+                ],                
+                "var" => [
+                    "short" => "V",
+                    "long" => "var",
+                    "default" => "ALL",
+                    "options" => [
+                        "variables" => [
+                            "var1",
+                            "var2"
+                        ],
+                        "costants" => [
+                            "ALL"
+                        ]
+                    ],
+                    "descriptions" => [
+                        "Esegue il calcolo per ciascuna delle variabili",
+                        "<var> o per tutte (ALL). Default ALL."
+                    ],
+                ]
+            ]
+        ];
+        
+        $expected = '  -h  --help  -h --help          -h --help                                              Stampa questo help.' . PHP_EOL;
+        $expected .= '  -V  --var   -V --var   [=ALL]  -V --var[=ALL]  <var1>,<var2>  ALL  <var1>,<var2>|ALL  Esegue il calcolo per ciascuna delle variabili' . PHP_EOL;
+        $expected .= '                                                                                        <var> o per tutte (ALL). Default ALL.' . PHP_EOL;
+         
+        $actual = setConsole($help, PHP_EOL);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group test
+     * covers setConsole()
+     */
+    public function testSetConsoleExceptions() : void
+    {
+        $help = [];
+        
+        $this->expectException(\Exception::class);
+        
+        setConsole($help, PHP_EOL);
+    }
+    
+    /**
+     * @group test
+     * covers setHeader()
+     */
+    public function testSetHeaderEquals() : void
+    {
+        $composer = [
+            "description" => "Applicazione",
+            "version" => "1.2.0",
+            "authors" => [
+                [
+                    "name" => "Vania Carta"
+                ]
+            ],
+        ];       
+        
+        $expected = 'scarichi 1.2.0 by Vania Carta and contributors';
+         
+        $actual = setHeader($composer);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group test
+     * covers setHeader()
+     */
+    public function testSetHeaderExceptions() : void
+    {
+        $composer = [];
+        
+        $this->expectException(\Exception::class);
+        
+        setHeader($composer);
+    }
+    
+    /**
+     * @coverNothing
+     */
+    public function setMsgProvider() : array
+    {
+        $composer = [
+            "description" => "Applicazione",
+            "version" => "1.2.0",
+            "authors" => [
+                [
+                    "name" => "Vania Carta"
+                ]
+            ],
+        ];
+        
+        $help = [
+            "command" => "php",
+            "global" => [                
+                "sections" => [            
+                    "pardef",
+                    "options",
+                    "descriptions"
+                ],
+                "offset" => "2"
+            ],
+            "parameters" => [
+                "help" => [
+                    "name" => "help",
+                    "short" => "h",
+                    "long" => "help",
+                    "default" => "",
+                    "options" => [
+                        "variables" => [],
+                        "costants" => []
+                    ],
+                    "descriptions" => [
+                        "Stampa questo help."
+                    ],
+                    "type" => "single"
+                ],                
+                "var" => [
+                    "name" => "variabile",
+                    "short" => "V",
+                    "long" => "var",
+                    "default" => "ALL",
+                    "options" => [
+                        "variables" => [
+                            "var1",
+                            "var2"
+                        ],
+                        "costants" => [
+                            "ALL"
+                        ]
+                    ],
+                    "descriptions" => [
+                        "Esegue il calcolo per ciascuna delle variabili",
+                        "<var> o per tutte (ALL). Default ALL."
+                    ],
+                    "type" => "group"
+                ]
+            ]
+        ];
+        
+        $data = [
+            "equals" => [
+                "composer" => $composer,
+                "help" => $help
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers setMsgHtml()
+     * @dataProvider setMsgProvider
+     */
+    public function testSetMsgHtmlContainsString($composer, $help) : void
+    {
+        $expected = '[user@localhost ~]# php -h<br/>';
+         
+        $actual = setMsgHtml($composer, $help, '<br/>');
+        
+        $this->assertStringContainsString($expected, $actual);
+    }
+    
+    /**
+     * @group test
+     * covers setMsgHtml()
+     */
+    public function testSetMsgHtmlComposerExceptions() : void
+    {
+        $composer = [];
+        $help = ['some values'];
+        
+        $this->expectException(\Exception::class);
+        
+        setMsgHtml($composer, $help, '<br/>');
+    }
+    
+    /**
+     * @group test
+     * covers setMsgHtml()
+     */
+    public function testSetMsgHtmlHelpExceptions() : void
+    {
+        $composer = ['some values'];
+        $help = [];
+        
+        $this->expectException(\Exception::class);
+        
+        setMsgHtml($composer, $help, '<br/>');
+    }
+    
+    /**
+     * @group test
+     * covers setMsgVersion()
+     * @dataProvider setMsgProvider
+     */
+    public function testSetMsgVersionContainsString($composer, $help) : void
+    {
+        $expected = setHeader($composer) . PHP_EOL;
+         
+        $actual = setMsgVersion($composer, $help, PHP_EOL);
+        
+        $this->assertStringContainsString($expected, $actual);
+    }
+    
+    /**
+     * @group test
+     * covers setMsgVersion()
+     */
+    public function testSetMsgVersionComposerExceptions() : void
+    {
+        $composer = [];
+        $help = ['some values'];
+        
+        $this->expectException(\Exception::class);
+        
+        setMsgVersion($composer, $help, PHP_EOL);
+    }
+    
+    /**
+     * @group test
+     * covers setMsgVersion()
+     */
+    public function testSetMsgVersionHelpExceptions() : void
+    {
+        $composer = ['some values'];
+        $help = [];
+        
+        $this->expectException(\Exception::class);
+        
+        setMsgVersion($composer, $help, PHP_EOL);
+    }
+    
+    /**
+     * @group test
+     * covers setMsgDefault()
+     * @dataProvider setMsgProvider
+     */
+    public function testSetMsgDefaultContainsString($composer, $help) : void
+    {
+        $expected = "php -V ALL" . PHP_EOL;
+         
+        $actual = setMsgDefault($composer, $help, PHP_EOL);
+        
+        $this->assertStringContainsString($expected, $actual);
+    }
+    
+    /**
+     * @group test
+     * covers setMsgDefault()
+     */
+    public function testSetMsgDefaultComposerExceptions() : void
+    {
+        $composer = [];
+        $help = ['some values'];
+        
+        $this->expectException(\Exception::class);
+        
+        setMsgDefault($composer, $help, PHP_EOL);
+    }
+    
+    /**
+     * @group test
+     * covers setMsgDefault()
+     */
+    public function testSetMsgDefaultHelpExceptions() : void
+    {
+        $composer = ['some values'];
+        $help = [];
+        
+        $this->expectException(\Exception::class);
+        
+        setMsgDefault($composer, $help, PHP_EOL);
+    }
+    
+    /**
+     * @group test
+     * covers setMsgHelp()
+     * @dataProvider setMsgProvider
+     */
+    public function testSetMsgHelpContainsString($composer, $help) : void
+    {
+        $expected1 = "Applicazione" . PHP_EOL;
+        $expected2 = "  php [-h]" . PHP_EOL;
+        $expected3 = "  php -V [options]" . PHP_EOL;
+         
+        $actual = setMsgHelp($composer, $help, PHP_EOL);
+        
+        $this->assertStringContainsString($expected1, $actual);
+        $this->assertStringContainsString($expected2, $actual);
+        $this->assertStringContainsString($expected3, $actual);
+    }
+    
+    /**
+     * @group test
+     * covers setMsgHelp()
+     */
+    public function testSetMsgHelpComposerExceptions() : void
+    {
+        $composer = [];
+        $help = ['some values'];
+        
+        $this->expectException(\Exception::class);
+        
+        setMsgHelp($composer, $help, PHP_EOL);
+    }
+    
+    /**
+     * @group test
+     * covers setMsgDefault()
+     */
+    public function testSetMsgHelpExceptions() : void
+    {
+        $composer = ['some values'];
+        $help = [];
+        
+        $this->expectException(\Exception::class);
+        
+        setMsgHelp($composer, $help, PHP_EOL);
+    }
+    
+    /**
+     * @group test
+     * covers setMsgOk()
+     * @dataProvider setMsgProvider
+     */
+    public function testSetMsgOkContainsString($composer, $help) : void
+    {
+        $expected = setHeader($composer) . PHP_EOL;
+         
+        $actual = setMsgOk($composer, $help, PHP_EOL);
+        
+        $this->assertStringContainsString($expected, $actual);
+    }
+    
+    /**
+     * @group test
+     * covers setMsgOk()
+     */
+    public function testSetMsgOkComposerExceptions() : void
+    {
+        $composer = [];
+        $help = ['some values'];
+        
+        $this->expectException(\Exception::class);
+        
+        setMsgOk($composer, $help, PHP_EOL);
+    }
+    
+    /**
+     * @group test
+     * covers setMsgOk()
+     */
+    public function testSetMsgOkHelpExceptions() : void
+    {
+        $composer = ['some values'];
+        $help = [];
+        
+        $this->expectException(\Exception::class);
+        
+        setMsgOk($composer, $help, PHP_EOL);
+    }
+    
+    /**
+     * @group test
+     * covers setMsgError()
+     * @dataProvider setMsgProvider
+     */
+    public function testSetMsgErrorContainsString($composer, $help) : void
+    {
+        $expected = 'Per info digitare: php -h' . PHP_EOL;
+         
+        $actual = setMsgError($composer, $help, PHP_EOL);
+        
+        $this->assertStringContainsString($expected, $actual);
+    }
+    
+    /**
+     * @group test
+     * covers setMsgError()
+     */
+    public function testSetMsgErrorComposerExceptions() : void
+    {
+        $composer = [];
+        $help = ['some values'];
+        
+        $this->expectException(\Exception::class);
+        
+        setMsgError($composer, $help, PHP_EOL);
+    }
+    
+    /**
+     * @group test
+     * covers setMsgError()
+     */
+    public function testSetMsgErrorHelpExceptions() : void
+    {
+        $composer = ['some values'];
+        $help = [];
+        
+        $this->expectException(\Exception::class);
+        
+        setMsgError($composer, $help, PHP_EOL);
+    }
+    
+    /**
+     * @coverNothing
+     */
+    public function getMessageProvider() : array
+    {
+        $composer = [
+            "description" => "Applicazione",
+            "version" => "1.2.0",
+            "authors" => [
+                [
+                    "name" => "Vania Carta"
+                ]
+            ],
+        ];
+        
+        $help = [
+            "command" => "php",
+            "global" => [                
+                "sections" => [            
+                    "pardef",
+                    "options",
+                    "descriptions"
+                ],
+                "offset" => "2"
+            ],
+            "parameters" => [
+                "help" => [
+                    "name" => "help",
+                    "short" => "h",
+                    "long" => "help",
+                    "default" => "",
+                    "options" => [
+                        "variables" => [],
+                        "costants" => []
+                    ],
+                    "descriptions" => [
+                        "Stampa questo help."
+                    ],
+                    "type" => "single"
+                ],                
+                "var" => [
+                    "name" => "variabile",
+                    "short" => "V",
+                    "long" => "var",
+                    "default" => "ALL",
+                    "options" => [
+                        "variables" => [
+                            "var1",
+                            "var2"
+                        ],
+                        "costants" => [
+                            "ALL"
+                        ]
+                    ],
+                    "descriptions" => [
+                        "Esegue il calcolo per ciascuna delle variabili",
+                        "<var> o per tutte (ALL). Default ALL."
+                    ],
+                    "type" => "group"
+                ]
+            ]
+        ];
+        
+        $data = [
+            "redirect" => [
+                "composer" => $composer,
+                "help" => $help,
+                "type" => "html"
+            ],
+            "version" => [
+                "composer" => $composer,
+                "help" => $help,
+                "type" => "version"
+            ],
+            "default" => [
+                "composer" => $composer,
+                "help" => $help,
+                "type" => "default"
+            ],
+            "help" => [
+                "composer" => $composer,
+                "help" => $help,
+                "type" => "help"
+            ],
+            "ok" => [
+                "composer" => $composer,
+                "help" => $help,
+                "type" => "ok"
+            ],
+            "error" => [
+                "composer" => $composer,
+                "help" => $help,
+                "type" => "error"
+            ]
+            
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers getMessage()
+     * @dataProvider getMessageProvider
+     */
+    public function testGetMessageIsString($composer, $help, $type) : void
+    {
+        $actual = getMessage($composer, $help, $type);
+        
+        $this->assertIsString($actual);
+    }
+    
+    /**
+     * @group test
+     * covers getMessage()
+     */
+    public function testGetMessageComposerExceptions() : void
+    {
+        $composer = [];
+        $help = ['some values'];
+        $type = 'ok';
+        
+        $this->expectException(\Exception::class);
+        
+        getMessage($composer, $help, $type);
+    }
+    
+    /**
+     * @group test
+     * covers getMessage()
+     */
+    public function testGetMessageHelpExceptions() : void
+    {
+        $composer = ['some values'];
+        $help = [];
+        $type = 'ok';
+        
+        $this->expectException(\Exception::class);
+        
+        getMessage($composer, $help, $type);
+    }
+    
+    /**
+     * @group test
+     * covers getMessage()
+     */
+    public function testGetMessageTypeExceptions() : void
+    {
+        $composer = ['some values'];
+        $help = ['some other values'];
+        $type = 'pippo';
+        
+        $this->expectException(\Exception::class);
+        
+        getMessage($composer, $help, $type);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function PropertyToStringProvider() : array
+    {
+        $parameters = [
+            "var" => [
+                "name" => "variabile",
+                "short" => "V",
+                "long" => "var",
+                "default" => "ALL",
+                "options" => [
+                    "variables" => [
+                        "var1",
+                        "var2"
+                    ],
+                    "costants" => [
+                        "ALL"
+                    ],
+                    "alias" => [
+                        "tutti"
+                    ]
+                ],
+                "regex" => "\/^[0-9]{5}([,][0-9]{5})*$\/",
+                "descriptions" => [
+                    "Esegue il calcolo per ciascuna delle variabili",
+                    "<var> o per tutte (ALL). Default ALL."
+                ],
+                "type" => "group"
+            ]
+        ];
+
+        $data = [
+            'no param' => [
+                'parameters' => $parameters,
+                'paramName' => 'pippo',
+                'propertyName' => 'default',
+                'expected' => ''
+            ],
+            'default' => [
+                'parameters' => $parameters,
+                'paramName' => 'var',
+                'propertyName' => 'default',
+                'expected' => 'ALL'
+            ],
+            'options' => [
+                'parameters' => $parameters,
+                'paramName' => 'var',
+                'propertyName' => 'options',
+                'expected' => 'var1 var2 ALL tutti'
+            ],
+            'descriptions' => [
+                'parameters' => $parameters,
+                'paramName' => 'var',
+                'propertyName' => 'descriptions',
+                'expected' => 'Esegue il calcolo per ciascuna delle variabili <var> o per tutte (ALL). Default ALL.'
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers propertyToString()
+     * @dataProvider propertyToStringProvider
+     */
+    public function testPropertyToStringEquals($parameters, $paramName, $propertyName, $expected) : void
+    {
+        $actual = propertyToString($parameters, $paramName, $propertyName);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers propertyToString()
+     */
+    public function testPropertyToStringException() : void
+    {
+        $parameters = [];
+        $paramName = 'var';
+        $propertyName = 'default';
+        
+        $this->expectException(\Exception::class);
+        
+        propertyToString($parameters, $paramName, $propertyName);
+    }
+
+    /**
+     * @coversNothing
+     */
+    public function getPropertiesProvider() : array
+    {
+        $parameters = [
+            "dummy" => [
+                "name" => "dummy",
+                "short" => "x",
+                "pippo" => "dummy",
+                "default" => "",
+                "options" => [
+                    "variables" => [],
+                    "costants" => []
+                ],
+                "descriptions" => [
+                    "Stampa questo help."
+                ],
+                "type" => "single"
+            ],
+            "help" => [
+                "name" => "help",
+                "short" => "h",
+                "long" => "help",
+                "default" => "",
+                "options" => [
+                    "variables" => [],
+                    "costants" => []
+                ],
+                "descriptions" => [
+                    "Stampa questo help."
+                ],
+                "type" => "single"
+            ],
+            "variabile" => [
+                "name" => "variabile",
+                "short" => "V",
+                "long" => "var",
+                "default" => "ALL",
+                "options" => [
+                    "variables" => [
+                        "var1",
+                        "var2"
+                    ],
+                    "costants" => [
+                        "ALL"
+                    ],
+                    "alias" => [
+                        "tutti"
+                    ]
+                ],
+                "regex" => "\/^[0-9]{5}([,][0-9]{5})*$\/",
+                "descriptions" => [
+                    "Esegue il calcolo per ciascuna delle variabili",
+                    "<var> o per tutte (ALL). Default ALL."
+                ],
+                "type" => "group"
+            ],
+            "variabile2" => [
+                "name" => "variabile n2",
+                "short" => "v",
+                "long" => "var2",
+                "default" => "ALL",
+                "options" => [
+                    "variables" => [
+                        "var1",
+                        "var2"
+                    ],
+                    "costants" => [
+                        "ALL"
+                    ],
+                    "alias" => [
+                        "tutti"
+                    ]
+                ],
+                "regex" => "\/^[0-9]{5}([,][0-9]{5})*$\/",
+                "descriptions" => [
+                    "Esegue il calcolo per ciascuna delle variabili",
+                    "<var> o per tutte (ALL). Default ALL."
+                ],
+                "type" => "group"
+            ]
+        ];
+
+        $data = [
+            'no property name' => [
+                'parameters' => $parameters,
+                'propertyName' => 'null',
+                'assoc' => null,
+                'filterInField' => null,
+                'filterInValue' => null,
+                'filterOutField' => null,
+                'filterOutValue' => null,
+                'prefix' => null, 
+                'expected' => []
+            ],
+            'dummy' => [
+                'parameters' => $parameters,
+                'propertyName' => 'pippo',
+                'assoc' => null,
+                'filterInField' => null,
+                'filterInValue' => null,
+                'filterOutField' => null,
+                'filterOutValue' => null,
+                'prefix' => null, 
+                'expected' => [
+                    'dummy'
+                ]
+            ],
+            'base' => [
+                'parameters' => $parameters,
+                'propertyName' => 'long',
+                'assoc' => null,
+                'filterInField' => null,
+                'filterInValue' => null,
+                'filterOutField' => null,
+                'filterOutValue' => null,
+                'prefix' => null, 
+                'expected' => [
+                    'help',
+                    'var',
+                    'var2'
+                ]
+            ],
+            'fieldIn' => [
+                'parameters' => $parameters,
+                'propertyName' => 'long',
+                'assoc' => null,
+                'filterInField' => 'type',
+                'filterInValue' => 'group',
+                'filterOutField' => null,
+                'filterOutValue' => null,
+                'prefix' => null, 
+                'expected' => [
+                    'var',
+                    'var2'
+                ]
+            ],
+            'fieldOut' => [
+                'parameters' => $parameters,
+                'propertyName' => 'long',
+                'assoc' => null,
+                'filterInField' => null,
+                'filterInValue' => null,
+                'filterOutField' => 'type',
+                'filterOutValue' => 'single',
+                'prefix' => null, 
+                'expected' => [
+                    'var',
+                    'var2'
+                ]
+            ],
+            'inAndOut' => [
+                'parameters' => $parameters,
+                'propertyName' => 'long',
+                'assoc' => null,
+                'filterInField' => 'type',
+                'filterInValue' => 'group',
+                'filterOutField' => 'long',
+                'filterOutValue' => 'var2',
+                'prefix' => null, 
+                'expected' => [
+                    'var'
+                ]
+            ],
+            'prefix' => [
+                'parameters' => $parameters,
+                'propertyName' => 'long',
+                'assoc' => null,
+                'filterInField' => null,
+                'filterInValue' => null,
+                'filterOutField' => null,
+                'filterOutValue' => null,
+                'prefix' => '*', 
+                'expected' => [
+                    '*help',
+                    '*var',
+                    '*var2'
+                ]
+            ],
+            'fieldIn wrong' => [
+                'parameters' => $parameters,
+                'propertyName' => 'name',
+                'assoc' => null,
+                'filterInField' => 'pluto',
+                'filterInValue' => 'paperino',
+                'filterOutField' => null,
+                'filterOutValue' => null,
+                'prefix' => null, 
+                'expected' => [
+                    'dummy',
+                    'help',
+                    'variabile',
+                    'variabile n2'
+                ]
+            ],
+            'fieldOut wrong' => [
+                'parameters' => $parameters,
+                'propertyName' => 'name',
+                'assoc' => null,
+                'filterInField' => null,
+                'filterInValue' => null,
+                'filterOutField' => 'pluto',
+                'filterOutValue' => 'paperino',
+                'prefix' => null, 
+                'expected' => [
+                    'dummy',
+                    'help',
+                    'variabile',
+                    'variabile n2'
+                ]
+            ],
+            'In wrong Out right' => [
+                'parameters' => $parameters,
+                'propertyName' => 'name',
+                'assoc' => null,
+                'filterInField' => 'pluto',
+                'filterInValue' => 'paperino',
+                'filterOutField' => 'type',
+                'filterOutValue' => 'group',
+                'prefix' => null, 
+                'expected' => [
+                    'dummy',
+                    'help'
+                ]
+            ],
+            'In right Out wrong' => [
+                'parameters' => $parameters,
+                'propertyName' => 'name',
+                'assoc' => null,
+                'filterInField' => 'type',
+                'filterInValue' => 'single',
+                'filterOutField' => 'pluto',
+                'filterOutValue' => 'paperino',
+                'prefix' => null, 
+                'expected' => [
+                    'dummy',
+                    'help'
+                ]
+            ],
+            'eraser' => [
+                'parameters' => $parameters,
+                'propertyName' => 'name',
+                'assoc' => null,
+                'filterInField' => 'type',
+                'filterInValue' => 'single',
+                'filterOutField' => 'type',
+                'filterOutValue' => 'single',
+                'prefix' => '-', 
+                'expected' => []
+            ],
+            'assoc' => [
+                'parameters' => $parameters,
+                'propertyName' => 'short',
+                'assoc' => true,
+                'filterInField' => null,
+                'filterInValue' => null,
+                'filterOutField' => null,
+                'filterOutValue' => null,
+                'prefix' => null, 
+                'expected' => [
+                    'dummy' => 'x',
+                    'help' => 'h',
+                    'variabile' => 'V',
+                    'variabile2' => 'v'
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers getProperties()
+     * @dataProvider getPropertiesProvider
+     */
+    public function testGetPropertiesEquals($parameters, $propertyName, $assoc, $filterInName, $filterInValue, $filterOutName, $filterOutValue, $prefix, $expected) : void
+    {
+        $actual = getProperties($parameters, $propertyName, $assoc, $filterInName, $filterInValue, $filterOutName, $filterOutValue, $prefix);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers getProperties()
+     */
+    public function testGetPropertiesException() : void
+    {
+        $parameters = [];
+        $propertyName = 'default';
+        
+        $this->expectException(\Exception::class);
+        
+        getProperties($parameters, $propertyName);
+    }   
+    
+    /**
+     * @coversNothing
+     */
+    public function filterPropertiesProvider() : array
+    {
+        $parameters = [
+           "help" => [
+                "name" => "help",                
+                "type" => "single"
+            ],
+            "variabile" => [
+                "name" => "variabile",                
+                "type" => "group"
+            ],
+            "variabile2" => [
+                "name" => "variabile",                
+                "type" => "group"
+            ]
+        ];
+
+        $data = [            
+            'include' => [
+                'parameters' => $parameters,
+                'field' => 'type',
+                'value' => 'group',
+                'include' => true,
+                'expected' => [
+                    "variabile" => [
+                        "name" => "variabile",                        
+                        "type" => "group"
+                    ],
+                    "variabile2" => [
+                        "name" => "variabile",                        
+                        "type" => "group"
+                    ]
+                ]
+            ],
+            'exclude' => [
+                'parameters' => $parameters,
+                'field' => 'type',
+                'value' => 'group',
+                'include' => false,
+                'expected' => [
+                    "help" => [
+                        "name" => "help",                
+                        "type" => "single"
+                    ]
+                ]
+            ],
+            'include null' => [
+                'parameters' => $parameters,
+                'field' => null,
+                'value' => null,
+                'include' => true,
+                'expected' => [
+                    "help" => [
+                        "name" => "help",                
+                        "type" => "single"
+                    ],
+                    "variabile" => [
+                        "name" => "variabile",                        
+                        "type" => "group"
+                    ],
+                    "variabile2" => [
+                        "name" => "variabile",                        
+                        "type" => "group"
+                    ]
+                ]
+            ],
+            'exclude null' => [
+                'parameters' => $parameters,
+                'field' => null,
+                'value' => null,
+                'include' => false,
+                'expected' => [
+                    "help" => [
+                        "name" => "help",                
+                        "type" => "single"
+                    ],
+                    "variabile" => [
+                        "name" => "variabile",                        
+                        "type" => "group"
+                    ],
+                    "variabile2" => [
+                        "name" => "variabile",                        
+                        "type" => "group"
+                    ]
+                ]
+            ],
+            'no field' => [
+                'parameters' => $parameters,
+                'field' => 'pippo',
+                'value' => 'pluto',
+                'include' => true,
+                'expected' => [
+                    "help" => [
+                        "name" => "help",                
+                        "type" => "single"
+                    ],
+                    "variabile" => [
+                        "name" => "variabile",                        
+                        "type" => "group"
+                    ],
+                    "variabile2" => [
+                        "name" => "variabile",                        
+                        "type" => "group"
+                    ]
+                ]
+            ],
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers filterProperties()
+     * @dataProvider filterPropertiesProvider
+     */
+    public function testFilterPropertiesEquals($parameters, $field, $value, $include, $expected) : void
+    {
+        $actual = filterProperties($parameters, $field, $value, $include);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers filterProperties()
+     */
+    public function testFilterPropertiesException() : void
+    {
+        $parameters = [];
+        $field = 'default';
+        $value = 'ALL';
+        $include = true;
+        
+        $this->expectException(\Exception::class);
+        
+        filterProperties($parameters, $field, $value, $include);
+    }
+    
+    /**
+     * @group test
+     * covers selectAllQuery()
+     */
+    public function testSelectAllQueryEquals() : void
+    {
+        $db = 'SSCP_data';
+        $query = 'query_variabili_ALL';        
+        $expecteds = ['30030', '30040', '30041'];
+               
+        $actuals = selectAllQuery($db, $query);
+        
+        foreach ($expecteds as $key => $expected) {
+            $this->assertEquals($expected, $actuals[$key]);  
+        }                 
+    }
+    
+    /**
+     * @group test
+     * covers selectAllQuery()
+     */
+    public function testSelectAllQueryException() : void
+    {
+        $db = 'dbutz';
+        $query = 'query_variabili_ALL';        
+        
+        $this->expectException(\Exception::class);
+        
+        selectAllQuery($db, $query);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function allParameterSetProvider() : array
+    {
+        $parameters = [
+           "help" => [
+               "short" => "h",                
+               "long" => "help",
+               "type" => "single"               
+            ],
+            "var" => [
+               "short" => "V",                
+               "long" => "var",
+               "type" => "group"
+            ],
+            "datefrom" => [
+               "short" => "f",                
+               "long" => "datefrom",
+               "type" => "group"
+            ],
+            "dateto" => [
+               "short" => "t",                
+               "long" => "dateto",
+               "type" => "group"
+            ],
+            "field" => [
+               "short" => "c",                
+               "long" => "campo",
+               "type" => "group"
+            ],
+            "full" => [
+               "short" => "n",                
+               "long" => "nozero",
+               "type" => "group"
+            ],
+        ];
+
+        $data = [            
+            'no arg' => [
+                'parameters' => $parameters,
+                'argv' => [
+                    'scarichi.php'
+                ],
+                'expected' => false
+            ],
+            'same arg' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '-V', '-f', '-t', '-c'],
+                'expected' => false
+            ],
+            'same mixed arg' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '--var', '-f', '-t', '--campo'],
+                'expected' => false
+            ],
+            'all short arg' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '-V', '-f', '-t', '-c', '-n'],
+                'expected' => true
+            ],
+            'all mixed arg' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '--var', '-f', '--dateto', '-c', '--nozero'],
+                'expected' => true
+            ],
+            'all mixed with val' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '--var', '30030,30040', '-f', 'YEAR', '--dateto', '01/01/2020', '-c', '--nozero'],
+                'expected' => true
+            ],
+            'sovra arg' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '--var', '30030,30040', '-f', '--dateto', '-c', '--nozero', '-V', '--datefrom', '01/01/2020'],
+                'expected' => true
+            ],
+            'bad arg' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '-v', '30030,30040', '--f', '-dateto', '01/01/2020', '-c', '--nozero'],
+                'expected' => false
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers allParameterSet()
+     * @dataProvider allParameterSetProvider
+     */
+    public function testAllParameterSetEquals($parameters, $arguments, $expected) : void
+    {
+        $actual = allParameterSet($parameters, $arguments);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers allParameterSet()
+     */
+    public function testAllParameterSetException() : void
+    {
+        $parameters = [];
+        $arguments = ['scarichi.php', '-V', '-f', '-t', '-c', '-n'];
+        
+        $this->expectException(\Exception::class);
+        
+        allParameterSet($parameters, $arguments);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function checkCliVarProvider() : array
+    {
+        $data = [            
+            'base' => [
+                'value' => '30030',
+                'expected' => ['30030']
+            ],
+            'multi' => [
+                'value' => '30030,30040',
+                'expected' => ['30030','30040']
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers checkCliVar()
+     * @dataProvider checkCliVarProvider
+     */
+    public function testCheckCliVarEquals($value, $expected) : void
+    {
+        $actual = checkCliVar($value);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers checkCliVar()
+     */
+    public function testCheckCliVarException() : void
+    {
+        $value = '40000';
+        
+        $this->expectException(\Exception::class);
+        
+        checkCliVar($value);
+    }
+    
+    /**
+     * @group test
+     * covers checkCliDatefrom()
+     */
+    public function testCheckCliDatefromEquals() : void
+    {
+        $value = '31/01/2020';
+        $expected = ['2020-01-31'];
+        
+        $actual = checkCliDatefrom($value);     
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers checkCliDatefrom()
+     */
+    public function testCheckCliDatefromException() : void
+    {
+        $value = '92/01/2020';
+        
+        $this->expectException(\Exception::class);
+        
+        checkCliDatefrom($value);
+    }
+    
+    /**
+     * @group test
+     * covers checkCliDateto()
+     */
+    public function testCheckCliDatetoEquals() : void
+    {
+        $value = '31/01/2020';
+        $expected = ['2020-01-31'];
+        
+        $actual = checkCliDateto($value);     
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers checkCliDateto()
+     */
+    public function testCheckCliDatetoException() : void
+    {
+        $value = '2020-01-31';
+        
+        $this->expectException(\Exception::class);
+        
+        checkCliDateto($value);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function checkCliFieldProvider() : array
+    {
+        $data = [            
+            'volume' => [
+                'value' => 'V',
+                'expected' => ['volume']
+            ],
+            'livello' => [
+                'value' => 'L',
+                'expected' => ['livello']
+            ],
+            'poertata' => [
+                'value' => 'Q',
+                'expected' => ['portata']
+            ],
+            'altezza' => [
+                'value' => 'H',
+                'expected' => ['altezza']
+            ],
+            'delta' => [
+                'value' => 'D',
+                'expected' => ['delta']
+            ],
+            'media' => [
+                'value' => 'M',
+                'expected' => ['media']
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers checkCliField()
+     * @dataProvider checkCliFieldProvider
+     */
+    public function testCheckCliFieldEquals($value, $expected) : void
+    {
+        $actual = checkCliField($value);     
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers checkCliField()
+     */
+    public function testCheckCliFieldException() : void
+    {
+        $value = 'K';
+        
+        $this->expectException(\Exception::class);
+        
+        checkCliField($value);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function checkCliFullProvider() : array
+    {
+        $data = [            
+            'true' => [
+                'value' => 'TRUE',
+                'expected' => [true]
+            ],
+            'false' => [
+                'value' => 'FALSE',
+                'expected' => [false]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers checkCliFull()
+     * @dataProvider checkCliFullProvider
+     */
+    public function testCheckCliFullEquals($value, $expected) : void
+    {
+        $actual = checkCliFull($value);     
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers checkCliFull()
+     */
+    public function testCheckCliFullException() : void
+    {
+        $value = 'pippo';
+        
+        $this->expectException(\Exception::class);
+        
+        checkCliFull($value);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function checkParameterProvider() : array
+    {
+        $data = [            
+            "var base" => [
+               "name" => "var",                
+               "value" => "30030",
+               "regex" => "/^[0-9]{5}([,][0-9]{5})*$/",
+               "default" => "ALL",
+               "expected" => ['30030'] 
+            ],
+            "var multi" => [
+               "name" => "var",                
+               "value" => "30030,30040",
+               "regex" => "/^[0-9]{5}([,][0-9]{5})*$/",
+               "default" => "ALL",
+               "expected" => ['30030','30040'] 
+            ],
+            "var default" => [
+               "name" => "var",                
+               "value" => "ALL",
+               "regex" => "/^[0-9]{5}([,][0-9]{5})*$/",
+               "default" => "ALL",
+               "expected" => ['ALL'] 
+            ],
+            "datefrom base" => [
+               "name" => "datefrom",                
+               "value" => "31/12/2020",
+               "regex" => "/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/",
+               "default" => "YEAR",
+               "expected" => ['2020-12-31'] 
+            ],
+            "datefrom default" => [
+               "name" => "datefrom",                
+               "value" => "YEAR",
+               "regex" => "/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/",
+               "default" => "YEAR",
+               "expected" => ['YEAR'] 
+            ],
+            "dateto default" => [
+               "name" => "dateto",                
+               "value" => "NOW",
+               "regex" => "/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/",
+               "default" => "NOW",
+               "expected" => ['NOW'] 
+            ],
+            "field base" => [
+               "name" => "field",                
+               "value" => "Q",
+               "regex" => "/^[V|L|M|D|H|Q]$/",
+               "default" => "V",
+               "expected" => ['portata'] 
+            ],
+            "field default" => [
+               "name" => "field",                
+               "value" => "V",
+               "regex" => "/^[V|L|M|D|H|Q]$/",
+               "default" => "V",
+               "expected" => ['volume'] 
+            ],
+            "full base" => [
+               "name" => "full",                
+               "value" => "TRUE",
+               "regex" => "/^((TRUE)|(FALSE))$/",
+               "default" => "FALSE",
+               "expected" => [true] 
+            ],
+            "full default" => [
+               "name" => "full",                
+               "value" => "FALSE",
+               "regex" => "/^((TRUE)|(FALSE))$/",
+               "default" => "FALSE",
+               "expected" => [false] 
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers checkParameter()
+     * @dataProvider checkParameterProvider
+     */
+    public function testCheckParameterEquals($paramName, $paramValue, $regex, $default, $expected) : void
+    {
+        $actual = checkParameter($paramName, $paramValue, $regex, $default);     
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers checkParameter()
+     */
+    public function testCheckParameterException() : void
+    {
+        $paramName = 'pippo';
+        $paramValue = 'pluto';
+        $regex = '/^[0-9]{5}([,][0-9]{5})*$/';
+        $default = 'paperoga';
+        
+        $this->expectException(\Exception::class);
+        
+        checkParameter($paramName, $paramValue, $regex, $default);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function setParameterProvider() : array
+    {
+        $parameters = [           
+            "var" => [
+               "short" => "V",                
+               "long" => "var",
+               "regex" => "/^[0-9]{5}([,][0-9]{5})*$/",
+               "default" => "ALL"
+            ],
+            "datefrom" => [
+               "short" => "f",                
+               "long" => "datefrom",
+               "regex" => "/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/",
+               "default" => "YEAR"
+            ],
+            "dateto" => [
+               "short" => "t",                
+               "long" => "dateto",
+               "regex" => "/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/",
+               "default" => "NOW"
+            ],
+            "field" => [
+               "short" => "c",                
+               "long" => "campo",
+               "regex" => "/^[V|L|M|D|H|Q]$/",
+               "default" => "V"
+            ],
+            "full" => [
+               "short" => "n",                
+               "long" => "nozero",
+               "regex" => "/^((TRUE)|(FALSE))$/",
+               "default" => "FALSE"
+            ]
+        ];
+
+        $data = [       
+            'var base' => [
+                'parameters' => $parameters,
+                'param' => 'var',
+                'argv' => ['scarichi.php', '-V', '30030', '-f', '-t', '-c', '-n'],
+                'expected' => ['30030']
+            ],
+            'var multi' => [
+                'parameters' => $parameters,
+                'param' => 'var',
+                'argv' => ['scarichi.php', '-V', '30030,30040', '-f', '-t', '-c', '-n'],
+                'expected' => ['30030','30040']
+            ],
+            'var default' => [
+                'parameters' => $parameters,
+                'param' => 'var',
+                'argv' => ['scarichi.php', '-V', 'ALL', '-f', '-t', '-c', '-n'],
+                'expected' => ['ALL']
+            ],            
+            'var no value' => [
+                'parameters' => $parameters,
+                'param' => 'var',
+                'argv' => ['scarichi.php', '-V', '-f', '-t', '-c', '-n'],
+                'expected' => ['ALL']
+            ],            
+            'var double' => [
+                'parameters' => $parameters,
+                'param' => 'var',
+                'argv' => ['scarichi.php', '-V', '-f', '-t', '-c', '-n', '--var', '30030'],
+                'expected' => ['30030']
+            ],
+            'datefrom base' => [
+                'parameters' => $parameters,
+                'param' => 'datefrom',
+                'argv' => ['scarichi.php', '-V', '-f', '31/12/2020', '-t', '-c', '-n'],
+                'expected' => ['2020-12-31']
+            ],
+            'datefrom default' => [
+                'parameters' => $parameters,
+                'param' => 'datefrom',
+                'argv' => ['scarichi.php', '-V', '-f', 'YEAR', '-t', '-c', '-n'],
+                'expected' => ['YEAR']
+            ],
+            'datefrom no value' => [
+                'parameters' => $parameters,
+                'param' => 'datefrom',
+                'argv' => ['scarichi.php', '-V', '-f', '-t', '-c', '-n'],
+                'expected' => ['YEAR']
+            ],
+            'dateto base' => [
+                'parameters' => $parameters,
+                'param' => 'dateto',
+                'argv' => ['scarichi.php', '-V', '-f', '-t', '31/12/2020', '-c', '-n'],
+                'expected' => ['2020-12-31']
+            ],
+            'dateto default' => [
+                'parameters' => $parameters,
+                'param' => 'dateto',
+                'argv' => ['scarichi.php', '-V', '-f', '-t', 'NOW', '-c', '-n'],
+                'expected' => ['NOW']
+            ],
+            'dateto no value' => [
+                'parameters' => $parameters,
+                'param' => 'dateto',
+                'argv' => ['scarichi.php', '-V', '-f', '-t', '-c', '-n'],
+                'expected' => ['NOW']
+            ],
+            'field base' => [
+                'parameters' => $parameters,
+                'param' => 'field',
+                'argv' => ['scarichi.php', '-V', '-f', '-t', '-c', 'Q', '-n'],
+                'expected' => ['portata']
+            ],
+            'field default' => [
+                'parameters' => $parameters,
+                'param' => 'field',
+                'argv' => ['scarichi.php', '-V', '-f', '-t', '-c', 'V', '-n'],
+                'expected' => ['volume']
+            ],
+            'field no value' => [
+                'parameters' => $parameters,
+                'param' => 'field',
+                'argv' => ['scarichi.php', '-V', '-f', '-t', '-c', '-n'],
+                'expected' => ['V']
+            ],
+            'full base' => [
+                'parameters' => $parameters,
+                'param' => 'full',
+                'argv' => ['scarichi.php', '-V', '-f', '-t', '-c', 'Q', '-n', 'TRUE'],
+                'expected' => [true]
+            ],
+            'full default' => [
+                'parameters' => $parameters,
+                'param' => 'full',
+                'argv' => ['scarichi.php', '-V', '-f', '-t', '-c', 'V', '-n', 'FALSE'],
+                'expected' => [false]
+            ],
+            'full no value' => [
+                'parameters' => $parameters,
+                'param' => 'full',
+                'argv' => ['scarichi.php', '-V', '-f', '-t', '-c', '-n'],
+                'expected' => ['FALSE']
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers setParameter()
+     * @dataProvider setParameterProvider
+     */
+    public function testSetParameterEquals($parameters, $paramName, $arguments, $expected) : void
+    {
+        $actual = setParameter($parameters, $paramName, $arguments);     
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers etParameter()
+     */
+    public function testSetParameterException() : void
+    {
+        $parameters = [];
+        $paramName = 'var';
+        $arguments = ['scarichi.php', '-V', '-f', '-t', '-c', '-n'];
+        
+        $this->expectException(\Exception::class);
+        
+        setParameter($parameters, $paramName, $arguments);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function shuntTypesProvider() : array
+    {
+        $parameters = [
+            "help" => [
+               "short" => "h",                
+               "long" => "help",
+               "regex" => "",
+               "default" => "",
+               "type" => "single"
+            ],
+            "version" => [
+               "short" => "v",                
+               "long" => "version",
+               "regex" => "",
+               "default" => "",
+               "type" => "single"
+            ],
+            "default" => [
+               "short" => "d",                
+               "long" => "default",
+               "regex" => "",
+               "default" => "",
+               "type" => "single"
+            ],
+            "var" => [
+               "short" => "V",                
+               "long" => "var",
+               "regex" => "/^[0-9]{5}([,][0-9]{5})*$/",
+               "default" => "ALL",
+               "type" => "group"
+            ],
+            "datefrom" => [
+               "short" => "f",                
+               "long" => "datefrom",
+               "regex" => "/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/",
+               "default" => "YEAR",
+               "type" => "group"
+            ],
+            "dateto" => [
+               "short" => "t",                
+               "long" => "dateto",
+               "regex" => "/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/",
+               "default" => "NOW",
+               "type" => "group"
+            ],
+            "field" => [
+               "short" => "c",                
+               "long" => "campo",
+               "regex" => "/^[V|L|M|D|H|Q]$/",
+               "default" => "V",
+               "type" => "group"
+            ],
+            "full" => [
+               "short" => "n",                
+               "long" => "nozero",
+               "regex" => "/^((TRUE)|(FALSE))$/",
+               "default" => "FALSE",
+               "type" => "group"
+            ]
+        ];
+
+        $data = [       
+            'html' => [
+                'parameters' => $parameters,
+                'argv' => null,
+                'expected' => 'html'
+            ],
+            'no arg' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php'],
+                'expected' => 'help'
+            ],
+            'help short' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '-h'],
+                'expected' => 'help'
+            ],
+            'help long' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '--help'],
+                'expected' => 'help'
+            ],
+            'version short' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '-v'],
+                'expected' => 'version'
+            ],
+            'version long' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '--version'],
+                'expected' => 'version'
+            ],
+            'default short' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '-d'],
+                'expected' => 'default'
+            ],
+            'default long' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '--default'],
+                'expected' => 'default'
+            ],
+            'ok short' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '-V', '-f', '-t', '-c', '-n'],
+                'expected' => 'ok'
+            ],
+            'ok long' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '--var', '--datefrom', '--dateto', '--campo', '--nozero'],
+                'expected' => 'ok'
+            ],
+            'ok mixed' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '-V', '30030', '--datefrom', '-t', 'NOW', '-c', '-n', '--var', 'ALL'],
+                'expected' => 'ok'
+            ],
+            'error' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '-V', '30030', '--datefrom', '-t', 'NOW', '-c'],
+                'expected' => 'error'
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers shuntTypes()
+     * @dataProvider shuntTypesProvider
+     */
+    public function testShuntTypesEquals($parameters, $arguments, $expected) : void
+    {
+        $actual = shuntTypes($parameters, $arguments);     
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers shuntTypes()
+     */
+    public function testShuntTypesException() : void
+    {
+        $parameters = [];
+        $arguments = ['scarichi.php', '-V', '-f', '-t', '-c', '-n'];
+        
+        $this->expectException(\Exception::class);
+        
+        shuntTypes($parameters, $arguments);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function setParametersProvider() : array
+    {
+        $parameters = [
+            "help" => [
+               "name" => "help",
+               "short" => "h",                
+               "long" => "help",
+               "regex" => "",
+               "default" => "",
+               "type" => "single"
+            ],
+            "version" => [
+               "name" => "version",
+               "short" => "v",                
+               "long" => "version",
+               "regex" => "",
+               "default" => "",
+               "type" => "single"
+            ],
+            "default" => [
+               "name" => "default",
+               "short" => "d",                
+               "long" => "default",
+               "regex" => "",
+               "default" => "",
+               "type" => "single"
+            ],
+            "var" => [
+               "name" => "variabile",
+               "short" => "V",                
+               "long" => "var",
+               "regex" => "/^[0-9]{5}([,][0-9]{5})*$/",
+               "default" => "ALL",
+               "type" => "group"
+            ],
+            "datefrom" => [
+               "name" => "datefrom",
+               "short" => "f",                
+               "long" => "datefrom",
+               "regex" => "/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/",
+               "default" => "YEAR",
+               "type" => "group"
+            ],
+            "dateto" => [
+               "name" => "dateto",
+               "short" => "t",                
+               "long" => "dateto",
+               "regex" => "/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/",
+               "default" => "NOW",
+               "type" => "group"
+            ],
+            "field" => [
+               "name" => "campo",               
+               "short" => "c",                
+               "long" => "campo",
+               "regex" => "/^[V|L|M|D|H|Q]$/",
+               "default" => "V",
+               "type" => "group"
+            ],
+            "full" => [
+               "name" => "no zero",
+               "short" => "n",                
+               "long" => "nozero",
+               "regex" => "/^((TRUE)|(FALSE))$/",
+               "default" => "FALSE",
+               "type" => "group"
+            ]
+        ];
+
+        $data = [       
+            'html' => [
+                'parameters' => $parameters,
+                'argv' => null,
+                'type' => 'html',
+                'expected' => []
+            ],
+            'no arg' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php'],
+                'type' => 'help',                
+                'expected' => []
+            ],
+            'help' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '-h'],
+                'type' => 'help',
+                'expected' => []
+            ],
+            'version' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '-v'],                
+                'type' => 'version',
+                'expected' => []
+            ],
+            'default' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '-d'],
+                'type' => 'default',
+                'expected' => [
+                    'var' => ['ALL'],
+                    'datefrom' => ['YEAR'],
+                    'dateto' => ['NOW'],
+                    'field' => ['V'],
+                    'full' => ['FALSE']
+                ]
+                
+            ],
+            'ok default' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '-V', '-f', '-t', '-c', '-n'],
+                'type' => 'ok',
+                'expected' => [
+                    'var' => ['ALL'],
+                    'datefrom' => ['YEAR'],
+                    'dateto' => ['NOW'],
+                    'field' => ['V'],
+                    'full' => ['FALSE']
+                ]
+                
+            ],
+            'ok mixed' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '-V', 'ALL', '--datefrom', '31/12/2020', '-t', 'NOW', '-c', 'Q', '-n', '--var', '30030,30040'],
+                'type' => 'ok',
+                'expected' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => ['2020-12-31'],
+                    'dateto' => ['NOW'],
+                    'field' => ['portata'],
+                    'full' => ['FALSE']
+                ]
+            ],
+            'error' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '-V', '30030', '--datefrom', '-t', 'NOW', '-c'],
+                'type' => 'error',
+                'expected' => []
+                
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers setParameters()
+     * @dataProvider setParametersProvider
+     */
+    public function testSetParametersEquals($parameters, $arguments, $type, $expected) : void
+    {
+        $actual = setParameters($parameters, $arguments, $type);     
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers setParameters()
+     */
+    public function testSetParametersException() : void
+    {
+        $parameters = [];
+        $arguments = ['scarichi.php', '-V', '-f', '-t', '-c', '-n'];
+        $type = 'ok';
+        
+        $this->expectException(\Exception::class);
+        
+        setParameters($parameters, $arguments, $type);
     }
 }
