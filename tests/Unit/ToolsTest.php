@@ -88,6 +88,14 @@ use function vaniacarta74\Scarichi\checkParameter as checkParameter;
 use function vaniacarta74\Scarichi\setParameter as setParameter;
 use function vaniacarta74\Scarichi\shuntTypes as shuntTypes;
 use function vaniacarta74\Scarichi\setParameters as setParameters;
+use function vaniacarta74\Scarichi\fillParameters as fillParameters;
+use function vaniacarta74\Scarichi\fillVar as fillVar;
+use function vaniacarta74\Scarichi\fillDatefrom as fillDateFrom;
+use function vaniacarta74\Scarichi\fillDateto as fillDateto;
+use function vaniacarta74\Scarichi\fillField as fillField;
+use function vaniacarta74\Scarichi\fillFull as fillFull;
+use function vaniacarta74\Scarichi\setPostParameters as setPostParameters;
+use function vaniacarta74\Scarichi\goCurl as goCurl;
 
 
 class ToolsTest extends TestCase
@@ -6421,7 +6429,7 @@ class ToolsTest extends TestCase
      * covers getJsonArray()
      * @dataProvider getJsonArrayIsStringProvider
      */
-    public function testGetJsonArrayIsString($path, $keys, $deepKey) : void
+    public function testGetJsonArrayIsString(string $path, ?array $keys, ?string $deepKey) : void
     {
         $actual = getJsonArray($path, $keys, $deepKey);
         
@@ -6433,7 +6441,7 @@ class ToolsTest extends TestCase
      * covers getJsonArray()
      * @dataProvider getJsonArrayIsArrayProvider
      */
-    public function testGetJsonArrayIsArray($path, $keys, $deepKey) : void
+    public function testGetJsonArrayIsArray(string $path, ?array $keys, ?string $deepKey) : void
     {
         $actual = getJsonArray($path, $keys, $deepKey);
         
@@ -6975,7 +6983,7 @@ class ToolsTest extends TestCase
      * covers formatOptions()
      * @dataProvider formatOptionsProvider
      */
-    public function testFormatOptionsEquals($properties, $expected) : void
+    public function testFormatOptionsEquals(array $properties, string $expected) : void
     {
         $actual = formatOptions($properties);
         
@@ -7022,7 +7030,7 @@ class ToolsTest extends TestCase
      * covers formatOptions()
      * @dataProvider formatOptionsExceptionsProvider
      */
-    public function testFormatOptionsExceptions($parameters) : void
+    public function testFormatOptionsExceptions(array $parameters) : void
     {
         $this->expectException(\Exception::class);
         
@@ -7577,7 +7585,7 @@ class ToolsTest extends TestCase
      * covers setMsgHtml()
      * @dataProvider setMsgProvider
      */
-    public function testSetMsgHtmlContainsString($composer, $help) : void
+    public function testSetMsgHtmlContainsString(array $composer, array $help) : void
     {
         $expected = '[user@localhost ~]# php -h<br/>';
          
@@ -7619,7 +7627,7 @@ class ToolsTest extends TestCase
      * covers setMsgVersion()
      * @dataProvider setMsgProvider
      */
-    public function testSetMsgVersionContainsString($composer, $help) : void
+    public function testSetMsgVersionContainsString(array $composer, array $help) : void
     {
         $expected = setHeader($composer) . PHP_EOL;
          
@@ -7661,7 +7669,7 @@ class ToolsTest extends TestCase
      * covers setMsgDefault()
      * @dataProvider setMsgProvider
      */
-    public function testSetMsgDefaultContainsString($composer, $help) : void
+    public function testSetMsgDefaultContainsString(array $composer, array $help) : void
     {
         $expected = "php -V ALL" . PHP_EOL;
          
@@ -7703,7 +7711,7 @@ class ToolsTest extends TestCase
      * covers setMsgHelp()
      * @dataProvider setMsgProvider
      */
-    public function testSetMsgHelpContainsString($composer, $help) : void
+    public function testSetMsgHelpContainsString(array $composer, array $help) : void
     {
         $expected1 = "Applicazione" . PHP_EOL;
         $expected2 = "  php [-h]" . PHP_EOL;
@@ -7749,7 +7757,7 @@ class ToolsTest extends TestCase
      * covers setMsgOk()
      * @dataProvider setMsgProvider
      */
-    public function testSetMsgOkContainsString($composer, $help) : void
+    public function testSetMsgOkContainsString(array $composer, array $help) : void
     {
         $expected = setHeader($composer) . PHP_EOL;
          
@@ -7791,7 +7799,7 @@ class ToolsTest extends TestCase
      * covers setMsgError()
      * @dataProvider setMsgProvider
      */
-    public function testSetMsgErrorContainsString($composer, $help) : void
+    public function testSetMsgErrorContainsString(array $composer, array $help) : void
     {
         $expected = 'Per info digitare: php -h' . PHP_EOL;
          
@@ -7933,7 +7941,7 @@ class ToolsTest extends TestCase
      * covers getMessage()
      * @dataProvider getMessageProvider
      */
-    public function testGetMessageIsString($composer, $help, $type) : void
+    public function testGetMessageIsString(array $composer, array $help, string $type) : void
     {
         $actual = getMessage($composer, $help, $type);
         
@@ -8052,7 +8060,7 @@ class ToolsTest extends TestCase
      * covers propertyToString()
      * @dataProvider propertyToStringProvider
      */
-    public function testPropertyToStringEquals($parameters, $paramName, $propertyName, $expected) : void
+    public function testPropertyToStringEquals(array $parameters, string $paramName, string $propertyName,string $expected) : void
     {
         $actual = propertyToString($parameters, $paramName, $propertyName);
         
@@ -8351,7 +8359,7 @@ class ToolsTest extends TestCase
      * covers getProperties()
      * @dataProvider getPropertiesProvider
      */
-    public function testGetPropertiesEquals($parameters, $propertyName, $assoc, $filterInName, $filterInValue, $filterOutName, $filterOutValue, $prefix, $expected) : void
+    public function testGetPropertiesEquals(array $parameters, string $propertyName, ?bool $assoc, ?string $filterInName, ?string $filterInValue, ?string $filterOutName, ?string $filterOutValue, ?string $prefix, array $expected) : void
     {
         $actual = getProperties($parameters, $propertyName, $assoc, $filterInName, $filterInValue, $filterOutName, $filterOutValue, $prefix);
         
@@ -8491,7 +8499,7 @@ class ToolsTest extends TestCase
      * covers filterProperties()
      * @dataProvider filterPropertiesProvider
      */
-    public function testFilterPropertiesEquals($parameters, $field, $value, $include, $expected) : void
+    public function testFilterPropertiesEquals(array $parameters, ?string $field, ?string $value, bool $include, array $expected) : void
     {
         $actual = filterProperties($parameters, $field, $value, $include);
         
@@ -8636,7 +8644,7 @@ class ToolsTest extends TestCase
      * covers allParameterSet()
      * @dataProvider allParameterSetProvider
      */
-    public function testAllParameterSetEquals($parameters, $arguments, $expected) : void
+    public function testAllParameterSetEquals(array $parameters, array $arguments, bool $expected) : void
     {
         $actual = allParameterSet($parameters, $arguments);
         
@@ -8681,7 +8689,7 @@ class ToolsTest extends TestCase
      * covers checkCliVar()
      * @dataProvider checkCliVarProvider
      */
-    public function testCheckCliVarEquals($value, $expected) : void
+    public function testCheckCliVarEquals(string $value, array $expected) : void
     {
         $actual = checkCliVar($value);
         
@@ -8795,7 +8803,7 @@ class ToolsTest extends TestCase
      * covers checkCliField()
      * @dataProvider checkCliFieldProvider
      */
-    public function testCheckCliFieldEquals($value, $expected) : void
+    public function testCheckCliFieldEquals(string $value, array $expected) : void
     {
         $actual = checkCliField($value);     
         
@@ -8839,7 +8847,7 @@ class ToolsTest extends TestCase
      * covers checkCliFull()
      * @dataProvider checkCliFullProvider
      */
-    public function testCheckCliFullEquals($value, $expected) : void
+    public function testCheckCliFullEquals(string $value, array $expected) : void
     {
         $actual = checkCliFull($value);     
         
@@ -8945,7 +8953,7 @@ class ToolsTest extends TestCase
      * covers checkParameter()
      * @dataProvider checkParameterProvider
      */
-    public function testCheckParameterEquals($paramName, $paramValue, $regex, $default, $expected) : void
+    public function testCheckParameterEquals(string $paramName, string $paramValue, string $regex, string $default, array $expected) : void
     {
         $actual = checkParameter($paramName, $paramValue, $regex, $default);     
         
@@ -9119,7 +9127,7 @@ class ToolsTest extends TestCase
      * covers setParameter()
      * @dataProvider setParameterProvider
      */
-    public function testSetParameterEquals($parameters, $paramName, $arguments, $expected) : void
+    public function testSetParameterEquals(array $parameters,string $paramName, array $arguments, array $expected) : void
     {
         $actual = setParameter($parameters, $paramName, $arguments);     
         
@@ -9276,7 +9284,7 @@ class ToolsTest extends TestCase
      * covers shuntTypes()
      * @dataProvider shuntTypesProvider
      */
-    public function testShuntTypesEquals($parameters, $arguments, $expected) : void
+    public function testShuntTypesEquals(array $parameters, ?array $arguments, string $expected) : void
     {
         $actual = shuntTypes($parameters, $arguments);     
         
@@ -9404,8 +9412,7 @@ class ToolsTest extends TestCase
                     'dateto' => ['NOW'],
                     'field' => ['V'],
                     'full' => ['FALSE']
-                ]
-                
+                ]                
             ],
             'ok default' => [
                 'parameters' => $parameters,
@@ -9449,7 +9456,7 @@ class ToolsTest extends TestCase
      * covers setParameters()
      * @dataProvider setParametersProvider
      */
-    public function testSetParametersEquals($parameters, $arguments, $type, $expected) : void
+    public function testSetParametersEquals(array $parameters, ?array $arguments, string $type, array $expected) : void
     {
         $actual = setParameters($parameters, $arguments, $type);     
         
@@ -9470,4 +9477,933 @@ class ToolsTest extends TestCase
         
         setParameters($parameters, $arguments, $type);
     }
+    
+    /**
+     * @coversNothing
+     */
+    public function fillParametersProvider() : array
+    {
+        $parameters = [            
+            "var" => [
+                "default" => "ALL",
+                "options" => [
+                    "costants" => [],
+                    "alias" => []  
+                ]
+            ],
+            "datefrom" => [
+                "default" => "YEAR",
+                "options" => [
+                    "costants" => [],
+                    "alias" => []  
+                ]
+            ],
+            "dateto" => [
+                "default" => "NOW",
+                "options" => [
+                    "costants" => [],
+                    "alias" => []  
+                ]
+            ],
+            "field" => [
+                "default" => "V",
+                "options" => [
+                    "costants" => [
+                        "V",
+                        "L",
+                        "M",
+                        "D",
+                        "H",
+                        "Q"
+                    ],
+                    "alias" => [
+                        "volume",
+                        "livello",
+                        "media",
+                        "delta",
+                        "altezza",
+                        "portata"
+                    ]  
+                ]
+            ],
+            "full" => [
+                "default" => "FALSE",
+                "options" => [
+                    "costants" => [],
+                    "alias" => []  
+                ]
+            ]
+        ];
+        
+        $now = new \DateTime();
+        $year = new \DateTime();
+        $interval = new \DateInterval('P1Y');
+        $year->sub($interval);
+        $all = selectAllQuery('SSCP_data', 'query_variabili_ALL');
+
+        $data = [
+            'no values' => [
+                'parameters' => $parameters,
+                'values' => [],
+                'expected' => []               
+            ],
+            'default' => [
+                'parameters' => $parameters,
+                'values' => [
+                    'var' => ['ALL'],
+                    'datefrom' => ['YEAR'],
+                    'dateto' => ['NOW'],
+                    'field' => ['V'],
+                    'full' => ['FALSE']
+                ],
+                'expected' => [
+                    'var' => $all,
+                    'datefrom' => $year->format('d/m/Y'),
+                    'dateto' => $now->format('d/m/Y'),
+                    'field' => 'volume',
+                    'full' => '1'
+                ]               
+            ],
+            'mixed 1' => [
+                'parameters' => $parameters,
+                'values' => [
+                    'var' => ['ALL'],
+                    'datefrom' => ['YEAR'],
+                    'dateto' => ['2020-12-31'],
+                    'field' => ['volume'],
+                    'full' => [false]
+                ],
+                'expected' => [
+                    'var' => $all,
+                    'datefrom' => '31/12/2019',
+                    'dateto' => '31/12/2020',
+                    'field' => 'volume',
+                    'full' => '1'
+                ] 
+                
+            ],
+            'mixed 2' => [
+                'parameters' => $parameters,
+                'values' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => ['2020-12-31'],
+                    'dateto' => ['NOW'],
+                    'field' => ['portata'],
+                    'full' => ['FALSE']
+                ],
+                'expected' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '31/12/2020',
+                    'dateto' => $now->format('d/m/Y'),
+                    'field' => 'portata',
+                    'full' => '1'
+                ]
+            ],
+            'all new' => [
+                'parameters' => $parameters,
+                'values' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => ['2020-12-30'],
+                    'dateto' => ['2020-12-31'],
+                    'field' => ['portata'],
+                    'full' => [true]
+                ],
+                'expected' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '30/12/2020',
+                    'dateto' => '31/12/2020',
+                    'field' => 'portata',
+                    'full' => '0'
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers fillParameters()
+     * @dataProvider fillParametersProvider
+     */
+    public function testFillParametersEquals(array $parameters, array $values, array $expected) : void
+    {
+        $actual = fillParameters($parameters, $values);     
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers fillParameters()
+     */
+    public function testFillParametersException() : void
+    {
+        $parameters = [];
+        $values = [
+            'var' => ['30030','30040'],
+            'datefrom' => ['2020-12-30'],
+            'dateto' => ['2020-12-31'],
+            'field' => ['portata'],
+            'full' => [true]
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        fillParameters($parameters, $values);
+    }
+    
+    /**
+     * @group test
+     * covers fillParameters()
+     */
+    public function testFillParametersOptionException() : void
+    {
+        $parameters = ['pippo'];
+        $values = [
+            'variabile' => ['30030','30040'],
+            'datefrom' => ['2020-12-30'],
+            'dateto' => ['2020-12-31'],
+            'field' => ['portata'],
+            'full' => [true]
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        fillParameters($parameters, $values);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function fillVarProvider() : array
+    {
+        $parameters = [            
+            "var" => [
+                "default" => "ALL",
+                "options" => [
+                    "costants" => [],
+                    "alias" => []  
+                ]
+            ]
+        ];
+        
+        $all = selectAllQuery('SSCP_data', 'query_variabili_ALL');
+
+        $data = [
+            'default' => [
+                'parameters' => $parameters,
+                'values' => [
+                    'var' => ['ALL']                    
+                ],
+                'postArray' => [],
+                'expected' => [
+                    'var' => $all
+                ]               
+            ],
+            'single' => [
+                'parameters' => $parameters,
+                'values' => [
+                    'var' => ['30030'],
+                ],
+                'postArray' => [],                
+                'expected' => [
+                    'var' => ['30030'],
+                 ]
+            ],
+            'double' => [
+                'parameters' => $parameters,
+                'values' => [
+                    'var' => ['30030','30040'],
+                ],
+                'postArray' => [],                
+                'expected' => [
+                    'var' => ['30030','30040'],
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers fillVar()
+     * @dataProvider fillVarProvider
+     */
+    public function testFillVarEquals(array $parameters, array $values, array $postVars, array $expected) : void
+    {
+        $actual = fillVar($parameters, $values, $postVars);     
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers fillVar()
+     */
+    public function testFillVarException() : void
+    {
+        $parameters = [];
+        $values = [
+            'var' => ['30030','30040'],
+            'datefrom' => ['2020-12-30'],
+            'dateto' => ['2020-12-31'],
+            'field' => ['portata'],
+            'full' => [true]
+        ];
+        $postVars = [];
+        
+        $this->expectException(\Exception::class);
+        
+        fillVar($parameters, $values, $postVars);
+    }
+
+    /**
+     * @coversNothing
+     */
+    public function fillDatefromProvider() : array
+    {
+        $parameters = [            
+            "datefrom" => [
+                "default" => "YEAR",
+                "options" => [
+                    "costants" => [],
+                    "alias" => []  
+                ]
+            ],
+            "dateto" => [
+                "default" => "NOW",
+                "options" => [
+                    "costants" => [],
+                    "alias" => []  
+                ]
+            ]
+        ];
+        
+        $now = new \DateTime();
+        $year = new \DateTime();
+        $interval = new \DateInterval('P1Y');
+        $year->sub($interval);
+
+        $data = [
+            'default' => [
+                'parameters' => $parameters,
+                'values' => [
+                    'datefrom' => ['YEAR'],
+                    'dateto' => ['NOW']                    
+                ],
+                'postArray' => [
+                    'var' => ['30030','30040']
+                ],
+                'expected' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => $year->format('d/m/Y')
+                ]               
+            ],
+            'dependent' => [
+                'parameters' => $parameters,
+                'values' => [
+                    'datefrom' => ['YEAR'],
+                    'dateto' => ['2020-12-31'],
+                ],
+                'postArray' => [
+                    'var' => ['30030','30040']                    
+                ],                
+                'expected' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '31/12/2019'
+                 ]
+            ],
+            'indipendent' => [
+                'parameters' => $parameters,
+                'values' => [
+                    'datefrom' => ['2020-12-31']
+                ],
+                'postArray' => [
+                    'var' => ['30030','30040']
+                ],                
+                'expected' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '31/12/2020'
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers fillDatefrom()
+     * @dataProvider fillDatefromProvider
+     */
+    public function testFillDatefromEquals(array $parameters, array $values, array $postVars, array $expected) : void
+    {
+        $actual = fillDatefrom($parameters, $values, $postVars);     
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers fillDatefrom()
+     */
+    public function testFillDatefromException() : void
+    {
+        $parameters = [];
+        $values = [
+            'var' => ['30030','30040'],
+            'datefrom' => ['2020-12-30'],
+            'dateto' => ['2020-12-31'],
+            'field' => ['portata'],
+            'full' => [true]
+        ];
+        $postVars = [];
+        
+        $this->expectException(\Exception::class);
+        
+        fillDatefrom($parameters, $values, $postVars);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function fillDatetoProvider() : array
+    {
+        $parameters = [            
+            "dateto" => [
+                "default" => "NOW",
+                "options" => [
+                    "costants" => [],
+                    "alias" => []  
+                ]
+            ]
+        ];
+        
+        $now = new \DateTime();        
+
+        $data = [
+            'default' => [
+                'parameters' => $parameters,
+                'values' => [
+                    'dateto' => ['NOW']                    
+                ],
+                'postArray' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '31/12/2019'
+                ],
+                'expected' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '31/12/2019',
+                    'dateto' => $now->format('d/m/Y')
+                ]               
+            ],
+            'indipendent' => [
+                'parameters' => $parameters,
+                'values' => [
+                    'dateto' => ['2020-12-31']
+                ],
+                'postArray' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '31/12/2019'
+                ],                
+                'expected' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '31/12/2019',
+                    'dateto' => '31/12/2020'
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers fillDateto()
+     * @dataProvider fillDatetoProvider
+     */
+    public function testFillDatetoEquals(array $parameters, array $values, array $postVars, array $expected) : void
+    {
+        $actual = fillDateto($parameters, $values, $postVars);     
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers fillDateto()
+     */
+    public function testFillDatetoException() : void
+    {
+        $parameters = [];
+        $values = [
+            'var' => ['30030','30040'],
+            'datefrom' => ['2020-12-30'],
+            'dateto' => ['2020-12-31'],
+            'field' => ['portata'],
+            'full' => [true]
+        ];
+        $postVars = [];
+        
+        $this->expectException(\Exception::class);
+        
+        fillDateto($parameters, $values, $postVars);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function fillFieldProvider() : array
+    {
+        $parameters = [            
+            "field" => [
+                "default" => "V",
+                "options" => [
+                    "costants" => [
+                        "V",
+                        "L",
+                        "M",
+                        "D",
+                        "H",
+                        "Q"
+                    ],
+                    "alias" => [
+                        "volume",
+                        "livello",
+                        "media",
+                        "delta",
+                        "altezza",
+                        "portata"
+                    ]  
+                ]
+            ]
+        ];
+        
+        $data = [
+            'default' => [
+                'parameters' => $parameters,
+                'values' => [
+                    'field' => ['V']                    
+                ],
+                'postArray' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '31/12/2019',
+                    'dateto' => '31/12/2020'
+                ],
+                'expected' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '31/12/2019',
+                    'dateto' => '31/12/2020',
+                    'field' => 'volume'
+                ]               
+            ],
+            'dependent' => [
+                'parameters' => $parameters,
+                'values' => [
+                    'field' => ['volume']
+                ],
+                'postArray' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '31/12/2019',
+                    'dateto' => '31/12/2020'
+                    
+                ],                
+                'expected' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '31/12/2019',
+                    'dateto' => '31/12/2020',
+                    'field' => 'volume'
+                ]
+            ],
+            'independent' => [
+                'parameters' => $parameters,
+                'values' => [
+                    'field' => ['portata']
+                ],
+                'postArray' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '31/12/2019',
+                    'dateto' => '31/12/2020'
+                    
+                ],                
+                'expected' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '31/12/2019',
+                    'dateto' => '31/12/2020',
+                    'field' => 'portata'
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers fillField()
+     * @dataProvider fillFieldProvider
+     */
+    public function testFillFieldEquals(array $parameters, array $values, array $postVars, array $expected) : void
+    {
+        $actual = fillField($parameters, $values, $postVars);     
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers fillField()
+     */
+    public function testFillFieldException() : void
+    {
+        $parameters = [];
+        $values = [
+            'var' => ['30030','30040'],
+            'datefrom' => ['2020-12-30'],
+            'dateto' => ['2020-12-31'],
+            'field' => ['portata'],
+            'full' => [true]
+        ];
+        $postVars = [];
+        
+        $this->expectException(\Exception::class);
+        
+        fillField($parameters, $values, $postVars);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function fillFullProvider() : array
+    {
+        $parameters = [            
+            "full" => [
+                "default" => "FALSE",
+                "options" => [
+                    "costants" => [],
+                    "alias" => []  
+                ]
+            ]
+        ];
+        
+        $data = [
+            'default' => [
+                'parameters' => $parameters,
+                'values' => [
+                    'full' => ['FALSE']              
+                ],
+                'postArray' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '31/12/2019',
+                    'dateto' => '31/12/2020',
+                    'field' => 'volume'
+                ],
+                'expected' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '31/12/2019',
+                    'dateto' => '31/12/2020',
+                    'field' => 'volume',
+                    'full' => '1'
+                ]               
+            ],
+            'dependent' => [
+                'parameters' => $parameters,
+                'values' => [
+                    'full' => [false]
+                ],
+                'postArray' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '31/12/2019',
+                    'dateto' => '31/12/2020',
+                    'field' => 'volume'
+                    
+                ],                
+                'expected' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '31/12/2019',
+                    'dateto' => '31/12/2020',
+                    'field' => 'volume',
+                    'full' => '1'
+                ]
+            ],
+            'independent' => [
+                'parameters' => $parameters,
+                'values' => [
+                    'full' => [true]
+                ],
+                'postArray' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '31/12/2019',
+                    'dateto' => '31/12/2020',
+                    'field' => 'volume',
+                    
+                ],                
+                'expected' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '31/12/2019',
+                    'dateto' => '31/12/2020',
+                    'field' => 'volume',
+                    'full' => '0'
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers fillFull()
+     * @dataProvider fillFullProvider
+     */
+    public function testFillFullEquals(array $parameters, array $values, array $postVars, array $expected) : void
+    {
+        $actual = fillFull($parameters, $values, $postVars);     
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers fillFull()
+     */
+    public function testFillFullException() : void
+    {
+        $parameters = [];
+        $values = [
+            'var' => ['30030','30040'],
+            'datefrom' => ['2020-12-30'],
+            'dateto' => ['2020-12-31'],
+            'field' => ['portata'],
+            'full' => [true]
+        ];
+        $postVars = [];
+        
+        $this->expectException(\Exception::class);
+        
+        fillFull($parameters, $values, $postVars);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function setPostParametersProvider() : array
+    {
+        $parameters = [
+            'help' => [],
+            'version' => [],
+            'default' => [],
+            'var' => [],
+            'datefrom' => [],
+            'dateto' => [],
+            'field' => [],
+            'full' => []
+        ];
+        
+        $data = [
+            'no filled values' => [
+                'parameters' => $parameters,
+                'filled values' => [],
+                'expected' => []
+            ],
+            'single' => [
+                'parameters' => $parameters,
+                'filled values' => [                    
+                    'var' => ['30030'],
+                    'datefrom' => '30/12/2020',
+                    'dateto' => '31/12/2020',
+                    'field' => 'portata',
+                    'full' => '0'
+                ],
+                'expected' => [
+                    [
+                        'var' => '30030',
+                        'datefrom' => '30/12/2020',
+                        'dateto' => '31/12/2020',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ]
+            ],
+            'multi' => [
+                'parameters' => $parameters,
+                'filled values' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '30/12/2020',
+                    'dateto' => '31/12/2020',
+                    'field' => 'portata',
+                    'full' => '0'
+                ],
+                'expected' => [
+                    [
+                        'var' => '30030',
+                        'datefrom' => '30/12/2020',
+                        'dateto' => '31/12/2020',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ],
+                    [
+                        'var' => '30040',
+                        'datefrom' => '30/12/2020',
+                        'dateto' => '31/12/2020',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ]
+            ]            
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers setPostParameters()
+     * @dataProvider setPostParametersProvider
+     */
+    public function testSetPostParametersEquals($parameters, $filledValues, $expected) : void
+    {
+        $actual = setPostParameters($parameters, $filledValues);     
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers setPostParameters()
+     */
+    public function testSetPostParametersException() : void
+    {
+        $parameters = [
+            'help' => [],
+            'version' => [],
+            'default' => [],
+            'var' => [],
+            'datefrom' => [],
+            'dateto' => [],
+            'field' => [],
+            'full' => []
+        ];
+        $filledValues = [
+            'variabile' => ['30030'],
+            'datefrom' => '30/12/2020',
+            'dateto' => '31/12/2020',
+            'field' => 'portata',
+            'full' => '0'
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        setPostParameters($parameters, $filledValues);
+    }
+    
+    /**
+     * @group test
+     * covers setPostParameters()
+     */
+    public function testSetPostParametersNoVarException() : void
+    {
+        $parameters = [
+            'help' => [],
+            'version' => [],
+            'default' => [],
+            'variabile' => [],
+            'datefrom' => [],
+            'dateto' => [],
+            'field' => [],
+            'full' => []
+        ];
+        $filledValues = [
+            'variabile' => ['30030'],
+            'datefrom' => '30/12/2020',
+            'dateto' => '31/12/2020',
+            'field' => 'portata',
+            'full' => '0'
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        setPostParameters($parameters, $filledValues);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function goCurlProvider() : array
+    {
+        $url = "http://localhost/telecontrollo/scarichi/github/src/index.php";
+        $single = '1) 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        $multi = $single . '2) 30040: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        
+        $data = [
+            'no post values' => [
+                'post' => [],
+                'url' => $url,
+                'expected' => ''
+            ],
+            'single' => [                
+                'post' => [
+                    [
+                        'var' => '30030',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'url' => $url,
+                'expected' => $single
+            ],
+            'multi' => [                
+                'post' => [
+                    [
+                        'var' => '30030',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ],
+                    [
+                        'var' => '30040',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'url' => $url,
+                'expected' => $multi
+            ]            
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers goCurl()
+     * @dataProvider goCurlProvider
+     */
+    public function testGoCurlEquals(array $postParam, string $url, string $expected) : void
+    {
+        $actual = goCurl($postParam, $url);     
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers goCurl()
+     */
+    public function testGoCurlException() : void
+    {
+        $postParam = [];
+        $url = 'pippo';
+        
+        $this->expectException(\Exception::class);
+        
+        goCurl($postParam, $url);
+    }    
 }

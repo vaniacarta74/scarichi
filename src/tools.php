@@ -2331,53 +2331,19 @@ function shuntTypes(array $parameters, ?array $arguments) : string
 
 function fillParameters(array $parameters, array $values) : array
 {
-    try {       
-        foreach ($values as $parameter => $rawValues) {
-            switch ($parameter) {
-                case 'var':
-                    if ($rawValues[0] === $parameters['var']['default']) {
-                        $postVars['var'] = selectAllQuery('SSCP_data', 'query_variabili_ALL'); 
-                    } else {
-                        $postVars['var'] = $rawValues;
-                    }
-                    break;
-                case 'datefrom':
-                    if ($rawValues[0] === $parameters['datefrom']['default']) {
-                        $dateto = $values['dateto'][0];
-                        if ($dateto === $parameters['dateto']['default']) {
-                            $dateTimeTo = new \DateTime();
-                        } else {
-                            $dateTimeTo = new \DateTime($dateto);
-                        }
-                        $yearInt = new \DateInterval('P1Y');                        
-                        $dateTimeFrom = $dateTimeTo->sub($yearInt);
-                    } else {
-                        $dateTimeFrom = new \DateTime($rawValues[0]);                        
-                    }
-                    $postVars['datefrom'] = $dateTimeFrom->format('d/m/Y');
-                    break;
-                case 'dateto':
-                    if ($rawValues[0] === $parameters['dateto']['default']) {
-                        $dateTimeTo = new \DateTime();
-                    } else {
-                        $dateTimeTo = new \DateTime($rawValues[0]);                        
-                    }
-                    $postVars['dateto'] = $dateTimeTo->format('d/m/Y');
-                    break;
-                case 'field':
-                    $default = $parameters['field']['default'];                    
-                    if ($rawValues[0] === $default) {
-                        $options = $parameters['field']['options'];
-                        $key = array_search($default, $options['costants']);
-                        $postVars['field'] = $options['alias'][$key];
-                    } else {
-                        $postVars['field'] = $rawValues[0];                        
-                    }
-                    break;
-                case 'full':                    
-                    $postVars['full'] = filter_var($rawValues[0], FILTER_VALIDATE_BOOLEAN) ? '0' : '1';
-                    break;
-            }     
+    try {
+        if (count($parameters) === 0) {
+            throw new \Exception('Array parametri di configurazione vuoto');
+        }
+        $postVars = [];
+        $keys = array_keys($values);
+        foreach ($keys as $key) {
+            $function = __NAMESPACE__ . '\fill' . ucfirst($key);
+            if (is_callable($function)) {
+                $postVars = call_user_func($function, $parameters, $values, $postVars);
+            } else {
+                throw new \Exception('Nome opzione non ammesso');
+            } 
         }        
         return $postVars;
     } catch (\Throwable $e) {
@@ -2387,16 +2353,133 @@ function fillParameters(array $parameters, array $values) : array
 }
 
 
-function setPostParameters(array $filledValues) : array
+function fillVar(array $parameters, array $values, array $postVars) : array
 {
-    try {       
-        foreach ($filledValues['var'] as $key => $value) {
-            $postParams[$key]['var'] = $value;
-            $postParams[$key]['datefrom'] = $filledValues['datefrom'];
-            $postParams[$key]['dateto'] = $filledValues['dateto'];
-            $postParams[$key]['full'] = $filledValues['full'];
-            $postParams[$key]['field'] = $filledValues['field'];
-        }   
+    try {
+        if (count($parameters) === 0) {
+            throw new \Exception('Array parametri di configurazione vuoto');
+        }
+        $rawValues = $values['var'];
+        if ($rawValues[0] === $parameters['var']['default']) {
+            $postVars['var'] = selectAllQuery('SSCP_data', 'query_variabili_ALL'); 
+        } else {
+            $postVars['var'] = $rawValues;
+        } 
+        return $postVars;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function fillDatefrom(array $parameters, array $values, array $postVars) : array
+{
+    try {
+        if (count($parameters) === 0) {
+            throw new \Exception('Array parametri di configurazione vuoto');
+        }
+        $rawValues = $values['datefrom'];
+        if ($rawValues[0] === $parameters['datefrom']['default']) {
+            $dateto = $values['dateto'][0];
+            if ($dateto === $parameters['dateto']['default']) {
+                $dateTimeTo = new \DateTime();
+            } else {
+                $dateTimeTo = new \DateTime($dateto);
+            }
+            $yearInt = new \DateInterval('P1Y');                        
+            $dateTimeFrom = $dateTimeTo->sub($yearInt);
+        } else {
+            $dateTimeFrom = new \DateTime($rawValues[0]);                        
+        }
+        $postVars['datefrom'] = $dateTimeFrom->format('d/m/Y');
+        return $postVars;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function fillDateto(array $parameters, array $values, array $postVars) : array
+{
+    try {
+        if (count($parameters) === 0) {
+            throw new \Exception('Array parametri di configurazione vuoto');
+        }
+        $rawValues = $values['dateto'];
+        if ($rawValues[0] === $parameters['dateto']['default']) {
+            $dateTimeTo = new \DateTime();
+        } else {
+            $dateTimeTo = new \DateTime($rawValues[0]);                        
+        }
+        $postVars['dateto'] = $dateTimeTo->format('d/m/Y');
+        return $postVars;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function fillField(array $parameters, array $values, array $postVars) : array
+{
+    try {
+        if (count($parameters) === 0) {
+            throw new \Exception('Array parametri di configurazione vuoto');
+        }
+        $rawValues = $values['field'];
+        $default = $parameters['field']['default'];                    
+        if ($rawValues[0] === $default) {
+            $options = $parameters['field']['options'];
+            $key = array_search($default, $options['costants']);
+            $postVars['field'] = $options['alias'][$key];
+        } else {
+            $postVars['field'] = $rawValues[0];                        
+        }
+        return $postVars;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function fillFull(array $parameters, array $values, array $postVars) : array
+{
+    try {
+        if (count($parameters) === 0) {
+            throw new \Exception('Array parametri di configurazione vuoto');
+        }
+        $rawValues = $values['full'];
+        $postVars['full'] = filter_var($rawValues[0], FILTER_VALIDATE_BOOLEAN) ? '0' : '1';
+        return $postVars;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function setPostParameters(array $parameters, array $filledValues) : array
+{
+    try {
+        $postParams = [];
+        if (count($filledValues) > 0) {
+            $keys = array_keys($filledValues);
+            if (array_diff($keys, array_keys($parameters)) || (!array_key_exists('var', $filledValues))) {
+                throw new \Exception('Parametri errati');
+            }
+            foreach ($filledValues['var'] as $nvar => $variable) {                
+                foreach ($keys as $key) {
+                    if ($key === 'var') {
+                        $postParams[$nvar][$key] = $variable;
+                    } else {
+                        $postParams[$nvar][$key] = $filledValues[$key];
+                    }
+                }              
+            }
+        }
         return $postParams;
     } catch (\Throwable $e) {
         Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -2408,6 +2491,14 @@ function setPostParameters(array $filledValues) : array
 function goCurl(array $postParams, string $url) : string
 {
     try {
+        $http = '(http[s]?:)[\/]{2}';
+        $ip = '([0-9][.]|[1-9][0-9][.]|[1][0-9][0-9][.]|[2][0-4][0-9][.]|[2][5][0-5][.]){3}([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5]){1}';
+        $root = '((localhost)|' . $ip . ')';
+        $path = '([\/][\w._-]+)*[\/](index\.php)';
+        $regex = $http . $root . $path;
+        if (!preg_match('/^' . $regex . '$/', $url)) {
+            throw new \Exception('Url non valido');
+        }
         $message = '';
         $i = 1;
         foreach ($postParams as $key => $params) {        

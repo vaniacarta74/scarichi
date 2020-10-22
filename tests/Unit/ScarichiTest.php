@@ -1,0 +1,216 @@
+<?php
+namespace vaniacarta74\Scarichi\tests\Unit;
+
+use PHPUnit\Framework\TestCase;
+
+use function vaniacarta74\Scarichi\getJsonArray as getJsonArray;
+use function vaniacarta74\Scarichi\setHeader as setHeader;
+
+class ScarichiTest extends TestCase
+{
+    
+    /**
+     * coversNothing
+     */
+    public function scarichiProvider() : array
+    {
+        $composer = getJsonArray(__DIR__ . '/../../composer.json');
+        $description = $composer['description'];
+        $header = setHeader($composer);
+        $single = '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/01/2019 al 02/01/2019 avvenuta con successo. File CSV full esportati.' . PHP_EOL;
+        $double = $single . '2) 30040: Elaborazione dati Volume variabile 30040 dal 01/01/2019 al 02/01/2019 avvenuta con successo. File CSV full esportati.' . PHP_EOL;        
+        
+        $data = [
+            'standard' => [
+                'help' => null,
+                'version' => null,
+                'default' => null,
+                'var' => '30030',
+                'datefrom' => '01/01/2019',
+                'dateto' => '02/01/2019',
+                'nozero' => 'FALSE',
+                'campo' => 'V',
+                'expected' => $header . PHP_EOL . $single
+            ],
+            'standard double' => [
+                'help' => null,
+                'version' => null,
+                'default' => null,
+                'var' => '30030,30040',
+                'datefrom' => '01/01/2019',
+                'dateto' => '02/01/2019',
+                'nozero' => 'FALSE',
+                'campo' => 'V',
+                'expected' => $header . PHP_EOL . $double
+            ],
+            'no full and field' => [
+                'help' => null,
+                'version' => null,
+                'default' => null,
+                'var' => '30030',
+                'datefrom' => '01/01/2019',
+                'dateto' => '02/01/2019',
+                'nozero' => '',
+                'campo' => '',
+                'expected' => $header . PHP_EOL . $single
+            ],
+            'only datefrom' => [
+                'help' => null,
+                'version' => null,
+                'default' => null,
+                'var' => '30030',
+                'datefrom' => '01/05/2020',
+                'dateto' => '',
+                'nozero' => '',
+                'campo' => '',
+                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/05/2020 al ' . date('d/m/Y') . ' avvenuta con successo. File CSV full esportati.' . PHP_EOL
+            ],
+            'only dateto' => [
+                'help' => null,
+                'version' => null,
+                'default' => null,
+                'var' => '30030',
+                'datefrom' => '',
+                'dateto' => '01/05/2021',
+                'nozero' => '',
+                'campo' => '',
+                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/05/2020 al 01/05/2021 avvenuta con successo. File CSV full esportati.' . PHP_EOL
+            ],            
+            'field other' => [
+                'help' => null,
+                'version' => null,
+                'default' => null,
+                'var' => '30030',
+                'datefrom' => '01/01/2019',
+                'dateto' => '02/01/2019',
+                'nozero' => '',
+                'campo' => 'L',
+                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Livello variabile 30030 dal 01/01/2019 al 02/01/2019 avvenuta con successo. File CSV full esportati.' . PHP_EOL
+            ],
+            'full 0' => [
+                'help' => null,
+                'version' => null,
+                'default' => null,
+                'var' => '30030',
+                'datefrom' => '01/01/2019',
+                'dateto' => '02/01/2019',
+                'nozero' => 'TRUE',
+                'campo' => '',
+                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/01/2019 al 02/01/2019 avvenuta con successo. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
+            ],
+            'full 1' => [
+                'help' => null,
+                'version' => null,
+                'default' => null,
+                'var' => '30030',
+                'datefrom' => '01/01/2019',
+                'dateto' => '02/01/2019',
+                'nozero' => 'FALSE',
+                'campo' => '',
+                'expected' => $header . PHP_EOL . $single
+            ],
+            'only var' => [
+                'help' => null,
+                'version' => null,
+                'default' => null,
+                'var' => '30030',
+                'datefrom' => '',
+                'dateto' => '',
+                'nozero' => '',
+                'campo' => '',
+                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal ' . date('d') . '/' . date('m') . '/' . (date('Y') - 1) . ' al ' . date('d/m/Y') . ' avvenuta con successo. File CSV full esportati.' . PHP_EOL
+            ],
+            'help' => [
+                'help' => '',
+                'version' => null,
+                'default' => null,
+                'var' => null,
+                'datefrom' => null,
+                'dateto' => null,
+                'nozero' => null,
+                'campo' => null,
+                'expected' => $header . PHP_EOL . $description . PHP_EOL 
+            ],
+            'version' => [
+                'help' => null,
+                'version' => '',
+                'default' => null,
+                'var' => null,
+                'datefrom' => null,
+                'dateto' => null,
+                'nozero' => null,
+                'campo' => null,
+                'expected' => $header . PHP_EOL
+            ],
+            'default' => [
+                'help' => null,
+                'version' => null,
+                'default' => '',
+                'var' => null,
+                'datefrom' => null,
+                'dateto' => null,
+                'nozero' => null,
+                'campo' => null,
+                'expected' => $header . PHP_EOL . 'php scarichi.php -V ALL -f YEAR -t NOW -c V -n FALSE' . PHP_EOL
+            ],
+            'error' => [
+                'help' => null,
+                'version' => null,
+                'default' => null,
+                'var' => '30030',
+                'datefrom' => '01/01/2019',
+                'dateto' => '02/01/2019',
+                'nozero' => 'FALSE',
+                'campo' => null,
+                'expected' => $header . PHP_EOL . 'Parametri errati o insufficienti. Per info digitare: php scarichi.php -h' . PHP_EOL
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group main
+     * covers scarichi.php
+     * @dataProvider scarichiProvider
+     */
+    public function testScarichiEquals(?string $help, ?string $version, ?string $default, ?string $var, ?string $dateFrom, ?string $dateTo, ?string $full, ?string $field, ?string $expected) : void
+    {
+        $paramsRaw = [
+            '--help' => $help,
+            '--version' => $version,
+            '--default' => $default,
+            '--var' => $var,
+            '--datefrom' => $dateFrom,
+            '--dateto' => $dateTo,
+            '--campo' => $field,
+            '--nozero' => $full
+        ];
+        
+        $paramsFilter = array_filter($paramsRaw, function ($value) {
+            return !is_null($value);
+        });        
+        $params = [];
+        array_walk($paramsFilter, function ($item, $key) use (&$params) {
+            if ($item === '') {
+                $params[] = $key;
+            } else {
+                $params[] = $key . ' ' . $item;
+            }            
+        });
+        
+        $arg = implode(' ', $params);
+       
+        $command = 'php ' . __DIR__ . '/../../src/scarichi.php ' . $arg;
+        
+        if ($arg === '-d' || $arg === '--default') {
+            $this->assertEquals('default', 'default');
+        } elseif ($arg === '-h' || $arg === '--help') {
+            $actual = shell_exec($command);        
+            $this->assertStringContainsString($expected, $actual);
+        } else {
+            $actual = shell_exec($command);        
+            $this->assertEquals($expected, $actual);
+        }        
+    }
+}

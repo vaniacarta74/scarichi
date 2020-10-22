@@ -12,7 +12,7 @@
 
     <testsuites>
         <testsuite name="Project Test Suite">
-            <directory>./Unit</directory>
+            <directory>./Unit</directory>            
         </testsuite>
     </testsuites>
 
@@ -21,10 +21,17 @@
             <directory suffix=".php">../src/</directory>
             <exclude>
                 <file>../src/index.php</file>
+                <file>../src/scarichi.php</file>
                 <file>../src/config/config.php</file>
             </exclude>
         </whitelist>
     </filter>
+    
+    <groups>
+        <exclude>
+            <group>main</group>
+        </exclude>    
+    </groups>
 
     <php>
         <env name="APP_ENV" value="testing"/>
