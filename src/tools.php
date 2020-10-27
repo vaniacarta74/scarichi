@@ -332,8 +332,7 @@ function addMedia(array $dati, string $nomeCampo) : array
         foreach ($dati as $record => $campi) {
             if (!array_key_exists($nomeCampo, $campi)) {
                 throw new \Exception('Campo inesistente. Impossibile eseguirne la media');
-            }
-            
+            }            
             foreach ($campi as $campo => $valore) {
                 $medie[$record][$campo] = $valore;
 
@@ -362,16 +361,13 @@ function addDelta(array $dati, string $nomeCampo) : array
         foreach ($dati as $record => $campi) {
             if (!array_key_exists($nomeCampo, $campi)) {
                 throw new \Exception('Campo inesistente. Impossibile calcolare il delta temporale');
-            }
-            
+            }            
             foreach ($campi as $campo => $valore) {
                 $delta[$record][$campo] = $valore;
-
                 if ($campo === $nomeCampo) {
                     if (!is_a($valore, 'DateTime')) {
                         throw new \Exception('Per calcolare il delta temporale è neccessario che gli elementi del campo scelto siano del tipo \'DateTime\'');
-                    }
-                    
+                    }                    
                     if ($record === 0) {
                         $deltaT = 0;
                     } else {
@@ -394,21 +390,19 @@ function addDelta(array $dati, string $nomeCampo) : array
 function initVolumi(array $variabili, array $dati) : array
 {
     try {
-        if (count($dati) === 0) {
-            throw new \Exception('Nessun dato presente per le date selezionate');
-        }
-        
         $volumi = [];
         foreach ($dati as $record => $campi) {
-            $volumi[$record]['variabile'] = $variabili['id_variabile'];
-
-            foreach ($campi as $campo => $valore) {
-                if ($campo === 'data_e_ora') {
-                    $volumi[$record][$campo] = $valore;
+            if (array_key_exists('id_variabile', $variabili)) {
+                $volumi[$record]['variabile'] = $variabili['id_variabile'];
+                foreach ($campi as $campo => $valore) {
+                    if ($campo === 'data_e_ora') {
+                        $volumi[$record][$campo] = $valore;
+                    }
                 }
+                $volumi[$record]['tipo_dato'] = 1;
+            } else {
+                throw new \Exception('Problemi con le chiavi dell\'array variabili');
             }
-
-            $volumi[$record]['tipo_dato'] = 1;
         }
         return $volumi;
     } catch (\Throwable $e) {
@@ -463,7 +457,11 @@ function addAltezza(array $dati, array $formule) : array
                 foreach ($campi as $campo => $valore) {
                     $altezze[$record][$campo] = $valore;
                     if ($campo === $nomeCampo) {
-                        $altezze[$record]['altezza'] = $dati[$record][$campo] - $quota;
+                        if ($dati[$record][$campo] != NODATA) {
+                            $altezze[$record]['altezza'] = $dati[$record][$campo] - $quota;
+                        } else {
+                            $altezze[$record]['altezza'] = NODATA;
+                        }
                     }
                 }
             } else {
@@ -476,10 +474,14 @@ function addAltezza(array $dati, array $formule) : array
                         $livelloValle = $dati[$record][$campo];
                     }
                 }
-                if ($livelloValle > $quota) {
-                    $altezze[$record]['altezza'] = $livelloMonte - $livelloValle;
+                if ($livelloMonte != NODATA && $livelloValle != NODATA) { 
+                    if ($livelloValle > $quota) {
+                        $altezze[$record]['altezza'] = $livelloMonte - $livelloValle;
+                    } else {
+                        $altezze[$record]['altezza'] = $livelloMonte - $quota;
+                    }
                 } else {
-                    $altezze[$record]['altezza'] = $livelloMonte - $quota;
+                    $altezze[$record]['altezza'] = NODATA;
                 }
             }
         }
@@ -500,15 +502,23 @@ function addPortata(array $dati, array $formule) : array
         $nomi_campo = ['livello', 'altezza', 'manovra'];
         $portate = [];
         foreach ($dati as $record => $campi) {
+            $noData = false;
             $parametri = [];
             foreach ($campi as $campo => $valore) {
-                $portate[$record][$campo] = $valore;
-                
+                $portate[$record][$campo] = $valore;                
                 if (in_array($campo, $nomi_campo)) {
-                    $parametri[$campo] = $dati[$record][$campo];
+                    if ($valore != NODATA) {
+                        $parametri[$campo] = $valore;
+                    } else {
+                        $noData = true;
+                    }
                 }
             }
-            $portate[$record]['portata'] = calcolaPortata($formule, $parametri);
+            if ($noData) {
+                $portate[$record]['portata'] = NODATA;
+            } else {
+                $portate[$record]['portata'] = calcolaPortata($formule, $parametri);
+            }
         }
         return $portate;
     } catch (\Throwable $e) {
@@ -525,12 +535,15 @@ function addVolume(array $dati) : array
         foreach ($dati as $record => $campi) {
             if (!array_key_exists('portata', $campi) || !array_key_exists('delta', $campi)) {
                 throw new \Exception('Dati di portata e delta t assenti impossibile calcolare volume scaricato');
-            }
-            
+            }            
             foreach ($campi as $campo => $valore) {
                 $volumi[$record][$campo] = $valore;
             }
-            $volumi[$record]['volume'] = $volumi[$record]['portata'] * $volumi[$record]['delta'];
+            if ($volumi[$record]['portata'] != NODATA) {
+                $volumi[$record]['volume'] = $volumi[$record]['portata'] * $volumi[$record]['delta'];
+            } else {
+                $volumi[$record]['volume'] = NODATA;
+            }
         }
         return $volumi;
     } catch (\Throwable $e) {
@@ -608,8 +621,7 @@ function format(array $dati, string $field) : array
         foreach ($dati as $record => $campi) {
             if (!array_key_exists($field, $campi)) {
                 throw new \Exception('Campo inesistente. Impossibile assegnarlo a \'valore\'');
-            }
-            
+            }            
             foreach ($campi as $campo => $valore) {
                 if (in_array($campo, $nomiCampi)) {
                     foreach ($nomiCampi as $nuovo => $vecchio) {
@@ -893,9 +905,9 @@ function printPart(array $printableData, int $i, bool $filtered, string $field) 
 }
 
 
-function filter(array $dati, bool $full) : array
+function filter(array $dati, bool $full, int $filterVal) : array
 {
-    try {
+    try {        
         if ($full) {
             $filteredData = $dati;
         } else {
@@ -903,11 +915,10 @@ function filter(array $dati, bool $full) : array
             foreach ($dati as $record => $campi) {
                 if (!array_key_exists('valore', $campi)) {
                     throw new \Exception('Campo "valore" su cui eseguire il filtro non presente');
-                }
-                
+                }                
                 $flag = true;
                 foreach ($campi as $campo => $valore) {
-                    if (($campo === 'valore') && ($valore === '0')) {
+                    if ($campo === 'valore' && $valore === strval($filterVal)) {
                         $flag = false;
                     }
                 }
@@ -922,7 +933,8 @@ function filter(array $dati, bool $full) : array
         throw $e;
     }
 }
-    
+
+
 function response(array $request, bool $printed) : string
 {
     try {
@@ -965,7 +977,7 @@ function calcolaPortata(array $formule, array $parametri) : float
                     $portata = 0;
                 }
                 break;
-            case 'portata scarico a sezione rettangolare con velocita e apertura percentuale':
+            case 'portata scarico a sezione rettangolare con velocita e apertura percentuale':                
                 $altezza_idrostatica = $parametri['altezza'];
                 $apertura_paratoia = $parametri['manovra'];
                 $mi = $formule['mi'];
@@ -977,14 +989,14 @@ function calcolaPortata(array $formule, array $parametri) : float
                     $portata = $mi * $larghezza_soglia * $apertura_paratoia * sqrt(2 * $g) * (sqrt(($altezza_idrostatica + $altezza_cinetica) ** 3) - sqrt($altezza_cinetica ** 3));
                 } else {
                     $portata = 0;
-                }
+                }                
                 break;
             case 'portata scarico a sezione rettangolare ad apertura lineare':
                 $altezza_idrostatica = $parametri['altezza'];
                 $apertura_paratoia = $parametri['manovra'];
                 $mi = $formule['mi'];
                 $larghezza_soglia = $formule['larghezza'];
-                
+
                 if ($altezza_idrostatica > 0) {
                     $portata = $mi * $larghezza_soglia * $apertura_paratoia * sqrt(2 * $g * $altezza_idrostatica);
                 } else {
@@ -997,7 +1009,7 @@ function calcolaPortata(array $formule, array $parametri) : float
                 $mi = $formule['mi'];
                 $raggio = $formule['raggio'];
                 $area_sezione = pi() * $raggio ** 2;
-                
+
                 if ($altezza_idrostatica > 0) {
                     $portata = $mi * $area_sezione * $apertura_paratoia * sqrt(2 * $g * $altezza_idrostatica);
                 } else {
@@ -1015,12 +1027,12 @@ function calcolaPortata(array $formule, array $parametri) : float
                 $profondita_ventola = $altezza_max / sin($rad_max);
                 $apertura_ventola = $altezza_max - $profondita_ventola * sin($rad_max - $rad_ventola);
                 $tirante = $altezza_idrostatica + $apertura_ventola;
-                
+
                 if ($tirante > 0) {
                     $portata = $mi * $larghezza * $tirante * sqrt(2 * $g * $tirante);
                 } else {
                     $portata = 0;
-                }
+                }   
                 break;
             case 'portata saracinesca':
                 $altezza_idrostatica = $parametri['altezza'];
@@ -1031,7 +1043,7 @@ function calcolaPortata(array $formule, array $parametri) : float
                 $rad_angolo = 2 * acos($k);
                 $area_scarico = ($rad_angolo - sin($rad_angolo)) * ($raggio ** 2) / 2;
                 $tirante = $altezza_idrostatica - ($altezza_saracinesca / 2);
-                
+
                 if ($tirante > 0) {
                     $portata = $mi * $area_scarico * sqrt(2 * $g * $tirante);
                 } else {
@@ -1042,21 +1054,21 @@ function calcolaPortata(array $formule, array $parametri) : float
                 $livello_monte = $parametri['livello'];
                 $altezza_idrostatica = $parametri['altezza'];
                 $altezza_saracinesca = $parametri['manovra'];
-                
+
                 $scabrosita = $formule['scabrosita'];
                 $lunghezza_galleria = $formule['lunghezza'];
                 $raggio = $formule['raggio'];
                 $quota = $formule['quota'];
                 $angolo_limite = $formule['angolo'];
                 $quota_limite = $formule['limite'];
-                
+
                 $R = $raggio / 2;
                 $chi = 87 / (1 + $scabrosita / sqrt($R));
                 $J = $altezza_idrostatica / $lunghezza_galleria;
                 $area = pi() * $raggio ** 2;
-                
+
                 $portata_base = $chi * $area * sqrt($R * $J);
-                
+
                 $rad_limite = $angolo_limite / 180 * pi();
                 $altezza_saracinesca_limite = $raggio * (1 - cos($rad_limite / 2));
                 $area_limite = ($rad_limite - sin($rad_limite)) * ($raggio ** 2) / 2;
@@ -1064,11 +1076,11 @@ function calcolaPortata(array $formule, array $parametri) : float
                 $R_limite = $area_limite / $arco_limite;
                 $chi_limite = 87 / (1 + $scabrosita / sqrt($R_limite));
                 $J_limite = ($quota_limite - $quota) / $lunghezza_galleria;
-                
+
                 $portata_limite = $chi_limite * $area_limite * sqrt($R_limite * $J_limite);
-                
+
                 $energia_limite = $altezza_saracinesca_limite + (($portata_limite ** 2) / (2 * $g * $area_limite ** 2));
-                                
+
                 if ($livello_monte > $quota_limite) {
                     $portata = $portata_base * $altezza_saracinesca / $energia_limite;
                 } else {
@@ -1114,14 +1126,14 @@ function uniformaCategorie(array $dati_acquisiti) : array
 
 function integraDate(array $targets, array $checkers) : array
 {
-    try {
-        if (count($targets) === 0) {
-            throw new \Exception('Nessun dato presente nel target, modificare date');
-        }
+    try {        
         foreach ($checkers as $categoria => $dati) {
-            foreach ($dati as $j => $dato) {
-                $iMax = count($targets) - 1;
-                
+            foreach ($dati as $dato) {
+                if (count($dato) === 0) {
+                    throw new \Exception('Nessun dato presente nel checker');
+                }
+                $targets = insertNoData($targets, $dato);                
+                $iMax = count($targets) - 1;               
                 $prototype = [
                     $iMax => [
                         'variabile' => $targets[$iMax]['variabile'],
@@ -1131,7 +1143,6 @@ function integraDate(array $targets, array $checkers) : array
                         'tipo_dato' => $targets[$iMax]['tipo_dato']
                     ]
                 ];
-                
                 if ($dato['data_e_ora'] < $targets[0]['data_e_ora']) {
                     array_splice($targets, 0, 0, $prototype);
                 } elseif ($dato['data_e_ora'] > $targets[$iMax]['data_e_ora']) {
@@ -1152,22 +1163,51 @@ function integraDate(array $targets, array $checkers) : array
         throw $e;
     }
 }
-    
+
+
+function insertNoData(array $targets, array $dato) : array
+{
+    try {
+        if (count($dato) === 0) {
+            throw new \Exception('Nessun dato di riferimento presente nel checker');
+        }
+        if (count($targets) === 0) {        
+            $prototype = [
+                [
+                    'variabile' => NODATA,
+                    'valore' => NODATA,
+                    'unita_misura' => NODATA,
+                    'data_e_ora' => $dato['data_e_ora'],
+                    'tipo_dato' => NODATA
+                ]
+            ];
+            $targets = $prototype;
+        }
+        return $targets;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
     
 function completaDati(array $dati_uniformi) : array
 {
     try {
         if (count($dati_uniformi) === 0) {
             throw new \Exception('Nessuna categoria definita');
-        }
-        
+        }        
         $completi = [];
-        foreach ($dati_uniformi as $categoria => $dati) {
-            $completi[$categoria] = riempiCode($dati);
-            if ($categoria === 'manovra') {
-                $completi[$categoria] = riempiNull($completi[$categoria]);
+        foreach ($dati_uniformi as $categoria => $dati) {            
+            if (count($dati)) {
+                $completi[$categoria] = riempiCode($dati);
+                if ($categoria === 'manovra') {
+                    $completi[$categoria] = riempiNull($completi[$categoria]);
+                } else {
+                    $completi[$categoria] = interpolaNull($completi[$categoria]);
+                }
             } else {
-                $completi[$categoria] = interpolaNull($completi[$categoria]);
+                $completi[$categoria] = [];
             }
         }
         return $completi;
@@ -1258,8 +1298,7 @@ function trovaCapi(array $dati) : array
 function riempiNull(array $dati) : array
 {
     try {
-        $pieni = [];
-        
+        $pieni = [];        
         foreach ($dati as $record => $campi) {
             foreach ($campi as $key => $valore) {
                 if ($key === 'valore') {
@@ -1271,6 +1310,7 @@ function riempiNull(array $dati) : array
                             $pieni[$record][$key] = $prev;
                         } else {
                             throw new \Exception('Nessun valore di riferimento trovato');
+                            //$pieni[$record][$key] = $valore;
                         }
                     }
                 } else {
@@ -1390,16 +1430,19 @@ function eraseDoubleDate(array $dati_acquisiti) : array
     try {
         if (count($dati_acquisiti) === 0) {
             throw new \Exception('Nessuna categoria definita');
-        }
-        
+        }        
         $erased = [];
         foreach ($dati_acquisiti as $categoria => $dati) {
-            $erased[$categoria][] = $dati[0];
-            $iMax = count($dati) - 1;
-            for ($i = 1; $i <= $iMax; $i++) {
-                if ($dati[$i]['data_e_ora'] != $dati[$i - 1]['data_e_ora']) {
-                    $erased[$categoria][] = $dati[$i];
+            if (count($dati) > 0) {
+                $erased[$categoria][] = $dati[0];
+                $iMax = count($dati) - 1;
+                for ($i = 1; $i <= $iMax; $i++) {
+                    if ($dati[$i]['data_e_ora'] != $dati[$i - 1]['data_e_ora']) {
+                        $erased[$categoria][] = $dati[$i];
+                    }
                 }
+            } else {
+                $erased[$categoria] = [];
             }
         }
         return $erased;
@@ -1796,7 +1839,7 @@ function formatParams(array $properties) : string
 function formatDefault(array $properties) : string
 {
     try {
-        if (!array_key_exists('default', $properties) || ($properties['default'] !== '' && !preg_match('/^[A-Z]+$/', $properties['default']))) {
+        if (!array_key_exists('default', $properties) || ($properties['default'] !== '' && !preg_match('/^((([0-9]{1,3})?[A-Z])|[A-Z]+)$/', $properties['default']))) {
             throw new \Exception('Proprieta "default" non definita o non definita correttamente');
         }
         if ($properties['default'] !== "") {
@@ -1817,7 +1860,7 @@ function formatPardef(array $properties) : string
     try {
         $params = formatParams($properties);
         $default = formatDefault($properties);
-        if ((!preg_match('/^[-][a-zA-Z]\s[-]{2}[a-z]{3,}$/', $params)) || ($default !== '' && !preg_match('/^[\[][=][A-Z]+[\]]$/', $default))) {
+        if ((!preg_match('/^[-][a-zA-Z]\s[-]{2}[a-z]{3,}$/', $params)) || ($default !== '' && !preg_match('/^[[][=]((([0-9]{1,3})?[A-Z])|[A-Z]+)[]]$/', $default))) {
             //@codeCoverageIgnoreStart
             throw new \Exception('Formato parametri di default errato');
             //@codeCoverageIgnoreEnd
@@ -1858,8 +1901,15 @@ function formatCostants(array $properties) : string
         if (!array_key_exists('options', $properties) || !array_key_exists('costants', $properties['options'])) {
             throw new \Exception('Proprieta "costants" non definita');
         }
-        if (count($properties['options']['costants']) > 0) {
-            $formatted = implode('|', $properties['options']['costants']);                    
+        $costants = $properties['options']['costants'];
+        $limits = $properties['options']['limits'];
+        if (count($costants) > 0 && count($limits) > 0) {
+            foreach ($costants as $key => $costant) {
+                $mergeds[] = '[1-' . $limits[$key] . ']' . $costant;
+            }
+            $formatted = implode('|', $mergeds);
+        } elseif (count($costants) > 0) {
+            $formatted = implode('|', $costants);                    
         } else {
             $formatted = '';
         }                    
@@ -1876,7 +1926,7 @@ function formatOptions(array $properties) : string
     try {
         $variables = formatVariables($properties);
         $costants = formatCostants($properties);
-        if (($variables !== '' && !preg_match('/^[<](\w)+[>]([,][<](\w)+[>])*$/', $variables)) || ($costants !== '' && !preg_match('/^([A-Z])+([|]([A-Z])+)*$/', $costants))) {
+        if (($variables !== '' && !preg_match('/^[<](\w)+[>]([,][<](\w)+[>])*$/', $variables)) || ($costants !== '' && !preg_match('/^([[][1][-][0-9]{1,3}[]])?([A-Z])+([|]([[][1][-][0-9]{1,3}[]])?([A-Z])+)*$/', $costants))) {
             throw new \Exception('Formato opzioni errato');
         }
         if ($variables !== '' && $costants !== '') {
@@ -2185,10 +2235,14 @@ function checkCliDatefrom(string $value) : array
 {
     try {
         $values = [];
-        try {
-            $values[] = formatDate($value);
-        } catch (\Throwable $e){
-            Utility::errorHandler($e, DEBUG_LEVEL, true);
+        if (preg_match('/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/', $value, $matches)) {
+            try {
+                $values[] = formatDate($matches[0]);
+            } catch (\Throwable $e){
+                Utility::errorHandler($e, DEBUG_LEVEL, true);
+            }
+        } else {
+            $values[] = $value;
         }
         if (count($values) === 0) {
             throw new \Exception('Valori parametro "datefrom" non ammissibili.');
@@ -2380,15 +2434,17 @@ function fillDatefrom(array $parameters, array $values, array $postVars) : array
             throw new \Exception('Array parametri di configurazione vuoto');
         }
         $rawValues = $values['datefrom'];
-        if ($rawValues[0] === $parameters['datefrom']['default']) {
+        $costants = $parameters['datefrom']['options']['costants'];
+        $costant = substr($rawValues[0], -1);
+        if (in_array($costant, $costants)) {
             $dateto = $values['dateto'][0];
             if ($dateto === $parameters['dateto']['default']) {
                 $dateTimeTo = new \DateTime();
             } else {
                 $dateTimeTo = new \DateTime($dateto);
             }
-            $yearInt = new \DateInterval('P1Y');                        
-            $dateTimeFrom = $dateTimeTo->sub($yearInt);
+            $interval = new \DateInterval('P' . $rawValues[0]);                        
+            $dateTimeFrom = $dateTimeTo->sub($interval);
         } else {
             $dateTimeFrom = new \DateTime($rawValues[0]);                        
         }
@@ -2509,8 +2565,8 @@ function goCurl(array $postParams, string $url) : string
             curl_setopt($ch, CURLOPT_HEADER, false);
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, TIMEOUT);
+            curl_setopt($ch, CURLOPT_TIMEOUT, TIMEOUT);
 
             $report = curl_exec($ch);
 

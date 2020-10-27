@@ -96,6 +96,7 @@ use function vaniacarta74\Scarichi\fillField as fillField;
 use function vaniacarta74\Scarichi\fillFull as fillFull;
 use function vaniacarta74\Scarichi\setPostParameters as setPostParameters;
 use function vaniacarta74\Scarichi\goCurl as goCurl;
+use function vaniacarta74\Scarichi\insertNoData as insertNoData;
 
 
 class ToolsTest extends TestCase
@@ -2203,18 +2204,50 @@ class ToolsTest extends TestCase
     }
     
     /**
+     * @group depends
+     * covers initVolumi()
+     */
+    public function testInitVolumiNoDataEquals() : void
+    {
+        $variabili = [
+            'id_variabile' => 30030,
+            'impianto' => 75,
+            'unita_misura' => 'mc'
+        ];        
+        $dati = [];        
+        $expected = [];
+        
+        $actual = initVolumi($variabili, $dati);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
      * @group ex
      * covers initVolumi()
      */
     public function testInitVolumiException() : array
     {
         $variabili = [
-            'id_variabile' => 30030,
+            'variabile' => 30030,
             'impianto' => 75,
             'unita_misura' => 'mc'
         ];
         
-        $dati = [];
+        $dati = [
+            '0' => [
+                'variabile' => 165071,
+                'valore' => 266.206,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'tipo_dato' => 2
+            ],
+            '1' => [
+                'variabile' => 165071,
+                'valore' => 266.140,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'tipo_dato' => 2
+            ]
+        ];
                 
         $this->expectException(\Exception::class);
         
@@ -2224,10 +2257,22 @@ class ToolsTest extends TestCase
     /**
      * @group depends
      * covers addCategoria()
-     * @depends testInitVolumiEquals
      */
-    public function testAddCategoriaEquals(array $volumi) : array
+    public function testAddCategoriaEquals() : array
     {
+        $volumi = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'tipo_dato' => 1
+            ],
+            '1' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'tipo_dato' => 1
+            ]
+        ];
+        
         $dati = [
             'livello' => [
                 '0' => [
@@ -2283,10 +2328,206 @@ class ToolsTest extends TestCase
     /**
      * @group depends
      * covers addCategoria()
-     * @depends testInitVolumiEquals
      */
-    public function testAddCategoriaException(array $volumi) : array
+    public function testAddCategoriaManovraEquals() : void
     {
+        $volumi = [
+            '0' => [
+                'variabile' => 30050,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media livello' => 266.206,
+                'altezza' => 0.026,
+                'tipo_dato' => 1
+            ],
+            '1' => [
+                'variabile' => 30050,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media livello' => 266.173,
+                'altezza' => -0.007,
+                'tipo_dato' => 1
+            ]
+        ];
+        
+        $dati = [
+            'manovra' => [
+                '0' => [
+                    'variabile' => 39999,
+                    'valore' => 100,
+                    'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                    'unita_misura' => '%',
+                    'tipo_dato' => 1
+                ],
+                '1' => [
+                    'variabile' => 39999,
+                    'valore' => 100,
+                    'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                    'unita_misura' => '%',
+                    'tipo_dato' => 1
+                ]
+            ]
+        ];
+        
+        $categoria = 'manovra';
+        
+        $expected = [
+            '0' => [
+                'variabile' => 30050,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media livello' => 266.206,
+                'altezza' => 0.026,
+                'tipo_dato' => 1,
+                'manovra' => 1
+            ],
+            '1' => [
+                'variabile' => 30050,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media livello' => 266.173,
+                'altezza' => -0.007,
+                'tipo_dato' => 1,
+                'manovra' => 1
+            ]
+        ];
+        
+        $actual = addCategoria($volumi, $dati, $categoria);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($expected[$row][$key], $value);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($value, $actual[$row][$key]);
+            }
+        }
+    }
+    
+    /**
+     * @group depends
+     * covers addCategoria()
+     */
+    public function testAddCategoriaNoDataManovraEquals() : void
+    {
+        $volumi = [
+            '0' => [
+                'variabile' => 30050,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media livello' => 266.206,
+                'altezza' => 0.026,
+                'tipo_dato' => 1
+            ],
+            '1' => [
+                'variabile' => 30050,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media livello' => 266.173,
+                'altezza' => -0.007,
+                'tipo_dato' => 1
+            ]
+        ];
+        
+        $dati = [
+            'manovra' => [
+                '0' => [
+                    'variabile' => NODATA,
+                    'valore' => NODATA,
+                    'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                    'unita_misura' => NODATA,
+                    'tipo_dato' => NODATA
+                ],
+                '1' => [
+                    'variabile' => NODATA,
+                    'valore' => NODATA,
+                    'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                    'unita_misura' => NODATA,
+                    'tipo_dato' => NODATA
+                ]
+            ]
+        ];
+        
+        $categoria = 'manovra';
+        
+        $expected = [
+            '0' => [
+                'variabile' => 30050,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media livello' => 266.206,
+                'altezza' => 0.026,
+                'tipo_dato' => 1,
+                'manovra' => NODATA
+            ],
+            '1' => [
+                'variabile' => 30050,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media livello' => 266.173,
+                'altezza' => -0.007,
+                'tipo_dato' => 1,
+                'manovra' => NODATA
+            ]
+        ];
+        
+        $actual = addCategoria($volumi, $dati, $categoria);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($expected[$row][$key], $value);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($value, $actual[$row][$key]);
+            }
+        }
+    }
+    
+    /**
+     * @group depends
+     * covers addCategoria()
+     */
+    public function testAddCategoriaNoCategoryEquals() : void
+    {
+        $volumi = [];        
+        $dati = [
+            'livello' => [],
+            'livello monte' => [],
+            'manovra' => [],
+        ];        
+        $categoria = 'manovra';        
+        $expected = [];
+        
+        $actual = addCategoria($volumi, $dati, $categoria);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group depends
+     * covers addCategoria()
+     */
+    public function testAddCategoriaArrayDifferentException() : array
+    {
+        $volumi = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'tipo_dato' => 1
+            ],
+            '1' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'tipo_dato' => 1
+            ]
+        ];
+        
         $dati = [
             'livello' => [
                 '0' => [
@@ -2323,10 +2564,22 @@ class ToolsTest extends TestCase
     /**
      * @group depends
      * covers addCategoria()
-     * @depends testInitVolumiEquals
      */
-    public function testAddCategoriaException1(array $volumi) : void
+    public function testAddCategoriaDateDifferentException() : void
     {
+        $volumi = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'tipo_dato' => 1
+            ],
+            '1' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'tipo_dato' => 1
+            ]
+        ];
+        
         $dati = [
             'livello' => [
                 '0' => [
@@ -2398,6 +2651,72 @@ class ToolsTest extends TestCase
     /**
      * @group depends
      * covers addMedia()
+     */
+    public function testAddMediaNoCategoryEquals() : void
+    {
+        $volumi = [];
+        $campo = 'livello';        
+        $expected = [];
+        
+        $actual = addMedia($volumi, $campo);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group depends
+     * covers addMedia()
+     */
+    public function testAddMediaNoLevelEquals() : void
+    {
+        $volumi = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media livello' => 265,
+                'livello valle' => NODATA,
+                'tipo_dato' => 1
+            ],
+            '1' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media livello' => 265,
+                'livello valle' => NODATA,
+                'tipo_dato' => 1
+            ]
+        ];        
+        $campo = 'livello valle';        
+        $expected = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media livello' => 265,
+                'livello valle' => NODATA,
+                'media livello valle' => NODATA,
+                'tipo_dato' => 1
+            ],
+            '1' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media livello' => 265,
+                'livello valle' => NODATA,
+                'media livello valle' => NODATA,
+                'tipo_dato' => 1
+            ]
+        ];
+        
+        $actual = addMedia($volumi, $campo);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group depends
+     * covers addMedia()
      * @depends testAddCategoriaEquals
      */
     public function testAddMediaException(array $volumi) : void
@@ -2458,6 +2777,72 @@ class ToolsTest extends TestCase
             }
         }
         return $actual;
+    }
+    
+    /**
+     * @group depends
+     * covers addAltezza()
+     */
+    public function testAddAltezzaNo1LevelEquals() : void
+    {
+        $volumi = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => NODATA,
+                'media livello' => NODATA,
+                'tipo_dato' => 1
+            ],
+            '1' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => NODATA,
+                'media livello' => NODATA,
+                'tipo_dato' => 1
+            ]
+        ];
+        
+        $specifiche = [
+            'tipo_formula' => 'portata sfiorante',
+            'scarico' => 1,
+            'mi' => 0.47,
+            'larghezza' => 40.5,
+            'quota' => 266.180,
+            'limite' => 942.67
+        ];
+        
+        $expected = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => NODATA,
+                'media livello' => NODATA,
+                'altezza' => NODATA,
+                'tipo_dato' => 1
+            ],
+            '1' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => NODATA,
+                'media livello' => NODATA,
+                'altezza' => NODATA,
+                'tipo_dato' => 1
+            ]
+        ];
+        
+        $actual = addAltezza($volumi, $specifiche);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($expected[$row][$key], $value);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($value, $actual[$row][$key]);
+            }
+        }
     }
     
     /**
@@ -2533,6 +2918,103 @@ class ToolsTest extends TestCase
             }
         }
         return $actual;
+    }
+    
+    /**
+     * @group depends
+     * covers addAltezza()
+     */
+    public function testAddAltezzaNo2LevelEquals() : array
+    {
+        $volumi = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media livello' => 265,
+                'livello valle' => NODATA,
+                'media livello valle' => NODATA,
+                'tipo_dato' => 1
+            ],
+            '1' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media livello' => 265,
+                'livello valle' => NODATA,
+                'media livello valle' => NODATA,
+                'tipo_dato' => 1
+            ]
+        ];
+        
+        $specifiche = [
+            'tipo_formula' => 'portata galleria',
+            'scarico' => 1,
+            'mi' => 0.47,
+            'larghezza' => 40.5,
+            'quota' => 260,
+            'limite' => 942.67
+        ];
+        
+        $expected = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media livello' => 265,
+                'livello valle' => NODATA,
+                'media livello valle' => NODATA,
+                'altezza' => NODATA,
+                'tipo_dato' => 1
+            ],
+            '1' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media livello' => 265,
+                'livello valle' => NODATA,
+                'media livello valle' => NODATA,
+                'altezza' => NODATA,
+                'tipo_dato' => 1
+            ]
+        ];
+        
+        $actual = addAltezza($volumi, $specifiche);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($expected[$row][$key], $value);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($value, $actual[$row][$key]);
+            }
+        }
+        return $actual;
+    }
+    
+    /**
+     * @group depends
+     * covers addAltezza()
+     */
+    public function testAddAltezzaNoCategoryEquals() : void
+    {
+        $volumi = [];        
+        $specifiche = [
+            'tipo_formula' => 'portata galleria',
+            'scarico' => 1,
+            'mi' => 0.47,
+            'larghezza' => 40.5,
+            'quota' => 260,
+            'limite' => 942.67
+        ];        
+        $expected = [];
+        
+        $actual = addAltezza($volumi, $specifiche);
+        
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -2806,6 +3288,181 @@ class ToolsTest extends TestCase
     }
     
     /**
+     * covers addPortata().
+     * @group depends
+     */
+    public function testAddPortataNoDataEquals() : void
+    {
+        $volumi = [
+            '0' => [
+                'variabile' => 30050,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => NODATA,
+                'media livello' => NODATA,
+                'altezza' => NODATA,
+                'tipo_dato' => 1,
+                'manovra' => NODATA
+            ],
+            '1' => [
+                'variabile' => 30050,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => NODATA,
+                'media livello' => NODATA,
+                'altezza' => NODATA,
+                'tipo_dato' => 1,
+                'manovra' => NODATA
+            ]
+        ];
+        
+        $specifiche = [
+            'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
+            'scarico' => 22,
+            'mi' => 0.47,
+            'larghezza' => 158.61,
+            'quota' => 16.05,
+            'limite' => 2000,
+            'velocita' => 0.8
+        ];
+        
+        $expected = [
+            '0' => [
+                'variabile' => 30050,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => NODATA,
+                'media livello' => NODATA,
+                'altezza' => NODATA,
+                'tipo_dato' => 1,
+                'manovra' => NODATA,
+                'portata' => NODATA
+            ],
+            '1' => [
+                'variabile' => 30050,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => NODATA,
+                'media livello' => NODATA,
+                'altezza' => NODATA,
+                'tipo_dato' => 1,
+                'manovra' => NODATA,
+                'portata' => NODATA
+            ]
+        ];
+        
+        $actual = addPortata($volumi, $specifiche);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+            }
+        }
+    }
+    
+    /**
+     * covers addPortata().
+     * @group depends
+     */
+    public function testAddPortataNoDataManovraEquals() : void
+    {
+        $volumi = [
+            '0' => [
+                'variabile' => 30051,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media livello' => 266.206,
+                'altezza' => 0.026,
+                'tipo_dato' => 1,
+                'manovra' => NODATA
+            ],
+            '1' => [
+                'variabile' => 30051,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media livello' => 266.173,
+                'altezza' => -0.007,
+                'tipo_dato' => 1,
+                'manovra' => NODATA
+            ]
+        ];
+        
+        $specifiche = [
+            'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
+            'scarico' => 22,
+            'mi' => 0.47,
+            'larghezza' => 158.61,
+            'quota' => 16.05,
+            'limite' => 2000,
+            'velocita' => 0.8
+        ];
+        
+        $expected = [
+            '0' => [
+                'variabile' => 30051,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media livello' => 266.206,
+                'altezza' => 0.026,
+                'tipo_dato' => 1,
+                'manovra' => NODATA,
+                'portata' => NODATA
+            ],
+            '1' => [
+                'variabile' => 30051,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media livello' => 266.173,
+                'altezza' => -0.007,
+                'tipo_dato' => 1,
+                'manovra' => NODATA,
+                'portata' => NODATA
+            ]
+        ];
+        
+        $actual = addPortata($volumi, $specifiche);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+            }
+        }
+    }
+    
+    /**
+     * covers addPortata().
+     * @group depends
+     */
+    public function testAddPortataNoCategoryEquals() : void
+    {
+        $volumi = [];
+        
+        $specifiche = [
+            'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
+            'scarico' => 22,
+            'mi' => 0.47,
+            'larghezza' => 158.61,
+            'quota' => 16.05,
+            'limite' => 2000,
+            'velocita' => 0.8
+        ];
+        
+        $expected = [];
+        
+        $actual = addPortata($volumi, $specifiche);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
      * @group depends
      * covers addPortata()
      * @depends testAddAltezzaEquals
@@ -2865,6 +3522,91 @@ class ToolsTest extends TestCase
             }
         }
         return $actual;
+    }
+    
+    /**
+     * @group depends
+     * covers addDelta()
+     * @depends testAddPortataEqualsWithDelta
+     */
+    public function testAddDeltaNoDataEquals() : void
+    {
+        $volumi = [
+            '0' => [
+                'variabile' => 30051,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media livello' => 266.206,
+                'altezza' => 0.026,
+                'tipo_dato' => 1,
+                'manovra' => NODATA,
+                'portata' => NODATA
+            ],
+            '1' => [
+                'variabile' => 30051,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media livello' => 266.173,
+                'altezza' => -0.007,
+                'tipo_dato' => 1,
+                'manovra' => NODATA,
+                'portata' => NODATA
+            ]
+        ];
+        $campo = 'data_e_ora';        
+        $expected = [
+            '0' => [
+                'variabile' => 30051,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media livello' => 266.206,
+                'altezza' => 0.026,
+                'tipo_dato' => 1,
+                'manovra' => NODATA,
+                'portata' => NODATA,
+                'delta' => 0
+            ],
+            '1' => [
+                'variabile' => 30051,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media livello' => 266.173,
+                'altezza' => -0.007,
+                'tipo_dato' => 1,
+                'manovra' => NODATA,
+                'portata' => NODATA,
+                'delta' => 900
+            ]
+        ];
+        
+        $actual = addDelta($volumi, $campo);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+            }
+        }
+    }
+    
+    /**
+     * @group depends
+     * covers addDelta()
+     */
+    public function testAddDeltaNoCategoryEquals() : void
+    {
+        $volumi = [];
+        $campo = 'data_e_ora';        
+        $expected = [];
+        
+        $actual = addDelta($volumi, $campo);
+        
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -2941,6 +3683,93 @@ class ToolsTest extends TestCase
             }
         }
         return $actual;
+    }
+    
+    /**
+     * @group depends
+     * covers addVolume()
+     */
+    public function testAddVolumeNoDataEquals() : void
+    {
+        $volumi = [
+            '0' => [
+                'variabile' => 30051,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media livello' => 266.206,
+                'altezza' => 0.026,
+                'tipo_dato' => 1,
+                'manovra' => NODATA,
+                'portata' => NODATA,
+                'delta' => 0
+            ],
+            '1' => [
+                'variabile' => 30051,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media livello' => 266.173,
+                'altezza' => -0.007,
+                'tipo_dato' => 1,
+                'manovra' => NODATA,
+                'portata' => NODATA,
+                'delta' => 900
+            ]
+        ];
+        
+        $expected = [
+            '0' => [
+                'variabile' => 30051,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media livello' => 266.206,
+                'altezza' => 0.026,
+                'tipo_dato' => 1,
+                'manovra' => NODATA,
+                'portata' => NODATA,
+                'delta' => 0,
+                'volume' => NODATA
+            ],
+            '1' => [
+                'variabile' => 30051,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media livello' => 266.173,
+                'altezza' => -0.007,
+                'tipo_dato' => 1,
+                'manovra' => NODATA,
+                'portata' => NODATA,
+                'delta' => 900,
+                'volume' => NODATA
+            ]
+        ];
+        
+        $actual = addVolume($volumi);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+            }
+        }
+    }
+    
+    /**
+     * @group depends
+     * covers addVolume()
+     */
+    public function testAddVolumeNoCategoryEquals() : void
+    {
+        $volumi = [];
+        $expected = [];
+        
+        $actual = addVolume($volumi);
+        
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -3177,6 +4006,68 @@ class ToolsTest extends TestCase
         }
         return $actual;
     }
+    
+    /**
+     * @group depends
+     * covers format()
+     */
+    public function testFormatNoDataEquals() : array
+    {
+        $campo = 'portata';
+        
+        $volumi = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media' => 266.206,
+                'altezza' => 0.026,
+                'portata' => NODATA,
+                'delta' => 0,
+                'volume' => 0,
+                'tipo_dato' => 1
+            ]
+        ];
+        
+        $expected = [
+            '0' => [
+                'variabile' => '30030',
+                'valore' => NODATA,
+                'data_e_ora' => '02/01/2018 00:00:00',
+                'tipo_dato' => '1'
+            ]
+        ];
+        
+        $actual = format($volumi, $campo);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($expected[$row][$key], $value);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($value, $actual[$row][$key]);
+            }
+        }
+        return $actual;
+    }
+    
+    /**
+     * @group depends
+     * covers format()
+     */
+    public function testFormatNoCategoryEquals() : void
+    {
+        $campo = 'portata';        
+        $volumi = [];        
+        $expected = [];
+        
+        $actual = format($volumi, $campo);
+        
+        $this->assertEquals($expected, $actual);
+    }
         
     /**
      * @group depends
@@ -3200,6 +4091,7 @@ class ToolsTest extends TestCase
     public function testFilterEquals(array $volumi) : array
     {
         $full = true;
+        $filter = 0;
         
         $expected = [
             '0' => [
@@ -3216,7 +4108,7 @@ class ToolsTest extends TestCase
             ]
         ];
         
-        $actual = filter($volumi, $full);
+        $actual = filter($volumi, $full, $filter);
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
@@ -3235,11 +4127,59 @@ class ToolsTest extends TestCase
     /**
      * @group depends
      * covers filter()
+     */
+    public function testFilterNoDataEquals() : void
+    {
+        $volumi = [
+            '0' => [
+                'variabile' => '30030',
+                'valore' => NODATA,
+                'data_e_ora' => '02/01/2018 00:00:00',
+                'tipo_dato' => '1'
+            ],
+            '1' => [
+                'variabile' => '30030',
+                'valore' => '0',
+                'data_e_ora' => '02/01/2018 00:15:00',
+                'tipo_dato' => '1'
+            ]
+        ];
+        $full = false;
+        $filter = NODATA;
+        
+        $expected = [
+            '1' => [
+                'variabile' => '30030',
+                'valore' => '0',
+                'data_e_ora' => '02/01/2018 00:15:00',
+                'tipo_dato' => '1'
+            ]
+        ];
+        
+        $actual = filter($volumi, $full, $filter);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($expected[$row][$key], $value);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($value, $actual[$row][$key]);
+            }
+        }
+    }
+    
+    /**
+     * @group depends
+     * covers filter()
      * @depends testFormatEquals2
      */
     public function testFilterEquals1(array $volumi) : void
     {
         $full = false;
+        $filter = 0;
         
         $expected = [
             '1' => [
@@ -3250,7 +4190,7 @@ class ToolsTest extends TestCase
             ]
         ];
         
-        $actual = filter($volumi, $full);
+        $actual = filter($volumi, $full, $filter);
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
@@ -3273,8 +4213,9 @@ class ToolsTest extends TestCase
     public function testFilterEmpty(array $volumi) : void
     {
         $full = false;
+        $filter = 0;
         
-        $actual = filter($volumi, $full);
+        $actual = filter($volumi, $full, $filter);
         
         $this->assertEmpty($actual);
     }
@@ -3286,6 +4227,7 @@ class ToolsTest extends TestCase
     public function testFilterException() : void
     {
         $full = false;
+        $filter = 0;
         $volumi = [
             '0' => [
                 'variabile' => '30030',
@@ -3297,7 +4239,7 @@ class ToolsTest extends TestCase
         
         $this->expectException(\Exception::class);
         
-        filter($volumi, $full);
+        filter($volumi, $full, $filter);
     }
     
     /**
@@ -4319,7 +5261,7 @@ class ToolsTest extends TestCase
      * @group tools
      * covers integraDate()
      */
-    public function testIntegraDateException() : void
+    public function testIntegraDateNoTarget1CheckEquals() : void
     {
         $target = [];
         
@@ -4329,7 +5271,80 @@ class ToolsTest extends TestCase
                     'variabile' => 42,
                     'valore' => 27.3,
                     'unita_misura' => 'mslm',
-                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 42,
+                    'valore' => 37.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 42,
+                    'valore' => 47.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 2
+                ]
+            ]
+        ];
+        
+        $expected = [
+            '0' => [
+                'variabile' => NODATA,
+                'valore' => NODATA,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                'tipo_dato' => NODATA
+            ],
+            '1' => [
+                'variabile' => NODATA,
+                'valore' => null,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                'tipo_dato' => NODATA
+            ],
+            '2' => [
+                'variabile' => NODATA,
+                'valore' => null,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                'tipo_dato' => NODATA
+            ]
+        ];
+        
+        $actual = integraDate($target, $checkers);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($expected[$row][$key], $value);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($value, $actual[$row][$key]);
+            }
+        }
+    }
+    
+    /**
+     * @group tools
+     * covers integraDate()
+     */
+    public function testIntegraDateNoTarget2CheckEquals() : void
+    {
+        $target = [];
+        
+        $checkers = [
+            'livello valle' => [
+                '0' => [
+                    'variabile' => 42,
+                    'valore' => 27.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:00:00'),
                     'tipo_dato' => 2
                 ],
                 '1' => [
@@ -4379,9 +5394,305 @@ class ToolsTest extends TestCase
             ]
         ];
         
+        $expected = [
+            '0' => [
+                'variabile' => NODATA,
+                'valore' => null,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                'tipo_dato' => NODATA
+            ],
+            '1' => [
+                'variabile' => NODATA,
+                'valore' => NODATA,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('05/01/2020 01:00:00'),
+                'tipo_dato' => NODATA
+            ],
+            '2' => [
+                'variabile' => NODATA,
+                'valore' => null,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                'tipo_dato' => NODATA
+            ],
+            '3' => [
+                'variabile' => NODATA,
+                'valore' => null,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                'tipo_dato' => NODATA
+            ],
+            '4' => [
+                'variabile' => NODATA,
+                'valore' => null,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                'tipo_dato' => NODATA
+            ],
+            '5' => [
+                'variabile' => NODATA,
+                'valore' => null,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                'tipo_dato' => NODATA
+            ]
+        ];
+        
+        $actual = integraDate($target, $checkers);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($expected[$row][$key], $value);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($value, $actual[$row][$key]);
+            }
+        }
+    }
+    
+    /**
+     * @group tools
+     * covers integraDate()
+     */
+    public function testIntegraDateNoTarget1NoCheckEquals() : void
+    {
+        $target = [];
+        
+        $checkers = [
+            'livello valle' => [],
+            'manovra' => [
+                '0' => [
+                    'variabile' => 30033,
+                    'valore' => 0,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '1' => [
+                    'variabile' => 30033,
+                    'valore' => 0.5,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '2' => [
+                    'variabile' => 30033,
+                    'valore' => 1,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '3' => [
+                    'variabile' => 30033,
+                    'valore' => 0.5,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                    'tipo_dato' => 1
+                ]
+            ]
+        ];
+        
+        $expected = [
+            '0' => [
+                'variabile' => NODATA,
+                'valore' => NODATA,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                'tipo_dato' => NODATA
+            ],
+            '1' => [
+                'variabile' => NODATA,
+                'valore' => null,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                'tipo_dato' => NODATA
+            ],
+            '2' => [
+                'variabile' => NODATA,
+                'valore' => null,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                'tipo_dato' => NODATA
+            ],
+            '3' => [
+                'variabile' => NODATA,
+                'valore' => null,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                'tipo_dato' => NODATA
+            ]
+        ];
+        
+        $actual = integraDate($target, $checkers);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($expected[$row][$key], $value);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($value, $actual[$row][$key]);
+            }
+        }
+    }
+    
+    /**
+     * @group tools
+     * covers integraDate()
+     */
+    public function testIntegraDateNoTarget2NoCheckEquals() : void
+    {
+        $target = [];
+        
+        $checkers = [
+            'livello valle' => [],
+            'manovra' => []
+        ];
+        
+        $expected = [];
+        
+        $actual = integraDate($target, $checkers);
+        
+       $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group tools
+     * covers integraDate()
+     */
+    public function testIntegraDateException() : void
+    {
+        $target = [];
+        
+        $checkers = [
+            'livello valle' => [
+                '0' => [
+                    'variabile' => 42,
+                    'valore' => 27.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 42,
+                    'valore' => 37.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 42,
+                    'valore' => 47.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'manovra' => [
+                '0' => [],
+                '1' => [
+                    'variabile' => 30033,
+                    'valore' => 0.5,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => 1
+                ]
+            ]            
+        ];
+        
         $this->expectException(\Exception::class);
         
         integraDate($target, $checkers);
+    }
+    
+    /**
+     * @group tools
+     * covers insertNoData()
+     */
+    public function testInsertNoDataEquals() : void
+    {
+        $target = [];
+        
+        $dato = [
+            'variabile' => 42,
+            'valore' => 27.3,
+            'unita_misura' => 'mslm',
+            'data_e_ora' => new \DateTime('05/01/2020 01:00:00'),
+            'tipo_dato' => 2
+        ];
+        
+        $expected = [
+            '0' => [
+                'variabile' => NODATA,
+                'valore' => NODATA,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('05/01/2020 01:00:00'),
+                'tipo_dato' => NODATA
+            ]
+        ];
+        
+        $actual = insertNoData($target, $dato);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group tools
+     * covers insertNoData()
+     */
+    public function testInsertNoDataWithTargetEquals() : void
+    {
+        $target = [
+            '0' => [
+                'variabile' => 1067,
+                'valore' => 17.3,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                'tipo_dato' => 2
+            ]
+        ];
+        
+        $dato = [
+            'variabile' => 42,
+            'valore' => 27.3,
+            'unita_misura' => 'mslm',
+            'data_e_ora' => new \DateTime('05/01/2020 01:00:00'),
+            'tipo_dato' => 2
+        ];
+        
+        $expected = [
+            '0' => [
+                'variabile' => 1067,
+                'valore' => 17.3,
+                'unita_misura' => 'mslm',
+                'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                'tipo_dato' => 2
+            ]
+        ];
+        
+        $actual = insertNoData($target, $dato);
+        
+        $this->assertEquals($expected, $actual);
+    }  
+    
+    /**
+     * @group tools
+     * covers insertNoData()
+     */
+    public function testInsertNoDataException() : void
+    {
+        $target = [];        
+        $dato = [];
+        
+        $this->expectException(\Exception::class);
+        
+        insertNoData($target, $dato);
     }
     
     /**
@@ -5074,6 +6385,131 @@ class ToolsTest extends TestCase
      * @group index
      * covers uniformaCategorie()
      */
+    public function testUniformaCategorieNoManovreEquals() : array
+    {
+        $dati_acquisiti = [
+            'livello' => [
+                '0' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:00:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'manovra' => []
+        ];
+        
+        $expected = [
+            'livello' => [
+                '0' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 1067,
+                    'valore' => 35.97,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:00:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'manovra' => [
+                '0' => [
+                    'variabile' => NODATA,
+                    'valore' => NODATA,
+                    'unita_misura' => NODATA,
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => NODATA
+                ],
+                '1' => [
+                    'variabile' => NODATA,
+                    'valore' => null,
+                    'unita_misura' => NODATA,
+                    'data_e_ora' => new \DateTime('05/01/2020 00:30:00'),
+                    'tipo_dato' => NODATA
+                ],
+                '2' => [
+                    'variabile' => NODATA,
+                    'valore' => null,
+                    'unita_misura' => NODATA,
+                    'data_e_ora' => new \DateTime('05/01/2020 01:00:00'),
+                    'tipo_dato' => NODATA
+                ]
+            ]
+        ];
+        
+        $actual = uniformaCategorie($dati_acquisiti);
+        
+        foreach ($actual as $categoria => $dati) {
+            foreach ($dati as $row => $fields) {
+                foreach ($fields as $key => $value) {
+                    $this->assertEquals($expected[$categoria][$row][$key], $value);
+                }
+            }
+        }
+        
+        foreach ($expected as $categoria => $dati) {
+            foreach ($dati as $row => $fields) {
+                foreach ($fields as $key => $value) {
+                    $this->assertEquals($value, $actual[$categoria][$row][$key]);
+                }
+            }
+        }
+        return $actual;
+    }
+    
+    /**
+     * @group index
+     * covers uniformaCategorie()
+     */
+    public function testUniformaCategorieNoCategoryEquals() : void
+    {
+        $input = [
+            'livello monte' => [],
+            'livello valle' => [],
+            'manovra' => []
+        ];
+        
+        $expected = [
+            'livello monte' => [],
+            'livello valle' => [],
+            'manovra' => []
+        ];
+        
+        $actual = uniformaCategorie($input);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group index
+     * covers uniformaCategorie()
+     */
     public function testUniformaCategorieException() : void
     {
         $dati_acquisiti = [];
@@ -5086,10 +6522,186 @@ class ToolsTest extends TestCase
     /**
      * covers completaDati().
      * @group index
-     * @depends testUniformaCategorieEquals
      */
-    public function testCompletaDatiEquals(array $input) : void
+    public function testCompletaDatiEquals() : void
     {
+        $input = [
+            'livello monte' => [
+                '0' => [
+                    'variabile' => 1067,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 1067,
+                    'valore' => 17.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 1067,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '3' => [
+                    'variabile' => 1067,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '4' => [
+                    'variabile' => 1067,
+                    'valore' => 18.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '5' => [
+                    'variabile' => 1067,
+                    'valore' => 19.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '6' => [
+                    'variabile' => 1067,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '7' => [
+                    'variabile' => 1067,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'livello valle' => [
+                '0' => [
+                    'variabile' => 42,
+                    'valore' => 17.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 42,
+                    'valore' => 27.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 42,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '3' => [
+                    'variabile' => 42,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '4' => [
+                    'variabile' => 42,
+                    'valore' => 37.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '5' => [
+                    'variabile' => 42,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '6' => [
+                    'variabile' => 42,
+                    'valore' => 47.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '7' => [
+                    'variabile' => 42,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'manovra' => [
+                '0' => [
+                    'variabile' => 30033,
+                    'valore' => null,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '1' => [
+                    'variabile' => 30033,
+                    'valore' => null,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '2' => [
+                    'variabile' => 30033,
+                    'valore' => 0,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '3' => [
+                    'variabile' => 30033,
+                    'valore' => 0.5,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => 1
+                ],
+                '4' => [
+                    'variabile' => 30033,
+                    'valore' => null,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '5' => [
+                    'variabile' => 30033,
+                    'valore' => null,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '6' => [
+                    'variabile' => 30033,
+                    'valore' => 1,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 1
+                ],
+                '7' => [
+                    'variabile' => 30033,
+                    'valore' => 0.5,
+                    'unita_misura' => 'cm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                    'tipo_dato' => 1
+                ]
+            ]
+        ];
+        
         $expected = [
             'livello monte' => [
                 '0' => [
@@ -5284,6 +6896,408 @@ class ToolsTest extends TestCase
                 }
             }
         }
+    }
+    
+    /**
+     * covers completaDati().
+     * @group index
+     */
+    public function testCompletaDatiNoDataEquals() : void
+    {
+        $input = [
+            'livello monte' => [
+                '0' => [
+                    'variabile' => 1067,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 1067,
+                    'valore' => 17.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 1067,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '3' => [
+                    'variabile' => 1067,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '4' => [
+                    'variabile' => 1067,
+                    'valore' => 18.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '5' => [
+                    'variabile' => 1067,
+                    'valore' => 19.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '6' => [
+                    'variabile' => 1067,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '7' => [
+                    'variabile' => 1067,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'livello valle' => [
+                '0' => [
+                    'variabile' => 42,
+                    'valore' => 17.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 42,
+                    'valore' => 27.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 42,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '3' => [
+                    'variabile' => 42,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '4' => [
+                    'variabile' => 42,
+                    'valore' => 37.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '5' => [
+                    'variabile' => 42,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '6' => [
+                    'variabile' => 42,
+                    'valore' => 47.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '7' => [
+                    'variabile' => 42,
+                    'valore' => null,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'manovra' => [
+                '0' => [
+                    'variabile' => NODATA,
+                    'valore' => null,
+                    'unita_misura' => NODATA,
+                    'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                    'tipo_dato' => NODATA
+                ],
+                '1' => [
+                    'variabile' => NODATA,
+                    'valore' => NODATA,
+                    'unita_misura' => NODATA,
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => NODATA
+                ],
+                '2' => [
+                    'variabile' => NODATA,
+                    'valore' => null,
+                    'unita_misura' => NODATA,
+                    'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                    'tipo_dato' => NODATA
+                ],
+                '3' => [
+                    'variabile' => NODATA,
+                    'valore' => null,
+                    'unita_misura' => NODATA,
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => NODATA
+                ],
+                '4' => [
+                    'variabile' => NODATA,
+                    'valore' => null,
+                    'unita_misura' => NODATA,
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => NODATA
+                ],
+                '5' => [
+                    'variabile' => NODATA,
+                    'valore' => null,
+                    'unita_misura' => NODATA,
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => NODATA
+                ],
+                '6' => [
+                    'variabile' => NODATA,
+                    'valore' => null,
+                    'unita_misura' => NODATA,
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => NODATA
+                ],
+                '7' => [
+                    'variabile' => NODATA,
+                    'valore' => null,
+                    'unita_misura' => NODATA,
+                    'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                    'tipo_dato' => NODATA
+                ]
+            ]
+        ];
+        
+        $expected = [
+            'livello monte' => [
+                '0' => [
+                    'variabile' => 1067,
+                    'valore' => 17.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 1067,
+                    'valore' => 17.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 1067,
+                    'valore' => 17.55,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '3' => [
+                    'variabile' => 1067,
+                    'valore' => 18.05,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '4' => [
+                    'variabile' => 1067,
+                    'valore' => 18.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '5' => [
+                    'variabile' => 1067,
+                    'valore' => 19.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '6' => [
+                    'variabile' => 1067,
+                    'valore' => 19.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '7' => [
+                    'variabile' => 1067,
+                    'valore' => 19.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'livello valle' => [
+                '0' => [
+                    'variabile' => 42,
+                    'valore' => 17.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 42,
+                    'valore' => 27.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 42,
+                    'valore' => 29.8,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '3' => [
+                    'variabile' => 42,
+                    'valore' => 34.8,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => 2
+                ],
+                '4' => [
+                    'variabile' => 42,
+                    'valore' => 37.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '5' => [
+                    'variabile' => 42,
+                    'valore' => 43.967,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '6' => [
+                    'variabile' => 42,
+                    'valore' => 47.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '7' => [
+                    'variabile' => 42,
+                    'valore' => 47.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'manovra' => [
+                '0' => [
+                    'variabile' => NODATA,
+                    'valore' => NODATA,
+                    'unita_misura' => NODATA,
+                    'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                    'tipo_dato' => NODATA
+                ],
+                '1' => [
+                    'variabile' => NODATA,
+                    'valore' => NODATA,
+                    'unita_misura' => NODATA,
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => NODATA
+                ],
+                '2' => [
+                    'variabile' => NODATA,
+                    'valore' => NODATA,
+                    'unita_misura' => NODATA,
+                    'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                    'tipo_dato' => NODATA
+                ],
+                '3' => [
+                    'variabile' => NODATA,
+                    'valore' => NODATA,
+                    'unita_misura' => NODATA,
+                    'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                    'tipo_dato' => NODATA
+                ],
+                '4' => [
+                    'variabile' => NODATA,
+                    'valore' => NODATA,
+                    'unita_misura' => NODATA,
+                    'data_e_ora' => new \DateTime('05/01/2020 02:00:00'),
+                    'tipo_dato' => NODATA
+                ],
+                '5' => [
+                    'variabile' => NODATA,
+                    'valore' => NODATA,
+                    'unita_misura' => NODATA,
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => NODATA
+                ],
+                '6' => [
+                    'variabile' => NODATA,
+                    'valore' => NODATA,
+                    'unita_misura' => NODATA,
+                    'data_e_ora' => new \DateTime('05/01/2020 05:00:00'),
+                    'tipo_dato' => NODATA
+                ],
+                '7' => [
+                    'variabile' => NODATA,
+                    'valore' => NODATA,
+                    'unita_misura' => NODATA,
+                    'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
+                    'tipo_dato' => NODATA
+                ]
+            ]
+        ];
+        
+        $actual = completaDati($input);
+        
+        foreach ($actual as $categoria => $dati) {
+            foreach ($dati as $row => $fields) {
+                foreach ($fields as $key => $value) {
+                    $this->assertEqualsWithDelta($expected[$categoria][$row][$key], $value, 0.001);
+                }
+            }
+        }
+        
+        foreach ($expected as $categoria => $dati) {
+            foreach ($dati as $row => $fields) {
+                foreach ($fields as $key => $value) {
+                    $this->assertEqualsWithDelta($value, $actual[$categoria][$row][$key], 0.001);
+                }
+            }
+        }
+    }
+    
+    /**
+     * covers completaDati().
+     * @group index
+     */
+    public function testCompletaDatiNoCategoryEquals() : void
+    {
+        $input = [
+            'livello monte' => [],
+            'livello valle' => [],
+            'manovra' => []
+        ];
+        
+        $expected = [
+            'livello monte' => [],
+            'livello valle' => [],
+            'manovra' => []
+        ];
+        
+        $actual = completaDati($input);
+        
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -5535,6 +7549,111 @@ class ToolsTest extends TestCase
                         'id' => 2,
                         'valore' => 17.3
                     ]
+                ],
+            ],
+            'middle no data' => [
+                'input' => [
+                    '0' => [
+                        'variabile' => NODATA,
+                        'valore' => null,
+                        'unita_misura' => NODATA,
+                        'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                        'tipo_dato' => NODATA
+                    ],
+                    '1' => [
+                        'variabile' => NODATA,
+                        'valore' => NODATA,
+                        'unita_misura' => NODATA,
+                        'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                        'tipo_dato' => NODATA
+                    ],
+                    '2' => [
+                        'variabile' => NODATA,
+                        'valore' => null,
+                        'unita_misura' => NODATA,
+                        'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                        'tipo_dato' => NODATA
+                    ]
+                ],
+                'expected' => [
+                    'testa' => [
+                        'id' => 1,
+                        'valore' => NODATA
+                    ],
+                    'coda' => [
+                        'id' => 1,
+                        'valore' => NODATA
+                    ]
+                ]
+            ],
+            'top no data' => [
+                'input' => [
+                    '0' => [
+                        'variabile' => NODATA,
+                        'valore' => NODATA,
+                        'unita_misura' => NODATA,
+                        'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                        'tipo_dato' => NODATA
+                    ],
+                    '1' => [
+                        'variabile' => NODATA,
+                        'valore' => null,
+                        'unita_misura' => NODATA,
+                        'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                        'tipo_dato' => NODATA
+                    ],
+                    '2' => [
+                        'variabile' => NODATA,
+                        'valore' => null,
+                        'unita_misura' => NODATA,
+                        'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                        'tipo_dato' => NODATA
+                    ]
+                ],
+                'expected' => [
+                    'testa' => [
+                        'id' => 0,
+                        'valore' => NODATA
+                    ],
+                    'coda' => [
+                        'id' => 0,
+                        'valore' => NODATA
+                    ]
+                ]
+            ],
+            'bottom no data' => [
+                'input' => [
+                    '0' => [
+                        'variabile' => NODATA,
+                        'valore' => null,
+                        'unita_misura' => NODATA,
+                        'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                        'tipo_dato' => NODATA
+                    ],
+                    '1' => [
+                        'variabile' => NODATA,
+                        'valore' => null,
+                        'unita_misura' => NODATA,
+                        'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                        'tipo_dato' => NODATA
+                    ],
+                    '2' => [
+                        'variabile' => NODATA,
+                        'valore' => NODATA,
+                        'unita_misura' => NODATA,
+                        'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                        'tipo_dato' => NODATA
+                    ]
+                ],
+                'expected' => [
+                    'testa' => [
+                        'id' => 2,
+                        'valore' => NODATA
+                    ],
+                    'coda' => [
+                        'id' => 2,
+                        'valore' => NODATA
+                    ]
                 ]
             ]
         ];
@@ -5592,6 +7711,19 @@ class ToolsTest extends TestCase
                 'tipo_dato' => 2
             ]
         ];
+        
+        $this->expectException(\Exception::class);
+        
+        trovaCapi($input);
+    }
+    
+    /**
+     * covers trovaCapi().
+     * @group tools
+     */
+    public function testTrovaCapiNoDataException() : void
+    {
+        $input = [];       
         
         $this->expectException(\Exception::class);
         
@@ -5705,6 +7837,89 @@ class ToolsTest extends TestCase
                 'unita_misura' => 'mslm',
                 'data_e_ora' => new \DateTime('05/01/2020 05:30:00'),
                 'tipo_dato' => 2
+            ]
+        ];
+        
+        $actual = riempiCode($dati);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($expected[$row][$key], $value);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($value, $actual[$row][$key]);
+            }
+        }
+    }
+    
+    /**
+     * covers riempiCode().
+     * @group tools
+     */
+    public function testRiempiCodeNoDataEquals() : void
+    {
+        $dati = [
+            '0' => [
+                'variabile' => NODATA,
+                'valore' => null,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                'tipo_dato' => NODATA
+            ],
+            '1' => [
+                'variabile' => NODATA,
+                'valore' => NODATA,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                'tipo_dato' => NODATA
+            ],
+            '2' => [
+                'variabile' => NODATA,
+                'valore' => null,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                'tipo_dato' => NODATA
+            ],
+            '3' => [
+                'variabile' => NODATA,
+                'valore' => null,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                'tipo_dato' => NODATA
+            ]
+        ];
+        
+        $expected = [
+            '0' => [
+                'variabile' => NODATA,
+                'valore' => NODATA,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('04/01/2020 23:00:00'),
+                'tipo_dato' => NODATA
+            ],
+            '1' => [
+                'variabile' => NODATA,
+                'valore' => NODATA,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                'tipo_dato' => NODATA
+            ],
+            '2' => [
+                'variabile' => NODATA,
+                'valore' => NODATA,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('05/01/2020 0:30:00'),
+                'tipo_dato' => NODATA
+            ],
+            '3' => [
+                'variabile' => NODATA,
+                'valore' => NODATA,
+                'unita_misura' => NODATA,
+                'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
+                'tipo_dato' => NODATA
             ]
         ];
         
@@ -6040,6 +8255,14 @@ class ToolsTest extends TestCase
                 ],
                 'categoria' => 'manovra',
                 'expected' => 1.04719
+            ],
+            'manovra no data' => [
+                'dati' => [
+                    'unita_misura' => NODATA,
+                    'valore' => NODATA
+                ],
+                'categoria' => 'manovra',
+                'expected' => NODATA
             ]
         ];
         
@@ -6257,6 +8480,103 @@ class ToolsTest extends TestCase
             }
         }
         return $actual;
+    }
+    
+    /**
+     * @group index
+     * covers eraseDoubleDate()
+     */
+    public function testEraseDoubleDateSomeDataEquals() : void
+    {
+        $dati_acquisiti = [
+            'livello monte' => [
+                '0' => [
+                    'variabile' => 1067,
+                    'valore' => 17.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 1067,
+                    'valore' => 18.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '2' => [
+                    'variabile' => 1067,
+                    'valore' => 19.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'livello valle' => [],
+            'manovra' => []
+        ];
+        
+        $expected = [
+            'livello monte' => [
+                '0' => [
+                    'variabile' => 1067,
+                    'valore' => 17.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 1067,
+                    'valore' => 18.3,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('05/01/2020 04:00:00'),
+                    'tipo_dato' => 2
+                ]
+            ],
+            'livello valle' => [],
+            'manovra' => []
+        ];
+        
+        $actual = eraseDoubleDate($dati_acquisiti);
+        
+        foreach ($actual as $categoria => $dati) {
+            foreach ($dati as $row => $fields) {
+                foreach ($fields as $key => $value) {
+                    $this->assertEquals($expected[$categoria][$row][$key], $value);
+                }
+            }
+        }
+        
+        foreach ($expected as $categoria => $dati) {
+            foreach ($dati as $row => $fields) {
+                foreach ($fields as $key => $value) {
+                    $this->assertEquals($value, $actual[$categoria][$row][$key]);
+                }
+            }
+        }
+    }
+    
+    /**
+     * @group index
+     * covers eraseDoubleDate()
+     */
+    public function testEraseDoubleDateNoDataEquals() : void
+    {
+        $dati_acquisiti = [
+            'livello monte' => [],
+            'livello valle' => [],
+            'manovra' => []
+        ];
+        
+        $expected = [
+            'livello monte' => [],
+            'livello valle' => [],
+            'manovra' => []
+        ];
+        
+        $actual = eraseDoubleDate($dati_acquisiti);
+        
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -6875,7 +9195,8 @@ class ToolsTest extends TestCase
     {
         $properties = [            
             "options" => [
-                "costants" => ['TRUE','FALSE']
+                "costants" => ['TRUE','FALSE'],
+                "limits" => []
             ]
         ];
         
@@ -6890,11 +9211,32 @@ class ToolsTest extends TestCase
      * @group test
      * covers formatCostants()
      */
+    public function testFormatCostantsLimitsEquals() : void
+    {
+        $properties = [            
+            "options" => [
+                "costants" => ['D','W','M','Y'],
+                "limits" => ['364','51','11','9']
+            ]
+        ];
+        
+        $expected = "[1-364]D|[1-51]W|[1-11]M|[1-9]Y";
+         
+        $actual = formatCostants($properties);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers formatCostants()
+     */
     public function testFormatCostantsVoidEquals() : void
     {
         $properties = [            
             "options" => [
-                "costants" => []
+                "costants" => [],
+                "limits" => []
             ]
         ];
         
@@ -6932,7 +9274,8 @@ class ToolsTest extends TestCase
                 'properties' => [            
                     "options" => [
                         "variables" => ['var1'],
-                        "costants" => ['V']
+                        "costants" => ['V'],
+                        "limits" => []
                     ]
                 ],
                 'expected' => "<var1>|V"
@@ -6941,7 +9284,8 @@ class ToolsTest extends TestCase
                 'properties' => [            
                     "options" => [
                         "variables" => ['var1','var2'],
-                        "costants" => ['V','M','Q']
+                        "costants" => ['V','M','Q'],
+                        "limits" => []
                     ]
                 ],
                 'expected' => "<var1>,<var2>|V|M|Q"
@@ -6950,7 +9294,8 @@ class ToolsTest extends TestCase
                 'properties' => [            
                     "options" => [
                         "variables" => ['var1','var2'],
-                        "costants" => []
+                        "costants" => [],
+                        "limits" => []
                     ]
                 ],
                 'expected' => "<var1>,<var2>"
@@ -6959,7 +9304,8 @@ class ToolsTest extends TestCase
                 'properties' => [            
                     "options" => [
                         "variables" => [],
-                        "costants" => ['V','M','Q']
+                        "costants" => ['V','M','Q'],
+                        "limits" => []
                     ]
                 ],
                 'expected' => "V|M|Q"
@@ -6968,7 +9314,8 @@ class ToolsTest extends TestCase
                 'properties' => [            
                     "options" => [
                         "variables" => [],
-                        "costants" => []
+                        "costants" => [],
+                        "limits" => []
                     ]
                 ],
                 'expected' => ""
@@ -7000,7 +9347,8 @@ class ToolsTest extends TestCase
                 'properties' => [            
                     "options" => [
                         "variables" => ['','var2'],
-                        "costants" => ['V']
+                        "costants" => ['V'],
+                        "limits" => []
                     ]
                 ]
             ],
@@ -7008,7 +9356,8 @@ class ToolsTest extends TestCase
                 'properties' => [            
                     "options" => [
                         "variables" => ['var1','var2'],
-                        "costants" => ['v','m','q']
+                        "costants" => ['v','m','q'],
+                        "limits" => []
                     ]
                 ]
             ],
@@ -7016,7 +9365,8 @@ class ToolsTest extends TestCase
                 'properties' => [            
                     "options" => [
                         "variables" => ['var1','var2'],
-                        "costants" => ['','M','Q']
+                        "costants" => ['','M','Q'],
+                        "limits" => []
                     ]
                 ]
             ]
@@ -7231,7 +9581,8 @@ class ToolsTest extends TestCase
                 "costants" => [
                     "ALL",
                     "TRUE"
-                ]
+                ],
+                "limits" => []
             ],
             "descriptions" => [
                 "Esegue il calcolo per ciascuna delle variabili",
@@ -7422,7 +9773,8 @@ class ToolsTest extends TestCase
                     "default" => "",
                     "options" => [
                         "variables" => [],
-                        "costants" => []
+                        "costants" => [],
+                        "limits" => []
                     ],
                     "descriptions" => [
                         "Stampa questo help."
@@ -7439,7 +9791,8 @@ class ToolsTest extends TestCase
                         ],
                         "costants" => [
                             "ALL"
-                        ]
+                        ],
+                        "limits" => []
                     ],
                     "descriptions" => [
                         "Esegue il calcolo per ciascuna delle variabili",
@@ -7540,7 +9893,8 @@ class ToolsTest extends TestCase
                     "default" => "",
                     "options" => [
                         "variables" => [],
-                        "costants" => []
+                        "costants" => [],
+                        "limits" => []
                     ],
                     "descriptions" => [
                         "Stampa questo help."
@@ -7559,7 +9913,8 @@ class ToolsTest extends TestCase
                         ],
                         "costants" => [
                             "ALL"
-                        ]
+                        ],
+                        "limits" => []
                     ],
                     "descriptions" => [
                         "Esegue il calcolo per ciascuna delle variabili",
@@ -7869,7 +10224,8 @@ class ToolsTest extends TestCase
                     "default" => "",
                     "options" => [
                         "variables" => [],
-                        "costants" => []
+                        "costants" => [],
+                        "limits" => []
                     ],
                     "descriptions" => [
                         "Stampa questo help."
@@ -7888,7 +10244,8 @@ class ToolsTest extends TestCase
                         ],
                         "costants" => [
                             "ALL"
-                        ]
+                        ],
+                        "limits" => []
                     ],
                     "descriptions" => [
                         "Esegue il calcolo per ciascuna delle variabili",
@@ -8727,6 +11084,20 @@ class ToolsTest extends TestCase
      * @group test
      * covers checkCliDatefrom()
      */
+    public function testCheckCliDatefromCostantEquals() : void
+    {
+        $value = '364D';
+        $expected = ['364D'];
+        
+        $actual = checkCliDatefrom($value);     
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers checkCliDatefrom()
+     */
     public function testCheckCliDatefromException() : void
     {
         $value = '92/01/2020';
@@ -9488,21 +11859,24 @@ class ToolsTest extends TestCase
                 "default" => "ALL",
                 "options" => [
                     "costants" => [],
-                    "alias" => []  
+                    "alias" => [],
+                    "limits" => []  
                 ]
             ],
             "datefrom" => [
-                "default" => "YEAR",
+                "default" => "1D",
                 "options" => [
-                    "costants" => [],
-                    "alias" => []  
+                    "costants" => ['D'],
+                    "alias" => ['giorno'],
+                    "limits" => ['364']  
                 ]
             ],
             "dateto" => [
                 "default" => "NOW",
                 "options" => [
                     "costants" => [],
-                    "alias" => []  
+                    "alias" => [],
+                    "limits" => []  
                 ]
             ],
             "field" => [
@@ -9523,22 +11897,24 @@ class ToolsTest extends TestCase
                         "delta",
                         "altezza",
                         "portata"
-                    ]  
+                    ],
+                    "limits" => []  
                 ]
             ],
             "full" => [
                 "default" => "FALSE",
                 "options" => [
                     "costants" => [],
-                    "alias" => []  
+                    "alias" => [],
+                    "limits" => []  
                 ]
             ]
         ];
         
         $now = new \DateTime();
-        $year = new \DateTime();
-        $interval = new \DateInterval('P1Y');
-        $year->sub($interval);
+        $day = new \DateTime();
+        $interval = new \DateInterval('P1D');
+        $day->sub($interval);
         $all = selectAllQuery('SSCP_data', 'query_variabili_ALL');
 
         $data = [
@@ -9551,14 +11927,14 @@ class ToolsTest extends TestCase
                 'parameters' => $parameters,
                 'values' => [
                     'var' => ['ALL'],
-                    'datefrom' => ['YEAR'],
+                    'datefrom' => ['1D'],
                     'dateto' => ['NOW'],
                     'field' => ['V'],
                     'full' => ['FALSE']
                 ],
                 'expected' => [
                     'var' => $all,
-                    'datefrom' => $year->format('d/m/Y'),
+                    'datefrom' => $day->format('d/m/Y'),
                     'dateto' => $now->format('d/m/Y'),
                     'field' => 'volume',
                     'full' => '1'
@@ -9568,14 +11944,14 @@ class ToolsTest extends TestCase
                 'parameters' => $parameters,
                 'values' => [
                     'var' => ['ALL'],
-                    'datefrom' => ['YEAR'],
+                    'datefrom' => ['1D'],
                     'dateto' => ['2020-12-31'],
                     'field' => ['volume'],
                     'full' => [false]
                 ],
                 'expected' => [
                     'var' => $all,
-                    'datefrom' => '31/12/2019',
+                    'datefrom' => '30/12/2020',
                     'dateto' => '31/12/2020',
                     'field' => 'volume',
                     'full' => '1'
@@ -9766,10 +12142,11 @@ class ToolsTest extends TestCase
     {
         $parameters = [            
             "datefrom" => [
-                "default" => "YEAR",
+                "default" => "1D",
                 "options" => [
-                    "costants" => [],
-                    "alias" => []  
+                    "costants" => ["D"],
+                    "alias" => ['giorno'],
+                    "limits" => ['364']
                 ]
             ],
             "dateto" => [
@@ -9782,15 +12159,15 @@ class ToolsTest extends TestCase
         ];
         
         $now = new \DateTime();
-        $year = new \DateTime();
-        $interval = new \DateInterval('P1Y');
-        $year->sub($interval);
+        $day = new \DateTime();
+        $interval = new \DateInterval('P1D');
+        $day->sub($interval);
 
         $data = [
             'default' => [
                 'parameters' => $parameters,
                 'values' => [
-                    'datefrom' => ['YEAR'],
+                    'datefrom' => ['1D'],
                     'dateto' => ['NOW']                    
                 ],
                 'postArray' => [
@@ -9798,13 +12175,13 @@ class ToolsTest extends TestCase
                 ],
                 'expected' => [
                     'var' => ['30030','30040'],
-                    'datefrom' => $year->format('d/m/Y')
+                    'datefrom' => $day->format('d/m/Y')
                 ]               
             ],
             'dependent' => [
                 'parameters' => $parameters,
                 'values' => [
-                    'datefrom' => ['YEAR'],
+                    'datefrom' => ['1D'],
                     'dateto' => ['2020-12-31'],
                 ],
                 'postArray' => [
@@ -9812,7 +12189,7 @@ class ToolsTest extends TestCase
                 ],                
                 'expected' => [
                     'var' => ['30030','30040'],
-                    'datefrom' => '31/12/2019'
+                    'datefrom' => '30/12/2020'
                  ]
             ],
             'indipendent' => [

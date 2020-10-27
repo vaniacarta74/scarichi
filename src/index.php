@@ -181,7 +181,9 @@ try {
 
     $volumi = format($volumi, $request['field']);
     
-    $volumi = filter($volumi, $request['full']);
+    $volumi = filter($volumi, $request['full'], 0);
+    
+    $volumi = filter($volumi, false, NODATA);
 
     $printed = divideAndPrint($volumi, $request['full'], $request['field']);
     

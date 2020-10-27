@@ -65,16 +65,27 @@ class ScarichiTest extends TestCase
                 'campo' => '',
                 'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/05/2020 al ' . date('d/m/Y') . ' avvenuta con successo. File CSV full esportati.' . PHP_EOL
             ],
+            'datefrom costant' => [
+                'help' => null,
+                'version' => null,
+                'default' => null,
+                'var' => '30030',
+                'datefrom' => '2D',
+                'dateto' => '03/01/2019',
+                'nozero' => '',
+                'campo' => '',
+                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/01/2019 al 03/01/2019 avvenuta con successo. File CSV full esportati.' . PHP_EOL
+            ],
             'only dateto' => [
                 'help' => null,
                 'version' => null,
                 'default' => null,
                 'var' => '30030',
                 'datefrom' => '',
-                'dateto' => '01/05/2021',
+                'dateto' => '02/05/2019',
                 'nozero' => '',
                 'campo' => '',
-                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/05/2020 al 01/05/2021 avvenuta con successo. File CSV full esportati.' . PHP_EOL
+                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/05/2019 al 02/05/2019 avvenuta con successo. File CSV full esportati.' . PHP_EOL
             ],            
             'field other' => [
                 'help' => null,
@@ -118,7 +129,7 @@ class ScarichiTest extends TestCase
                 'dateto' => '',
                 'nozero' => '',
                 'campo' => '',
-                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal ' . date('d') . '/' . date('m') . '/' . (date('Y') - 1) . ' al ' . date('d/m/Y') . ' avvenuta con successo. File CSV full esportati.' . PHP_EOL
+                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal ' . (date('d') - 1) . '/' . date('m') . '/' . date('Y') . ' al ' . date('d/m/Y') . ' avvenuta con successo. Nessun file CSV full esportato per mancanza di dati.' . PHP_EOL
             ],
             'help' => [
                 'help' => '',
