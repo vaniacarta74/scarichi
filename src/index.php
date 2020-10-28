@@ -43,6 +43,8 @@ try {
             'data_disattivazione' => $record['data_disattivazione']
         ];
         $dati[$categoria] = getDataFromDb($db, $queryFileName, $parametri);
+        
+        $dati = selectLastPrevData($db, $parametri, $dati, 'manovra');
 
         $dati_acquisiti = array_merge_recursive($dati_acquisiti, $dati);
     }

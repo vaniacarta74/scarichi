@@ -2581,3 +2581,37 @@ function goCurl(array $postParams, string $url) : string
         throw $e;
     }
 }
+
+
+function selectLastPrevData(string $db, array $parametri, array $dati, string $categoria) : array
+{
+    try {
+        array_walk($parametri, function ($item, $key) {
+            if (!isset($item)) {
+                throw new \Exception('Parametro ' . $key . ' non impostato');
+            }
+        });
+        if (array_key_exists($categoria, $dati) && count($dati[$categoria]) === 0) {
+            $lastParam = [
+                'variabile' => $parametri['variabile'],
+                'tipo_dato' => $parametri['tipo_dato'],
+                'data_e_ora' => $parametri['data_iniziale']            
+            ];                
+            $result = getDataFromDb($db, 'query_ultimo_precedente', $lastParam);
+            if (count($result) > 0) {
+                $strData = $lastParam['data_e_ora']->format('Y-m-d H:i:s');
+                $dateTime = new \DateTime($strData, new \DateTimeZone('Europe/Rome'));
+                $last[$categoria] = $result;
+                $last[$categoria][0]['data_e_ora'] = $dateTime;
+            } else {                
+                $last = $dati;
+            }          
+        } else {
+            $last = $dati;
+        }        
+        return $last;
+    } catch (\Throwable $e) {
+        Utility::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}

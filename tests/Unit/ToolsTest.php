@@ -97,6 +97,7 @@ use function vaniacarta74\Scarichi\fillFull as fillFull;
 use function vaniacarta74\Scarichi\setPostParameters as setPostParameters;
 use function vaniacarta74\Scarichi\goCurl as goCurl;
 use function vaniacarta74\Scarichi\insertNoData as insertNoData;
+use function vaniacarta74\Scarichi\selectLastPrevData as selectLastPrevData;
 
 
 class ToolsTest extends TestCase
@@ -330,6 +331,23 @@ class ToolsTest extends TestCase
                         'quota' => 276.5,
                         'velocita' => null,
                         'limite' => 942.67
+                    ]
+                ]
+            ],
+            'ultimo precedente' => [
+                'dbase' => 'SSCP_data',
+                'file' => 'query_ultimo_precedente',
+                'parametri' => [
+                    'variabile' => '30028',
+                    'tipo dato' => '1',
+                    'data_e_ora' => new \DateTime('2020-04-21 00:00:00')
+                ],
+                'expected' => [
+                    '0' => [
+                        'variabile' => 30028,
+                        'valore' => 0,
+                        'unita_misura' => 'cm',
+                        'tipo_dato' => 1
                     ]
                 ]
             ]
@@ -4133,7 +4151,7 @@ class ToolsTest extends TestCase
         $volumi = [
             '0' => [
                 'variabile' => '30030',
-                'valore' => NODATA,
+                'valore' => strval(NODATA),
                 'data_e_ora' => '02/01/2018 00:00:00',
                 'tipo_dato' => '1'
             ],
@@ -12774,7 +12792,7 @@ class ToolsTest extends TestCase
      * @group test
      * covers goCurl()
      */
-    public function testGoCurlException() : void
+    public function testGoCurlDataException() : void
     {
         $postParam = [];
         $url = 'pippo';
@@ -12782,5 +12800,150 @@ class ToolsTest extends TestCase
         $this->expectException(\Exception::class);
         
         goCurl($postParam, $url);
-    }    
+    }
+
+    /**
+     * @coversNothing
+     */
+    public function selectLastPrevDataProvider() : array
+    {
+        $data = [
+            'manovra void' => [
+                'db' => 'SSCP_data',
+                'parametri' => [
+                    'variabile' => '30028',
+                    'tipo_dato' => '1',
+                    'data_iniziale' => new \DateTime('2020-04-21 00:00:00')
+                ],
+                'dati' => [
+                    'manovra' => []
+                ],
+                'categoria' => 'manovra',
+                'expected' => [
+                    'manovra' => [
+                        '0' => [
+                            'variabile' => 30028,
+                            'valore' => 0,
+                            'unita_misura' => 'cm',
+                            'tipo_dato' => 1,
+                            'data_e_ora' => new \DateTime('2020-04-21 00:00:00', new \DateTimeZone('Europe/Rome'))
+                        ]
+                    ]
+                ]
+            ],
+            'manovra standard' => [
+                'db' => 'SSCP_data',
+                'parametri' => [
+                    'variabile' => '30028',
+                    'tipo_dato' => '1',
+                    'data_iniziale' => new \DateTime('2020-04-21 00:00:00')
+                ],
+                'dati' => [
+                    'manovra' => [
+                        '0' => [
+                            'variabile' => 30028,
+                            'valore' => 0,
+                            'unita_misura' => 'cm',
+                            'tipo_dato' => 1,
+                            'data_e_ora' => new \DateTime('2020-04-21 00:00:00', new \DateTimeZone('Europe/Rome'))
+                        ]
+                    ]
+                ],
+                'categoria' => 'manovra',
+                'expected' => [
+                    'manovra' => [
+                        '0' => [
+                            'variabile' => 30028,
+                            'valore' => 0,
+                            'unita_misura' => 'cm',
+                            'tipo_dato' => 1,
+                            'data_e_ora' => new \DateTime('2020-04-21 00:00:00', new \DateTimeZone('Europe/Rome'))
+                        ]
+                    ]
+                ]
+            ],
+            'manovra void over' => [
+                'db' => 'SSCP_data',
+                'parametri' => [
+                    'variabile' => '30028',
+                    'tipo_dato' => '1',
+                    'data_iniziale' => new \DateTime('1970-01-02 00:00:00')
+                ],
+                'dati' => [
+                    'manovra' => []
+                ],
+                'categoria' => 'manovra',
+                'expected' => [
+                    'manovra' => []
+                ]
+            ],
+            'no manovra' => [
+                'db' => 'SSCP_data',
+                'parametri' => [
+                    'variabile' => '30028',
+                    'tipo_dato' => '1',
+                    'data_iniziale' => new \DateTime('2020-04-21 00:00:00')
+                ],
+                'dati' => [
+                    'livello' => [
+                        '0' => [
+                            'variabile' => 30028,
+                            'valore' => 0,
+                            'unita_misura' => 'cm',
+                            'tipo_dato' => 1,
+                            'data_e_ora' => new \DateTime('2020-04-21 00:00:00', new \DateTimeZone('Europe/Rome'))
+                        ]
+                    ]
+                ],
+                'categoria' => 'manovra',
+                'expected' => [
+                    'livello' => [
+                        '0' => [
+                            'variabile' => 30028,
+                            'valore' => 0,
+                            'unita_misura' => 'cm',
+                            'tipo_dato' => 1,
+                            'data_e_ora' => new \DateTime('2020-04-21 00:00:00', new \DateTimeZone('Europe/Rome'))
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers selectLastPrevData()
+     * @dataProvider selectLastPrevDataProvider
+     */
+    public function testSelectLastPrevDataEquals(string $db, array $parametri, array $dati, string $categoria, array $expected) : void
+    {
+        $actual = selectLastPrevData($db, $parametri, $dati, $categoria);     
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group test
+     * covers selectLastPrevData()
+     */
+    public function testSelectLastPrevDataException() : void
+    {
+        $db = 'SSCP_data';
+        $parametri = [
+            'variabile' => null,
+            'tipo dato' => '1',
+            'data_iniziale' => new \DateTime('2020-04-21 00:00:00')
+        ];
+        $dati = [
+            'manovra' => []
+        ];
+        $categoria = 'manovra';
+
+        $this->expectException(\Exception::class);
+        
+        selectLastPrevData($db, $parametri, $dati, $categoria);
+    }
 }
