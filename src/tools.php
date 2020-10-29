@@ -76,7 +76,7 @@ function checkField(?array $request) : string
             if (in_array($urlField, $fieldsNames)) {
                 $field = $urlField;
             } elseif (in_array($urlShort, $shortNames)) {
-                $field = $fieldsNames[array_search($urlShort, $shortNames)];                
+                $field = $fieldsNames[array_search($urlShort, $shortNames)];
             } else {
                 throw new \Exception('Nome campo non supportato. Valori ammessi: ' . implode(', ', $fieldsNames) . ' o ' . implode(', ', $shortNames));
             }
@@ -332,7 +332,7 @@ function addMedia(array $dati, string $nomeCampo) : array
         foreach ($dati as $record => $campi) {
             if (!array_key_exists($nomeCampo, $campi)) {
                 throw new \Exception('Campo inesistente. Impossibile eseguirne la media');
-            }            
+            }
             foreach ($campi as $campo => $valore) {
                 $medie[$record][$campo] = $valore;
 
@@ -361,13 +361,13 @@ function addDelta(array $dati, string $nomeCampo) : array
         foreach ($dati as $record => $campi) {
             if (!array_key_exists($nomeCampo, $campi)) {
                 throw new \Exception('Campo inesistente. Impossibile calcolare il delta temporale');
-            }            
+            }
             foreach ($campi as $campo => $valore) {
                 $delta[$record][$campo] = $valore;
                 if ($campo === $nomeCampo) {
                     if (!is_a($valore, 'DateTime')) {
                         throw new \Exception('Per calcolare il delta temporale è neccessario che gli elementi del campo scelto siano del tipo \'DateTime\'');
-                    }                    
+                    }
                     if ($record === 0) {
                         $deltaT = 0;
                     } else {
@@ -474,7 +474,7 @@ function addAltezza(array $dati, array $formule) : array
                         $livelloValle = $dati[$record][$campo];
                     }
                 }
-                if ($livelloMonte != NODATA && $livelloValle != NODATA) { 
+                if ($livelloMonte != NODATA && $livelloValle != NODATA) {
                     if ($livelloValle > $quota) {
                         $altezze[$record]['altezza'] = $livelloMonte - $livelloValle;
                     } else {
@@ -505,7 +505,7 @@ function addPortata(array $dati, array $formule) : array
             $noData = false;
             $parametri = [];
             foreach ($campi as $campo => $valore) {
-                $portate[$record][$campo] = $valore;                
+                $portate[$record][$campo] = $valore;
                 if (in_array($campo, $nomi_campo)) {
                     if ($valore != NODATA) {
                         $parametri[$campo] = $valore;
@@ -535,7 +535,7 @@ function addVolume(array $dati) : array
         foreach ($dati as $record => $campi) {
             if (!array_key_exists('portata', $campi) || !array_key_exists('delta', $campi)) {
                 throw new \Exception('Dati di portata e delta t assenti impossibile calcolare volume scaricato');
-            }            
+            }
             foreach ($campi as $campo => $valore) {
                 $volumi[$record][$campo] = $valore;
             }
@@ -621,7 +621,7 @@ function format(array $dati, string $field) : array
         foreach ($dati as $record => $campi) {
             if (!array_key_exists($field, $campi)) {
                 throw new \Exception('Campo inesistente. Impossibile assegnarlo a \'valore\'');
-            }            
+            }
             foreach ($campi as $campo => $valore) {
                 if (in_array($campo, $nomiCampi)) {
                     foreach ($nomiCampi as $nuovo => $vecchio) {
@@ -907,7 +907,7 @@ function printPart(array $printableData, int $i, bool $filtered, string $field) 
 
 function filter(array $dati, bool $full, int $filterVal) : array
 {
-    try {        
+    try {
         if ($full) {
             $filteredData = $dati;
         } else {
@@ -915,7 +915,7 @@ function filter(array $dati, bool $full, int $filterVal) : array
             foreach ($dati as $record => $campi) {
                 if (!array_key_exists('valore', $campi)) {
                     throw new \Exception('Campo "valore" su cui eseguire il filtro non presente');
-                }                
+                }
                 $flag = true;
                 foreach ($campi as $campo => $valore) {
                     if ($campo === 'valore' && $valore === strval($filterVal)) {
@@ -977,7 +977,7 @@ function calcolaPortata(array $formule, array $parametri) : float
                     $portata = 0;
                 }
                 break;
-            case 'portata scarico a sezione rettangolare con velocita e apertura percentuale':                
+            case 'portata scarico a sezione rettangolare con velocita e apertura percentuale':
                 $altezza_idrostatica = $parametri['altezza'];
                 $apertura_paratoia = $parametri['manovra'];
                 $mi = $formule['mi'];
@@ -989,7 +989,7 @@ function calcolaPortata(array $formule, array $parametri) : float
                     $portata = $mi * $larghezza_soglia * $apertura_paratoia * sqrt(2 * $g) * (sqrt(($altezza_idrostatica + $altezza_cinetica) ** 3) - sqrt($altezza_cinetica ** 3));
                 } else {
                     $portata = 0;
-                }                
+                }
                 break;
             case 'portata scarico a sezione rettangolare ad apertura lineare':
                 $altezza_idrostatica = $parametri['altezza'];
@@ -1032,7 +1032,7 @@ function calcolaPortata(array $formule, array $parametri) : float
                     $portata = $mi * $larghezza * $tirante * sqrt(2 * $g * $tirante);
                 } else {
                     $portata = 0;
-                }   
+                }
                 break;
             case 'portata saracinesca':
                 $altezza_idrostatica = $parametri['altezza'];
@@ -1126,14 +1126,14 @@ function uniformaCategorie(array $dati_acquisiti) : array
 
 function integraDate(array $targets, array $checkers) : array
 {
-    try {        
+    try {
         foreach ($checkers as $categoria => $dati) {
             foreach ($dati as $dato) {
                 if (count($dato) === 0) {
                     throw new \Exception('Nessun dato presente nel checker');
                 }
-                $targets = insertNoData($targets, $dato);                
-                $iMax = count($targets) - 1;               
+                $targets = insertNoData($targets, $dato);
+                $iMax = count($targets) - 1;
                 $prototype = [
                     $iMax => [
                         'variabile' => $targets[$iMax]['variabile'],
@@ -1171,7 +1171,7 @@ function insertNoData(array $targets, array $dato) : array
         if (count($dato) === 0) {
             throw new \Exception('Nessun dato di riferimento presente nel checker');
         }
-        if (count($targets) === 0) {        
+        if (count($targets) === 0) {
             $prototype = [
                 [
                     'variabile' => NODATA,
@@ -1196,9 +1196,9 @@ function completaDati(array $dati_uniformi) : array
     try {
         if (count($dati_uniformi) === 0) {
             throw new \Exception('Nessuna categoria definita');
-        }        
+        }
         $completi = [];
-        foreach ($dati_uniformi as $categoria => $dati) {            
+        foreach ($dati_uniformi as $categoria => $dati) {
             if (count($dati)) {
                 $completi[$categoria] = riempiCode($dati);
                 if ($categoria === 'manovra') {
@@ -1298,7 +1298,7 @@ function trovaCapi(array $dati) : array
 function riempiNull(array $dati) : array
 {
     try {
-        $pieni = [];        
+        $pieni = [];
         foreach ($dati as $record => $campi) {
             foreach ($campi as $key => $valore) {
                 if ($key === 'valore') {
@@ -1430,7 +1430,7 @@ function eraseDoubleDate(array $dati_acquisiti) : array
     try {
         if (count($dati_acquisiti) === 0) {
             throw new \Exception('Nessuna categoria definita');
-        }        
+        }
         $erased = [];
         foreach ($dati_acquisiti as $categoria => $dati) {
             if (count($dati) > 0) {
@@ -1475,13 +1475,13 @@ function getMessage(array $composer, array $help, string $type) : string
         if (count($composer) === 0 || count($help) === 0) {
             throw new \Exception('Dati configurazione non presenti');
         }
-        $eol = ($type === 'html') ? '<br/>' : PHP_EOL;        
+        $eol = ($type === 'html') ? '<br/>' : PHP_EOL;
         $function = __NAMESPACE__ . '\setMsg' . ucfirst($type);
         if (is_callable($function)) {
             $message = call_user_func($function, $composer, $help, $eol);
         } else {
             throw new \Exception('Nome opzione non ammesso');
-        }           
+        }
         return $message;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -1498,7 +1498,7 @@ function setHeader(array $composer) : string
         }
         $version = $composer['version'];
         $author = $composer['authors'][0]['name'];
-        $message = 'scarichi ' . $version .  ' by ' . $author . ' and contributors';                      
+        $message = 'scarichi ' . $version .  ' by ' . $author . ' and contributors';
         return $message;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -1560,7 +1560,7 @@ function setMsgDefault(array $composer, array $help, string $eol) : string
         $defaults = getProperties($help['parameters'], 'default', null, 'type', 'group');
         $mixed = array_combine($shorts, $defaults);
         foreach ($mixed as $short => $default) {
-            $couples[] = $short . ' ' . $default; 
+            $couples[] = $short . ' ' . $default;
         }
         $params = implode(' ', $couples);
         
@@ -1583,13 +1583,13 @@ function setMsgHelp(array $composer, array $help, string $eol) : string
         }
         $header = setHeader($composer);
         $description = $composer['description'];
-        $command = $help['command'];        
+        $command = $help['command'];
         $console = setConsole($help, $eol);
         $singles = getProperties($help['parameters'], 'short', null, 'type', 'single', null, null, '-');
         $params = implode('|', $singles);
         $shorts = getProperties($help['parameters'], 'short', null, 'type', 'group', null, null, '-');
         foreach ($shorts as $short) {
-            $couples[] = $short . ' [options]'; 
+            $couples[] = $short . ' [options]';
         }
         $options = implode(' ', $couples);
 
@@ -1652,34 +1652,34 @@ function setMsgError(array $composer, array $help, string $eol) : string
 
 function getHelpLines(array $parameters, array $sections) : array
 {
-    try {        
+    try {
         $i = 0;
         $lines = [];
         $jMax = count($sections) - 1;
         if (count($parameters) === 0 || $jMax < 0) {
             throw new \Exception('Parametri o sezioni non definite');
-        } 
-        foreach ($parameters as $properties) {          
+        }
+        foreach ($parameters as $properties) {
             $cellText[$i] = fillLineSections($properties, $sections);
             if ($sections[$jMax] === 'descriptions') {
-                foreach ($properties['descriptions'] as $key => $text) {                
+                foreach ($properties['descriptions'] as $key => $text) {
                     for ($j = 0; $j < $jMax; $j++) {
                         if ($key === 0) {
                             $lines[$i][$sections[$j]] = $cellText[$i][$j];
                         } else {
                             $lines[$i][$sections[$j]] = '';
                         }
-                    }                
+                    }
                     $lines[$i][$sections[$jMax]] = $text;
                     $i++;
                 }
             } else {
                 foreach ($sections as $key => $secName) {
-                    $lines[$i][$secName] = $cellText[$i][$key];                    
+                    $lines[$i][$secName] = $cellText[$i][$key];
                 }
                 $i++;
             }
-        }        
+        }
         return $lines;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -1701,7 +1701,7 @@ function fillLineSections(array $properties, array $sections) : array
             } else {
                 throw new \Exception('Nome sezione non ammesso');
             }
-        }       
+        }
         return $cellsText;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -1717,13 +1717,13 @@ function formatDescriptions(array $properties) : string
             throw new \Exception('Proprieta "descriptions" non definita');
         }
         $formatted = '';
-        foreach ($properties['descriptions'] as $key => $text) {                
+        foreach ($properties['descriptions'] as $key => $text) {
             if ($key === 0) {
-                $formatted .= $text; 
+                $formatted .= $text;
             } else {
-                $formatted .= ' ' . $text; 
-            }                               
-        }                
+                $formatted .= ' ' . $text;
+            }
+        }
         return $formatted;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -1738,7 +1738,7 @@ function formatShort(array $properties) : string
         if (!array_key_exists('short', $properties) || !preg_match('/^[a-zA-Z]$/', $properties['short'])) {
             throw new \Exception('Proprieta "short" non definita o definita in modo errato');
         }
-        $formatted = '-' . $properties['short'];                
+        $formatted = '-' . $properties['short'];
         return $formatted;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -1809,8 +1809,8 @@ function formatPardef(array $properties) : string
             //@codeCoverageIgnoreStart
             throw new \Exception('Formato parametri di default errato');
             //@codeCoverageIgnoreEnd
-        }        
-        $formatted = $params . $default;                   
+        }
+        $formatted = $params . $default;
         return $formatted;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -1828,7 +1828,7 @@ function formatVariables(array $properties) : string
         if (count($properties['options']['variables']) > 0) {
             $prefixeds = preg_filter('/^/', '<', $properties['options']['variables']);
             $postfixeds = preg_filter('/$/', '>', $prefixeds);
-            $formatted = implode(',', $postfixeds);                    
+            $formatted = implode(',', $postfixeds);
         } else {
             $formatted = '';
         }
@@ -1854,10 +1854,10 @@ function formatCostants(array $properties) : string
             }
             $formatted = implode('|', $mergeds);
         } elseif (count($costants) > 0) {
-            $formatted = implode('|', $costants);                    
+            $formatted = implode('|', $costants);
         } else {
             $formatted = '';
-        }                    
+        }
         return $formatted;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -1875,14 +1875,14 @@ function formatOptions(array $properties) : string
             throw new \Exception('Formato opzioni errato');
         }
         if ($variables !== '' && $costants !== '') {
-            $formatted = $variables . '|' . $costants;                    
+            $formatted = $variables . '|' . $costants;
         } elseif ($variables !== '') {
             $formatted = $variables;
         } elseif ($costants !== '') {
             $formatted = $costants;
         } else {
             $formatted = '';
-        }                    
+        }
         return $formatted;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -1899,11 +1899,11 @@ function getMaxLenght(array $help, string $key) : int
         }
         foreach ($help as $line => $values) {
             if (array_key_exists($key, $values)) {
-                $lenghts[] = strlen($values[$key]);                
+                $lenghts[] = strlen($values[$key]);
             } else {
                 throw new \Exception('Chiave non presente');
-            }            
-        }         
+            }
+        }
         return max($lenghts);
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -1921,7 +1921,7 @@ function setConsole(array $help, string $eol) : string
         $parameters = $help['parameters'];
         $global = $help['global'];
         $sections = $global['sections'];
-        $offset = $global['offset'];                
+        $offset = $global['offset'];
         
         $helpLines = getHelpLines($parameters, $sections);
         
@@ -1935,25 +1935,25 @@ function setConsole(array $help, string $eol) : string
                     $i = $idSec - 1;
                     $prevSecMaxLen = getMaxLenght($helpLines, $sections[$i]);
                     $prevSecLen = strLen($lineSections[$sections[$i]]);
-                    $gap = $prevSecMaxLen - $prevSecLen;     
-                }                
+                    $gap = $prevSecMaxLen - $prevSecLen;
+                }
                 $message .= str_pad($secText, $secLenght + $gap + $offset, ' ', STR_PAD_LEFT);
                 $idSec++;
             }
             $message .= $eol;
-        }        
+        }
         return $message;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
-    }    
+    }
 }
 
 
 function selectAllQuery(string $dbName, string $queryFileName) : array
 {
     try {
-        $data = getDataFromDb($dbName, $queryFileName, []);       
+        $data = getDataFromDb($dbName, $queryFileName, []);
         if (count($data) === 0) {
             //@codeCoverageIgnoreStart
             throw new \Exception('Nessun risultato dalla query');
@@ -1964,7 +1964,7 @@ function selectAllQuery(string $dbName, string $queryFileName) : array
             foreach ($fields as $field => $value) {
                 $values[] = strval($value);
             }
-        }        
+        }
         return $values;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -1982,10 +1982,10 @@ function propertyToString(array $parameters, string $paramName, string $property
         $property = '';
         foreach ($parameters as $key => $properties) {
             if ($key === $paramName && array_key_exists($propertyName, $properties)) {
-                $strings = $properties[$propertyName]; 
+                $strings = $properties[$propertyName];
                 if (is_array($strings)) {
                     $items = [];
-                    array_walk_recursive($strings, function($item, $key) use (&$items) {
+                    array_walk_recursive($strings, function ($item, $key) use (&$items) {
                         $items[] = $item;
                     });
                     $property = implode(' ', $items);
@@ -1994,7 +1994,7 @@ function propertyToString(array $parameters, string $paramName, string $property
                 }
                 break;
             }
-        }        
+        }
         return $property;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -2020,7 +2020,7 @@ function getProperties(array $parameters, string $propertyName, ?bool $assoc = f
                     $group[] = $prefix . $properties[$propertyName];
                 }
             }
-        }        
+        }
         return $group;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -2042,16 +2042,16 @@ function filterProperties(array $parameters, ?string $field, ?string $value, boo
             $filter = [
                 'field' => $field,
                 'value' => $value,
-                'include' => $include 
+                'include' => $include
             ];
-            array_walk($parameters, function($properties, $key, $filter) use (&$filtered) {
+            array_walk($parameters, function ($properties, $key, $filter) use (&$filtered) {
                 if (array_key_exists($filter['field'], $properties)) {
                     if ($filter['include']) {
-                        if ($properties[$filter['field']] === $filter['value']) {                
+                        if ($properties[$filter['field']] === $filter['value']) {
                             $filtered[$key] = $properties;
                         }
                     } else {
-                        if ($properties[$filter['field']] !== $filter['value']) {                
+                        if ($properties[$filter['field']] !== $filter['value']) {
                             $filtered[$key] = $properties;
                         }
                     }
@@ -2108,18 +2108,18 @@ function setParameter(array $parameters, string $paramName, array $arguments) : 
         }
         $keyValue = $keyParam + 1;
         if ($keyValue < count($arguments)) {
-            $paramValue = $arguments[$keyValue];        
+            $paramValue = $arguments[$keyValue];
         }
         $otherShortParams = getProperties($parameters, 'short', null, 'type', 'group', 'short', $short, '-');
         $otherLongParams = getProperties($parameters, 'long', null, 'type', 'group', 'long', $long, '--');
-        $otherParams = array_merge($otherShortParams, $otherLongParams);        
+        $otherParams = array_merge($otherShortParams, $otherLongParams);
         $default = propertyToString($parameters, $paramName, 'default');
-        $regex = propertyToString($parameters, $paramName, 'regex');        
+        $regex = propertyToString($parameters, $paramName, 'regex');
         if (isset($paramValue) && !in_array($paramValue, $otherParams)) {
-            $values = checkParameter($paramName, $paramValue, $regex, $default);          
+            $values = checkParameter($paramName, $paramValue, $regex, $default);
         } else {
             $values[] = $default;
-        }        
+        }
         return $values;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -2130,7 +2130,7 @@ function setParameter(array $parameters, string $paramName, array $arguments) : 
 
 function checkParameter(string $paramName, string $paramValue, string $regex, string $default) : array
 {
-    try {        
+    try {
         $values = [];
         if (preg_match($regex, $paramValue, $matches)) {
             $function = __NAMESPACE__ . '\checkCli' . ucfirst($paramName);
@@ -2138,12 +2138,12 @@ function checkParameter(string $paramName, string $paramValue, string $regex, st
                 $values = call_user_func($function, $matches[0]);
             } else {
                 throw new \Exception('Nome opzione ' . $paramName . ' non ammesso');
-            }   
+            }
         } elseif (preg_match('/^(' . $default . ')$/', $paramValue)) {
             $values[] = $default;
         } else {
             throw new \Exception('Formato parametro "' . $paramName . '" errato.');
-        }          
+        }
         return $values;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -2161,9 +2161,9 @@ function checkCliVar(string $value) : array
             $request['var'] = $variable;
             try {
                 $values[] = checkVariable($request);
-            } catch (\Throwable $e){
+            } catch (\Throwable $e) {
                 Error::errorHandler($e, DEBUG_LEVEL, true);
-            }                
+            }
         }
         if (count($values) === 0) {
             throw new \Exception('Valori parametro "var" non ammissibili.');
@@ -2172,7 +2172,7 @@ function checkCliVar(string $value) : array
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
-    }    
+    }
 }
 
 
@@ -2183,7 +2183,7 @@ function checkCliDatefrom(string $value) : array
         if (preg_match('/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/', $value, $matches)) {
             try {
                 $values[] = formatDate($matches[0]);
-            } catch (\Throwable $e){
+            } catch (\Throwable $e) {
                 Error::errorHandler($e, DEBUG_LEVEL, true);
             }
         } else {
@@ -2196,7 +2196,7 @@ function checkCliDatefrom(string $value) : array
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
-    }    
+    }
 }
 
 
@@ -2206,7 +2206,7 @@ function checkCliDateto(string $value) : array
         $values = [];
         try {
             $values[] = formatDate($value);
-        } catch (\Throwable $e){
+        } catch (\Throwable $e) {
             Error::errorHandler($e, DEBUG_LEVEL, true);
         }
         if (count($values) === 0) {
@@ -2216,7 +2216,7 @@ function checkCliDateto(string $value) : array
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
-    }    
+    }
 }
 
 
@@ -2227,7 +2227,7 @@ function checkCliField(string $value) : array
         try {
             $request['field'] = $value;
             $values[] = checkField($request);
-        } catch (\Throwable $e){
+        } catch (\Throwable $e) {
             Error::errorHandler($e, DEBUG_LEVEL, true);
         }
         if (count($values) === 0) {
@@ -2237,7 +2237,7 @@ function checkCliField(string $value) : array
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
-    }    
+    }
 }
 
 
@@ -2254,7 +2254,7 @@ function checkCliFull(string $value) : array
                 $request['full'] = $value;
             }
             $values[] = checkFilter($request);
-        } catch (\Throwable $e){
+        } catch (\Throwable $e) {
             Error::errorHandler($e, DEBUG_LEVEL, true);
         }
         if (count($values) === 0) {
@@ -2264,7 +2264,7 @@ function checkCliFull(string $value) : array
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
-    }    
+    }
 }
 
 
@@ -2282,8 +2282,8 @@ function setParameters(array $parameters, ?array $arguments, string $type) : arr
                     if ($type === 'default') {
                         $values[$paramName][] = propertyToString($parameters, $paramName, $type);
                     } else {
-                        $values[$paramName] = setParameter($parameters, $paramName, $arguments);                
-                    } 
+                        $values[$paramName] = setParameter($parameters, $paramName, $arguments);
+                    }
                 }
             }
         }
@@ -2307,19 +2307,19 @@ function shuntTypes(array $parameters, ?array $arguments) : string
             $narg = count($arguments);
             $isOk = allParameterSet($parameters, $arguments);
             $shorts = getProperties($parameters, 'short', true);
-            $longs = getProperties($parameters, 'long', true);        
+            $longs = getProperties($parameters, 'long', true);
             if ($narg === 1 || ($narg === 2 && ($arguments[1] === '-' . $shorts['help'] || $arguments[1] === '--' . $longs['help']))) {
                 $type = 'help';
             } elseif ($narg === 2 && ($arguments[1] === '-' . $shorts['version'] || $arguments[1] === '--' . $longs['version'])) {
                 $type = 'version';
             } elseif ($narg === 2 && ($arguments[1] === '-' . $shorts['default'] || $arguments[1] === '--' . $longs['default'])) {
                 $type = 'default';
-            } elseif ($narg >= 6 && $isOk) {            
+            } elseif ($narg >= 6 && $isOk) {
                 $type = 'ok';
             } else {
                 $type = 'error';
             }
-        }      
+        }
         return $type;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -2342,8 +2342,8 @@ function fillParameters(array $parameters, array $values) : array
                 $postVars = call_user_func($function, $parameters, $values, $postVars);
             } else {
                 throw new \Exception('Nome opzione non ammesso');
-            } 
-        }        
+            }
+        }
         return $postVars;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -2360,10 +2360,10 @@ function fillVar(array $parameters, array $values, array $postVars) : array
         }
         $rawValues = $values['var'];
         if ($rawValues[0] === $parameters['var']['default']) {
-            $postVars['var'] = selectAllQuery('SSCP_data', 'query_variabili_ALL'); 
+            $postVars['var'] = selectAllQuery('SSCP_data', 'query_variabili_ALL');
         } else {
             $postVars['var'] = $rawValues;
-        } 
+        }
         return $postVars;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -2388,10 +2388,10 @@ function fillDatefrom(array $parameters, array $values, array $postVars) : array
             } else {
                 $dateTimeTo = new \DateTime($dateto);
             }
-            $interval = new \DateInterval('P' . $rawValues[0]);                        
+            $interval = new \DateInterval('P' . $rawValues[0]);
             $dateTimeFrom = $dateTimeTo->sub($interval);
         } else {
-            $dateTimeFrom = new \DateTime($rawValues[0]);                        
+            $dateTimeFrom = new \DateTime($rawValues[0]);
         }
         $postVars['datefrom'] = $dateTimeFrom->format('d/m/Y');
         return $postVars;
@@ -2412,7 +2412,7 @@ function fillDateto(array $parameters, array $values, array $postVars) : array
         if ($rawValues[0] === $parameters['dateto']['default']) {
             $dateTimeTo = new \DateTime();
         } else {
-            $dateTimeTo = new \DateTime($rawValues[0]);                        
+            $dateTimeTo = new \DateTime($rawValues[0]);
         }
         $postVars['dateto'] = $dateTimeTo->format('d/m/Y');
         return $postVars;
@@ -2430,13 +2430,13 @@ function fillField(array $parameters, array $values, array $postVars) : array
             throw new \Exception('Array parametri di configurazione vuoto');
         }
         $rawValues = $values['field'];
-        $default = $parameters['field']['default'];                    
+        $default = $parameters['field']['default'];
         if ($rawValues[0] === $default) {
             $options = $parameters['field']['options'];
             $key = array_search($default, $options['costants']);
             $postVars['field'] = $options['alias'][$key];
         } else {
-            $postVars['field'] = $rawValues[0];                        
+            $postVars['field'] = $rawValues[0];
         }
         return $postVars;
     } catch (\Throwable $e) {
@@ -2471,14 +2471,14 @@ function setPostParameters(array $parameters, array $filledValues) : array
             if (array_diff($keys, array_keys($parameters)) || (!array_key_exists('var', $filledValues))) {
                 throw new \Exception('Parametri errati');
             }
-            foreach ($filledValues['var'] as $nvar => $variable) {                
+            foreach ($filledValues['var'] as $nvar => $variable) {
                 foreach ($keys as $key) {
                     if ($key === 'var') {
                         $postParams[$nvar][$key] = $variable;
                     } else {
                         $postParams[$nvar][$key] = $filledValues[$key];
                     }
-                }              
+                }
             }
         }
         return $postParams;
@@ -2502,7 +2502,7 @@ function goCurl(array $postParams, string $url) : string
         }
         $message = '';
         $i = 1;
-        foreach ($postParams as $key => $params) {        
+        foreach ($postParams as $key => $params) {
             $ch = curl_init();
         
             curl_setopt($ch, CURLOPT_URL, $url);
@@ -2517,7 +2517,8 @@ function goCurl(array $postParams, string $url) : string
 
             curl_close($ch);
             
-            $message .= $i . ') ' . $params['var'] . ': ' . htmlspecialchars(strip_tags($report)) . PHP_EOL;
+            $response = checkCurlResponse($report, DEBUG_LEVEL);            
+            $message .= $i . ') ' . $params['var'] . ': ' . $response . PHP_EOL;
             $i++;
         }
         return $message;
@@ -2540,21 +2541,43 @@ function selectLastPrevData(string $db, array $parametri, array $dati, string $c
             $lastParam = [
                 'variabile' => $parametri['variabile'],
                 'tipo_dato' => $parametri['tipo_dato'],
-                'data_e_ora' => $parametri['data_iniziale']            
-            ];                
+                'data_e_ora' => $parametri['data_iniziale']
+            ];
             $result = getDataFromDb($db, 'query_ultimo_precedente', $lastParam);
             if (count($result) > 0) {
                 $strData = $lastParam['data_e_ora']->format('Y-m-d H:i:s');
                 $dateTime = new \DateTime($strData, new \DateTimeZone('Europe/Rome'));
                 $last[$categoria] = $result;
                 $last[$categoria][0]['data_e_ora'] = $dateTime;
-            } else {                
+            } else {
                 $last = $dati;
-            }          
+            }
         } else {
             $last = $dati;
-        }        
+        }
         return $last;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function checkCurlResponse(string $response, int $debug_level) : string
+{
+    try {
+        if ($debug_level > 2) {
+            throw new \Exception('Livello di debug non definito');
+        }
+        if ($response === '') {
+            $message = 'Elaborazone fallita.';
+            if ($debug_level === 1) {
+                $message .= ' Verificare il log degli errori (' . realpath(LOG_PATH) . '/' . ERROR_LOG . ').';
+            }
+        } else {
+            $message = htmlspecialchars(strip_tags($response));
+        }        
+        return $message;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;

@@ -41,8 +41,8 @@ class Error
             case 1:
                 $message = $date->format('d/m/Y H:i:s') . ' Errore fatale funzione ' . $functionName . '()' . PHP_EOL;
                 self::appendToFile($message);
-                break;           
-        }       
+                break;
+        }
     }
     
     /**
@@ -64,15 +64,15 @@ class Error
         switch ($debug_level) {
             case 0:
                 break;
-            case 1:                
-                $message = self::defineMessage($e, true);        
+            case 1:
+                $message = self::defineMessage($e, true);
                 self::appendToFile($message);
                 break;
-            case 2:                
-                $message = self::defineMessage($e, $isCli);        
-                echo $message;                
+            case 2:
+                $message = self::defineMessage($e, $isCli);
+                echo $message;
                 break;
-        }         
+        }
     }
     
     /**
@@ -110,14 +110,14 @@ class Error
             $offset = 3;
             $message .= 'Descrizione Errore' . PHP_EOL;
 
-            $lines[] = 'File: ' . $e->getFile() . PHP_EOL;                
+            $lines[] = 'File: ' . $e->getFile() . PHP_EOL;
             $lines[] = 'Linea: ' . $e->getLine() . PHP_EOL;
             $lines[] = 'Codice errore: ' . $e->getCode() . PHP_EOL;
             $lines[] = 'Messaggio di errore: ' . $e->getMessage() . PHP_EOL;
 
             foreach ($lines as $line) {
                 $message .= str_pad($line, strlen($line) + $offset, ' ', STR_PAD_LEFT);
-            }                
+            }
             $stack = $e->getTraceAsString();
             $arrStack = explode('#', $stack);
 

@@ -30,24 +30,24 @@ class Utility
      * @return void
      */
     public static function getJsonArray(string $path, ?array $keys = null, ?string $deepKey = null) : array
-    {        
+    {
         try {
             $response = [];
-            $string = @file_get_contents($path);        
+            $string = @file_get_contents($path);
             $json = json_decode($string, true);
 
             if ($keys !== null) {
                 $jsonArray = self::getSubArray($json, $keys);
             } else {
                 $jsonArray = $json;
-            }        
+            }
             if ($deepKey !== null) {
                 if (is_array($jsonArray) && array_key_exists($deepKey, $jsonArray)) {
                     if (is_array($jsonArray[$deepKey])) {
                         throw new \Exception('Problemi con il file json. Parametro deepKey usato impropriamente');
                     } else {
                         $response[] = $jsonArray[$deepKey];
-                    }                
+                    }
                 } else {
                     throw new \Exception('Problemi con il file json. Rivedere i parametri');
                 }
@@ -78,14 +78,14 @@ class Utility
             $key = $keys[0];
             $subKeys = array_slice($keys, 1);
             if (array_key_exists($key, $master)) {
-                if (count($subKeys) > 0) {    
+                if (count($subKeys) > 0) {
                     $subArray = self::getSubArray($master[$key], $subKeys);
                 } else {
                     $subArray = $master[$key];
                 }
             } else {
                 throw new \Exception('Problemi con il file json. Chiave inesistente');
-            }                
+            }
             return $subArray;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);

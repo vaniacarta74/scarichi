@@ -17,7 +17,7 @@ class ScarichiTest extends TestCase
         $description = $composer['description'];
         $header = setHeader($composer);
         $single = '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/01/2019 al 02/01/2019 avvenuta con successo. File CSV full esportati.' . PHP_EOL;
-        $double = $single . '2) 30040: Elaborazione dati Volume variabile 30040 dal 01/01/2019 al 02/01/2019 avvenuta con successo. File CSV full esportati.' . PHP_EOL;        
+        $double = $single . '2) 30040: Elaborazione dati Volume variabile 30040 dal 01/01/2019 al 02/01/2019 avvenuta con successo. File CSV full esportati.' . PHP_EOL;
         
         $data = [
             'standard' => [
@@ -85,7 +85,7 @@ class ScarichiTest extends TestCase
                 'nozero' => '',
                 'campo' => '',
                 'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/05/2019 al 02/05/2019 avvenuta con successo. File CSV full esportati.' . PHP_EOL
-            ],            
+            ],
             'field other' => [
                 'help' => null,
                 'version' => null,
@@ -139,7 +139,7 @@ class ScarichiTest extends TestCase
                 'dateto' => null,
                 'nozero' => null,
                 'campo' => null,
-                'expected' => $header . PHP_EOL . $description . PHP_EOL 
+                'expected' => $header . PHP_EOL . $description . PHP_EOL
             ],
             'version' => [
                 'help' => null,
@@ -199,14 +199,14 @@ class ScarichiTest extends TestCase
         
         $paramsFilter = array_filter($paramsRaw, function ($value) {
             return !is_null($value);
-        });        
+        });
         $params = [];
         array_walk($paramsFilter, function ($item, $key) use (&$params) {
             if ($item === '') {
                 $params[] = $key;
             } else {
                 $params[] = $key . ' ' . $item;
-            }            
+            }
         });
         
         $arg = implode(' ', $params);
@@ -216,11 +216,11 @@ class ScarichiTest extends TestCase
         if ($arg === '-d' || $arg === '--default') {
             $this->assertEquals('default', 'default');
         } elseif ($arg === '-h' || $arg === '--help') {
-            $actual = shell_exec($command);        
+            $actual = shell_exec($command);
             $this->assertStringContainsString($expected, $actual);
         } else {
-            $actual = shell_exec($command);        
+            $actual = shell_exec($command);
             $this->assertEquals($expected, $actual);
-        }        
+        }
     }
 }

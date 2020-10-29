@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -24,10 +24,9 @@ try {
     
     $filledValues = fillParameters($parameters, $values);
     $postParams = setPostParameters($parameters, $filledValues);
-    $message .= goCurl($postParams, $url);
-    //$message = checkMessage($message);
+    $message .= goCurl($postParams, $url);    
     
-    echo $message;        
+    echo $message;
 } catch (\Throwable $e) {
     Error::errorHandler($e, DEBUG_LEVEL, true);
     exit();

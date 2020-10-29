@@ -96,7 +96,7 @@ use function vaniacarta74\Scarichi\setPostParameters as setPostParameters;
 use function vaniacarta74\Scarichi\goCurl as goCurl;
 use function vaniacarta74\Scarichi\insertNoData as insertNoData;
 use function vaniacarta74\Scarichi\selectLastPrevData as selectLastPrevData;
-
+use function vaniacarta74\Scarichi\checkCurlResponse as checkCurlResponse;
 
 class ToolsTest extends TestCase
 {
@@ -2229,8 +2229,8 @@ class ToolsTest extends TestCase
             'id_variabile' => 30030,
             'impianto' => 75,
             'unita_misura' => 'mc'
-        ];        
-        $dati = [];        
+        ];
+        $dati = [];
         $expected = [];
         
         $actual = initVolumi($variabili, $dati);
@@ -2511,13 +2511,13 @@ class ToolsTest extends TestCase
      */
     public function testAddCategoriaNoCategoryEquals() : void
     {
-        $volumi = [];        
+        $volumi = [];
         $dati = [
             'livello' => [],
             'livello monte' => [],
             'manovra' => [],
-        ];        
-        $categoria = 'manovra';        
+        ];
+        $categoria = 'manovra';
         $expected = [];
         
         $actual = addCategoria($volumi, $dati, $categoria);
@@ -2671,7 +2671,7 @@ class ToolsTest extends TestCase
     public function testAddMediaNoCategoryEquals() : void
     {
         $volumi = [];
-        $campo = 'livello';        
+        $campo = 'livello';
         $expected = [];
         
         $actual = addMedia($volumi, $campo);
@@ -2702,8 +2702,8 @@ class ToolsTest extends TestCase
                 'livello valle' => NODATA,
                 'tipo_dato' => 1
             ]
-        ];        
-        $campo = 'livello valle';        
+        ];
+        $campo = 'livello valle';
         $expected = [
             '0' => [
                 'variabile' => 30030,
@@ -3017,7 +3017,7 @@ class ToolsTest extends TestCase
      */
     public function testAddAltezzaNoCategoryEquals() : void
     {
-        $volumi = [];        
+        $volumi = [];
         $specifiche = [
             'tipo_formula' => 'portata galleria',
             'scarico' => 1,
@@ -3025,7 +3025,7 @@ class ToolsTest extends TestCase
             'larghezza' => 40.5,
             'quota' => 260,
             'limite' => 942.67
-        ];        
+        ];
         $expected = [];
         
         $actual = addAltezza($volumi, $specifiche);
@@ -3569,7 +3569,7 @@ class ToolsTest extends TestCase
                 'portata' => NODATA
             ]
         ];
-        $campo = 'data_e_ora';        
+        $campo = 'data_e_ora';
         $expected = [
             '0' => [
                 'variabile' => 30051,
@@ -3617,7 +3617,7 @@ class ToolsTest extends TestCase
     public function testAddDeltaNoCategoryEquals() : void
     {
         $volumi = [];
-        $campo = 'data_e_ora';        
+        $campo = 'data_e_ora';
         $expected = [];
         
         $actual = addDelta($volumi, $campo);
@@ -4076,8 +4076,8 @@ class ToolsTest extends TestCase
      */
     public function testFormatNoCategoryEquals() : void
     {
-        $campo = 'portata';        
-        $volumi = [];        
+        $campo = 'portata';
+        $volumi = [];
         $expected = [];
         
         $actual = format($volumi, $campo);
@@ -4264,7 +4264,7 @@ class ToolsTest extends TestCase
      */
     public function testSetPathNoSubEquals() : void
     {
-        $variabile = 'Test';        
+        $variabile = 'Test';
         $path = CSV;
         $makeDir = false;
         
@@ -4292,7 +4292,7 @@ class ToolsTest extends TestCase
         $this->assertEquals($expected, $actual);
         
         return $variabile;
-    }   
+    }
     
     /**
      * @group depends
@@ -4311,7 +4311,7 @@ class ToolsTest extends TestCase
         $this->assertEquals($expected, $actual);
         
         rmdir($actual);
-    }   
+    }
     
     /**
      * @group depends
@@ -4485,9 +4485,10 @@ class ToolsTest extends TestCase
                 'tipo_dato' => '1',
                 'valore' => '2278,234'
             ]
-        ];
+        ];        
         
-        $expected = CSV . '/v30030/Livello_30030_201803252030_201803252045_full.csv';
+        $subDir = MAKESUBDIR ? '/v30030' : '';
+        $expected = CSV . $subDir . '/Livello_30030_201803252030_201803252045_full.csv';
         
         printPart($dati, $i, $filtered, $field);
         
@@ -4541,9 +4542,10 @@ class ToolsTest extends TestCase
         $field = 'delta';
         $limit = 1;
         
+        $subDir = MAKESUBDIR ? '/v30030' : '';
         $expecteds = [
-            CSV . '/v30030/Delta_30030_201801020000_201801020000_full.csv',
-            CSV . '/v30030/Delta_30030_201801020015_201801020015_full.csv',
+            CSV . $subDir . '/Delta_30030_201801020000_201801020000_full.csv',
+            CSV . $subDir . '/Delta_30030_201801020015_201801020015_full.csv',
         ];
         
         divideAndPrint($volumi, $full, $field, $limit);
@@ -4563,8 +4565,9 @@ class ToolsTest extends TestCase
         $full = true;
         $field = 'delta';
         
+        $subDir = MAKESUBDIR ? '/v30030' : '';
         $expecteds = [
-            CSV . '/v30030/Delta_30030_201801020000_201801020015_full.csv'
+            CSV . $subDir . '/Delta_30030_201801020000_201801020015_full.csv'
         ];
         
         divideAndPrint($volumi, $full, $field);
@@ -5575,7 +5578,7 @@ class ToolsTest extends TestCase
         
         $actual = integraDate($target, $checkers);
         
-       $this->assertEquals($expected, $actual);
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -5619,7 +5622,7 @@ class ToolsTest extends TestCase
                     'data_e_ora' => new \DateTime('05/01/2020 01:30:00'),
                     'tipo_dato' => 1
                 ]
-            ]            
+            ]
         ];
         
         $this->expectException(\Exception::class);
@@ -5695,7 +5698,7 @@ class ToolsTest extends TestCase
         $actual = insertNoData($target, $dato);
         
         $this->assertEquals($expected, $actual);
-    }  
+    }
     
     /**
      * @group tools
@@ -5703,7 +5706,7 @@ class ToolsTest extends TestCase
      */
     public function testInsertNoDataException() : void
     {
-        $target = [];        
+        $target = [];
         $dato = [];
         
         $this->expectException(\Exception::class);
@@ -7739,7 +7742,7 @@ class ToolsTest extends TestCase
      */
     public function testTrovaCapiNoDataException() : void
     {
-        $input = [];       
+        $input = [];
         
         $this->expectException(\Exception::class);
         
@@ -8708,7 +8711,7 @@ class ToolsTest extends TestCase
             "params",
             "default",
             "descriptions"
-        ];            
+        ];
         
         $expected = [
             [
@@ -8719,13 +8722,13 @@ class ToolsTest extends TestCase
             [
                 "params" => "",
                 "default" => "",
-                "descriptions" => "<var> o per tutte (ALL). Default ALL."                
+                "descriptions" => "<var> o per tutte (ALL). Default ALL."
             ]
         ];
         
         $actual = getHelpLines($parameters, $sections);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -8765,11 +8768,11 @@ class ToolsTest extends TestCase
                 "params",
                 "descriptions",
                 "default"
-        ];            
+        ];
         
         $expected = [
             [
-                "params" => "-V --var",                
+                "params" => "-V --var",
                 "descriptions" => "Esegue il calcolo per ciascuna delle variabili <var> o per tutte (ALL). Default ALL.",
                 "default" => "[=ALL]"
             ]
@@ -8777,7 +8780,7 @@ class ToolsTest extends TestCase
         
         $actual = getHelpLines($parameters, $sections);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -8818,7 +8821,7 @@ class ToolsTest extends TestCase
      */
     public function testFormatParamsEquals() : void
     {
-        $properties = [            
+        $properties = [
                 "short" => "V",
                 "long" => "var"
         ];
@@ -8827,7 +8830,7 @@ class ToolsTest extends TestCase
          
         $actual = formatParams($properties);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -8836,7 +8839,7 @@ class ToolsTest extends TestCase
      */
     public function testFormatParamsException() : void
     {
-        $properties = [            
+        $properties = [
                 "short" => "",
                 "long" => "va"
         ];
@@ -8852,7 +8855,7 @@ class ToolsTest extends TestCase
      */
     public function testFormatDefaultEquals() : void
     {
-        $properties = [            
+        $properties = [
                 "default" => "ALL"
         ];
         
@@ -8860,7 +8863,7 @@ class ToolsTest extends TestCase
          
         $actual = formatDefault($properties);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -8869,7 +8872,7 @@ class ToolsTest extends TestCase
      */
     public function testFormatDefaultVoidEquals() : void
     {
-        $properties = [            
+        $properties = [
                 "default" => ""
         ];
         
@@ -8877,7 +8880,7 @@ class ToolsTest extends TestCase
          
         $actual = formatDefault($properties);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -8886,7 +8889,7 @@ class ToolsTest extends TestCase
      */
     public function testFormatDefaultException() : void
     {
-        $properties = [            
+        $properties = [
                 "pippo" => "V"
         ];
         
@@ -8901,7 +8904,7 @@ class ToolsTest extends TestCase
      */
     public function testFormatDefaultRegexException() : void
     {
-        $properties = [            
+        $properties = [
                 "default" => "v"
         ];
         
@@ -8916,7 +8919,7 @@ class ToolsTest extends TestCase
      */
     public function testFormatVariablesEquals() : void
     {
-        $properties = [            
+        $properties = [
             "options" => [
                 "variables" => ['30030','30040']
             ]
@@ -8926,7 +8929,7 @@ class ToolsTest extends TestCase
          
         $actual = formatVariables($properties);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -8935,7 +8938,7 @@ class ToolsTest extends TestCase
      */
     public function testFormatVariablesVoidEquals() : void
     {
-        $properties = [            
+        $properties = [
             "options" => [
                 "variables" => []
             ]
@@ -8945,7 +8948,7 @@ class ToolsTest extends TestCase
          
         $actual = formatVariables($properties);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -8954,7 +8957,7 @@ class ToolsTest extends TestCase
      */
     public function testFormatVariablesException() : void
     {
-        $properties = [            
+        $properties = [
             "options" => [
                 "pippo" => ['30030','30040']
             ]
@@ -8971,7 +8974,7 @@ class ToolsTest extends TestCase
      */
     public function testFormatCostantsEquals() : void
     {
-        $properties = [            
+        $properties = [
             "options" => [
                 "costants" => ['TRUE','FALSE'],
                 "limits" => []
@@ -8982,7 +8985,7 @@ class ToolsTest extends TestCase
          
         $actual = formatCostants($properties);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -8991,7 +8994,7 @@ class ToolsTest extends TestCase
      */
     public function testFormatCostantsLimitsEquals() : void
     {
-        $properties = [            
+        $properties = [
             "options" => [
                 "costants" => ['D','W','M','Y'],
                 "limits" => ['364','51','11','9']
@@ -9002,7 +9005,7 @@ class ToolsTest extends TestCase
          
         $actual = formatCostants($properties);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -9011,7 +9014,7 @@ class ToolsTest extends TestCase
      */
     public function testFormatCostantsVoidEquals() : void
     {
-        $properties = [            
+        $properties = [
             "options" => [
                 "costants" => [],
                 "limits" => []
@@ -9022,7 +9025,7 @@ class ToolsTest extends TestCase
          
         $actual = formatCostants($properties);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -9031,7 +9034,7 @@ class ToolsTest extends TestCase
      */
     public function testFormatCostantsException() : void
     {
-        $properties = [            
+        $properties = [
             "options" => [
                 "pippo" => ['TRUE','FALSE']
             ]
@@ -9049,7 +9052,7 @@ class ToolsTest extends TestCase
     {
         $data = [
             'full' => [
-                'properties' => [            
+                'properties' => [
                     "options" => [
                         "variables" => ['var1'],
                         "costants" => ['V'],
@@ -9059,7 +9062,7 @@ class ToolsTest extends TestCase
                 'expected' => "<var1>|V"
             ],
             'full multi' => [
-                'properties' => [            
+                'properties' => [
                     "options" => [
                         "variables" => ['var1','var2'],
                         "costants" => ['V','M','Q'],
@@ -9069,7 +9072,7 @@ class ToolsTest extends TestCase
                 'expected' => "<var1>,<var2>|V|M|Q"
             ],
             'only variables' => [
-                'properties' => [            
+                'properties' => [
                     "options" => [
                         "variables" => ['var1','var2'],
                         "costants" => [],
@@ -9079,7 +9082,7 @@ class ToolsTest extends TestCase
                 'expected' => "<var1>,<var2>"
             ],
             'only costants' => [
-                'properties' => [            
+                'properties' => [
                     "options" => [
                         "variables" => [],
                         "costants" => ['V','M','Q'],
@@ -9089,7 +9092,7 @@ class ToolsTest extends TestCase
                 'expected' => "V|M|Q"
             ],
             'no options' => [
-                'properties' => [            
+                'properties' => [
                     "options" => [
                         "variables" => [],
                         "costants" => [],
@@ -9112,7 +9115,7 @@ class ToolsTest extends TestCase
     {
         $actual = formatOptions($properties);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -9122,7 +9125,7 @@ class ToolsTest extends TestCase
     {
         $data = [
             'variables exception' => [
-                'properties' => [            
+                'properties' => [
                     "options" => [
                         "variables" => ['','var2'],
                         "costants" => ['V'],
@@ -9131,7 +9134,7 @@ class ToolsTest extends TestCase
                 ]
             ],
             'costants exception1' => [
-                'properties' => [            
+                'properties' => [
                     "options" => [
                         "variables" => ['var1','var2'],
                         "costants" => ['v','m','q'],
@@ -9140,7 +9143,7 @@ class ToolsTest extends TestCase
                 ]
             ],
             'costants exception2' => [
-                'properties' => [            
+                'properties' => [
                     "options" => [
                         "variables" => ['var1','var2'],
                         "costants" => ['','M','Q'],
@@ -9171,7 +9174,7 @@ class ToolsTest extends TestCase
      */
     public function testFormatDescriptionsEquals() : void
     {
-        $properties = [            
+        $properties = [
             "descriptions" => [
                 "pippo",
                 "pluto",
@@ -9183,7 +9186,7 @@ class ToolsTest extends TestCase
          
         $actual = formatDescriptions($properties);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -9192,7 +9195,7 @@ class ToolsTest extends TestCase
      */
     public function testFormatDescriptionsVoidEquals() : void
     {
-        $properties = [            
+        $properties = [
             "descriptions" => []
         ];
         
@@ -9200,7 +9203,7 @@ class ToolsTest extends TestCase
          
         $actual = formatDescriptions($properties);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -9209,7 +9212,7 @@ class ToolsTest extends TestCase
      */
     public function testFormatDescriptionsException() : void
     {
-        $properties = [            
+        $properties = [
             "options" => [
                 "pippo",
                 "pluto",
@@ -9228,7 +9231,7 @@ class ToolsTest extends TestCase
      */
     public function testFormatShortEquals() : void
     {
-        $properties = [            
+        $properties = [
             "short" => "h"
         ];
         
@@ -9236,7 +9239,7 @@ class ToolsTest extends TestCase
          
         $actual = formatShort($properties);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
       
     /**
@@ -9245,7 +9248,7 @@ class ToolsTest extends TestCase
      */
     public function testFormatShortException() : void
     {
-        $properties = [            
+        $properties = [
             "short" => "ha"
         ];
         
@@ -9260,7 +9263,7 @@ class ToolsTest extends TestCase
      */
     public function testFormatLongEquals() : void
     {
-        $properties = [            
+        $properties = [
             "long" => "version"
         ];
         
@@ -9268,7 +9271,7 @@ class ToolsTest extends TestCase
          
         $actual = formatLong($properties);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
       
     /**
@@ -9277,7 +9280,7 @@ class ToolsTest extends TestCase
      */
     public function testFormatLongException() : void
     {
-        $properties = [            
+        $properties = [
             "long" => "to"
         ];
         
@@ -9302,7 +9305,7 @@ class ToolsTest extends TestCase
          
         $actual = formatPardef($properties);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -9321,7 +9324,7 @@ class ToolsTest extends TestCase
          
         $actual = formatPardef($properties);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
       
     /**
@@ -9427,7 +9430,7 @@ class ToolsTest extends TestCase
         $this->expectException(\Exception::class);
         
         fillLineSections($properties, $sections);
-    } 
+    }
     
     /**
      * @group test
@@ -9452,7 +9455,7 @@ class ToolsTest extends TestCase
         $this->expectException(\Exception::class);
         
         fillLineSections($properties, $sections);
-    }  
+    }
     
     /**
      * @group test
@@ -9469,7 +9472,7 @@ class ToolsTest extends TestCase
             [
                 "params" => "",
                 "default" => "",
-                "descriptions" => "<var> o per tutte (ALL). Default ALL."                
+                "descriptions" => "<var> o per tutte (ALL). Default ALL."
             ]
         ];
         
@@ -9497,7 +9500,7 @@ class ToolsTest extends TestCase
             [
                 "params" => "",
                 "default" => "",
-                "descriptions" => "<var> o per tutte (ALL). Default ALL."                
+                "descriptions" => "<var> o per tutte (ALL). Default ALL."
             ]
         ];
         
@@ -9530,8 +9533,8 @@ class ToolsTest extends TestCase
     public function testSetConsoleEquals() : void
     {
         $help = [
-            "global" => [                
-                "sections" => [            
+            "global" => [
+                "sections" => [
                     "short",
                     "long",
                     "params",
@@ -9557,7 +9560,7 @@ class ToolsTest extends TestCase
                     "descriptions" => [
                         "Stampa questo help."
                     ]
-                ],                
+                ],
                 "var" => [
                     "short" => "V",
                     "long" => "var",
@@ -9616,7 +9619,7 @@ class ToolsTest extends TestCase
                     "name" => "Vania Carta"
                 ]
             ],
-        ];       
+        ];
         
         $expected = 'scarichi 1.2.0 by Vania Carta and contributors';
          
@@ -9655,8 +9658,8 @@ class ToolsTest extends TestCase
         
         $help = [
             "command" => "php",
-            "global" => [                
-                "sections" => [            
+            "global" => [
+                "sections" => [
                     "pardef",
                     "options",
                     "descriptions"
@@ -9678,7 +9681,7 @@ class ToolsTest extends TestCase
                         "Stampa questo help."
                     ],
                     "type" => "single"
-                ],                
+                ],
                 "var" => [
                     "name" => "variabile",
                     "short" => "V",
@@ -9986,8 +9989,8 @@ class ToolsTest extends TestCase
         
         $help = [
             "command" => "php",
-            "global" => [                
-                "sections" => [            
+            "global" => [
+                "sections" => [
                     "pardef",
                     "options",
                     "descriptions"
@@ -10009,7 +10012,7 @@ class ToolsTest extends TestCase
                         "Stampa questo help."
                     ],
                     "type" => "single"
-                ],                
+                ],
                 "var" => [
                     "name" => "variabile",
                     "short" => "V",
@@ -10195,11 +10198,11 @@ class ToolsTest extends TestCase
      * covers propertyToString()
      * @dataProvider propertyToStringProvider
      */
-    public function testPropertyToStringEquals(array $parameters, string $paramName, string $propertyName,string $expected) : void
+    public function testPropertyToStringEquals(array $parameters, string $paramName, string $propertyName, string $expected) : void
     {
         $actual = propertyToString($parameters, $paramName, $propertyName);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -10310,7 +10313,7 @@ class ToolsTest extends TestCase
                 'filterInValue' => null,
                 'filterOutField' => null,
                 'filterOutValue' => null,
-                'prefix' => null, 
+                'prefix' => null,
                 'expected' => []
             ],
             'dummy' => [
@@ -10321,7 +10324,7 @@ class ToolsTest extends TestCase
                 'filterInValue' => null,
                 'filterOutField' => null,
                 'filterOutValue' => null,
-                'prefix' => null, 
+                'prefix' => null,
                 'expected' => [
                     'dummy'
                 ]
@@ -10334,7 +10337,7 @@ class ToolsTest extends TestCase
                 'filterInValue' => null,
                 'filterOutField' => null,
                 'filterOutValue' => null,
-                'prefix' => null, 
+                'prefix' => null,
                 'expected' => [
                     'help',
                     'var',
@@ -10349,7 +10352,7 @@ class ToolsTest extends TestCase
                 'filterInValue' => 'group',
                 'filterOutField' => null,
                 'filterOutValue' => null,
-                'prefix' => null, 
+                'prefix' => null,
                 'expected' => [
                     'var',
                     'var2'
@@ -10363,7 +10366,7 @@ class ToolsTest extends TestCase
                 'filterInValue' => null,
                 'filterOutField' => 'type',
                 'filterOutValue' => 'single',
-                'prefix' => null, 
+                'prefix' => null,
                 'expected' => [
                     'var',
                     'var2'
@@ -10377,7 +10380,7 @@ class ToolsTest extends TestCase
                 'filterInValue' => 'group',
                 'filterOutField' => 'long',
                 'filterOutValue' => 'var2',
-                'prefix' => null, 
+                'prefix' => null,
                 'expected' => [
                     'var'
                 ]
@@ -10390,7 +10393,7 @@ class ToolsTest extends TestCase
                 'filterInValue' => null,
                 'filterOutField' => null,
                 'filterOutValue' => null,
-                'prefix' => '*', 
+                'prefix' => '*',
                 'expected' => [
                     '*help',
                     '*var',
@@ -10405,7 +10408,7 @@ class ToolsTest extends TestCase
                 'filterInValue' => 'paperino',
                 'filterOutField' => null,
                 'filterOutValue' => null,
-                'prefix' => null, 
+                'prefix' => null,
                 'expected' => [
                     'dummy',
                     'help',
@@ -10421,7 +10424,7 @@ class ToolsTest extends TestCase
                 'filterInValue' => null,
                 'filterOutField' => 'pluto',
                 'filterOutValue' => 'paperino',
-                'prefix' => null, 
+                'prefix' => null,
                 'expected' => [
                     'dummy',
                     'help',
@@ -10437,7 +10440,7 @@ class ToolsTest extends TestCase
                 'filterInValue' => 'paperino',
                 'filterOutField' => 'type',
                 'filterOutValue' => 'group',
-                'prefix' => null, 
+                'prefix' => null,
                 'expected' => [
                     'dummy',
                     'help'
@@ -10451,7 +10454,7 @@ class ToolsTest extends TestCase
                 'filterInValue' => 'single',
                 'filterOutField' => 'pluto',
                 'filterOutValue' => 'paperino',
-                'prefix' => null, 
+                'prefix' => null,
                 'expected' => [
                     'dummy',
                     'help'
@@ -10465,7 +10468,7 @@ class ToolsTest extends TestCase
                 'filterInValue' => 'single',
                 'filterOutField' => 'type',
                 'filterOutValue' => 'single',
-                'prefix' => '-', 
+                'prefix' => '-',
                 'expected' => []
             ],
             'assoc' => [
@@ -10476,7 +10479,7 @@ class ToolsTest extends TestCase
                 'filterInValue' => null,
                 'filterOutField' => null,
                 'filterOutValue' => null,
-                'prefix' => null, 
+                'prefix' => null,
                 'expected' => [
                     'dummy' => 'x',
                     'help' => 'h',
@@ -10498,7 +10501,7 @@ class ToolsTest extends TestCase
     {
         $actual = getProperties($parameters, $propertyName, $assoc, $filterInName, $filterInValue, $filterOutName, $filterOutValue, $prefix);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -10513,7 +10516,7 @@ class ToolsTest extends TestCase
         $this->expectException(\Exception::class);
         
         getProperties($parameters, $propertyName);
-    }   
+    }
     
     /**
      * @coversNothing
@@ -10522,20 +10525,20 @@ class ToolsTest extends TestCase
     {
         $parameters = [
            "help" => [
-                "name" => "help",                
+                "name" => "help",
                 "type" => "single"
             ],
             "variabile" => [
-                "name" => "variabile",                
+                "name" => "variabile",
                 "type" => "group"
             ],
             "variabile2" => [
-                "name" => "variabile",                
+                "name" => "variabile",
                 "type" => "group"
             ]
         ];
 
-        $data = [            
+        $data = [
             'include' => [
                 'parameters' => $parameters,
                 'field' => 'type',
@@ -10543,11 +10546,11 @@ class ToolsTest extends TestCase
                 'include' => true,
                 'expected' => [
                     "variabile" => [
-                        "name" => "variabile",                        
+                        "name" => "variabile",
                         "type" => "group"
                     ],
                     "variabile2" => [
-                        "name" => "variabile",                        
+                        "name" => "variabile",
                         "type" => "group"
                     ]
                 ]
@@ -10559,7 +10562,7 @@ class ToolsTest extends TestCase
                 'include' => false,
                 'expected' => [
                     "help" => [
-                        "name" => "help",                
+                        "name" => "help",
                         "type" => "single"
                     ]
                 ]
@@ -10571,15 +10574,15 @@ class ToolsTest extends TestCase
                 'include' => true,
                 'expected' => [
                     "help" => [
-                        "name" => "help",                
+                        "name" => "help",
                         "type" => "single"
                     ],
                     "variabile" => [
-                        "name" => "variabile",                        
+                        "name" => "variabile",
                         "type" => "group"
                     ],
                     "variabile2" => [
-                        "name" => "variabile",                        
+                        "name" => "variabile",
                         "type" => "group"
                     ]
                 ]
@@ -10591,15 +10594,15 @@ class ToolsTest extends TestCase
                 'include' => false,
                 'expected' => [
                     "help" => [
-                        "name" => "help",                
+                        "name" => "help",
                         "type" => "single"
                     ],
                     "variabile" => [
-                        "name" => "variabile",                        
+                        "name" => "variabile",
                         "type" => "group"
                     ],
                     "variabile2" => [
-                        "name" => "variabile",                        
+                        "name" => "variabile",
                         "type" => "group"
                     ]
                 ]
@@ -10611,15 +10614,15 @@ class ToolsTest extends TestCase
                 'include' => true,
                 'expected' => [
                     "help" => [
-                        "name" => "help",                
+                        "name" => "help",
                         "type" => "single"
                     ],
                     "variabile" => [
-                        "name" => "variabile",                        
+                        "name" => "variabile",
                         "type" => "group"
                     ],
                     "variabile2" => [
-                        "name" => "variabile",                        
+                        "name" => "variabile",
                         "type" => "group"
                     ]
                 ]
@@ -10638,7 +10641,7 @@ class ToolsTest extends TestCase
     {
         $actual = filterProperties($parameters, $field, $value, $include);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -10664,14 +10667,14 @@ class ToolsTest extends TestCase
     public function testSelectAllQueryEquals() : void
     {
         $db = 'SSCP_data';
-        $query = 'query_variabili_ALL';        
+        $query = 'query_variabili_ALL';
         $expecteds = ['30030', '30040', '30041'];
                
         $actuals = selectAllQuery($db, $query);
         
         foreach ($expecteds as $key => $expected) {
-            $this->assertEquals($expected, $actuals[$key]);  
-        }                 
+            $this->assertEquals($expected, $actuals[$key]);
+        }
     }
     
     /**
@@ -10681,7 +10684,7 @@ class ToolsTest extends TestCase
     public function testSelectAllQueryException() : void
     {
         $db = 'dbutz';
-        $query = 'query_variabili_ALL';        
+        $query = 'query_variabili_ALL';
         
         $this->expectException(\Exception::class);
         
@@ -10695,38 +10698,38 @@ class ToolsTest extends TestCase
     {
         $parameters = [
            "help" => [
-               "short" => "h",                
+               "short" => "h",
                "long" => "help",
-               "type" => "single"               
+               "type" => "single"
             ],
             "var" => [
-               "short" => "V",                
+               "short" => "V",
                "long" => "var",
                "type" => "group"
             ],
             "datefrom" => [
-               "short" => "f",                
+               "short" => "f",
                "long" => "datefrom",
                "type" => "group"
             ],
             "dateto" => [
-               "short" => "t",                
+               "short" => "t",
                "long" => "dateto",
                "type" => "group"
             ],
             "field" => [
-               "short" => "c",                
+               "short" => "c",
                "long" => "campo",
                "type" => "group"
             ],
             "full" => [
-               "short" => "n",                
+               "short" => "n",
                "long" => "nozero",
                "type" => "group"
             ],
         ];
 
-        $data = [            
+        $data = [
             'no arg' => [
                 'parameters' => $parameters,
                 'argv' => [
@@ -10783,7 +10786,7 @@ class ToolsTest extends TestCase
     {
         $actual = allParameterSet($parameters, $arguments);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -10805,7 +10808,7 @@ class ToolsTest extends TestCase
      */
     public function checkCliVarProvider() : array
     {
-        $data = [            
+        $data = [
             'base' => [
                 'value' => '30030',
                 'expected' => ['30030']
@@ -10828,7 +10831,7 @@ class ToolsTest extends TestCase
     {
         $actual = checkCliVar($value);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -10853,9 +10856,9 @@ class ToolsTest extends TestCase
         $value = '31/01/2020';
         $expected = ['2020-01-31'];
         
-        $actual = checkCliDatefrom($value);     
+        $actual = checkCliDatefrom($value);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -10867,9 +10870,9 @@ class ToolsTest extends TestCase
         $value = '364D';
         $expected = ['364D'];
         
-        $actual = checkCliDatefrom($value);     
+        $actual = checkCliDatefrom($value);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -10894,9 +10897,9 @@ class ToolsTest extends TestCase
         $value = '31/01/2020';
         $expected = ['2020-01-31'];
         
-        $actual = checkCliDateto($value);     
+        $actual = checkCliDateto($value);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -10917,7 +10920,7 @@ class ToolsTest extends TestCase
      */
     public function checkCliFieldProvider() : array
     {
-        $data = [            
+        $data = [
             'volume' => [
                 'value' => 'V',
                 'expected' => ['volume']
@@ -10954,9 +10957,9 @@ class ToolsTest extends TestCase
      */
     public function testCheckCliFieldEquals(string $value, array $expected) : void
     {
-        $actual = checkCliField($value);     
+        $actual = checkCliField($value);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -10977,7 +10980,7 @@ class ToolsTest extends TestCase
      */
     public function checkCliFullProvider() : array
     {
-        $data = [            
+        $data = [
             'true' => [
                 'value' => 'TRUE',
                 'expected' => [true]
@@ -10998,9 +11001,9 @@ class ToolsTest extends TestCase
      */
     public function testCheckCliFullEquals(string $value, array $expected) : void
     {
-        $actual = checkCliFull($value);     
+        $actual = checkCliFull($value);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -11021,76 +11024,76 @@ class ToolsTest extends TestCase
      */
     public function checkParameterProvider() : array
     {
-        $data = [            
+        $data = [
             "var base" => [
-               "name" => "var",                
+               "name" => "var",
                "value" => "30030",
                "regex" => "/^[0-9]{5}([,][0-9]{5})*$/",
                "default" => "ALL",
-               "expected" => ['30030'] 
+               "expected" => ['30030']
             ],
             "var multi" => [
-               "name" => "var",                
+               "name" => "var",
                "value" => "30030,30040",
                "regex" => "/^[0-9]{5}([,][0-9]{5})*$/",
                "default" => "ALL",
-               "expected" => ['30030','30040'] 
+               "expected" => ['30030','30040']
             ],
             "var default" => [
-               "name" => "var",                
+               "name" => "var",
                "value" => "ALL",
                "regex" => "/^[0-9]{5}([,][0-9]{5})*$/",
                "default" => "ALL",
-               "expected" => ['ALL'] 
+               "expected" => ['ALL']
             ],
             "datefrom base" => [
-               "name" => "datefrom",                
+               "name" => "datefrom",
                "value" => "31/12/2020",
                "regex" => "/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/",
                "default" => "YEAR",
-               "expected" => ['2020-12-31'] 
+               "expected" => ['2020-12-31']
             ],
             "datefrom default" => [
-               "name" => "datefrom",                
+               "name" => "datefrom",
                "value" => "YEAR",
                "regex" => "/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/",
                "default" => "YEAR",
-               "expected" => ['YEAR'] 
+               "expected" => ['YEAR']
             ],
             "dateto default" => [
-               "name" => "dateto",                
+               "name" => "dateto",
                "value" => "NOW",
                "regex" => "/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/",
                "default" => "NOW",
-               "expected" => ['NOW'] 
+               "expected" => ['NOW']
             ],
             "field base" => [
-               "name" => "field",                
+               "name" => "field",
                "value" => "Q",
                "regex" => "/^[V|L|M|D|H|Q]$/",
                "default" => "V",
-               "expected" => ['portata'] 
+               "expected" => ['portata']
             ],
             "field default" => [
-               "name" => "field",                
+               "name" => "field",
                "value" => "V",
                "regex" => "/^[V|L|M|D|H|Q]$/",
                "default" => "V",
-               "expected" => ['volume'] 
+               "expected" => ['volume']
             ],
             "full base" => [
-               "name" => "full",                
+               "name" => "full",
                "value" => "TRUE",
                "regex" => "/^((TRUE)|(FALSE))$/",
                "default" => "FALSE",
-               "expected" => [true] 
+               "expected" => [true]
             ],
             "full default" => [
-               "name" => "full",                
+               "name" => "full",
                "value" => "FALSE",
                "regex" => "/^((TRUE)|(FALSE))$/",
                "default" => "FALSE",
-               "expected" => [false] 
+               "expected" => [false]
             ]
         ];
         
@@ -11104,9 +11107,9 @@ class ToolsTest extends TestCase
      */
     public function testCheckParameterEquals(string $paramName, string $paramValue, string $regex, string $default, array $expected) : void
     {
-        $actual = checkParameter($paramName, $paramValue, $regex, $default);     
+        $actual = checkParameter($paramName, $paramValue, $regex, $default);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -11130,40 +11133,40 @@ class ToolsTest extends TestCase
      */
     public function setParameterProvider() : array
     {
-        $parameters = [           
+        $parameters = [
             "var" => [
-               "short" => "V",                
+               "short" => "V",
                "long" => "var",
                "regex" => "/^[0-9]{5}([,][0-9]{5})*$/",
                "default" => "ALL"
             ],
             "datefrom" => [
-               "short" => "f",                
+               "short" => "f",
                "long" => "datefrom",
                "regex" => "/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/",
                "default" => "YEAR"
             ],
             "dateto" => [
-               "short" => "t",                
+               "short" => "t",
                "long" => "dateto",
                "regex" => "/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/",
                "default" => "NOW"
             ],
             "field" => [
-               "short" => "c",                
+               "short" => "c",
                "long" => "campo",
                "regex" => "/^[V|L|M|D|H|Q]$/",
                "default" => "V"
             ],
             "full" => [
-               "short" => "n",                
+               "short" => "n",
                "long" => "nozero",
                "regex" => "/^((TRUE)|(FALSE))$/",
                "default" => "FALSE"
             ]
         ];
 
-        $data = [       
+        $data = [
             'var base' => [
                 'parameters' => $parameters,
                 'param' => 'var',
@@ -11181,13 +11184,13 @@ class ToolsTest extends TestCase
                 'param' => 'var',
                 'argv' => ['scarichi.php', '-V', 'ALL', '-f', '-t', '-c', '-n'],
                 'expected' => ['ALL']
-            ],            
+            ],
             'var no value' => [
                 'parameters' => $parameters,
                 'param' => 'var',
                 'argv' => ['scarichi.php', '-V', '-f', '-t', '-c', '-n'],
                 'expected' => ['ALL']
-            ],            
+            ],
             'var double' => [
                 'parameters' => $parameters,
                 'param' => 'var',
@@ -11276,11 +11279,11 @@ class ToolsTest extends TestCase
      * covers setParameter()
      * @dataProvider setParameterProvider
      */
-    public function testSetParameterEquals(array $parameters,string $paramName, array $arguments, array $expected) : void
+    public function testSetParameterEquals(array $parameters, string $paramName, array $arguments, array $expected) : void
     {
-        $actual = setParameter($parameters, $paramName, $arguments);     
+        $actual = setParameter($parameters, $paramName, $arguments);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -11305,56 +11308,56 @@ class ToolsTest extends TestCase
     {
         $parameters = [
             "help" => [
-               "short" => "h",                
+               "short" => "h",
                "long" => "help",
                "regex" => "",
                "default" => "",
                "type" => "single"
             ],
             "version" => [
-               "short" => "v",                
+               "short" => "v",
                "long" => "version",
                "regex" => "",
                "default" => "",
                "type" => "single"
             ],
             "default" => [
-               "short" => "d",                
+               "short" => "d",
                "long" => "default",
                "regex" => "",
                "default" => "",
                "type" => "single"
             ],
             "var" => [
-               "short" => "V",                
+               "short" => "V",
                "long" => "var",
                "regex" => "/^[0-9]{5}([,][0-9]{5})*$/",
                "default" => "ALL",
                "type" => "group"
             ],
             "datefrom" => [
-               "short" => "f",                
+               "short" => "f",
                "long" => "datefrom",
                "regex" => "/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/",
                "default" => "YEAR",
                "type" => "group"
             ],
             "dateto" => [
-               "short" => "t",                
+               "short" => "t",
                "long" => "dateto",
                "regex" => "/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/",
                "default" => "NOW",
                "type" => "group"
             ],
             "field" => [
-               "short" => "c",                
+               "short" => "c",
                "long" => "campo",
                "regex" => "/^[V|L|M|D|H|Q]$/",
                "default" => "V",
                "type" => "group"
             ],
             "full" => [
-               "short" => "n",                
+               "short" => "n",
                "long" => "nozero",
                "regex" => "/^((TRUE)|(FALSE))$/",
                "default" => "FALSE",
@@ -11362,7 +11365,7 @@ class ToolsTest extends TestCase
             ]
         ];
 
-        $data = [       
+        $data = [
             'html' => [
                 'parameters' => $parameters,
                 'argv' => null,
@@ -11435,9 +11438,9 @@ class ToolsTest extends TestCase
      */
     public function testShuntTypesEquals(array $parameters, ?array $arguments, string $expected) : void
     {
-        $actual = shuntTypes($parameters, $arguments);     
+        $actual = shuntTypes($parameters, $arguments);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -11462,7 +11465,7 @@ class ToolsTest extends TestCase
         $parameters = [
             "help" => [
                "name" => "help",
-               "short" => "h",                
+               "short" => "h",
                "long" => "help",
                "regex" => "",
                "default" => "",
@@ -11470,7 +11473,7 @@ class ToolsTest extends TestCase
             ],
             "version" => [
                "name" => "version",
-               "short" => "v",                
+               "short" => "v",
                "long" => "version",
                "regex" => "",
                "default" => "",
@@ -11478,7 +11481,7 @@ class ToolsTest extends TestCase
             ],
             "default" => [
                "name" => "default",
-               "short" => "d",                
+               "short" => "d",
                "long" => "default",
                "regex" => "",
                "default" => "",
@@ -11486,7 +11489,7 @@ class ToolsTest extends TestCase
             ],
             "var" => [
                "name" => "variabile",
-               "short" => "V",                
+               "short" => "V",
                "long" => "var",
                "regex" => "/^[0-9]{5}([,][0-9]{5})*$/",
                "default" => "ALL",
@@ -11494,7 +11497,7 @@ class ToolsTest extends TestCase
             ],
             "datefrom" => [
                "name" => "datefrom",
-               "short" => "f",                
+               "short" => "f",
                "long" => "datefrom",
                "regex" => "/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/",
                "default" => "YEAR",
@@ -11502,15 +11505,15 @@ class ToolsTest extends TestCase
             ],
             "dateto" => [
                "name" => "dateto",
-               "short" => "t",                
+               "short" => "t",
                "long" => "dateto",
                "regex" => "/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/",
                "default" => "NOW",
                "type" => "group"
             ],
             "field" => [
-               "name" => "campo",               
-               "short" => "c",                
+               "name" => "campo",
+               "short" => "c",
                "long" => "campo",
                "regex" => "/^[V|L|M|D|H|Q]$/",
                "default" => "V",
@@ -11518,7 +11521,7 @@ class ToolsTest extends TestCase
             ],
             "full" => [
                "name" => "no zero",
-               "short" => "n",                
+               "short" => "n",
                "long" => "nozero",
                "regex" => "/^((TRUE)|(FALSE))$/",
                "default" => "FALSE",
@@ -11526,7 +11529,7 @@ class ToolsTest extends TestCase
             ]
         ];
 
-        $data = [       
+        $data = [
             'html' => [
                 'parameters' => $parameters,
                 'argv' => null,
@@ -11536,7 +11539,7 @@ class ToolsTest extends TestCase
             'no arg' => [
                 'parameters' => $parameters,
                 'argv' => ['scarichi.php'],
-                'type' => 'help',                
+                'type' => 'help',
                 'expected' => []
             ],
             'help' => [
@@ -11547,7 +11550,7 @@ class ToolsTest extends TestCase
             ],
             'version' => [
                 'parameters' => $parameters,
-                'argv' => ['scarichi.php', '-v'],                
+                'argv' => ['scarichi.php', '-v'],
                 'type' => 'version',
                 'expected' => []
             ],
@@ -11561,7 +11564,7 @@ class ToolsTest extends TestCase
                     'dateto' => ['NOW'],
                     'field' => ['V'],
                     'full' => ['FALSE']
-                ]                
+                ]
             ],
             'ok default' => [
                 'parameters' => $parameters,
@@ -11607,9 +11610,9 @@ class ToolsTest extends TestCase
      */
     public function testSetParametersEquals(array $parameters, ?array $arguments, string $type, array $expected) : void
     {
-        $actual = setParameters($parameters, $arguments, $type);     
+        $actual = setParameters($parameters, $arguments, $type);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -11632,13 +11635,13 @@ class ToolsTest extends TestCase
      */
     public function fillParametersProvider() : array
     {
-        $parameters = [            
+        $parameters = [
             "var" => [
                 "default" => "ALL",
                 "options" => [
                     "costants" => [],
                     "alias" => [],
-                    "limits" => []  
+                    "limits" => []
                 ]
             ],
             "datefrom" => [
@@ -11646,7 +11649,7 @@ class ToolsTest extends TestCase
                 "options" => [
                     "costants" => ['D'],
                     "alias" => ['giorno'],
-                    "limits" => ['364']  
+                    "limits" => ['364']
                 ]
             ],
             "dateto" => [
@@ -11654,7 +11657,7 @@ class ToolsTest extends TestCase
                 "options" => [
                     "costants" => [],
                     "alias" => [],
-                    "limits" => []  
+                    "limits" => []
                 ]
             ],
             "field" => [
@@ -11676,7 +11679,7 @@ class ToolsTest extends TestCase
                         "altezza",
                         "portata"
                     ],
-                    "limits" => []  
+                    "limits" => []
                 ]
             ],
             "full" => [
@@ -11684,7 +11687,7 @@ class ToolsTest extends TestCase
                 "options" => [
                     "costants" => [],
                     "alias" => [],
-                    "limits" => []  
+                    "limits" => []
                 ]
             ]
         ];
@@ -11699,7 +11702,7 @@ class ToolsTest extends TestCase
             'no values' => [
                 'parameters' => $parameters,
                 'values' => [],
-                'expected' => []               
+                'expected' => []
             ],
             'default' => [
                 'parameters' => $parameters,
@@ -11716,7 +11719,7 @@ class ToolsTest extends TestCase
                     'dateto' => $now->format('d/m/Y'),
                     'field' => 'volume',
                     'full' => '1'
-                ]               
+                ]
             ],
             'mixed 1' => [
                 'parameters' => $parameters,
@@ -11733,7 +11736,7 @@ class ToolsTest extends TestCase
                     'dateto' => '31/12/2020',
                     'field' => 'volume',
                     'full' => '1'
-                ] 
+                ]
                 
             ],
             'mixed 2' => [
@@ -11782,9 +11785,9 @@ class ToolsTest extends TestCase
      */
     public function testFillParametersEquals(array $parameters, array $values, array $expected) : void
     {
-        $actual = fillParameters($parameters, $values);     
+        $actual = fillParameters($parameters, $values);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -11832,12 +11835,12 @@ class ToolsTest extends TestCase
      */
     public function fillVarProvider() : array
     {
-        $parameters = [            
+        $parameters = [
             "var" => [
                 "default" => "ALL",
                 "options" => [
                     "costants" => [],
-                    "alias" => []  
+                    "alias" => []
                 ]
             ]
         ];
@@ -11848,19 +11851,19 @@ class ToolsTest extends TestCase
             'default' => [
                 'parameters' => $parameters,
                 'values' => [
-                    'var' => ['ALL']                    
+                    'var' => ['ALL']
                 ],
                 'postArray' => [],
                 'expected' => [
                     'var' => $all
-                ]               
+                ]
             ],
             'single' => [
                 'parameters' => $parameters,
                 'values' => [
                     'var' => ['30030'],
                 ],
-                'postArray' => [],                
+                'postArray' => [],
                 'expected' => [
                     'var' => ['30030'],
                  ]
@@ -11870,7 +11873,7 @@ class ToolsTest extends TestCase
                 'values' => [
                     'var' => ['30030','30040'],
                 ],
-                'postArray' => [],                
+                'postArray' => [],
                 'expected' => [
                     'var' => ['30030','30040'],
                 ]
@@ -11887,9 +11890,9 @@ class ToolsTest extends TestCase
      */
     public function testFillVarEquals(array $parameters, array $values, array $postVars, array $expected) : void
     {
-        $actual = fillVar($parameters, $values, $postVars);     
+        $actual = fillVar($parameters, $values, $postVars);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -11918,7 +11921,7 @@ class ToolsTest extends TestCase
      */
     public function fillDatefromProvider() : array
     {
-        $parameters = [            
+        $parameters = [
             "datefrom" => [
                 "default" => "1D",
                 "options" => [
@@ -11931,7 +11934,7 @@ class ToolsTest extends TestCase
                 "default" => "NOW",
                 "options" => [
                     "costants" => [],
-                    "alias" => []  
+                    "alias" => []
                 ]
             ]
         ];
@@ -11946,7 +11949,7 @@ class ToolsTest extends TestCase
                 'parameters' => $parameters,
                 'values' => [
                     'datefrom' => ['1D'],
-                    'dateto' => ['NOW']                    
+                    'dateto' => ['NOW']
                 ],
                 'postArray' => [
                     'var' => ['30030','30040']
@@ -11954,7 +11957,7 @@ class ToolsTest extends TestCase
                 'expected' => [
                     'var' => ['30030','30040'],
                     'datefrom' => $day->format('d/m/Y')
-                ]               
+                ]
             ],
             'dependent' => [
                 'parameters' => $parameters,
@@ -11963,8 +11966,8 @@ class ToolsTest extends TestCase
                     'dateto' => ['2020-12-31'],
                 ],
                 'postArray' => [
-                    'var' => ['30030','30040']                    
-                ],                
+                    'var' => ['30030','30040']
+                ],
                 'expected' => [
                     'var' => ['30030','30040'],
                     'datefrom' => '30/12/2020'
@@ -11977,7 +11980,7 @@ class ToolsTest extends TestCase
                 ],
                 'postArray' => [
                     'var' => ['30030','30040']
-                ],                
+                ],
                 'expected' => [
                     'var' => ['30030','30040'],
                     'datefrom' => '31/12/2020'
@@ -11995,9 +11998,9 @@ class ToolsTest extends TestCase
      */
     public function testFillDatefromEquals(array $parameters, array $values, array $postVars, array $expected) : void
     {
-        $actual = fillDatefrom($parameters, $values, $postVars);     
+        $actual = fillDatefrom($parameters, $values, $postVars);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -12026,23 +12029,23 @@ class ToolsTest extends TestCase
      */
     public function fillDatetoProvider() : array
     {
-        $parameters = [            
+        $parameters = [
             "dateto" => [
                 "default" => "NOW",
                 "options" => [
                     "costants" => [],
-                    "alias" => []  
+                    "alias" => []
                 ]
             ]
         ];
         
-        $now = new \DateTime();        
+        $now = new \DateTime();
 
         $data = [
             'default' => [
                 'parameters' => $parameters,
                 'values' => [
-                    'dateto' => ['NOW']                    
+                    'dateto' => ['NOW']
                 ],
                 'postArray' => [
                     'var' => ['30030','30040'],
@@ -12052,7 +12055,7 @@ class ToolsTest extends TestCase
                     'var' => ['30030','30040'],
                     'datefrom' => '31/12/2019',
                     'dateto' => $now->format('d/m/Y')
-                ]               
+                ]
             ],
             'indipendent' => [
                 'parameters' => $parameters,
@@ -12062,7 +12065,7 @@ class ToolsTest extends TestCase
                 'postArray' => [
                     'var' => ['30030','30040'],
                     'datefrom' => '31/12/2019'
-                ],                
+                ],
                 'expected' => [
                     'var' => ['30030','30040'],
                     'datefrom' => '31/12/2019',
@@ -12081,9 +12084,9 @@ class ToolsTest extends TestCase
      */
     public function testFillDatetoEquals(array $parameters, array $values, array $postVars, array $expected) : void
     {
-        $actual = fillDateto($parameters, $values, $postVars);     
+        $actual = fillDateto($parameters, $values, $postVars);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -12112,7 +12115,7 @@ class ToolsTest extends TestCase
      */
     public function fillFieldProvider() : array
     {
-        $parameters = [            
+        $parameters = [
             "field" => [
                 "default" => "V",
                 "options" => [
@@ -12131,7 +12134,7 @@ class ToolsTest extends TestCase
                         "delta",
                         "altezza",
                         "portata"
-                    ]  
+                    ]
                 ]
             ]
         ];
@@ -12140,7 +12143,7 @@ class ToolsTest extends TestCase
             'default' => [
                 'parameters' => $parameters,
                 'values' => [
-                    'field' => ['V']                    
+                    'field' => ['V']
                 ],
                 'postArray' => [
                     'var' => ['30030','30040'],
@@ -12152,7 +12155,7 @@ class ToolsTest extends TestCase
                     'datefrom' => '31/12/2019',
                     'dateto' => '31/12/2020',
                     'field' => 'volume'
-                ]               
+                ]
             ],
             'dependent' => [
                 'parameters' => $parameters,
@@ -12164,7 +12167,7 @@ class ToolsTest extends TestCase
                     'datefrom' => '31/12/2019',
                     'dateto' => '31/12/2020'
                     
-                ],                
+                ],
                 'expected' => [
                     'var' => ['30030','30040'],
                     'datefrom' => '31/12/2019',
@@ -12182,7 +12185,7 @@ class ToolsTest extends TestCase
                     'datefrom' => '31/12/2019',
                     'dateto' => '31/12/2020'
                     
-                ],                
+                ],
                 'expected' => [
                     'var' => ['30030','30040'],
                     'datefrom' => '31/12/2019',
@@ -12202,9 +12205,9 @@ class ToolsTest extends TestCase
      */
     public function testFillFieldEquals(array $parameters, array $values, array $postVars, array $expected) : void
     {
-        $actual = fillField($parameters, $values, $postVars);     
+        $actual = fillField($parameters, $values, $postVars);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -12233,12 +12236,12 @@ class ToolsTest extends TestCase
      */
     public function fillFullProvider() : array
     {
-        $parameters = [            
+        $parameters = [
             "full" => [
                 "default" => "FALSE",
                 "options" => [
                     "costants" => [],
-                    "alias" => []  
+                    "alias" => []
                 ]
             ]
         ];
@@ -12247,7 +12250,7 @@ class ToolsTest extends TestCase
             'default' => [
                 'parameters' => $parameters,
                 'values' => [
-                    'full' => ['FALSE']              
+                    'full' => ['FALSE']
                 ],
                 'postArray' => [
                     'var' => ['30030','30040'],
@@ -12261,7 +12264,7 @@ class ToolsTest extends TestCase
                     'dateto' => '31/12/2020',
                     'field' => 'volume',
                     'full' => '1'
-                ]               
+                ]
             ],
             'dependent' => [
                 'parameters' => $parameters,
@@ -12274,7 +12277,7 @@ class ToolsTest extends TestCase
                     'dateto' => '31/12/2020',
                     'field' => 'volume'
                     
-                ],                
+                ],
                 'expected' => [
                     'var' => ['30030','30040'],
                     'datefrom' => '31/12/2019',
@@ -12294,7 +12297,7 @@ class ToolsTest extends TestCase
                     'dateto' => '31/12/2020',
                     'field' => 'volume',
                     
-                ],                
+                ],
                 'expected' => [
                     'var' => ['30030','30040'],
                     'datefrom' => '31/12/2019',
@@ -12315,9 +12318,9 @@ class ToolsTest extends TestCase
      */
     public function testFillFullEquals(array $parameters, array $values, array $postVars, array $expected) : void
     {
-        $actual = fillFull($parameters, $values, $postVars);     
+        $actual = fillFull($parameters, $values, $postVars);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -12365,7 +12368,7 @@ class ToolsTest extends TestCase
             ],
             'single' => [
                 'parameters' => $parameters,
-                'filled values' => [                    
+                'filled values' => [
                     'var' => ['30030'],
                     'datefrom' => '30/12/2020',
                     'dateto' => '31/12/2020',
@@ -12407,7 +12410,7 @@ class ToolsTest extends TestCase
                         'full' => '0'
                     ]
                 ]
-            ]            
+            ]
         ];
         
         return $data;
@@ -12420,9 +12423,9 @@ class ToolsTest extends TestCase
      */
     public function testSetPostParametersEquals($parameters, $filledValues, $expected) : void
     {
-        $actual = setPostParameters($parameters, $filledValues);     
+        $actual = setPostParameters($parameters, $filledValues);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -12498,7 +12501,7 @@ class ToolsTest extends TestCase
                 'url' => $url,
                 'expected' => ''
             ],
-            'single' => [                
+            'single' => [
                 'post' => [
                     [
                         'var' => '30030',
@@ -12511,7 +12514,7 @@ class ToolsTest extends TestCase
                 'url' => $url,
                 'expected' => $single
             ],
-            'multi' => [                
+            'multi' => [
                 'post' => [
                     [
                         'var' => '30030',
@@ -12530,7 +12533,7 @@ class ToolsTest extends TestCase
                 ],
                 'url' => $url,
                 'expected' => $multi
-            ]            
+            ]
         ];
         
         return $data;
@@ -12543,9 +12546,9 @@ class ToolsTest extends TestCase
      */
     public function testGoCurlEquals(array $postParam, string $url, string $expected) : void
     {
-        $actual = goCurl($postParam, $url);     
+        $actual = goCurl($postParam, $url);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -12680,9 +12683,9 @@ class ToolsTest extends TestCase
      */
     public function testSelectLastPrevDataEquals(string $db, array $parametri, array $dati, string $categoria, array $expected) : void
     {
-        $actual = selectLastPrevData($db, $parametri, $dati, $categoria);     
+        $actual = selectLastPrevData($db, $parametri, $dati, $categoria);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -12705,5 +12708,57 @@ class ToolsTest extends TestCase
         $this->expectException(\Exception::class);
         
         selectLastPrevData($db, $parametri, $dati, $categoria);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function checkCurlResponseProvider() : array
+    {
+        $data = [
+            'no response level 1' => [
+                'response' => '',
+                'debug' => 1,
+                'expected' => 'Elaborazone fallita. Verificare il log degli errori (' . realpath(LOG_PATH) . '/' . ERROR_LOG . ').'
+            ],
+            'no response level 2' => [
+                'response' => '',
+                'debug' => 2,
+                'expected' => 'Elaborazone fallita.'
+            ],
+            'response' => [
+                'response' => '<b>pippo<b/>',
+                'debug' => 1,
+                'expected' => 'pippo'
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers checkCurlResponse()
+     * @dataProvider checkCurlResponseProvider
+     */
+    public function testCheckCurlResponseEquals(string $response, int $debug_level, string $expected) : void
+    {
+        $actual = checkCurlResponse($response, $debug_level);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group test
+     * covers checkCurlResponse()
+     */
+    public function testCheckCurlResponseException() : void
+    {
+        $response = 'pippo';
+        $debug_level = 3;
+        
+        $this->expectException(\Exception::class);
+        
+        checkCurlResponse($response, $debug_level);
     }
 }

@@ -25,7 +25,7 @@ class ErrorTest extends TestCase
         $dateTime = new \DateTime();
         $dateTime->setTimezone(new \DateTimeZone('Europe/Rome'));
         $date = $dateTime->format('d/m/Y H:i:s');
-        $functionName = 'pippo';        
+        $functionName = 'pippo';
         $expected_OLD = $date . ': Errore fatale funzione <b>' . $functionName . '()</b><br/>';
         
         $expected = '';
@@ -57,7 +57,7 @@ class ErrorTest extends TestCase
      * @covers \vaniacarta74\Scarichi\Error::printErrorInfo
      */
     public function testPrintErrorInfoNoOutput() : void
-    {        
+    {
         $functionName = 'pippo';
         
         $expected = '';
@@ -67,9 +67,9 @@ class ErrorTest extends TestCase
         Error::printErrorInfo($functionName, 0);
     }
     
-     /**
-     * @covers \vaniacarta74\Scarichi\Error::appendToFile
-     */
+    /**
+    * @covers \vaniacarta74\Scarichi\Error::appendToFile
+    */
     public function testAppendToFileContents() : void
     {
         $message = 'Test message';
@@ -83,9 +83,9 @@ class ErrorTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
     
-     /**
-     * @covers \vaniacarta74\Scarichi\Error::appendToFile
-     */
+    /**
+    * @covers \vaniacarta74\Scarichi\Error::appendToFile
+    */
     public function testAppendToFileMode() : void
     {
         $message = 'Test file mode';
@@ -101,7 +101,7 @@ class ErrorTest extends TestCase
     
     /**
      * @covers \vaniacarta74\Scarichi\Error::defineMessage
-     */    
+     */
     public function testDefineMessageCliContainsString() : void
     {
         try {
@@ -118,7 +118,7 @@ class ErrorTest extends TestCase
     
     /**
      * @covers \vaniacarta74\Scarichi\Error::defineMessage
-     */    
+     */
     public function testDefineMessageWwwContainsString() : void
     {
         try {
@@ -172,7 +172,7 @@ class ErrorTest extends TestCase
 
             $this->assertStringContainsString($expected, $actual);
         }
-    }   
+    }
     
     /**
      * @covers \vaniacarta74\Scarichi\Error::errorHandler

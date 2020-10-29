@@ -52,12 +52,12 @@ class UtilityTest extends TestCase
                 'keys' => ['authors','0'],
                 'deepKey' => 'name'
             ],
-            'level3.0' => [                
+            'level3.0' => [
                 'path' => $path2,
                 'keys' => ['parameters','field','descriptions'],
                 'deepKey' => '0'
             ],
-            'level4.0' => [                
+            'level4.0' => [
                 'path' => $path2,
                 'keys' => ['parameters','field','options','costants'],
                 'deepKey' => '0'
@@ -96,7 +96,7 @@ class UtilityTest extends TestCase
                 'keys' => ['parameters','field','descriptions'],
                 'deepKey' => null
             ],
-            'level3' => [                
+            'level3' => [
                 'path' => $path2,
                 'keys' => ['parameters','field','options','costants'],
                 'deepKey' => null
@@ -227,7 +227,7 @@ class UtilityTest extends TestCase
     {
         $actual = Utility::getSubArray($master, $keys);
         
-        $this->assertEquals($expected, $actual);           
+        $this->assertEquals($expected, $actual);
     }
     
     /**
