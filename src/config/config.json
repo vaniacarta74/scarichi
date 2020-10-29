@@ -1,5 +1,22 @@
 {
+    "define": {
+        "system": {
+            "timeout": 7200,
+            "memory_limit": "2048M"
+        },
+        "log": {
+            "debug_level": 1,
+            "log_path": "/../../log",
+            "error_log": "error.log"
+        },
+        "csv": {
+            "nodata": -9999,        
+            "maxrecord": 10000,        
+            "subdirectory": true
+        }
+    },
     "command": "php scarichi.php",
+    "url": "http://localhost/telecontrollo/scarichi/github/src/index.php",
     "global": {
         "section_types": [
             "short",

@@ -9,16 +9,14 @@ namespace vaniacarta74\Scarichi;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$url = "http://localhost/telecontrollo/scarichi/github/src/index.php";
-//$url = "http://192.168.1.100/telecontrollo/scarichi/github/src/index.php";
-
 //$argc = 2;
 //$argv = ['scarichi.php', '-h'];
 
 try {
-    $composer = getJsonArray(__DIR__ . '/../composer.json');
-    $help = getJsonArray(__DIR__ . '/config/help.json');
-    $parameters = $help['parameters'];   
+    $composer = COMPOSER;
+    $help = CONFIG;
+    $parameters = $help['parameters'];
+    $url = $help['url'];
 
     $type = shuntTypes($parameters, $argv);
     $message = getMessage($composer, $help, $type);
@@ -27,9 +25,10 @@ try {
     $filledValues = fillParameters($parameters, $values);
     $postParams = setPostParameters($parameters, $filledValues);
     $message .= goCurl($postParams, $url);
+    //$message = checkMessage($message);
     
     echo $message;        
 } catch (\Throwable $e) {
-    Utility::errorHandler($e, DEBUG_LEVEL, true);
+    Error::errorHandler($e, DEBUG_LEVEL, true);
     exit();
 }

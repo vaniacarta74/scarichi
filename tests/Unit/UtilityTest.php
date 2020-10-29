@@ -17,198 +17,241 @@ use vaniacarta74\Scarichi\Utility;
  */
 class UtilityTest extends TestCase
 {
-    /**
-     * @covers \vaniacarta74\Scarichi\Utility::printErrorInfo
-     */
-    public function testPrintErrorInfoOutputString() : void
-    {
-        $dateTime = new \DateTime();
-        $dateTime->setTimezone(new \DateTimeZone('Europe/Rome'));
-        $date = $dateTime->format('d/m/Y H:i:s');
-        $functionName = 'pippo';        
-        $expected_OLD = $date . ': Errore fatale funzione <b>' . $functionName . '()</b><br/>';
-        
-        $expected = '';
-        $this->expectOutputString($expected);
-        
-        $actual = Utility::printErrorInfo($functionName, 2);
-    }
     
     /**
-     * @covers \vaniacarta74\Scarichi\Utility::printErrorInfo
+     * @coversNothing
      */
-    public function testPrintErrorInfoOutputFile() : void
+    public function getJsonArrayIsStringProvider() : array
     {
-        $dateTime = new \DateTime();
-        $dateTime->setTimezone(new \DateTimeZone('Europe/Rome'));
-        $date = $dateTime->format('d/m/Y H:i:s');
-        $functionName = 'pippo';
+        $path1 = __DIR__ . '/../../composer.json';
+        $path2 = __DIR__ . '/../../src/config/config.json';
         
-        $expected = $date . ' Errore fatale funzione ' . $functionName . '()' . PHP_EOL;
+        $data = [
+            'level0.0' => [
+                'path' => $path1,
+                'keys' => null,
+                'deepKey' => 'version'
+            ],
+            'level1.0' => [
+                'path' => $path1,
+                'keys' => ['support'],
+                'deepKey' => 'source'
+            ],
+            'level1.1' => [
+                'path' => $path1,
+                'keys' => ['keywords'],
+                'deepKey' => '1'
+            ],
+            'level2.0' => [
+                'path' => $path1,
+                'keys' => ['autoload','files'],
+                'deepKey' => '0'
+            ],
+            'level2.1' => [
+                'path' => $path1,
+                'keys' => ['authors','0'],
+                'deepKey' => 'name'
+            ],
+            'level3.0' => [                
+                'path' => $path2,
+                'keys' => ['parameters','field','descriptions'],
+                'deepKey' => '0'
+            ],
+            'level4.0' => [                
+                'path' => $path2,
+                'keys' => ['parameters','field','options','costants'],
+                'deepKey' => '0'
+            ]
+        ];
         
-        Utility::printErrorInfo($functionName, 1);
-        
-        $actual = file_get_contents(Utility::$logFile, false, null, -1 * strlen($expected));
-        
-        $this->assertEquals($expected, $actual);
+        return $data;
     }
-    
-    /**
-     * @covers \vaniacarta74\Scarichi\Utility::printErrorInfo
-     */
-    public function testPrintErrorInfoNoOutput() : void
-    {        
-        $functionName = 'pippo';
-        
-        $expected = '';
-        
-        $this->expectOutputString($expected);
-        
-        Utility::printErrorInfo($functionName, 0);
-    }
-    
-     /**
-     * @covers \vaniacarta74\Scarichi\Utility::appendToFile
-     */
-    public function testAppendToFileContents() : void
-    {
-        $message = 'Test message';
-        
-        $expected = $message;
-        
-        Utility::appendToFile($message);
-        
-        $actual = file_get_contents(Utility::$logFile, false, null, -1 * strlen($message));
-        
-        $this->assertEquals($expected, $actual);
-    }
-    
-     /**
-     * @covers \vaniacarta74\Scarichi\Utility::appendToFile
-     */
-    public function testAppendToFileMode() : void
-    {
-        $message = 'Test file mode';
-        
-        Utility::appendToFile($message);
-        
-        $expected = '0777';
-        
-        $actual = substr(sprintf('%o', fileperms(Utility::$logFile)), -4);
-        
-        $this->assertEquals($expected, $actual);
-    }
-    
-    /**
-     * @covers \vaniacarta74\Scarichi\Utility::defineMessage
-     */    
-    public function testDefineMessageCliContainsString() : void
-    {
-        try {
-            if (true) {
-                throw new \Exception('Test if defineMessage() contains a string');
-            }
-        } catch (\Exception $e) {
-            $expected = 'Messaggio di errore: ' . $e->getMessage() . PHP_EOL;
-            $actual = Utility::defineMessage($e, true);
 
-            $this->assertStringContainsString($expected, $actual);
-        }
-    }
-    
     /**
-     * @covers \vaniacarta74\Scarichi\Utility::defineMessage
-     */    
-    public function testDefineMessageWwwContainsString() : void
-    {
-        try {
-            if (true) {
-                throw new \Exception('Test if defineMessage() contains a string');
-            }
-        } catch (\Exception $e) {
-            $expected = 'Messaggio di errore: <b>' . $e->getMessage() . '</b><br/>';
-            $actual = Utility::defineMessage($e, false);
-
-            $this->assertStringContainsString($expected, $actual);
-        }
-    }
-    
-    /**
-     * @covers \vaniacarta74\Scarichi\Utility::errorHandler
+     * @coversNothing
      */
-    public function testErrorHandlerNoOutput() : void
+    public function getJsonArrayIsArrayProvider() : array
     {
-        try {
-            if (true) {
-                throw new \Exception('Test if errorHandler() return a string');
-            }
-        } catch (\Exception $e) {
-            $expected = '';
+        $path1 = __DIR__ . '/../../composer.json';
+        $path2 = __DIR__ . '/../../src/config/config.json';
         
-            $this->expectOutputString($expected);
-            
-            Utility::errorHandler($e, 0, true);
-        }
+        $data = [
+            'only path' => [
+                'path' => $path1,
+                'keys' => null,
+                'deepKey' => null
+            ],
+            'level0' => [
+                'path' => $path1,
+                'keys' => ['support'],
+                'deepKey' => null
+            ],
+            'level1' => [
+                'path' => $path1,
+                'keys' => ['autoload','files'],
+                'deepKey' => null
+            ],
+            'level2' => [
+                'path' => $path2,
+                'keys' => ['parameters','field','descriptions'],
+                'deepKey' => null
+            ],
+            'level3' => [                
+                'path' => $path2,
+                'keys' => ['parameters','field','options','costants'],
+                'deepKey' => null
+            ]
+        ];
+        
+        return $data;
     }
     
     /**
-     * @covers \vaniacarta74\Scarichi\Utility::errorHandler
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::getJsonArray
+     * @dataProvider getJsonArrayIsStringProvider
      */
-    public function testErrorHandlerOutputFile() : void
+    public function testGetJsonArrayIsString(string $path, ?array $keys, ?string $deepKey) : void
     {
-        try {
-            $dateTime = new \DateTime();
-            $dateTime->setTimezone(new \DateTimeZone('Europe/Rome'));
-            $date = $dateTime->format('d/m/Y H:i:s');
-            if (true) {
-                throw new \Exception($date . ' Test if errorHandler() return a string');
-            }
-        } catch (\Exception $e) {
-            $expected = 'Messaggio di errore: ' . $e->getMessage() . PHP_EOL;
-
-            Utility::errorHandler($e, 1, true);
-
-            $actual = file_get_contents(Utility::$logFile);
-
-            $this->assertStringContainsString($expected, $actual);
-        }
-    }   
-    
-    /**
-     * @covers \vaniacarta74\Scarichi\Utility::errorHandler
-     */
-    public function testErrorHandlerCliOutputRegex() : void
-    {
-        try {
-            if (true) {
-                throw new \Exception('Test if errorHandler return a cli string');
-            }
-        } catch (\Exception $e) {
-            $expected = 'Messaggio di errore\: ' . $e->getMessage() . '\\n';
-            $regex = '/(' . $expected . ')/';
-            
-            $this->expectOutputRegex($regex);
-            
-            Utility::errorHandler($e, 2, true);
-        }
+        $actual = Utility::getJsonArray($path, $keys, $deepKey);
+        
+        $this->assertIsString($actual[0]);
     }
     
     /**
-     * @covers \vaniacarta74\Scarichi\Utility::errorHandler
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::getJsonArray
+     * @dataProvider getJsonArrayIsArrayProvider
      */
-    public function testErrorHandlerWwwOutputRegex() : void
+    public function testGetJsonArrayIsArray(string $path, ?array $keys, ?string $deepKey) : void
     {
-        try {
-            if (true) {
-                throw new \Exception('Test if errorHandler return a www string');
-            }
-        } catch (\Exception $e) {
-            $expected = 'Messaggio di errore: <b>' . $e->getMessage() . '<\/b><br\/>';
-            $regex = '/(' . $expected . ')/';
-            
-            $this->expectOutputRegex($regex);
-            
-            Utility::errorHandler($e, 2, false);
-        }
+        $actual = Utility::getJsonArray($path, $keys, $deepKey);
+        
+        $this->assertIsArray($actual);
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::getJsonArray
+     */
+    public function testGetJsonArrayException() : void
+    {
+        $path = __DIR__ . '/../../composer.json';
+        $deepKey = 'pippo';
+        
+        $this->expectException(\Exception::class);
+        
+        Utility::getJsonArray($path, null, $deepKey);
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::getJsonArray
+     */
+    public function testGetJsonArrayDeepKeyException() : void
+    {
+        $path = __DIR__ . '/../../composer.json';
+        $keys = ['autoload'];
+        $deepKey = 'files';
+        
+        $this->expectException(\Exception::class);
+        
+        Utility::getJsonArray($path, $keys, $deepKey);
+    }
+
+    /**
+     * @coversNothing
+     */
+    public function getSubArrayProvider() : array
+    {
+        $array = [
+            'parameters' => [
+                'field' => [
+                    'options' => [
+                        'costants' => ['V','L','M']
+                    ]
+                ],
+                'help' => [
+                    'name' => 'help'
+                ]
+            ]
+        ];
+        
+        $data = [
+            'level1' => [
+                'master' => $array,
+                'keys' => ['parameters'],
+                'expected' => [
+                    'field' => [
+                        'options' => [
+                            'costants' => ['V','L','M']
+                        ]
+                    ],
+                    'help' => [
+                        'name' => 'help'
+                    ]
+                ]
+            ],
+            'level2' => [
+                'master' => $array,
+                'keys' => ['parameters','field'],
+                'expected' => [
+                    'options' => [
+                        'costants' => ['V','L','M']
+                    ]
+                ]
+            ],
+            'level3' => [
+                'master' => $array,
+                'keys' => ['parameters','field','options'],
+                'expected' => [
+                    'costants' => ['V','L','M']
+                ]
+            ],
+            'level4' => [
+                'master' => $array,
+                'keys' => ['parameters','field','options','costants'],
+                'expected' => ['V','L','M']
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::getSubArray
+     * @dataProvider getSubArrayProvider
+     */
+    public function testGetSubArrayEquals($master, $keys, $expected) : void
+    {
+        $actual = Utility::getSubArray($master, $keys);
+        
+        $this->assertEquals($expected, $actual);           
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::getSubArray
+     */
+    public function testGetSubArrayException() : void
+    {
+        $master = [
+            'parameters' => [
+                'field' => [
+                    'options' => [
+                        'costants' => ['V','L','M']
+                    ]
+                ],
+                'help' => [
+                    'name' => 'help'
+                ]
+            ]
+        ];
+        $keys = ['autoload'];
+        
+        $this->expectException(\Exception::class);
+        
+        Utility::getSubArray($master, $keys);
     }
 }

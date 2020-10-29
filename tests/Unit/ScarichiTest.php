@@ -3,7 +3,6 @@ namespace vaniacarta74\Scarichi\tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 
-use function vaniacarta74\Scarichi\getJsonArray as getJsonArray;
 use function vaniacarta74\Scarichi\setHeader as setHeader;
 
 class ScarichiTest extends TestCase
@@ -14,7 +13,7 @@ class ScarichiTest extends TestCase
      */
     public function scarichiProvider() : array
     {
-        $composer = getJsonArray(__DIR__ . '/../../composer.json');
+        $composer = COMPOSER;
         $description = $composer['description'];
         $header = setHeader($composer);
         $single = '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/01/2019 al 02/01/2019 avvenuta con successo. File CSV full esportati.' . PHP_EOL;
