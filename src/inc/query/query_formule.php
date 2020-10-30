@@ -3,6 +3,7 @@ namespace vaniacarta74\Scarichi\inc\query;
 
 $queryString = "SELECT
                     tipi_formula.tipo_formula,
+                    tipi_formula.alias,
                     formule.scarico,
                     formule.mi,
                     formule.scabrosita,

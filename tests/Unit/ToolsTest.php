@@ -37,6 +37,13 @@ use function vaniacarta74\Scarichi\checkNull as checkNull;
 use function vaniacarta74\Scarichi\response as response;
 use function vaniacarta74\Scarichi\close as close;
 use function vaniacarta74\Scarichi\calcolaPortata as calcolaPortata;
+use function vaniacarta74\Scarichi\formulaPortataSfioro as formulaPortataSfioro;
+use function vaniacarta74\Scarichi\formulaPortataScarico1 as formulaPortataScarico1;
+use function vaniacarta74\Scarichi\formulaPortataScarico2 as formulaPortataScarico2;
+use function vaniacarta74\Scarichi\formulaPortataScarico3 as formulaPortataScarico3;
+use function vaniacarta74\Scarichi\formulaPortataVentola as formulaPortataVentola;
+use function vaniacarta74\Scarichi\formulaPortataSaracinesca as formulaPortataSaracinesca;
+use function vaniacarta74\Scarichi\formulaPortataGalleria as formulaPortataGalleria;
 use function vaniacarta74\Scarichi\integraDate as integraDate;
 use function vaniacarta74\Scarichi\uniformaCategorie as uniformaCategorie;
 use function vaniacarta74\Scarichi\completaDati as completaDati;
@@ -94,6 +101,9 @@ use function vaniacarta74\Scarichi\fillField as fillField;
 use function vaniacarta74\Scarichi\fillFull as fillFull;
 use function vaniacarta74\Scarichi\setPostParameters as setPostParameters;
 use function vaniacarta74\Scarichi\goCurl as goCurl;
+use function vaniacarta74\Scarichi\initCurl as initCurl;
+use function vaniacarta74\Scarichi\goMultiCurl as goMultiCurl;
+use function vaniacarta74\Scarichi\goSingleCurl as goSingleCurl;
 use function vaniacarta74\Scarichi\insertNoData as insertNoData;
 use function vaniacarta74\Scarichi\selectLastPrevData as selectLastPrevData;
 use function vaniacarta74\Scarichi\checkCurlResponse as checkCurlResponse;
@@ -318,6 +328,7 @@ class ToolsTest extends TestCase
                 'expected' => [
                     '0' => [
                         'tipo_formula' => 'portata sfiorante',
+                        'alias' => 'sfioro',
                         'scarico' => 1,
                         'mi' => 0.47,
                         'scabrosita' => null,
@@ -1857,6 +1868,7 @@ class ToolsTest extends TestCase
         $expected = [
             0 => [
                 'tipo_formula' => 'portata sfiorante',
+                'alias' => 'sfioro',
                 'scarico' => 1,
                 'mi' => 0.47,
                 'scabrosita' => null,
@@ -3056,6 +3068,7 @@ class ToolsTest extends TestCase
     {
         $specifiche = [
             'tipo_formula' => 'portata sfiorante',
+            'alias' => 'sfioro',
             'scarico' => 1,
             'mi' => 0.47,
             'larghezza' => 40.5,
@@ -3109,6 +3122,7 @@ class ToolsTest extends TestCase
     {
         $specifiche = [
             'tipo_formula' => 'portata sfiorante',
+            'alias' => 'sfioro',
             'scarico' => 1,
             'mi' => 0.47,
             'larghezza' => 40.5,
@@ -3181,6 +3195,7 @@ class ToolsTest extends TestCase
         
         $specifiche = [
             'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
+            'alias' => 'scarico1',
             'scarico' => 22,
             'mi' => 0.47,
             'larghezza' => 158.61,
@@ -3257,6 +3272,7 @@ class ToolsTest extends TestCase
         
         $specifiche = [
             'tipo_formula' => 'portata scarico a sezione rettangolare ad apertura lineare',
+            'alias' => 'scarico2',
             'scarico' => 23,
             'mi' => 0.85,
             'larghezza' => 2.8,
@@ -3332,6 +3348,7 @@ class ToolsTest extends TestCase
         
         $specifiche = [
             'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
+            'alias' => 'scarico1',
             'scarico' => 22,
             'mi' => 0.47,
             'larghezza' => 158.61,
@@ -3407,6 +3424,7 @@ class ToolsTest extends TestCase
         
         $specifiche = [
             'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
+            'alias' => 'scarico1',
             'scarico' => 22,
             'mi' => 0.47,
             'larghezza' => 158.61,
@@ -3463,6 +3481,7 @@ class ToolsTest extends TestCase
         
         $specifiche = [
             'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
+            'alias' => 'scarico1',
             'scarico' => 22,
             'mi' => 0.47,
             'larghezza' => 158.61,
@@ -4738,6 +4757,7 @@ class ToolsTest extends TestCase
             'sfioro' => [
                 'formule' => [
                     'tipo_formula' => 'portata sfiorante',
+                    'alias' => 'sfioro',
                     'mi' => 0.47,
                     'larghezza' => 0.387,
                     'limite' => 800
@@ -4750,6 +4770,7 @@ class ToolsTest extends TestCase
             'superficie velocita' => [
                 'formule' => [
                     'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
+                    'alias' => 'scarico1',
                     'mi' => 0.47,
                     'larghezza' => 158.61,
                     'limite' => 2379.27,
@@ -4764,6 +4785,7 @@ class ToolsTest extends TestCase
             'superficie velocita sotto soglia' => [
                 'formule' => [
                     'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
+                    'alias' => 'scarico1',
                     'mi' => 0.47,
                     'larghezza' => 158.61,
                     'limite' => 2379.27,
@@ -4778,6 +4800,7 @@ class ToolsTest extends TestCase
             'mezzofondo lineare' => [
                 'formule' => [
                     'tipo_formula' => 'portata scarico a sezione rettangolare ad apertura lineare',
+                    'alias' => 'scarico2',
                     'mi' => 0.85,
                     'larghezza' => 2.8,
                     'limite' => 189.34
@@ -4791,6 +4814,7 @@ class ToolsTest extends TestCase
             'mezzofondo lineare sotto soglia' => [
                 'formule' => [
                     'tipo_formula' => 'portata scarico a sezione rettangolare ad apertura lineare',
+                    'alias' => 'scarico2',
                     'mi' => 0.85,
                     'larghezza' => 2.8,
                     'limite' => 189.34
@@ -4804,6 +4828,7 @@ class ToolsTest extends TestCase
             'by-pass' => [
                 'formule' => [
                     'tipo_formula' => 'portata scarico a sezione circolare e apertura percentuale',
+                    'alias' => 'scarico3',
                     'mi' => 0.9,
                     'raggio' => 0.1,
                     'limite' => 0.75
@@ -4817,6 +4842,7 @@ class ToolsTest extends TestCase
             'by-pass sotto soglia' => [
                 'formule' => [
                     'tipo_formula' => 'portata scarico a sezione circolare e apertura percentuale',
+                    'alias' => 'scarico3',
                     'mi' => 0.9,
                     'raggio' => 0.1,
                     'limite' => 0.75
@@ -4830,11 +4856,12 @@ class ToolsTest extends TestCase
             'ventola' => [
                 'formule' => [
                     'tipo_formula' => 'portata ventola',
+                    'alias' => 'ventola',
                     'mi' => 0.48,
                     'larghezza' => 10,
                     'altezza' => 2,
                     'angolo' => 60,
-                    'limite' => 139,217
+                    'limite' => 139.217
                 ],
                 'parametri' => [
                     'altezza' => 1,
@@ -4845,11 +4872,12 @@ class ToolsTest extends TestCase
             'ventola sotto soglia' => [
                 'formule' => [
                     'tipo_formula' => 'portata ventola',
+                    'alias' => 'ventola',
                     'mi' => 0.48,
                     'larghezza' => 10,
                     'altezza' => 2,
                     'angolo' => 60,
-                    'limite' => 139,217
+                    'limite' => 139.217
                 ],
                 'parametri' => [
                     'altezza' => -1.5,
@@ -4860,6 +4888,7 @@ class ToolsTest extends TestCase
             'saracinesca' => [
                 'formule' => [
                     'tipo_formula' => 'portata saracinesca',
+                    'alias' => 'saracinesca',
                     'mi' => 0.9,
                     'raggio' => 0.45,
                     'limite' => 15.26
@@ -4873,6 +4902,7 @@ class ToolsTest extends TestCase
             'saracinesca sotto soglia' => [
                 'formule' => [
                     'tipo_formula' => 'portata saracinesca',
+                    'alias' => 'saracinesca',
                     'mi' => 0.9,
                     'raggio' => 0.45,
                     'limite' => 15.26
@@ -4886,6 +4916,7 @@ class ToolsTest extends TestCase
             'galleria' => [
                 'formule' => [
                     'tipo_formula' => 'portata galleria',
+                    'alias' => 'galleria',
                     'scabrosita' => 0.1,
                     'lunghezza' => 6890,
                     'angolo' => 301,
@@ -4903,6 +4934,7 @@ class ToolsTest extends TestCase
             'galleria sbocco libero' => [
                 'formule' => [
                     'tipo_formula' => 'portata galleria',
+                    'alias' => 'galleria',
                     'scabrosita' => 0.1,
                     'lunghezza' => 6890,
                     'angolo' => 301,
@@ -4920,6 +4952,7 @@ class ToolsTest extends TestCase
             'galleria moto a pelo libero' => [
                 'formule' => [
                     'tipo_formula' => 'portata galleria',
+                    'alias' => 'galleria',
                     'scabrosita' => 0.1,
                     'lunghezza' => 6890,
                     'angolo' => 301,
@@ -4959,6 +4992,7 @@ class ToolsTest extends TestCase
     {
         $formule = [
             'tipo_formula' => '',
+            'alias' => '',
             'mi' => 0.47,
             'larghezza' => 0.387,
             'limite' => 800
@@ -4968,6 +5002,719 @@ class ToolsTest extends TestCase
         $this->expectException(\Exception::class);
         
         calcolaPortata($formule, $parametri);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function formulaPortataSfioroProvider() : array
+    {
+        $dati = [
+            'sfioro' => [
+                'formule' => [
+                    'tipo_formula' => 'portata sfiorante',
+                    'alias' => 'sfioro',
+                    'mi' => 0.47,
+                    'larghezza' => 0.387,
+                    'limite' => 800
+                ],
+                'parametri' => [
+                    'altezza' => 10
+                ],
+                'expected' => 25.478
+            ]
+        ];
+        
+        return $dati;
+    }
+    
+    /**
+     * covers formulaPortataSfioro()
+     * @group tools
+     * @dataProvider formulaPortataSfioroProvider
+     */
+    public function testFormulaPortataSfioroEqualsWithDelta(array $formule, array $parametri, float $expected) : void
+    {
+        $actual = formulaPortataSfioro($formule, $parametri);
+        
+        $this->assertEqualsWithDelta($expected, $actual, 0.001);
+    }
+    
+    /**
+     * @group tools
+     * covers formulaPortataSfioro()
+     */
+    public function testFormulaPortataSfioroException() : void
+    {
+        $formule = [
+            'tipo_formula' => 'portata sfiorante',
+            'alias' => 'sfioro',
+            'mi' => 0.47,
+            'larghezza' => 0.387,
+            'limite' => 800
+        ];
+        $parametri = [
+            'altezza' => NODATA
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formulaPortataSfioro($formule, $parametri);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function formulaPortataScarico1Provider() : array
+    {
+        $dati = [
+            'superficie velocita' => [
+                'formule' => [
+                    'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
+                    'alias' => 'scarico1',
+                    'mi' => 0.47,
+                    'larghezza' => 158.61,
+                    'limite' => 2379.27,
+                    'velocita' => 0.8
+                ],
+                'parametri' => [
+                    'altezza' => 3,
+                    'manovra' => 1
+                ],
+                'expected' => 1741.8875
+            ],
+            'superficie velocita sotto soglia' => [
+                'formule' => [
+                    'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
+                    'alias' => 'scarico1',
+                    'mi' => 0.47,
+                    'larghezza' => 158.61,
+                    'limite' => 2379.27,
+                    'velocita' => 0.8
+                ],
+                'parametri' => [
+                    'altezza' => -0.3,
+                    'manovra' => 1
+                ],
+                'expected' => 0
+            ]
+        ];
+        
+        return $dati;
+    }
+    
+    /**
+     * covers formulaPortataScarico1()
+     * @group tools
+     * @dataProvider formulaPortataScarico1Provider
+     */
+    public function testFormulaPortataScarico1EqualsWithDelta(array $formule, array $parametri, float $expected) : void
+    {
+        $actual = formulaPortataScarico1($formule, $parametri);
+        
+        $this->assertEqualsWithDelta($expected, $actual, 0.001);
+    }
+    
+    /**
+     * @group tools
+     * covers formulaPortataScarico1()
+     */
+    public function testFormulaPortataScarico1AltezzaException() : void
+    {
+        $formule = [
+            'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
+            'alias' => 'scarico1',
+            'mi' => 0.47,
+            'larghezza' => 158.61,
+            'limite' => 2379.27,
+            'velocita' => 0.8
+        ];
+        $parametri = [
+            'altezza' => NODATA,
+            'manovra' => 0.40
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formulaPortataScarico1($formule, $parametri);
+    }
+    
+    /**
+     * @group tools
+     * covers formulaPortataScarico1()
+     */
+    public function testFormulaPortataScarico1ManovraException() : void
+    {
+        $formule = [
+            'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
+            'alias' => 'scarico1',
+            'mi' => 0.47,
+            'larghezza' => 158.61,
+            'limite' => 2379.27,
+            'velocita' => 0.8
+        ];
+        $parametri = [
+            'altezza' => 3,
+            'manovra' => NODATA
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formulaPortataScarico1($formule, $parametri);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function formulaPortataScarico2Provider() : array
+    {
+        $dati = [
+            'mezzofondo lineare' => [
+                'formule' => [
+                    'tipo_formula' => 'portata scarico a sezione rettangolare ad apertura lineare',
+                    'alias' => 'scarico2',
+                    'mi' => 0.85,
+                    'larghezza' => 2.8,
+                    'limite' => 189.34
+                ],
+                'parametri' => [
+                    'altezza' => 1,
+                    'manovra' => 0.40
+                ],
+                'expected' => 4.217
+            ],
+            'mezzofondo lineare sotto soglia' => [
+                'formule' => [
+                    'tipo_formula' => 'portata scarico a sezione rettangolare ad apertura lineare',
+                    'alias' => 'scarico2',
+                    'mi' => 0.85,
+                    'larghezza' => 2.8,
+                    'limite' => 189.34
+                ],
+                'parametri' => [
+                    'altezza' => -1,
+                    'manovra' => 0.40
+                ],
+                'expected' => 0
+            ]
+        ];
+        
+        return $dati;
+    }
+    
+    /**
+     * covers formulaPortataScarico2()
+     * @group tools
+     * @dataProvider formulaPortataScarico2Provider
+     */
+    public function testFormulaPortataScarico2EqualsWithDelta(array $formule, array $parametri, float $expected) : void
+    {
+        $actual = formulaPortataScarico2($formule, $parametri);
+        
+        $this->assertEqualsWithDelta($expected, $actual, 0.001);
+    }
+    
+    /**
+     * @group tools
+     * covers formulaPortataScarico2()
+     */
+    public function testFormulaPortataScarico2AltezzaException() : void
+    {
+        $formule = [
+            'tipo_formula' => 'portata scarico a sezione rettangolare ad apertura lineare',
+            'alias' => 'scarico2',
+            'mi' => 0.85,
+            'larghezza' => 2.8,
+            'limite' => 189.34
+        ];
+        $parametri = [
+            'altezza' => NODATA,
+            'manovra' => 0.40
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formulaPortataScarico2($formule, $parametri);
+    }
+    
+    /**
+     * @group tools
+     * covers formulaPortataScarico2()
+     */
+    public function testFormulaPortataScarico2ManovraException() : void
+    {
+        $formule = [
+            'tipo_formula' => 'portata scarico a sezione rettangolare ad apertura lineare',
+            'alias' => 'scarico2',
+            'mi' => 0.85,
+            'larghezza' => 2.8,
+            'limite' => 189.34
+        ];
+        $parametri = [
+            'altezza' => 3,
+            'manovra' => NODATA
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formulaPortataScarico2($formule, $parametri);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function formulaPortataScarico3Provider() : array
+    {
+        $dati = [
+            'by-pass' => [
+                'formule' => [
+                    'tipo_formula' => 'portata scarico a sezione circolare e apertura percentuale',
+                    'alias' => 'scarico3',
+                    'mi' => 0.9,
+                    'raggio' => 0.1,
+                    'limite' => 0.75
+                ],
+                'parametri' => [
+                    'altezza' => 10,
+                    'manovra' => 0.50
+                ],
+                'expected' => 0.19792
+            ],
+            'by-pass sotto soglia' => [
+                'formule' => [
+                    'tipo_formula' => 'portata scarico a sezione circolare e apertura percentuale',
+                    'alias' => 'scarico3',
+                    'mi' => 0.9,
+                    'raggio' => 0.1,
+                    'limite' => 0.75
+                ],
+                'parametri' => [
+                    'altezza' => -10,
+                    'manovra' => 0.50
+                ],
+                'expected' => 0
+            ]
+        ];
+        
+        return $dati;
+    }
+    
+    /**
+     * covers formulaPortataScarico3()
+     * @group tools
+     * @dataProvider formulaPortataScarico3Provider
+     */
+    public function testFormulaPortataScarico3EqualsWithDelta(array $formule, array $parametri, float $expected) : void
+    {
+        $actual = formulaPortataScarico3($formule, $parametri);
+        
+        $this->assertEqualsWithDelta($expected, $actual, 0.001);
+    }
+    
+    /**
+     * @group tools
+     * covers formulaPortataScarico3()
+     */
+    public function testFormulaPortataScarico3AltezzaException() : void
+    {
+        $formule = [
+            'tipo_formula' => 'portata scarico a sezione circolare e apertura percentuale',
+            'alias' => 'scarico3',
+            'mi' => 0.9,
+            'raggio' => 0.1,
+            'limite' => 0.75
+        ];
+        $parametri = [
+            'altezza' => NODATA,
+            'manovra' => 0.50
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formulaPortataScarico3($formule, $parametri);
+    }
+    
+    /**
+     * @group tools
+     * covers formulaPortataScarico3()
+     */
+    public function testFormulaPortataScarico3ManovraException() : void
+    {
+        $formule = [
+            'tipo_formula' => 'portata scarico a sezione circolare e apertura percentuale',
+            'alias' => 'scarico3',
+            'mi' => 0.9,
+            'raggio' => 0.1,
+            'limite' => 0.75
+        ];
+        $parametri = [
+            'altezza' => 10,
+            'manovra' => NODATA
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formulaPortataScarico3($formule, $parametri);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function formulaPortataVentolaProvider() : array
+    {
+        $dati = [
+            'ventola' => [
+                'formule' => [
+                    'tipo_formula' => 'portata ventola',
+                    'alias' => 'ventola',
+                    'mi' => 0.48,
+                    'larghezza' => 10,
+                    'altezza' => 2,
+                    'angolo' => 60,
+                    'limite' => 139.217
+                ],
+                'parametri' => [
+                    'altezza' => 1,
+                    'manovra' => 45 / 180 * pi()
+                ],
+                'expected' => 79.1638
+            ],
+            'ventola sotto soglia' => [
+                'formule' => [
+                    'tipo_formula' => 'portata ventola',
+                    'alias' => 'ventola',
+                    'mi' => 0.48,
+                    'larghezza' => 10,
+                    'altezza' => 2,
+                    'angolo' => 60,
+                    'limite' => 139.217
+                ],
+                'parametri' => [
+                    'altezza' => -1.5,
+                    'manovra' => 45 / 180 * pi()
+                ],
+                'expected' => 0
+            ]
+        ];
+        
+        return $dati;
+    }
+    
+    /**
+     * covers formulaPortataVentola()
+     * @group tools
+     * @dataProvider formulaPortataVentolaProvider
+     */
+    public function testFormulaPortataVentolaEqualsWithDelta(array $formule, array $parametri, float $expected) : void
+    {
+        $actual = formulaPortataVentola($formule, $parametri);
+        
+        $this->assertEqualsWithDelta($expected, $actual, 0.001);
+    }
+    
+    /**
+     * @group tools
+     * covers formulaPortataVentola()
+     */
+    public function testFormulaPortataVentolaAltezzaException() : void
+    {
+        $formule = [
+            'tipo_formula' => 'portata ventola',
+            'alias' => 'ventola',
+            'mi' => 0.48,
+            'larghezza' => 10,
+            'altezza' => 2,
+            'angolo' => 60,
+            'limite' => 139.217
+        ];
+        $parametri = [
+            'altezza' => NODATA,
+            'manovra' => 0.50
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formulaPortataVentola($formule, $parametri);
+    }
+    
+    /**
+     * @group tools
+     * covers formulaPortataVentola()
+     */
+    public function testFormulaPortataVentolaManovraException() : void
+    {
+        $formule = [
+            'tipo_formula' => 'portata ventola',
+            'alias' => 'ventola',
+            'mi' => 0.48,
+            'larghezza' => 10,
+            'altezza' => 2,
+            'angolo' => 60,
+            'limite' => 139.217
+        ];
+        $parametri = [
+            'altezza' => 10,
+            'manovra' => NODATA
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formulaPortataVentola($formule, $parametri);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function formulaPortataSaracinescaProvider() : array
+    {
+        $dati = [
+            'saracinesca' => [
+                'formule' => [
+                    'tipo_formula' => 'portata saracinesca',
+                    'alias' => 'saracinesca',
+                    'mi' => 0.9,
+                    'raggio' => 0.45,
+                    'limite' => 15.26
+                ],
+                'parametri' => [
+                    'altezza' => 30,
+                    'manovra' => 0.6
+                ],
+                'expected' => 9.7883
+            ],
+            'saracinesca sotto soglia' => [
+                'formule' => [
+                    'tipo_formula' => 'portata saracinesca',
+                    'alias' => 'saracinesca',
+                    'mi' => 0.9,
+                    'raggio' => 0.45,
+                    'limite' => 15.26
+                ],
+                'parametri' => [
+                    'altezza' => 0.4,
+                    'manovra' => 0.9
+                ],
+                'expected' => 0
+            ]
+        ];
+        
+        return $dati;
+    }
+    
+    /**
+     * covers formulaPortataSaracinesca()
+     * @group tools
+     * @dataProvider formulaPortataSaracinescaProvider
+     */
+    public function testFormulaPortataSaracinescaEqualsWithDelta(array $formule, array $parametri, float $expected) : void
+    {
+        $actual = formulaPortataSaracinesca($formule, $parametri);
+        
+        $this->assertEqualsWithDelta($expected, $actual, 0.001);
+    }
+    
+    /**
+     * @group tools
+     * covers formulaPortataSaracinesca()
+     */
+    public function testFormulaPortataSaracinescaAltezzaException() : void
+    {
+        $formule = [
+            'tipo_formula' => 'portata saracinesca',
+            'alias' => 'saracinesca',
+            'mi' => 0.9,
+            'raggio' => 0.45,
+            'limite' => 15.26
+        ];
+        $parametri = [
+            'altezza' => NODATA,
+            'manovra' => 0.6
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formulaPortataSaracinesca($formule, $parametri);
+    }
+    
+    /**
+     * @group tools
+     * covers formulaPortataSaracinesca()
+     */
+    public function testFormulaPortataSaracinescaManovraException() : void
+    {
+        $formule = [
+            'tipo_formula' => 'portata saracinesca',
+            'alias' => 'saracinesca',
+            'mi' => 0.9,
+            'raggio' => 0.45,
+            'limite' => 15.26
+        ];
+        $parametri = [
+            'altezza' => 30,
+            'manovra' => NODATA
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formulaPortataSaracinesca($formule, $parametri);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function formulaPortataGalleriaProvider() : array
+    {
+        $dati = [
+            'galleria' => [
+                'formule' => [
+                    'tipo_formula' => 'portata galleria',
+                    'alias' => 'galleria',
+                    'scabrosita' => 0.1,
+                    'lunghezza' => 6890,
+                    'angolo' => 301,
+                    'raggio' => 1.25,
+                    'quota' => 264.18,
+                    'limite' => 266.247
+                ],
+                'parametri' => [
+                    'livello' => 270,
+                    'altezza' => 5,
+                    'manovra' => 2
+                ],
+                'expected' => 6.713206
+            ],
+            'galleria sbocco libero' => [
+                'formule' => [
+                    'tipo_formula' => 'portata galleria',
+                    'alias' => 'galleria',
+                    'scabrosita' => 0.1,
+                    'lunghezza' => 6890,
+                    'angolo' => 301,
+                    'raggio' => 1.25,
+                    'quota' => 264.18,
+                    'limite' => 266.247
+                ],
+                'parametri' => [
+                    'livello' => 270,
+                    'altezza' => 5.82,
+                    'manovra' => 2
+                ],
+                'expected' => 7.2428
+            ],
+            'galleria moto a pelo libero' => [
+                'formule' => [
+                    'tipo_formula' => 'portata galleria',
+                    'alias' => 'galleria',
+                    'scabrosita' => 0.1,
+                    'lunghezza' => 6890,
+                    'angolo' => 301,
+                    'raggio' => 1.25,
+                    'quota' => 264.18,
+                    'limite' => 266.247
+                ],
+                'parametri' => [
+                    'livello' => 266,
+                    'altezza' => 1.82,
+                    'manovra' => 2
+                ],
+                'expected' => 0
+            ]
+        ];
+        
+        return $dati;
+    }
+    
+    /**
+     * covers formulaPortataGalleria()
+     * @group tools
+     * @dataProvider formulaPortataGalleriaProvider
+     */
+    public function testFormulaPortataGalleriaEqualsWithDelta(array $formule, array $parametri, float $expected) : void
+    {
+        $actual = formulaPortataGalleria($formule, $parametri);
+        
+        $this->assertEqualsWithDelta($expected, $actual, 0.001);
+    }
+    
+    /**
+     * @group tools
+     * covers formulaPortataGalleria()
+     */
+    public function testFormulaPortataGalleriaAltezzaException() : void
+    {
+        $formule = [
+            'tipo_formula' => 'portata galleria',
+            'alias' => 'galleria',
+            'scabrosita' => 0.1,
+            'lunghezza' => 6890,
+            'angolo' => 301,
+            'raggio' => 1.25,
+            'quota' => 264.18,
+            'limite' => 266.247
+        ];
+        $parametri = [
+            'livello' => 270,
+            'altezza' => NODATA,
+            'manovra' => 2
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formulaPortataGalleria($formule, $parametri);
+    }
+    
+    /**
+     * @group tools
+     * covers formulaPortataGalleria()
+     */
+    public function testFormulaPortataGalleriaManovraException() : void
+    {
+        $formule = [
+            'tipo_formula' => 'portata galleria',
+            'alias' => 'galleria',
+            'scabrosita' => 0.1,
+            'lunghezza' => 6890,
+            'angolo' => 301,
+            'raggio' => 1.25,
+            'quota' => 264.18,
+            'limite' => 266.247
+        ];
+        $parametri = [
+            'livello' => 270,
+            'altezza' => 5,
+            'manovra' => NODATA
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formulaPortataGalleria($formule, $parametri);
+    }
+    
+    /**
+     * @group tools
+     * covers formulaPortataGalleria()
+     */
+    public function testFormulaPortataGalleriaLivelloException() : void
+    {
+        $formule = [
+            'tipo_formula' => 'portata galleria',
+            'alias' => 'galleria',
+            'scabrosita' => 0.1,
+            'lunghezza' => 6890,
+            'angolo' => 301,
+            'raggio' => 1.25,
+            'quota' => 264.18,
+            'limite' => 266.247
+        ];
+        $parametri = [
+            'livello' => NODATA,
+            'altezza' => 5,
+            'manovra' => 2
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formulaPortataGalleria($formule, $parametri);
     }
     
     /**
@@ -9657,7 +10404,9 @@ class ToolsTest extends TestCase
         ];
         
         $help = [
-            "command" => "php",
+            "command" => [
+                "sintax" => "php"
+            ],
             "global" => [
                 "sections" => [
                     "pardef",
@@ -9988,7 +10737,9 @@ class ToolsTest extends TestCase
         ];
         
         $help = [
-            "command" => "php",
+            "command" => [
+                "sintax" => "php"
+            ],
             "global" => [
                 "sections" => [
                     "pardef",
@@ -12491,7 +13242,7 @@ class ToolsTest extends TestCase
      */
     public function goCurlProvider() : array
     {
-        $url = "http://localhost/telecontrollo/scarichi/github/src/index.php";
+        $url = CONFIG['command']['url'];
         $single = '1) 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         $multi = $single . '2) 30040: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         
@@ -12499,6 +13250,7 @@ class ToolsTest extends TestCase
             'no post values' => [
                 'post' => [],
                 'url' => $url,
+                'async' => false,
                 'expected' => ''
             ],
             'single' => [
@@ -12512,9 +13264,193 @@ class ToolsTest extends TestCase
                     ]
                 ],
                 'url' => $url,
+                'async' => false,
                 'expected' => $single
             ],
             'multi' => [
+                'post' => [
+                    [
+                        'var' => '30030',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ],
+                    [
+                        'var' => '30040',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'url' => $url,
+                'async' => false,
+                'expected' => $multi
+            ],
+            'single async' => [
+                'post' => [
+                    [
+                        'var' => '30030',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'url' => $url,
+                'async' => true,
+                'expected' => $single
+            ],
+            'multi async' => [
+                'post' => [
+                    [
+                        'var' => '30030',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ],
+                    [
+                        'var' => '30040',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'url' => $url,
+                'async' => true,
+                'expected' => ''
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers goCurl()
+     * @dataProvider goCurlProvider
+     */
+    public function testGoCurlEquals(array $postParam, string $url, bool $async, string $expected) : void
+    {
+        $actual = goCurl($postParam, $url, $async);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group test
+     * covers goCurl()
+     */
+    public function testGoCurlDataException() : void
+    {
+        $postParam = [];
+        $url = 'pippo';
+        $async = false;
+        
+        $this->expectException(\Exception::class);
+        
+        goCurl($postParam, $url, $async);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function initCurlProvider() : array
+    {
+        $url = CONFIG['command']['url'];
+        
+        $data = [            
+            'single' => [
+                'post' => [
+                    [
+                        'var' => '30030',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'url' => $url
+            ],
+            'multi' => [
+                'post' => [
+                    [
+                        'var' => '30030',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ],
+                    [
+                        'var' => '30040',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'url' => $url
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers initCurl()
+     * @dataProvider initCurlProvider
+     */
+    public function testInitCurlIsResource(array $postParam, string $url) : void
+    {
+        $actuals = initCurl($postParam, $url);
+        
+        foreach ($actuals as $actual) {        
+            $this->assertIsResource($actual);
+        }
+    }
+    
+    /**
+     * @group test
+     * covers initCurl()
+     */
+    public function testInitCurlDataException() : void
+    {
+        $postParam = [];
+        $url = CONFIG['command']['url'];
+        
+        $this->expectException(\Exception::class);
+        
+        initCurl($postParam, $url);
+    }
+
+    /**
+     * @coversNothing
+     */
+    public function goSingleCurlProvider() : array
+    {
+        $url = CONFIG['command']['url'];
+        $single = '1) 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        $multi = $single . '2) 30040: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        
+        $data = [            
+            'single post' => [
+                'post' => [
+                    [
+                        'var' => '30030',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'url' => $url,
+                'expected' => $single
+            ],
+            'multi post' => [
                 'post' => [
                     [
                         'var' => '30030',
@@ -12541,30 +13477,156 @@ class ToolsTest extends TestCase
     
     /**
      * @group test
-     * covers goCurl()
-     * @dataProvider goCurlProvider
+     * covers goSingleCurl()
+     * @dataProvider goSingleCurlProvider
      */
-    public function testGoCurlEquals(array $postParam, string $url, string $expected) : void
+    public function testGoSingleCurlEquals(array $postParam, string $url, string $expected) : void
     {
-        $actual = goCurl($postParam, $url);
+        $actual = goSingleCurl($postParam, $url);
         
         $this->assertEquals($expected, $actual);
     }
     
     /**
      * @group test
-     * covers goCurl()
+     * covers goSingleCurl()
      */
-    public function testGoCurlDataException() : void
+    public function testGoSingleCurlDataException() : void
     {
         $postParam = [];
-        $url = 'pippo';
+        $url = CONFIG['command']['url'];
         
         $this->expectException(\Exception::class);
         
-        goCurl($postParam, $url);
+        goSingleCurl($postParam, $url);
     }
-
+    
+    /**
+     * @coversNothing
+     */
+    public function goMultiCurlProvider() : array
+    {
+        $url = CONFIG['command']['url'];
+        $single = '1) 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        $multi = $single . '2) 30040: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        
+        $data = [            
+            'single post' => [
+                'post' => [
+                    [
+                        'var' => '30030',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'url' => $url,
+                'expected' => $single
+            ],
+            'multi post' => [
+                'post' => [
+                    [
+                        'var' => '30030',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ],
+                    [
+                        'var' => '30040',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'url' => $url,
+                'expected' => $multi
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers goMultiCurl()
+     * @dataProvider goMultiCurlProvider
+     */
+    public function testGoMultiCurlOutputString(array $postParam, string $url, string $expected) : void
+    {
+        $this->expectOutputString($expected);
+        
+        goMultiCurl($postParam, $url);  
+    }
+    
+    /**
+     * @group test
+     * covers goMultiCurl()
+     */
+    public function testGoMultiCurlDataException() : void
+    {
+        $postParam = [];
+        $url = CONFIG['command']['url'];
+        
+        $this->expectException(\Exception::class);
+        
+        goMultiCurl($postParam, $url);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function checkCurlResponseProvider() : array
+    {
+        $data = [
+            'no response level 1' => [
+                'response' => '',
+                'debug' => 1,
+                'expected' => 'Elaborazone fallita. Verificare il log degli errori (' . realpath(LOG_PATH) . '/' . ERROR_LOG . ').'
+            ],
+            'no response level 2' => [
+                'response' => '',
+                'debug' => 2,
+                'expected' => 'Elaborazone fallita.'
+            ],
+            'response' => [
+                'response' => '<b>pippo<b/>',
+                'debug' => 1,
+                'expected' => 'pippo'
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers checkCurlResponse()
+     * @dataProvider checkCurlResponseProvider
+     */
+    public function testCheckCurlResponseEquals(string $response, int $debug_level, string $expected) : void
+    {
+        $actual = checkCurlResponse($response, $debug_level);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group test
+     * covers checkCurlResponse()
+     */
+    public function testCheckCurlResponseException() : void
+    {
+        $response = 'pippo';
+        $debug_level = 3;
+        
+        $this->expectException(\Exception::class);
+        
+        checkCurlResponse($response, $debug_level);
+    }
+    
     /**
      * @coversNothing
      */
@@ -12708,57 +13770,5 @@ class ToolsTest extends TestCase
         $this->expectException(\Exception::class);
         
         selectLastPrevData($db, $parametri, $dati, $categoria);
-    }
-    
-    /**
-     * @coversNothing
-     */
-    public function checkCurlResponseProvider() : array
-    {
-        $data = [
-            'no response level 1' => [
-                'response' => '',
-                'debug' => 1,
-                'expected' => 'Elaborazone fallita. Verificare il log degli errori (' . realpath(LOG_PATH) . '/' . ERROR_LOG . ').'
-            ],
-            'no response level 2' => [
-                'response' => '',
-                'debug' => 2,
-                'expected' => 'Elaborazone fallita.'
-            ],
-            'response' => [
-                'response' => '<b>pippo<b/>',
-                'debug' => 1,
-                'expected' => 'pippo'
-            ]
-        ];
-        
-        return $data;
-    }
-    
-    /**
-     * @group test
-     * covers checkCurlResponse()
-     * @dataProvider checkCurlResponseProvider
-     */
-    public function testCheckCurlResponseEquals(string $response, int $debug_level, string $expected) : void
-    {
-        $actual = checkCurlResponse($response, $debug_level);
-        
-        $this->assertEquals($expected, $actual);
-    }
-    
-    /**
-     * @group test
-     * covers checkCurlResponse()
-     */
-    public function testCheckCurlResponseException() : void
-    {
-        $response = 'pippo';
-        $debug_level = 3;
-        
-        $this->expectException(\Exception::class);
-        
-        checkCurlResponse($response, $debug_level);
     }
 }

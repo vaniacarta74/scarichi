@@ -963,135 +963,252 @@ function response(array $request, bool $printed) : string
 function calcolaPortata(array $formule, array $parametri) : float
 {
     try {
-        $g = 9.81;
-        $tipo = $formule['tipo_formula'];
-        switch ($tipo) {
-            case 'portata sfiorante':
-                $altezza_idrostatica = $parametri['altezza'];
-                $mi = $formule['mi'];
-                $larghezza_soglia = $formule['larghezza'];
-
-                if ($altezza_idrostatica > 0) {
-                    $portata = $mi * $larghezza_soglia * $altezza_idrostatica * sqrt(2 * $g * $altezza_idrostatica);
-                } else {
-                    $portata = 0;
-                }
-                break;
-            case 'portata scarico a sezione rettangolare con velocita e apertura percentuale':
-                $altezza_idrostatica = $parametri['altezza'];
-                $apertura_paratoia = $parametri['manovra'];
-                $mi = $formule['mi'];
-                $larghezza_soglia = $formule['larghezza'];
-                $velocita = $formule['velocita'];
-                $altezza_cinetica = ($velocita ** 2) / (2 * $g);
-
-                if ($altezza_idrostatica > 0) {
-                    $portata = $mi * $larghezza_soglia * $apertura_paratoia * sqrt(2 * $g) * (sqrt(($altezza_idrostatica + $altezza_cinetica) ** 3) - sqrt($altezza_cinetica ** 3));
-                } else {
-                    $portata = 0;
-                }
-                break;
-            case 'portata scarico a sezione rettangolare ad apertura lineare':
-                $altezza_idrostatica = $parametri['altezza'];
-                $apertura_paratoia = $parametri['manovra'];
-                $mi = $formule['mi'];
-                $larghezza_soglia = $formule['larghezza'];
-
-                if ($altezza_idrostatica > 0) {
-                    $portata = $mi * $larghezza_soglia * $apertura_paratoia * sqrt(2 * $g * $altezza_idrostatica);
-                } else {
-                    $portata = 0;
-                }
-                break;
-            case 'portata scarico a sezione circolare e apertura percentuale':
-                $altezza_idrostatica = $parametri['altezza'];
-                $apertura_paratoia = $parametri['manovra'];
-                $mi = $formule['mi'];
-                $raggio = $formule['raggio'];
-                $area_sezione = pi() * $raggio ** 2;
-
-                if ($altezza_idrostatica > 0) {
-                    $portata = $mi * $area_sezione * $apertura_paratoia * sqrt(2 * $g * $altezza_idrostatica);
-                } else {
-                    $portata = 0;
-                }
-                break;
-            case 'portata ventola':
-                $altezza_idrostatica = $parametri['altezza'];
-                $rad_ventola = $parametri['manovra'];
-                $mi = $formule['mi'];
-                $larghezza = $formule['larghezza'];
-                $angolo_max = $formule['angolo'];
-                $rad_max = $angolo_max / 180 * pi();
-                $altezza_max = $formule['altezza'];
-                $profondita_ventola = $altezza_max / sin($rad_max);
-                $apertura_ventola = $altezza_max - $profondita_ventola * sin($rad_max - $rad_ventola);
-                $tirante = $altezza_idrostatica + $apertura_ventola;
-
-                if ($tirante > 0) {
-                    $portata = $mi * $larghezza * $tirante * sqrt(2 * $g * $tirante);
-                } else {
-                    $portata = 0;
-                }
-                break;
-            case 'portata saracinesca':
-                $altezza_idrostatica = $parametri['altezza'];
-                $altezza_saracinesca = $parametri['manovra'];
-                $mi = $formule['mi'];
-                $raggio = $formule['raggio'];
-                $k = ($raggio - $altezza_saracinesca) / $raggio;
-                $rad_angolo = 2 * acos($k);
-                $area_scarico = ($rad_angolo - sin($rad_angolo)) * ($raggio ** 2) / 2;
-                $tirante = $altezza_idrostatica - ($altezza_saracinesca / 2);
-
-                if ($tirante > 0) {
-                    $portata = $mi * $area_scarico * sqrt(2 * $g * $tirante);
-                } else {
-                    $portata = 0;
-                }
-                break;
-            case 'portata galleria':
-                $livello_monte = $parametri['livello'];
-                $altezza_idrostatica = $parametri['altezza'];
-                $altezza_saracinesca = $parametri['manovra'];
-
-                $scabrosita = $formule['scabrosita'];
-                $lunghezza_galleria = $formule['lunghezza'];
-                $raggio = $formule['raggio'];
-                $quota = $formule['quota'];
-                $angolo_limite = $formule['angolo'];
-                $quota_limite = $formule['limite'];
-
-                $R = $raggio / 2;
-                $chi = 87 / (1 + $scabrosita / sqrt($R));
-                $J = $altezza_idrostatica / $lunghezza_galleria;
-                $area = pi() * $raggio ** 2;
-
-                $portata_base = $chi * $area * sqrt($R * $J);
-
-                $rad_limite = $angolo_limite / 180 * pi();
-                $altezza_saracinesca_limite = $raggio * (1 - cos($rad_limite / 2));
-                $area_limite = ($rad_limite - sin($rad_limite)) * ($raggio ** 2) / 2;
-                $arco_limite = $rad_limite * $raggio;
-                $R_limite = $area_limite / $arco_limite;
-                $chi_limite = 87 / (1 + $scabrosita / sqrt($R_limite));
-                $J_limite = ($quota_limite - $quota) / $lunghezza_galleria;
-
-                $portata_limite = $chi_limite * $area_limite * sqrt($R_limite * $J_limite);
-
-                $energia_limite = $altezza_saracinesca_limite + (($portata_limite ** 2) / (2 * $g * $area_limite ** 2));
-
-                if ($livello_monte > $quota_limite) {
-                    $portata = $portata_base * $altezza_saracinesca / $energia_limite;
-                } else {
-                    $portata = 0;
-                }
-                break;
-            default:
-                throw new \Exception('Tipologia di portata non definita');
-                break;
+        $alias = $formule['alias'];
+        
+        $function = __NAMESPACE__ . '\formulaPortata' . ucfirst($alias);
+        if (is_callable($function)) {
+            $portata = call_user_func($function, $formule, $parametri);
+        } else {
+            throw new \Exception('Nome opzione non ammesso');
         }
-        return ($portata <= $formule['limite']) ? $portata : 0;
+        
+        if ($portata > $formule['limite']) {
+            $portata = 0;
+            //$portata = NODATA;
+        }
+        return $portata;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function formulaPortataSfioro(array $formule, array $parametri) : float
+{
+    try {
+        if (!array_key_exists('altezza', $parametri) || $parametri['altezza'] == NODATA) {
+            throw new \Exception('Parametro altezza non impostato o nodata');
+        }
+        $g = 9.81;        
+        $altezza_idrostatica = $parametri['altezza'];
+        $mi = $formule['mi'];
+        $larghezza_soglia = $formule['larghezza'];
+        if ($altezza_idrostatica > 0) {
+            $portata = $mi * $larghezza_soglia * $altezza_idrostatica * sqrt(2 * $g * $altezza_idrostatica);
+        } else {
+            $portata = 0;
+        }    
+        return $portata;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function formulaPortataScarico1(array $formule, array $parametri) : float
+{
+    try {
+        if (!array_key_exists('altezza', $parametri) || $parametri['altezza'] == NODATA) {
+            throw new \Exception('Parametro altezza non impostato o nodata');
+        }
+        if (!array_key_exists('manovra', $parametri) || $parametri['manovra'] == NODATA) {
+            throw new \Exception('Parametro manovra non impostato o nodata');
+        }
+        $g = 9.81;        
+        $altezza_idrostatica = $parametri['altezza'];
+        $apertura_paratoia = $parametri['manovra'];
+        $mi = $formule['mi'];
+        $larghezza_soglia = $formule['larghezza'];
+        $velocita = $formule['velocita'];
+        $altezza_cinetica = ($velocita ** 2) / (2 * $g);
+
+        if ($altezza_idrostatica > 0) {
+            $portata = $mi * $larghezza_soglia * $apertura_paratoia * sqrt(2 * $g) * (sqrt(($altezza_idrostatica + $altezza_cinetica) ** 3) - sqrt($altezza_cinetica ** 3));
+        } else {
+            $portata = 0;
+        }
+        return $portata;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function formulaPortataScarico2(array $formule, array $parametri) : float
+{
+    try {
+        if (!array_key_exists('altezza', $parametri) || $parametri['altezza'] == NODATA) {
+            throw new \Exception('Parametro altezza non impostato o nodata');
+        }
+        if (!array_key_exists('manovra', $parametri) || $parametri['manovra'] == NODATA) {
+            throw new \Exception('Parametro manovra non impostato o nodata');
+        }
+        $g = 9.81;        
+        $altezza_idrostatica = $parametri['altezza'];
+        $apertura_paratoia = $parametri['manovra'];
+        $mi = $formule['mi'];
+        $larghezza_soglia = $formule['larghezza'];
+
+        if ($altezza_idrostatica > 0) {
+            $portata = $mi * $larghezza_soglia * $apertura_paratoia * sqrt(2 * $g * $altezza_idrostatica);
+        } else {
+            $portata = 0;
+        }
+        return $portata;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function formulaPortataScarico3(array $formule, array $parametri) : float
+{
+    try {
+        if (!array_key_exists('altezza', $parametri) || $parametri['altezza'] == NODATA) {
+            throw new \Exception('Parametro altezza non impostato o nodata');
+        }
+        if (!array_key_exists('manovra', $parametri) || $parametri['manovra'] == NODATA) {
+            throw new \Exception('Parametro manovra non impostato o nodata');
+        }
+        $g = 9.81;        
+        $altezza_idrostatica = $parametri['altezza'];
+        $apertura_paratoia = $parametri['manovra'];
+        $mi = $formule['mi'];
+        $raggio = $formule['raggio'];
+        $area_sezione = pi() * $raggio ** 2;
+
+        if ($altezza_idrostatica > 0) {
+            $portata = $mi * $area_sezione * $apertura_paratoia * sqrt(2 * $g * $altezza_idrostatica);
+        } else {
+            $portata = 0;
+        }
+        return $portata;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function formulaPortataVentola(array $formule, array $parametri) : float
+{
+    try {
+        if (!array_key_exists('altezza', $parametri) || $parametri['altezza'] == NODATA) {
+            throw new \Exception('Parametro altezza non impostato o nodata');
+        }
+        if (!array_key_exists('manovra', $parametri) || $parametri['manovra'] == NODATA) {
+            throw new \Exception('Parametro manovra non impostato o nodata');
+        }
+        $g = 9.81;        
+        $altezza_idrostatica = $parametri['altezza'];
+        $rad_ventola = $parametri['manovra'];
+        $mi = $formule['mi'];
+        $larghezza = $formule['larghezza'];
+        $angolo_max = $formule['angolo'];
+        $rad_max = $angolo_max / 180 * pi();
+        $altezza_max = $formule['altezza'];
+        $profondita_ventola = $altezza_max / sin($rad_max);
+        $apertura_ventola = $altezza_max - $profondita_ventola * sin($rad_max - $rad_ventola);
+        $tirante = $altezza_idrostatica + $apertura_ventola;
+
+        if ($tirante > 0) {
+            $portata = $mi * $larghezza * $tirante * sqrt(2 * $g * $tirante);
+        } else {
+            $portata = 0;
+        }
+        return $portata;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function formulaPortataSaracinesca(array $formule, array $parametri) : float
+{
+    try {
+        if (!array_key_exists('altezza', $parametri) || $parametri['altezza'] == NODATA) {
+            throw new \Exception('Parametro altezza non impostato o nodata');
+        }
+        if (!array_key_exists('manovra', $parametri) || $parametri['manovra'] == NODATA) {
+            throw new \Exception('Parametro manovra non impostato o nodata');
+        }
+        $g = 9.81;        
+        $altezza_idrostatica = $parametri['altezza'];
+        $altezza_saracinesca = $parametri['manovra'];
+        $mi = $formule['mi'];
+        $raggio = $formule['raggio'];
+        $k = ($raggio - $altezza_saracinesca) / $raggio;
+        $rad_angolo = 2 * acos($k);
+        $area_scarico = ($rad_angolo - sin($rad_angolo)) * ($raggio ** 2) / 2;
+        $tirante = $altezza_idrostatica - ($altezza_saracinesca / 2);
+
+        if ($tirante > 0) {
+            $portata = $mi * $area_scarico * sqrt(2 * $g * $tirante);
+        } else {
+            $portata = 0;
+        }
+        return $portata;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function formulaPortataGalleria(array $formule, array $parametri) : float
+{
+    try {
+        if (!array_key_exists('altezza', $parametri) || $parametri['altezza'] == NODATA) {
+            throw new \Exception('Parametro altezza non impostato o nodata');
+        }
+        if (!array_key_exists('manovra', $parametri) || $parametri['manovra'] == NODATA) {
+            throw new \Exception('Parametro manovra non impostato o nodata');
+        }
+        if (!array_key_exists('livello', $parametri) || $parametri['livello'] == NODATA) {
+            throw new \Exception('Parametro livello non impostato o nodata');
+        }
+        $g = 9.81;        
+        $livello_monte = $parametri['livello'];
+        $altezza_idrostatica = $parametri['altezza'];
+        $altezza_saracinesca = $parametri['manovra'];
+
+        $scabrosita = $formule['scabrosita'];
+        $lunghezza_galleria = $formule['lunghezza'];
+        $raggio = $formule['raggio'];
+        $quota = $formule['quota'];
+        $angolo_limite = $formule['angolo'];
+        $quota_limite = $formule['limite'];
+
+        $R = $raggio / 2;
+        $chi = 87 / (1 + $scabrosita / sqrt($R));
+        $J = $altezza_idrostatica / $lunghezza_galleria;
+        $area = pi() * $raggio ** 2;
+
+        $portata_base = $chi * $area * sqrt($R * $J);
+
+        $rad_limite = $angolo_limite / 180 * pi();
+        $altezza_saracinesca_limite = $raggio * (1 - cos($rad_limite / 2));
+        $area_limite = ($rad_limite - sin($rad_limite)) * ($raggio ** 2) / 2;
+        $arco_limite = $rad_limite * $raggio;
+        $R_limite = $area_limite / $arco_limite;
+        $chi_limite = 87 / (1 + $scabrosita / sqrt($R_limite));
+        $J_limite = ($quota_limite - $quota) / $lunghezza_galleria;
+
+        $portata_limite = $chi_limite * $area_limite * sqrt($R_limite * $J_limite);
+
+        $energia_limite = $altezza_saracinesca_limite + (($portata_limite ** 2) / (2 * $g * $area_limite ** 2));
+
+        if ($livello_monte > $quota_limite) {
+            $portata = $portata_base * $altezza_saracinesca / $energia_limite;
+        } else {
+            $portata = 0;
+        }
+        return $portata;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
