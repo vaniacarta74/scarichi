@@ -15,8 +15,11 @@
             "subdirectory": true
         }
     },
-    "command": "php scarichi.php",
-    "url": "http://localhost/telecontrollo/scarichi/github/src/index.php",
+    "command": { 
+        "sintax": "php scarichi.php",
+        "url": "http://localhost/telecontrollo/scarichi/github/src/index.php",
+        "async": true
+    },
     "global": {
         "section_types": [
             "short",

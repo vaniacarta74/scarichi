@@ -16,17 +16,16 @@ try {
     $composer = COMPOSER;
     $help = CONFIG;
     $parameters = $help['parameters'];
-    $url = $help['url'];
+    $url = $help['command']['url'];
+    $async = $help['command']['async'];
 
     $type = shuntTypes($parameters, $argv);
-    $message = getMessage($composer, $help, $type);
+    echo getMessage($composer, $help, $type);
     $values = setParameters($parameters, $argv, $type);
     
     $filledValues = fillParameters($parameters, $values);
     $postParams = setPostParameters($parameters, $filledValues);
-    $message .= goCurl($postParams, $url);    
-    
-    echo $message;
+    echo goCurl($postParams, $url, $async); 
 } catch (\Throwable $e) {
     Error::errorHandler($e, DEBUG_LEVEL, true);
     exit();

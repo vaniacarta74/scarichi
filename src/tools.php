@@ -1514,7 +1514,7 @@ function setMsgHtml(array $composer, array $help, string $eol) : string
             throw new \Exception('Dati configurazione non presenti');
         }
         $header = setHeader($composer);
-        $command = $help['command'];
+        $command = $help['command']['sintax'];
         $param = propertyToString($help['parameters'], 'help', 'short');
         
         $message = $header . $eol;
@@ -1555,7 +1555,7 @@ function setMsgDefault(array $composer, array $help, string $eol) : string
             throw new \Exception('Dati configurazione non presenti');
         }
         $header = setHeader($composer);
-        $command = $help['command'];
+        $command = $help['command']['sintax'];
         $shorts = getProperties($help['parameters'], 'short', null, 'type', 'group', null, null, '-');
         $defaults = getProperties($help['parameters'], 'default', null, 'type', 'group');
         $mixed = array_combine($shorts, $defaults);
@@ -1583,7 +1583,7 @@ function setMsgHelp(array $composer, array $help, string $eol) : string
         }
         $header = setHeader($composer);
         $description = $composer['description'];
-        $command = $help['command'];
+        $command = $help['command']['sintax'];
         $console = setConsole($help, $eol);
         $singles = getProperties($help['parameters'], 'short', null, 'type', 'single', null, null, '-');
         $params = implode('|', $singles);
@@ -1636,7 +1636,7 @@ function setMsgError(array $composer, array $help, string $eol) : string
             throw new \Exception('Dati configurazione non presenti');
         }
         $header = setHeader($composer);
-        $command = $help['command'];
+        $command = $help['command']['sintax'];
         $param = propertyToString($help['parameters'], 'help', 'short');
         
         $message = $header . $eol;
@@ -2489,7 +2489,7 @@ function setPostParameters(array $parameters, array $filledValues) : array
 }
 
 
-function goCurl(array $postParams, string $url) : string
+function goCurl(array $postParams, string $url, bool $async) : string
 {
     try {
         $http = '(http[s]?:)[\/]{2}';
@@ -2501,26 +2501,127 @@ function goCurl(array $postParams, string $url) : string
             throw new \Exception('Url non valido');
         }
         $message = '';
-        $i = 1;
-        foreach ($postParams as $key => $params) {
-            $ch = curl_init();
-        
+        $n_param = count($postParams);
+        if ($n_param > 0) {
+            if ($async && $n_param > 1) {
+                goMultiCurl($postParams, $url);            
+            } else {
+                $message = goSingleCurl($postParams, $url);
+            }
+        }
+        return $message;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function initCurl(array $postParams, string $url) : array
+{
+    try {
+        if (count($postParams) === 0) {
+            throw new \Exception('Parametri curl non definiti');
+        }
+        $handlers = [];
+        foreach ($postParams as $params) {
+            $ch = curl_init();        
+            
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_HEADER, false);
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, TIMEOUT);
-            curl_setopt($ch, CURLOPT_TIMEOUT, TIMEOUT);
+            curl_setopt($ch, CURLOPT_TIMEOUT, TIMEOUT);            
+            
+            $handlers[$params['var']] = $ch;
+        }
+        return $handlers;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
 
+
+function goSingleCurl(array $postParams, string $url) : string
+{
+    try {
+        if (count($postParams) === 0) {
+            throw new \Exception('Parametri curl non definiti');
+        }
+        $handlers = initCurl($postParams, $url);
+        $message = '';
+        $i = 1;
+        foreach ($handlers as $key => $ch) {
             $report = curl_exec($ch);
-
             curl_close($ch);
             
             $response = checkCurlResponse($report, DEBUG_LEVEL);            
-            $message .= $i . ') ' . $params['var'] . ': ' . $response . PHP_EOL;
+            $message .= $i . ') ' . $key . ': ' . $response . PHP_EOL;
             $i++;
+        }        
+        return $message;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+    
+    
+function goMultiCurl(array $postParams, string $url) : void
+{
+    try {
+        if (count($postParams) === 0) {
+            throw new \Exception('Parametri curl non definiti');
         }
+        $mh = curl_multi_init();        
+        $handlers = initCurl($postParams, $url);        
+        foreach ($handlers as $ch) {            
+            curl_multi_add_handle($mh, $ch);
+        }
+        $i = 1;
+        do {
+            $status = curl_multi_exec($mh, $still_running);
+            if ($still_running) {
+                curl_multi_select($mh);
+            }
+            while ($info = curl_multi_info_read($mh)) {
+                $ch = $info['handle'];
+                $key = array_search($ch, $handlers);
+                $report = curl_multi_getcontent($ch);
+                $response = checkCurlResponse($report, DEBUG_LEVEL);            
+                echo $i . ') ' . $key . ': ' . $response . PHP_EOL;
+                $i++;
+            }
+        } while ($still_running && $status == CURLM_OK);        
+        foreach ($handlers as $ch) {            
+            curl_multi_remove_handle($mh, $ch);
+            curl_close($ch);
+        }        
+        curl_multi_close($mh);       
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function checkCurlResponse(string $response, int $debug_level) : string
+{
+    try {
+        if ($debug_level > 2) {
+            throw new \Exception('Livello di debug non definito');
+        }
+        if ($response === '') {
+            $message = 'Elaborazone fallita.';
+            if ($debug_level === 1) {
+                $message .= ' Verificare il log degli errori (' . realpath(LOG_PATH) . '/' . ERROR_LOG . ').';
+            }
+        } else {
+            $message = htmlspecialchars(strip_tags($response));
+        }        
         return $message;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -2556,28 +2657,6 @@ function selectLastPrevData(string $db, array $parametri, array $dati, string $c
             $last = $dati;
         }
         return $last;
-    } catch (\Throwable $e) {
-        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-        throw $e;
-    }
-}
-
-
-function checkCurlResponse(string $response, int $debug_level) : string
-{
-    try {
-        if ($debug_level > 2) {
-            throw new \Exception('Livello di debug non definito');
-        }
-        if ($response === '') {
-            $message = 'Elaborazone fallita.';
-            if ($debug_level === 1) {
-                $message .= ' Verificare il log degli errori (' . realpath(LOG_PATH) . '/' . ERROR_LOG . ').';
-            }
-        } else {
-            $message = htmlspecialchars(strip_tags($response));
-        }        
-        return $message;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
