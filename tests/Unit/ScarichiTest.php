@@ -128,7 +128,7 @@ class ScarichiTest extends TestCase
                 'dateto' => '',
                 'nozero' => '',
                 'campo' => '',
-                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal ' . (date('d') - 1) . '/' . date('m') . '/' . date('Y') . ' al ' . date('d/m/Y') . ' avvenuta con successo. Nessun file CSV full esportato per mancanza di dati.' . PHP_EOL
+                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal ' . date('d/m/Y', strtotime(date('Y') . '-' . date('m') . '-' . (date('d') - 1))) . ' al ' . date('d/m/Y') . ' avvenuta con successo. Nessun file CSV full esportato per mancanza di dati.' . PHP_EOL
             ],
             'help' => [
                 'help' => '',

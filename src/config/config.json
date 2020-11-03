@@ -15,6 +15,94 @@
             "subdirectory": true
         }
     },
+    "modelli": {
+        "1": {
+            "base": "data_e_ora",
+            "dati": [
+                "livello"
+            ],
+            "calcoli": {
+                "delta": [
+                    "data_e_ora"
+                ],
+                "media": [
+                    "livello"
+                ]
+            },
+            "formule": {
+                "altezza": [
+                    "media livello"
+                ],
+                "portata": [
+                    "altezza"
+                ],
+                "volume": [
+                    "portata",
+                    "delta"
+                ]
+            }
+        },
+        "2": {
+            "base": "data_e_ora",
+            "dati": [
+                "livello",
+                "manovra"
+            ],
+            "calcoli": {
+                "delta": [
+                    "data_e_ora"
+                ],
+                "media": [
+                    "livello"
+                ]
+            },
+            "formule": {
+                "altezza": [
+                    "media livello"
+                ],
+                "portata": [
+                    "altezza",
+                    "manovra"
+                ],
+                "volume": [
+                    "portata",
+                    "delta"
+                ]
+            }
+        },
+        "3": {
+            "base": "data_e_ora",
+            "dati": [
+                "livello",
+                "livello valle",
+                "manovra"
+            ],
+            "calcoli": {
+                "delta": [
+                    "data_e_ora"
+                ],
+                "media": [
+                    "livello",
+                    "livello valle"
+                ]
+            },
+            "formule": {
+                "altezza": [
+                    "media livello",
+                    "media livello valle"
+                ],
+                "portata": [
+                    "media livello",
+                    "altezza",
+                    "manovra"
+                ],
+                "volume": [
+                    "portata",
+                    "delta"
+                ]
+            }
+        }
+    },
     "command": { 
         "sintax": "php scarichi.php",
         "url": "http://localhost/telecontrollo/scarichi/github/src/index.php",

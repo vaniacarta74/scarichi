@@ -20,10 +20,12 @@ use function vaniacarta74\Scarichi\checkDates as checkDates;
 use function vaniacarta74\Scarichi\datesToString as datesToString;
 use function vaniacarta74\Scarichi\setToLocal as setToLocal;
 use function vaniacarta74\Scarichi\getDataFromDb as getDataFromDb;
-use function vaniacarta74\Scarichi\initVolumi as initVolumi;
+use function vaniacarta74\Scarichi\inizializza as inizializza;
 use function vaniacarta74\Scarichi\addCategoria as addCategoria;
 use function vaniacarta74\Scarichi\addMedia as addMedia;
 use function vaniacarta74\Scarichi\addAltezza as addAltezza;
+use function vaniacarta74\Scarichi\formulaAltezza1 as formulaAltezza1;
+use function vaniacarta74\Scarichi\formulaAltezza2 as formulaAltezza2;
 use function vaniacarta74\Scarichi\addPortata as addPortata;
 use function vaniacarta74\Scarichi\addDelta as addDelta;
 use function vaniacarta74\Scarichi\addVolume as addVolume;
@@ -107,6 +109,10 @@ use function vaniacarta74\Scarichi\goSingleCurl as goSingleCurl;
 use function vaniacarta74\Scarichi\insertNoData as insertNoData;
 use function vaniacarta74\Scarichi\selectLastPrevData as selectLastPrevData;
 use function vaniacarta74\Scarichi\checkCurlResponse as checkCurlResponse;
+use function vaniacarta74\Scarichi\addCampiDati as addCampiDati;
+use function vaniacarta74\Scarichi\addCampiCalcoli as addCampiCalcoli;
+use function vaniacarta74\Scarichi\addCampiFormule as addCampiFormule;
+use function vaniacarta74\Scarichi\addTable as addTable;
 
 class ToolsTest extends TestCase
 {
@@ -253,7 +259,8 @@ class ToolsTest extends TestCase
                         'scarico' => 1,
                         'denominazione' => 'Diga Flumineddu - Sfioratore di superficie',
                         'variabile' => 30030,
-                        'tipo' => 'sfioratore di superficie'
+                        'tipo' => 'sfioratore di superficie',
+                        'modello' => '1'
                     ]
                 ]
             ],
@@ -1849,7 +1856,8 @@ class ToolsTest extends TestCase
                 'scarico' => 1,
                 'denominazione' => 'Diga Flumineddu - Sfioratore di superficie',
                 'variabile' => 30030,
-                'tipo' => 'sfioratore di superficie'
+                'tipo' => 'sfioratore di superficie',
+                'modello' => '1'
             ]
         ];
         
@@ -2177,9 +2185,9 @@ class ToolsTest extends TestCase
     
     /**
      * @group depends
-     * covers initVolumi()
+     * covers inizializza()
      */
-    public function testInitVolumiEquals() : array
+    public function testInizializzaEquals() : array
     {
         $variabili = [
             'id_variabile' => 30030,
@@ -2202,6 +2210,8 @@ class ToolsTest extends TestCase
             ]
         ];
         
+        $base = 'data_e_ora';
+        
         $expected = [
             '0' => [
                 'variabile' => 30030,
@@ -2215,7 +2225,7 @@ class ToolsTest extends TestCase
             ]
         ];
         
-        $actual = initVolumi($variabili, $dati);
+        $actual = inizializza($variabili, $dati, $base);
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
@@ -2233,9 +2243,9 @@ class ToolsTest extends TestCase
     
     /**
      * @group depends
-     * covers initVolumi()
+     * covers inizializza()
      */
-    public function testInitVolumiNoDataEquals() : void
+    public function testInizializzaNoDataEquals() : void
     {
         $variabili = [
             'id_variabile' => 30030,
@@ -2243,18 +2253,19 @@ class ToolsTest extends TestCase
             'unita_misura' => 'mc'
         ];
         $dati = [];
+        $base = 'data_e_ora';
         $expected = [];
         
-        $actual = initVolumi($variabili, $dati);
+        $actual = inizializza($variabili, $dati, $base);
         
         $this->assertEquals($expected, $actual);
     }
     
     /**
      * @group ex
-     * covers initVolumi()
+     * covers inizializza()
      */
-    public function testInitVolumiException() : array
+    public function testInizializzaException() : array
     {
         $variabili = [
             'variabile' => 30030,
@@ -2276,10 +2287,1192 @@ class ToolsTest extends TestCase
                 'tipo_dato' => 2
             ]
         ];
-                
+        
+        $base = 'data_e_ora';
+        
         $this->expectException(\Exception::class);
         
-        initVolumi($variabili, $dati);
+        inizializza($variabili, $dati, $base);
+    }
+    
+    /**
+     * @group depends
+     * covers addCampiDati()
+     */
+    public function testAddCampiDatiEquals() : void
+    {
+        $volumi = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'tipo_dato' => 1
+            ],
+            '1' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'tipo_dato' => 1
+            ]
+        ];
+        
+        $dati = [
+            'livello' => [
+                '0' => [
+                    'variabile' => 165071,
+                    'valore' => 266.206,
+                    'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                    'unita_misura' => 'mslm',
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 165071,
+                    'valore' => 266.140,
+                    'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                    'unita_misura' => 'mslm',
+                    'tipo_dato' => 2
+                ]
+            ],
+            'manovra' => [
+                '0' => [
+                    'variabile' => 39999,
+                    'valore' => 100,
+                    'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                    'unita_misura' => '%',
+                    'tipo_dato' => 1
+                ],
+                '1' => [
+                    'variabile' => 39999,
+                    'valore' => 100,
+                    'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                    'unita_misura' => '%',
+                    'tipo_dato' => 1
+                ]
+            ]
+        ];
+        
+        $fieldsDati = [
+            'livello',
+            'manovra'
+        ];
+        
+        $expected = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                'tipo_dato' => 1,
+                'livello' => 266.206,
+                'manovra' => 1
+            ],
+            '1' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'tipo_dato' => 1,
+                'livello' => 266.140,
+                'manovra' => 1                
+            ]
+        ];
+        
+        $actual = addCampiDati($volumi, $dati, $fieldsDati);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($expected[$row][$key], $value);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($value, $actual[$row][$key]);
+            }
+        }
+    }
+    
+    /**
+     * @group depends
+     * covers addCampiDati()
+     */
+    public function testAddCampiDatiException() : void
+    {
+        $volumi = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'tipo_dato' => 1
+            ],
+            '1' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'tipo_dato' => 1
+            ]
+        ];
+        
+        $dati = [
+            'livello' => [
+                '0' => [
+                    'variabile' => 165071,
+                    'valore' => 266.206,
+                    'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                    'unita_misura' => 'mslm',
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 165071,
+                    'valore' => 266.140,
+                    'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                    'unita_misura' => 'mslm',
+                    'tipo_dato' => 2
+                ]
+            ]
+        ];
+        
+        $fieldsDati = [];
+        
+        $this->expectException(\Exception::class);
+        
+        $actual = addCampiDati($volumi, $dati, $fieldsDati);
+    }
+    
+    /*
+     * @coversNothing
+     */
+    public function addCampiCalcoliProvider() : array
+    {
+        $dati = [
+            'delta' => [
+                'table' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 266.206,
+                        'livello valle' => 170.058,
+                        'manovra' => 1
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 266.140,
+                        'livello valle' => 170.098,
+                        'manovra' => 1                
+                    ]
+                ],
+                'campi' => [
+                    'delta' => [
+                        'data_e_ora'
+                    ]
+                ],
+                'expected' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 266.206,
+                        'livello valle' => 170.058,
+                        'manovra' => 1,
+                        'delta' => 0
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 266.140,
+                        'livello valle' => 170.098,
+                        'manovra' => 1,
+                        'delta' => 900
+                    ]
+                ]
+            ],
+            'media' => [
+                'table' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 266.206,
+                        'livello valle' => 170.058,
+                        'manovra' => 1
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 266.140,
+                        'livello valle' => 170.098,
+                        'manovra' => 1                
+                    ]
+                ],
+                'campi' => [
+                    'media' => [
+                        'livello'
+                    ]
+                ],
+                'expected' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 266.206,
+                        'livello valle' => 170.058,
+                        'manovra' => 1,
+                        'media livello' => 266.206
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 266.140,
+                        'livello valle' => 170.098,
+                        'manovra' => 1,
+                        'media livello' => 266.173
+                    ]
+                ]
+            ],
+            'delta e media' => [
+                'table' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 266.206,
+                        'livello valle' => 170.058,
+                        'manovra' => 1
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 266.140,
+                        'livello valle' => 170.098,
+                        'manovra' => 1                
+                    ]
+                ],
+                'campi' => [
+                    'delta' => [
+                        'data_e_ora'
+                    ],
+                    'media' => [
+                        'livello',
+                        'livello valle'
+                    ]
+                ],
+                'expected' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 266.206,
+                        'livello valle' => 170.058,
+                        'manovra' => 1,
+                        'delta' => 0,
+                        'media livello' => 266.206,
+                        'media livello valle' => 170.058
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 266.140,
+                        'livello valle' => 170.098,
+                        'manovra' => 1,
+                        'delta' => 900,
+                        'media livello' => 266.173,
+                        'media livello valle' => 170.078
+                    ]
+                ]
+            ]
+        ];        
+        return $dati;
+    }
+    
+    /**
+     * @group table
+     * covers addCampiCalcoli()
+     * @dataProvider addCampiCalcoliProvider
+     */
+    public function testAddCampiCalcoliEquals(array $table, array $campi, array $expected) : void
+    {
+        $actual = addCampiCalcoli($table, $campi);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($expected[$row][$key], $value);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEquals($value, $actual[$row][$key]);
+            }
+        }
+    }
+    
+    /**
+     * @group depends
+     * covers addCampiCalcoli()
+     */
+    public function testAddCampiCalcoliException() : void
+    {
+        $table = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                'tipo_dato' => 1,
+                'livello' => 266.206,
+                'livello valle' => 170.058,
+                'manovra' => 1
+            ],
+            '1' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'tipo_dato' => 1,
+                'livello' => 266.140,
+                'livello valle' => 170.098,
+                'manovra' => 1                
+            ]
+        ];
+        
+        $campi = [
+            'mediana' => [
+                'livello'
+            ]
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        addCampiCalcoli($table, $campi);
+    }
+    
+    /*
+     * @coversNothing
+     */
+    public function addCampiFormuleProvider() : array
+    {
+        $dati = [
+            'altezza 1 livello' => [
+                'table' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 266.206,
+                        'delta' => 0,
+                        'media livello' => 266.206
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 266.140,
+                        'delta' => 900,
+                        'media livello' => 266.173
+                    ]
+                ],
+                'coefficienti' => [
+                    'tipo_formula' => 'portata sfiorante',
+                    'alias' => 'sfioro',
+                    'scarico' => 1,
+                    'mi' => 0.47,
+                    'larghezza' => 40.5,
+                    'quota' => 266.1,
+                    'limite' => 942.67
+                ],
+                'campi' => [
+                    'altezza' => [
+                        'media livello'
+                    ]
+                ],
+                'expected' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 266.206,
+                        'delta' => 0,
+                        'media livello' => 266.206,
+                        'altezza' => 0.106
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 266.140,
+                        'delta' => 900,
+                        'media livello' => 266.173,
+                        'altezza' => 0.073
+                    ]
+                ]
+            ],
+            'altezza 2 livello' => [
+                'table' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 266.206,
+                        'livello valle' => 266.058,
+                        'manovra' => 1,
+                        'delta' => 0,
+                        'media livello' => 266.206,
+                        'media livello valle' => 266.058
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 266.140,
+                        'livello valle' => 264.098,
+                        'manovra' => 1,
+                        'delta' => 900,
+                        'media livello' => 266.173,
+                        'media livello valle' => 265.078
+                    ]
+                ],
+                'coefficienti' => [
+                    'tipo_formula' => 'portata sfiorante',
+                    'alias' => 'sfioro',
+                    'scarico' => 1,
+                    'mi' => 0.47,
+                    'larghezza' => 40.5,
+                    'quota' => 266,
+                    'limite' => 942.67
+                ],
+                'campi' => [
+                    'altezza' => [
+                        'media livello',
+                        'media livello valle'
+                    ]
+                ],
+                'expected' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 266.206,
+                        'livello valle' => 266.058,
+                        'manovra' => 1,
+                        'delta' => 0,
+                        'media livello' => 266.206,
+                        'media livello valle' => 266.058,
+                        'altezza' => 0.148
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 266.140,
+                        'livello valle' => 264.098,
+                        'manovra' => 1,
+                        'delta' => 900,
+                        'media livello' => 266.173,
+                        'media livello valle' => 265.078,
+                        'altezza' => 0.173
+                    ]
+                ]
+            ],
+            'portata modello 1' => [
+                'table' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 266.206,
+                        'delta' => 0,
+                        'media livello' => 266.206,
+                        'altezza' => 0.106
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 266.140,
+                        'delta' => 900,
+                        'media livello' => 266.173,
+                        'altezza' => 0.073
+                    ]
+                ],
+                'coefficienti' => [
+                    'tipo_formula' => 'portata sfiorante',
+                    'alias' => 'sfioro',
+                    'scarico' => 1,
+                    'mi' => 0.47,
+                    'larghezza' => 40.5,
+                    'quota' => 266.1,
+                    'limite' => 942.67
+                ],
+                'campi' => [
+                    'portata' => [
+                        'altezza'
+                    ]
+                ],
+                'expected' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 266.206,
+                        'delta' => 0,
+                        'media livello' => 266.206,
+                        'altezza' => 0.106,
+                        'portata' => 2.909
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 266.140,
+                        'delta' => 900,
+                        'media livello' => 266.173,
+                        'altezza' => 0.073,
+                        'portata' => 1.662
+                    ]
+                ]
+            ],
+            'portata modello 2' => [
+                'table' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 266.206,
+                        'manovra' => 1,
+                        'delta' => 0,
+                        'media livello' => 266.206,
+                        'altezza' => 0.148
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 266.140,
+                        'manovra' => 1,
+                        'delta' => 900,
+                        'media livello' => 266.173,
+                        'altezza' => 0.173
+                    ]
+                ],
+                'coefficienti' => [
+                    'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
+                    'alias' => 'scarico1',
+                    'scarico' => 22,
+                    'mi' => 0.47,
+                    'larghezza' => 158.61,
+                    'quota' => 16.05,
+                    'limite' => 2000,
+                    'velocita' => 0.8
+                ],
+                'campi' => [
+                    'portata' => [
+                        'altezza',
+                        'manovra'
+                    ]
+                ],
+                'expected' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 266.206,
+                        'manovra' => 1,
+                        'delta' => 0,
+                        'media livello' => 266.206,
+                        'altezza' => 0.148,
+                        'portata' => 23.402
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 266.140,
+                        'manovra' => 1,
+                        'delta' => 900,
+                        'media livello' => 266.173,
+                        'altezza' => 0.173,
+                        'portata' => 28.842
+                    ]
+                ]
+            ],
+            'portata modello 3' => [
+                'table' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 270.206,
+                        'livello valle' => 266.058,
+                        'manovra' => 2,
+                        'delta' => 0,
+                        'media livello' => 270.206,
+                        'media livello valle' => 266.058,
+                        'altezza' => 4.148
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 270.140,
+                        'livello valle' => 264.098,
+                        'manovra' => 2,
+                        'delta' => 900,
+                        'media livello' => 270.173,
+                        'media livello valle' => 265.078,
+                        'altezza' => 4.173
+                    ]
+                ],
+                'coefficienti' => [
+                    'tipo_formula' => 'portata galleria',
+                    'alias' => 'galleria',
+                    'scabrosita' => 0.1,
+                    'lunghezza' => 6890,
+                    'angolo' => 301,
+                    'raggio' => 1.25,
+                    'quota' => 264.18,
+                    'limite' => 266.247
+                ],
+                'campi' => [
+                    'portata' => [
+                        'media livello',
+                        'altezza',
+                        'manovra'
+                    ]
+                ],
+                'expected' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 270.206,
+                        'livello valle' => 266.058,
+                        'manovra' => 2,
+                        'delta' => 0,
+                        'media livello' => 270.206,
+                        'media livello valle' => 266.058,
+                        'altezza' => 4.148,
+                        'portata' => 6.115
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 270.140,
+                        'livello valle' => 264.098,
+                        'manovra' => 2,
+                        'delta' => 900,
+                        'media livello' => 270.173,
+                        'media livello valle' => 265.078,
+                        'altezza' => 4.173,
+                        'portata' => 6.133
+                    ]
+                ]
+            ],
+            'volume' => [
+                'table' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 270.206,
+                        'livello valle' => 266.058,
+                        'manovra' => 2,
+                        'delta' => 0,
+                        'media livello' => 270.206,
+                        'media livello valle' => 266.058,
+                        'altezza' => 4.148,
+                        'portata' => 6.115
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 270.140,
+                        'livello valle' => 264.098,
+                        'manovra' => 2,
+                        'delta' => 900,
+                        'media livello' => 270.173,
+                        'media livello valle' => 265.078,
+                        'altezza' => 4.173,
+                        'portata' => 6.133
+                    ]
+                ],
+                'coefficienti' => [
+                    'tipo_formula' => 'portata galleria',
+                    'alias' => 'galleria',
+                    'scabrosita' => 0.1,
+                    'lunghezza' => 6890,
+                    'angolo' => 301,
+                    'raggio' => 1.25,
+                    'quota' => 264.18,
+                    'limite' => 266.247
+                ],
+                'campi' => [
+                    'volume' => [
+                        'portata',
+                        'delta'
+                    ]
+                ],
+                'expected' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 270.206,
+                        'livello valle' => 266.058,
+                        'manovra' => 2,
+                        'delta' => 0,
+                        'media livello' => 270.206,
+                        'media livello valle' => 266.058,
+                        'altezza' => 4.148,
+                        'portata' => 6.115,
+                        'volume' => 0
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 270.140,
+                        'livello valle' => 264.098,
+                        'manovra' => 2,
+                        'delta' => 900,
+                        'media livello' => 270.173,
+                        'media livello valle' => 265.078,
+                        'altezza' => 4.173,
+                        'portata' => 6.133,
+                        'volume' => 5519.7
+                    ]
+                ]
+            ]            
+        ];        
+        return $dati;
+    }
+    
+    /**
+     * @group table
+     * covers addCampiFormule()
+     * @dataProvider addCampiFormuleProvider
+     */
+    public function testAddCampiFormuleEqualsWithDelta(array $table, array $coefficienti, array $campi, array $expected) : void
+    {
+        $actual = addCampiFormule($table, $coefficienti, $campi);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+            }
+        }
+    }
+    
+    /**
+     * @group depends
+     * covers addCampiFormule()
+     */
+    public function testAddCampiFormuleException() : void
+    {
+        $table = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                'tipo_dato' => 1,
+                'livello' => 266.206,
+                'livello valle' => 170.058,
+                'manovra' => 1
+            ],
+            '1' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'tipo_dato' => 1,
+                'livello' => 266.140,
+                'livello valle' => 170.098,
+                'manovra' => 1                
+            ]
+        ];
+        
+        $coefficienti = [
+            'tipo_formula' => 'portata sfiorante',
+            'alias' => 'sfioro',
+            'scarico' => 1,
+            'mi' => 0.47,
+            'larghezza' => 40.5,
+            'quota' => 266.1,
+            'limite' => 942.67
+        ];
+        
+        $campi = [
+            'mediana' => [
+                'livello'
+            ]
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        addCampiFormule($table, $coefficienti, $campi);
+    }
+    
+    /*
+     * @coversNothing
+     */
+    public function addTableProvider() : array
+    {
+        $dati = [              
+            'modello 1' => [
+                'variabili' => [
+                    '0' => [
+                        'id_variabile' => 30030,
+                        'impianto' => 75,
+                        'unita_misura' => 'mc'
+                    ]
+                ],
+                'scarichi' => [
+                    '0' => [
+                        'scarico' => 1,
+                        'denominazione' => 'Diga Flumineddu - Sfioratore di superficie',
+                        'variabile' => 30030,
+                        'tipo' => 'sfioratore di superficie',
+                        'modello' => 1
+                    ]
+                ],
+                'dati' => [
+                    'livello' => [
+                        '0' => [
+                            'variabile' => 1067,
+                            'valore' => 270.206,
+                            'unita_misura' => 'mslm',
+                            'data_e_ora' => new \DateTime('02/01/2018 00:00:00'),
+                            'tipo_dato' => 2
+                        ],
+                        '1' => [
+                            'variabile' => 1067,
+                            'valore' => 270.140,
+                            'unita_misura' => 'mslm',
+                            'data_e_ora' => new \DateTime('02/01/2018 00:15:00'),
+                            'tipo_dato' => 2
+                        ]
+                    ]
+                ],
+                'formule' => [
+                    '0' => [
+                        'tipo_formula' => 'portata sfiorante',
+                        'alias' => 'sfioro',
+                        'scarico' => 1,
+                        'mi' => 0.47,
+                        'larghezza' => 40.5,
+                        'quota' => 266.1,
+                        'limite' => 942.67
+                    ]
+                ],
+                'expected' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 270.206,
+                        'delta' => 0,
+                        'media livello' => 270.206,
+                        'altezza' => 4.106,
+                        'portata' => 701.505,
+                        'volume' => 0
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-02-01 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 270.140,
+                        'delta' => 900,
+                        'media livello' => 270.173,
+                        'altezza' => 4.073,
+                        'portata' => 693.065,
+                        'volume' => 623758.544
+                    ]
+                ]
+            ],
+            'modello 2' => [
+                'variabili' => [
+                    '0' => [
+                        'id_variabile' => 30030,
+                        'impianto' => 75,
+                        'unita_misura' => 'mc'
+                    ]
+                ],
+                'scarichi' => [
+                    '0' => [
+                        'scarico' => 1,
+                        'denominazione' => 'Diga Flumineddu - Sfioratore di superficie',
+                        'variabile' => 30030,
+                        'tipo' => 'sfioratore di superficie',
+                        'modello' => 2
+                    ]
+                ],
+                'dati' => [
+                    'livello' => [
+                        '0' => [
+                            'variabile' => 1067,
+                            'valore' => 270.206,
+                            'unita_misura' => 'mslm',
+                            'data_e_ora' => new \DateTime('02/01/2018 00:00:00'),
+                            'tipo_dato' => 2
+                        ],
+                        '1' => [
+                            'variabile' => 1067,
+                            'valore' => 270.140,
+                            'unita_misura' => 'mslm',
+                            'data_e_ora' => new \DateTime('02/01/2018 00:15:00'),
+                            'tipo_dato' => 2
+                        ]                        
+                    ],
+                    'manovra' => [
+                        '0' => [
+                            'variabile' => 30033,
+                            'valore' => 50,
+                            'unita_misura' => 'cm',
+                            'data_e_ora' => new \DateTime('02/01/2018 00:00:00'),
+                            'tipo_dato' => 1
+                        ],
+                        '1' => [
+                            'variabile' => 30033,
+                            'valore' => 20,
+                            'unita_misura' => 'cm',
+                            'data_e_ora' => new \DateTime('02/01/2018 00:15:00'),
+                            'tipo_dato' => 1
+                        ]
+                    ]
+                ],
+                'formule' => [
+                    '0' => [
+                        'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
+                        'alias' => 'scarico1',
+                        'scarico' => 22,
+                        'mi' => 0.47,
+                        'larghezza' => 158.61,
+                        'quota' => 266.05,
+                        'limite' => 2000,
+                        'velocita' => 0.8
+                    ]
+                ],
+                'expected' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 270.206,
+                        'manovra' => 0.5,
+                        'delta' => 0,
+                        'media livello' => 270.206,
+                        'altezza' => 4.156,
+                        'portata' => 1414.346,
+                        'volume' => 0
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-02-01 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 270.140,
+                        'manovra' => 0.2,
+                        'delta' => 900,
+                        'media livello' => 270.173,
+                        'altezza' => 4.123,
+                        'portata' => 559.061,
+                        'volume' => 503155.240
+                    ]
+                ]
+            ],
+            'modello 3' => [
+                'variabili' => [
+                    '0' => [
+                        'id_variabile' => 30030,
+                        'impianto' => 75,
+                        'unita_misura' => 'mc'
+                    ]
+                ],
+                'scarichi' => [
+                    '0' => [
+                        'scarico' => 1,
+                        'denominazione' => 'Diga Flumineddu - Sfioratore di superficie',
+                        'variabile' => 30030,
+                        'tipo' => 'sfioratore di superficie',
+                        'modello' => 3
+                    ]
+                ],
+                'dati' => [
+                    'livello' => [
+                        '0' => [
+                            'variabile' => 1067,
+                            'valore' => 270.206,
+                            'unita_misura' => 'mslm',
+                            'data_e_ora' => new \DateTime('02/01/2018 00:00:00'),
+                            'tipo_dato' => 2
+                        ],
+                        '1' => [
+                            'variabile' => 1067,
+                            'valore' => 270.140,
+                            'unita_misura' => 'mslm',
+                            'data_e_ora' => new \DateTime('02/01/2018 00:15:00'),
+                            'tipo_dato' => 2
+                        ]                        
+                    ],
+                    'livello valle' => [
+                        '0' => [
+                            'variabile' => 1067,
+                            'valore' => 266.206,
+                            'unita_misura' => 'mslm',
+                            'data_e_ora' => new \DateTime('02/01/2018 00:00:00'),
+                            'tipo_dato' => 2
+                        ],
+                        '1' => [
+                            'variabile' => 1067,
+                            'valore' => 259.140,
+                            'unita_misura' => 'mslm',
+                            'data_e_ora' => new \DateTime('02/01/2018 00:15:00'),
+                            'tipo_dato' => 2
+                        ]                        
+                    ],
+                    'manovra' => [
+                        '0' => [
+                            'variabile' => 30033,
+                            'valore' => 50,
+                            'unita_misura' => 'cm',
+                            'data_e_ora' => new \DateTime('02/01/2018 00:00:00'),
+                            'tipo_dato' => 1
+                        ],
+                        '1' => [
+                            'variabile' => 30033,
+                            'valore' => 20,
+                            'unita_misura' => 'cm',
+                            'data_e_ora' => new \DateTime('02/01/2018 00:15:00'),
+                            'tipo_dato' => 1
+                        ]
+                    ]
+                ],
+                'formule' => [
+                    '0' => [
+                        'tipo_formula' => 'portata galleria',
+                        'alias' => 'galleria',
+                        'scabrosita' => 0.1,
+                        'lunghezza' => 6890,
+                        'angolo' => 301,
+                        'raggio' => 1.25,
+                        'quota' => 264.18,
+                        'limite' => 266.247
+                    ]
+                ],
+                'expected' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 270.206,
+                        'livello valle' => 266.206,
+                        'manovra' => 0.5,
+                        'delta' => 0,
+                        'media livello' => 270.206,
+                        'media livello valle' => 266.206, 
+                        'altezza' => 4,
+                        'portata' => 1.501,
+                        'volume' => 0
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-02-01 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 270.140,
+                        'livello valle' => 259.14,
+                        'manovra' => 0.2,
+                        'delta' => 900,
+                        'media livello' => 270.173,
+                        'media livello valle' => 262.673,
+                        'altezza' => 5.993,
+                        'portata' => 0.735,
+                        'volume' => 661.468
+                    ]
+                ]
+            ]
+        ];        
+        return $dati;
+    }
+    
+    /**
+     * @group table
+     * covers addTable()
+     * @dataProvider addTableProvider
+     */
+    public function testAddTableEqualsWithDelta(array $variabili, array $scarichi, array $dati, array $formule, array $expected) : void
+    {
+        $actual = addTable($variabili, $scarichi, $dati, $formule);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+            }
+        }
+    }
+    
+    /**
+     * @group depends
+     * covers addTable()
+     */
+    public function testAddTableException() : void
+    {
+        $variabili = [
+            '0' => [
+                'id_variabile' => 30030,
+                'impianto' => 75,
+                'unita_misura' => 'mc'
+            ]
+        ];
+        
+        $scarichi = [
+            '0' => [
+                'scarico' => 1,
+                'denominazione' => 'Diga Flumineddu - Sfioratore di superficie',
+                'variabile' => 30030,
+                'tipo' => 'sfioratore di superficie',
+                'modello' => 0
+            ]
+        ];
+        
+        $dati = [
+            'livello' => [
+                '0' => [
+                    'variabile' => 1067,
+                    'valore' => 270.206,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('02/01/2018 00:00:00'),
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 1067,
+                    'valore' => 270.140,
+                    'unita_misura' => 'mslm',
+                    'data_e_ora' => new \DateTime('02/01/2018 00:15:00'),
+                    'tipo_dato' => 2
+                ]
+            ]
+        ];
+        
+        $formule = [
+            '0' => [
+                'tipo_formula' => 'portata sfiorante',
+                'alias' => 'sfioro',
+                'scarico' => 1,
+                'mi' => 0.47,
+                'larghezza' => 40.5,
+                'quota' => 266.1,
+                'limite' => 942.67
+            ]
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        addTable($variabili, $scarichi, $dati, $formule);
     }
     
     /**
@@ -2636,6 +3829,51 @@ class ToolsTest extends TestCase
     
     /**
      * @group depends
+     * covers addCategoria()
+     */
+    public function testAddCategoriaNameException() : void
+    {
+        $volumi = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'tipo_dato' => 1
+            ],
+            '1' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'tipo_dato' => 1
+            ]
+        ];
+        
+        $dati = [
+            'livello' => [
+                '0' => [
+                    'variabile' => 165071,
+                    'valore' => 266.206,
+                    'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                    'unita_misura' => 'mslm',
+                    'tipo_dato' => 2
+                ],
+                '1' => [
+                    'variabile' => 165071,
+                    'valore' => 266.140,
+                    'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                    'unita_misura' => 'mslm',
+                    'tipo_dato' => 2
+                ]
+            ]
+        ];
+        
+        $categoria = 'pippo';
+        
+        $this->expectException(\Exception::class);
+        
+        $actual = addCategoria($volumi, $dati, $categoria);
+    }
+        
+    /**
+     * @group depends
      * covers addMedia()
      * @depends testAddCategoriaEquals
      */
@@ -2791,7 +4029,11 @@ class ToolsTest extends TestCase
             ]
         ];
         
-        $actual = addAltezza($volumi, $specifiche);
+        $campi = [
+            'media livello'
+        ];
+        
+        $actual = addAltezza($volumi, $specifiche, $campi);
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
@@ -2839,6 +4081,10 @@ class ToolsTest extends TestCase
             'limite' => 942.67
         ];
         
+        $campi = [
+            'media livello'
+        ];
+        
         $expected = [
             '0' => [
                 'variabile' => 30030,
@@ -2858,7 +4104,7 @@ class ToolsTest extends TestCase
             ]
         ];
         
-        $actual = addAltezza($volumi, $specifiche);
+        $actual = addAltezza($volumi, $specifiche, $campi);
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
@@ -2909,6 +4155,11 @@ class ToolsTest extends TestCase
             'limite' => 942.67
         ];
         
+        $campi = [
+            'media livello',
+            'media livello valle'
+        ];
+        
         $expected = [
             '0' => [
                 'variabile' => 30030,
@@ -2932,7 +4183,7 @@ class ToolsTest extends TestCase
             ]
         ];
         
-        $actual = addAltezza($volumi, $specifiche);
+        $actual = addAltezza($volumi, $specifiche, $campi);
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
@@ -2984,6 +4235,11 @@ class ToolsTest extends TestCase
             'limite' => 942.67
         ];
         
+        $campi = [
+            'media livello',
+            'media livello valle'
+        ];
+        
         $expected = [
             '0' => [
                 'variabile' => 30030,
@@ -3007,7 +4263,7 @@ class ToolsTest extends TestCase
             ]
         ];
         
-        $actual = addAltezza($volumi, $specifiche);
+        $actual = addAltezza($volumi, $specifiche, $campi);
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
@@ -3038,9 +4294,12 @@ class ToolsTest extends TestCase
             'quota' => 260,
             'limite' => 942.67
         ];
+        $campi = [
+            'media livello'
+        ];
         $expected = [];
         
-        $actual = addAltezza($volumi, $specifiche);
+        $actual = addAltezza($volumi, $specifiche, $campi);
         
         $this->assertEquals($expected, $actual);
     }
@@ -3053,10 +4312,277 @@ class ToolsTest extends TestCase
     public function testAddAltezzaException(array $volumi) : array
     {
         $specifiche = [];
+        $campi = [
+            'media livello'
+        ];
         
         $this->expectException(\Exception::class);
         
-        addAltezza($volumi, $specifiche);
+        addAltezza($volumi, $specifiche, $campi);
+    }
+    
+    /**
+     * @group depends
+     * covers addAltezza()
+     */
+    public function testAddAltezzaCampiException() : void
+    {
+        $volumi = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media livello' => 265,
+                'livello valle' => NODATA,
+                'media livello valle' => NODATA,
+                'tipo_dato' => 1
+            ],
+            '1' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media livello' => 265,
+                'livello valle' => NODATA,
+                'media livello valle' => NODATA,
+                'tipo_dato' => 1
+            ]
+        ];
+        
+        $specifiche = [
+            'tipo_formula' => 'portata galleria',
+            'scarico' => 1,
+            'mi' => 0.47,
+            'larghezza' => 40.5,
+            'quota' => 260,
+            'limite' => 942.67
+        ];
+        
+        $campi = [
+            'livello valle',
+            'livello monte',
+            'livello intermedio'
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        addAltezza($volumi, $specifiche, $campi);
+    }
+    
+    /**
+     * @group depends
+     * covers formulaAltezza1()
+     */
+    public function testFormulaAltezza1Equals() : void
+    {
+        $campi = [
+            'variabile' => 30030,
+            'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+            'livello' => 266.206,
+            'media livello' => 266.206,
+            'tipo_dato' => 1
+        ];
+        
+        $quota = 266.180;
+        
+        $fields = [
+            'media livello'
+        ];
+        
+        $expected = [
+            'variabile' => 30030,
+            'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+            'livello' => 266.206,
+            'media livello' => 266.206,
+            'tipo_dato' => 1,
+            'altezza' => 0.026
+        ];
+        
+        $actual = formulaAltezza1($campi, $quota, $fields);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group depends
+     * covers formulaAltezza1()
+     */
+    public function testFormulaAltezza1NodataEquals() : void
+    {
+        $campi = [
+            'variabile' => 30030,
+            'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+            'livello' => NODATA,
+            'media livello' => NODATA,
+            'tipo_dato' => 1
+        ];
+        
+        $quota = 266.180;
+        
+        $fields = [
+            'media livello'
+        ];
+        
+        $expected = [
+            'variabile' => 30030,
+            'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+            'livello' => NODATA,
+            'media livello' => NODATA,
+            'tipo_dato' => 1,
+            'altezza' => NODATA
+        ];
+        
+        $actual = formulaAltezza1($campi, $quota, $fields);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group depends
+     * covers formulaAltezza1()
+     */
+    public function testFormulaAltezza1Exception() : void
+    {
+        $campi = [
+            'variabile' => 30030,
+            'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+            'livello' => 266.206,
+            'media livello' => 266.206,
+            'tipo_dato' => 1
+        ];
+        $quota = 270;
+        $fields = [
+            'pippo'
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formulaAltezza1($campi, $quota, $fields);
+    }
+    
+    /**
+     * @group depends
+     * covers formulaAltezza2()
+     */
+    public function testFormulaAltezza2Equals() : void
+    {
+        $campi = [
+            'variabile' => 30030,
+            'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+            'livello' => 266.206,
+            'media livello' => 265,
+            'livello valle' => 266.206,
+            'media livello valle' => 261,
+            'tipo_dato' => 1
+        ];
+        
+        $quota = 260;
+        
+        $fields = [
+            'media livello',
+            'media livello valle'
+        ];
+        
+        $expected = [
+            'variabile' => 30030,
+            'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+            'livello' => 266.206,
+            'media livello' => 265,
+            'livello valle' => 266.206,
+            'media livello valle' => 261,
+            'tipo_dato' => 1,
+            'altezza' => 4
+        ];
+        
+        $actual = formulaAltezza2($campi, $quota, $fields);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group depends
+     * covers formulaAltezza2()
+     */
+    public function testFormulaAltezza2NodataEquals() : void
+    {
+        $campi = [
+            'variabile' => 30030,
+            'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+            'livello' => 266.206,
+            'media livello' => 265,
+            'livello valle' => NODATA,
+            'media livello valle' => NODATA,
+            'tipo_dato' => 1
+        ];
+        
+        $quota = 266.180;
+        
+        $fields = [
+            'media livello',
+            'media livello valle'
+        ];
+        
+        $expected = [
+            'variabile' => 30030,
+            'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+            'livello' => 266.206,
+            'media livello' => 265,
+            'livello valle' => NODATA,
+            'media livello valle' => NODATA,
+            'tipo_dato' => 1,
+            'altezza' => NODATA
+        ];
+        
+        $actual = formulaAltezza2($campi, $quota, $fields);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group depends
+     * covers formulaAltezza2()
+     */
+    public function testFormulaAltezza2Exception() : void
+    {
+        $campi = [
+            'variabile' => 30030,
+            'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+            'livello' => 266.206,
+            'media livello' => 266.206,
+            'tipo_dato' => 1
+        ];
+        $quota = 270;
+        $fields = [
+            'pippo',
+            'pluto'
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formulaAltezza2($campi, $quota, $fields);
+    }
+    
+    /**
+     * @group depends
+     * covers formulaAltezza2()
+     */
+    public function testFormulaAltezza2AuxException() : void
+    {
+        $campi = [
+            'variabile' => 30030,
+            'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+            'livello' => 266.206,
+            'media livello' => 266.206,
+            'tipo_dato' => 1
+        ];
+        $quota = 270;
+        $fields = [
+            'media livello',
+            'pluto'
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formulaAltezza2($campi, $quota, $fields);
     }
     
     /**
@@ -3074,6 +4600,10 @@ class ToolsTest extends TestCase
             'larghezza' => 40.5,
             'quota' => 276.5,
             'limite' => 942.67
+        ];
+        
+        $campi = [
+            'altezza'
         ];
         
         $expected = [
@@ -3097,7 +4627,7 @@ class ToolsTest extends TestCase
             ]
         ];
         
-        $actual = addPortata($volumi, $specifiche);
+        $actual = addPortata($volumi, $specifiche, $campi);
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
@@ -3130,6 +4660,10 @@ class ToolsTest extends TestCase
             'limite' => 0.35
         ];
         
+        $campi = [
+            'altezza'
+        ];
+        
         $expected = [
             '0' => [
                 'variabile' => 30030,
@@ -3151,7 +4685,7 @@ class ToolsTest extends TestCase
             ]
         ];
         
-        $actual = addPortata($volumi, $specifiche);
+        $actual = addPortata($volumi, $specifiche, $campi);
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
@@ -3191,7 +4725,7 @@ class ToolsTest extends TestCase
                 'tipo_dato' => 1,
                 'manovra' => 1
             ]
-        ];
+        ];       
         
         $specifiche = [
             'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
@@ -3202,6 +4736,11 @@ class ToolsTest extends TestCase
             'quota' => 16.05,
             'limite' => 2000,
             'velocita' => 0.8
+        ];
+        
+        $campi = [
+            'altezza',
+            'manovra'
         ];
         
         $expected = [
@@ -3228,7 +4767,7 @@ class ToolsTest extends TestCase
             ]
         ];
         
-        $actual = addPortata($volumi, $specifiche);
+        $actual = addPortata($volumi, $specifiche, $campi);
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
@@ -3280,6 +4819,11 @@ class ToolsTest extends TestCase
             'limite' => 2000
         ];
         
+        $campi = [
+            'altezza',
+            'manovra'
+        ];
+        
         $expected = [
             '0' => [
                 'variabile' => 30051,
@@ -3304,7 +4848,7 @@ class ToolsTest extends TestCase
             ]
         ];
         
-        $actual = addPortata($volumi, $specifiche);
+        $actual = addPortata($volumi, $specifiche, $campi);
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
@@ -3357,6 +4901,11 @@ class ToolsTest extends TestCase
             'velocita' => 0.8
         ];
         
+        $campi = [
+            'altezza',
+            'manovra'
+        ];
+        
         $expected = [
             '0' => [
                 'variabile' => 30050,
@@ -3380,7 +4929,7 @@ class ToolsTest extends TestCase
             ]
         ];
         
-        $actual = addPortata($volumi, $specifiche);
+        $actual = addPortata($volumi, $specifiche, $campi);
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
@@ -3433,6 +4982,11 @@ class ToolsTest extends TestCase
             'velocita' => 0.8
         ];
         
+        $campi = [
+            'altezza',
+            'manovra'
+        ];
+        
         $expected = [
             '0' => [
                 'variabile' => 30051,
@@ -3456,7 +5010,7 @@ class ToolsTest extends TestCase
             ]
         ];
         
-        $actual = addPortata($volumi, $specifiche);
+        $actual = addPortata($volumi, $specifiche, $campi);
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
@@ -3490,9 +5044,14 @@ class ToolsTest extends TestCase
             'velocita' => 0.8
         ];
         
+        $campi = [
+            'altezza',
+            'manovra'
+        ];
+        
         $expected = [];
         
-        $actual = addPortata($volumi, $specifiche);
+        $actual = addPortata($volumi, $specifiche, $campi);
         
         $this->assertEquals($expected, $actual);
     }
@@ -3506,9 +5065,14 @@ class ToolsTest extends TestCase
     {
         $specifiche = [];
         
+        $campi = [
+            'altezza',
+            'manovra'
+        ];
+        
         $this->expectException(\Exception::class);
                 
-        addPortata($volumi, $specifiche);
+        addPortata($volumi, $specifiche, $campi);
     }
     
     /**
@@ -3679,6 +5243,13 @@ class ToolsTest extends TestCase
      */
     public function testAddVolumeEqualsWithDelta(array $volumi) : array
     {
+        $formule = [];
+        
+        $campi = [
+            'portata',
+            'delta'
+        ];
+        
         $expected = [
             '0' => [
                 'variabile' => 30030,
@@ -3704,7 +5275,7 @@ class ToolsTest extends TestCase
             ]
         ];
         
-        $actual = addVolume($volumi);
+        $actual = addVolume($volumi, $formule, $campi);
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
@@ -3751,6 +5322,13 @@ class ToolsTest extends TestCase
             ]
         ];
         
+        $formule = [];
+        
+        $campi = [
+            'portata',
+            'delta'
+        ];
+        
         $expected = [
             '0' => [
                 'variabile' => 30051,
@@ -3778,7 +5356,7 @@ class ToolsTest extends TestCase
             ]
         ];
         
-        $actual = addVolume($volumi);
+        $actual = addVolume($volumi, $formule, $campi);
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
@@ -3800,9 +5378,14 @@ class ToolsTest extends TestCase
     public function testAddVolumeNoCategoryEquals() : void
     {
         $volumi = [];
+        $formule = [];
+        $campi = [
+            'portata',
+            'delta'
+        ];
         $expected = [];
         
-        $actual = addVolume($volumi);
+        $actual = addVolume($volumi, $formule, $campi);
         
         $this->assertEquals($expected, $actual);
     }
@@ -3823,10 +5406,15 @@ class ToolsTest extends TestCase
                 'tipo_dato' => 1
             ]
         ];
+        $formule = [];
+        $campi = [
+            'portata',
+            'delta'
+        ];
         
         $this->expectException(\Exception::class);
         
-        addVolume($data);
+        addVolume($data, $formule, $campi);
     }
     
     /**
@@ -3846,10 +5434,15 @@ class ToolsTest extends TestCase
                 'tipo_dato' => 1
             ]
         ];
+        $formule = [];
+        $campi = [
+            'portata',
+            'delta'
+        ];
         
         $this->expectException(\Exception::class);
         
-        addVolume($data);
+        addVolume($data, $formule, $campi);
     }
     
     /**
@@ -3869,10 +5462,15 @@ class ToolsTest extends TestCase
                 'tipo_dato' => 1
             ]
         ];
+        $formule = [];
+        $campi = [
+            'portata',
+            'delta'
+        ];
         
         $this->expectException(\Exception::class);
         
-        addVolume($data);
+        addVolume($data, $formule, $campi);
     }
     
     /**
@@ -4765,6 +6363,9 @@ class ToolsTest extends TestCase
                 'parametri' => [
                     'altezza' => 10
                 ],
+                'campi' => [
+                    'altezza'
+                ],
                 'expected' => 25.478
             ],
             'superficie velocita' => [
@@ -4779,6 +6380,10 @@ class ToolsTest extends TestCase
                 'parametri' => [
                     'altezza' => 3,
                     'manovra' => 1
+                ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
                 ],
                 'expected' => 1741.8875
             ],
@@ -4795,6 +6400,10 @@ class ToolsTest extends TestCase
                     'altezza' => -0.3,
                     'manovra' => 1
                 ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],
                 'expected' => 0
             ],
             'mezzofondo lineare' => [
@@ -4808,6 +6417,10 @@ class ToolsTest extends TestCase
                 'parametri' => [
                     'altezza' => 1,
                     'manovra' => 0.40
+                ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
                 ],
                 'expected' => 4.217
             ],
@@ -4823,6 +6436,10 @@ class ToolsTest extends TestCase
                     'altezza' => -1,
                     'manovra' => 0.40
                 ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],
                 'expected' => 0
             ],
             'by-pass' => [
@@ -4837,6 +6454,10 @@ class ToolsTest extends TestCase
                     'altezza' => 10,
                     'manovra' => 0.50
                 ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],
                 'expected' => 0.19792
             ],
             'by-pass sotto soglia' => [
@@ -4850,6 +6471,10 @@ class ToolsTest extends TestCase
                 'parametri' => [
                     'altezza' => -10,
                     'manovra' => 0.50
+                ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
                 ],
                 'expected' => 0
             ],
@@ -4867,6 +6492,10 @@ class ToolsTest extends TestCase
                     'altezza' => 1,
                     'manovra' => 45 / 180 * pi()
                 ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],
                 'expected' => 79.1638
             ],
             'ventola sotto soglia' => [
@@ -4883,6 +6512,10 @@ class ToolsTest extends TestCase
                     'altezza' => -1.5,
                     'manovra' => 45 / 180 * pi()
                 ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],
                 'expected' => 0
             ],
             'saracinesca' => [
@@ -4897,6 +6530,10 @@ class ToolsTest extends TestCase
                     'altezza' => 30,
                     'manovra' => 0.6
                 ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],
                 'expected' => 9.7883
             ],
             'saracinesca sotto soglia' => [
@@ -4910,6 +6547,10 @@ class ToolsTest extends TestCase
                 'parametri' => [
                     'altezza' => 0.4,
                     'manovra' => 0.9
+                ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
                 ],
                 'expected' => 0
             ],
@@ -4929,6 +6570,11 @@ class ToolsTest extends TestCase
                     'altezza' => 5,
                     'manovra' => 2
                 ],
+                'campi' => [
+                    'livello',
+                    'altezza',
+                    'manovra'
+                ],
                 'expected' => 6.713206
             ],
             'galleria sbocco libero' => [
@@ -4946,6 +6592,11 @@ class ToolsTest extends TestCase
                     'livello' => 270,
                     'altezza' => 5.82,
                     'manovra' => 2
+                ],
+                'campi' => [
+                    'livello',
+                    'altezza',
+                    'manovra'
                 ],
                 'expected' => 7.2428
             ],
@@ -4965,6 +6616,11 @@ class ToolsTest extends TestCase
                     'altezza' => 1.82,
                     'manovra' => 2
                 ],
+                'campi' => [
+                    'livello',
+                    'altezza',
+                    'manovra'
+                ],
                 'expected' => 0
             ]
         ];
@@ -4977,9 +6633,9 @@ class ToolsTest extends TestCase
      * @group tools
      * @dataProvider calcolaPortataProvider
      */
-    public function testCalcolaPortataEqualsWithDelta(array $formule, array $parametri, float $expected) : void
+    public function testCalcolaPortataEqualsWithDelta(array $formule, array $parametri, array $campi, float $expected) : void
     {
-        $actual = calcolaPortata($formule, $parametri);
+        $actual = calcolaPortata($formule, $parametri, $campi);
         
         $this->assertEqualsWithDelta($expected, $actual, 0.001);
     }
@@ -4998,10 +6654,11 @@ class ToolsTest extends TestCase
             'limite' => 800
         ];
         $parametri = ['altezza'];
+        $campi = ['altezza'];
         
         $this->expectException(\Exception::class);
         
-        calcolaPortata($formule, $parametri);
+        calcolaPortata($formule, $parametri, $campi);
     }
     
     /**
@@ -5021,6 +6678,9 @@ class ToolsTest extends TestCase
                 'parametri' => [
                     'altezza' => 10
                 ],
+                'campi' => [
+                    'altezza'
+                ],
                 'expected' => 25.478
             ]
         ];
@@ -5033,9 +6693,9 @@ class ToolsTest extends TestCase
      * @group tools
      * @dataProvider formulaPortataSfioroProvider
      */
-    public function testFormulaPortataSfioroEqualsWithDelta(array $formule, array $parametri, float $expected) : void
+    public function testFormulaPortataSfioroEqualsWithDelta(array $formule, array $parametri, array $campi, float $expected) : void
     {
-        $actual = formulaPortataSfioro($formule, $parametri);
+        $actual = formulaPortataSfioro($formule, $parametri, $campi);
         
         $this->assertEqualsWithDelta($expected, $actual, 0.001);
     }
@@ -5056,10 +6716,13 @@ class ToolsTest extends TestCase
         $parametri = [
             'altezza' => NODATA
         ];
+        $campi = [
+            'altezza'
+        ];
         
         $this->expectException(\Exception::class);
         
-        formulaPortataSfioro($formule, $parametri);
+        formulaPortataSfioro($formule, $parametri, $campi);
     }
     
     /**
@@ -5081,6 +6744,10 @@ class ToolsTest extends TestCase
                     'altezza' => 3,
                     'manovra' => 1
                 ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],
                 'expected' => 1741.8875
             ],
             'superficie velocita sotto soglia' => [
@@ -5096,6 +6763,10 @@ class ToolsTest extends TestCase
                     'altezza' => -0.3,
                     'manovra' => 1
                 ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],
                 'expected' => 0
             ]
         ];
@@ -5108,9 +6779,9 @@ class ToolsTest extends TestCase
      * @group tools
      * @dataProvider formulaPortataScarico1Provider
      */
-    public function testFormulaPortataScarico1EqualsWithDelta(array $formule, array $parametri, float $expected) : void
+    public function testFormulaPortataScarico1EqualsWithDelta(array $formule, array $parametri, array $campi, float $expected) : void
     {
-        $actual = formulaPortataScarico1($formule, $parametri);
+        $actual = formulaPortataScarico1($formule, $parametri, $campi);
         
         $this->assertEqualsWithDelta($expected, $actual, 0.001);
     }
@@ -5133,10 +6804,15 @@ class ToolsTest extends TestCase
             'altezza' => NODATA,
             'manovra' => 0.40
         ];
+        $campi = [
+            'altezza',
+            'manovra'
+        ];
+        
         
         $this->expectException(\Exception::class);
         
-        formulaPortataScarico1($formule, $parametri);
+        formulaPortataScarico1($formule, $parametri, $campi);
     }
     
     /**
@@ -5157,10 +6833,14 @@ class ToolsTest extends TestCase
             'altezza' => 3,
             'manovra' => NODATA
         ];
-        
+        $campi = [
+            'altezza',
+            'manovra'
+        ];
+                
         $this->expectException(\Exception::class);
         
-        formulaPortataScarico1($formule, $parametri);
+        formulaPortataScarico1($formule, $parametri, $campi);
     }
     
     /**
@@ -5181,6 +6861,10 @@ class ToolsTest extends TestCase
                     'altezza' => 1,
                     'manovra' => 0.40
                 ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],
                 'expected' => 4.217
             ],
             'mezzofondo lineare sotto soglia' => [
@@ -5195,6 +6879,10 @@ class ToolsTest extends TestCase
                     'altezza' => -1,
                     'manovra' => 0.40
                 ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],
                 'expected' => 0
             ]
         ];
@@ -5207,9 +6895,9 @@ class ToolsTest extends TestCase
      * @group tools
      * @dataProvider formulaPortataScarico2Provider
      */
-    public function testFormulaPortataScarico2EqualsWithDelta(array $formule, array $parametri, float $expected) : void
+    public function testFormulaPortataScarico2EqualsWithDelta(array $formule, array $parametri, array $campi, float $expected) : void
     {
-        $actual = formulaPortataScarico2($formule, $parametri);
+        $actual = formulaPortataScarico2($formule, $parametri, $campi);
         
         $this->assertEqualsWithDelta($expected, $actual, 0.001);
     }
@@ -5231,10 +6919,14 @@ class ToolsTest extends TestCase
             'altezza' => NODATA,
             'manovra' => 0.40
         ];
+        $campi = [
+            'altezza',
+            'manovra'
+        ];
         
         $this->expectException(\Exception::class);
         
-        formulaPortataScarico2($formule, $parametri);
+        formulaPortataScarico2($formule, $parametri, $campi);
     }
     
     /**
@@ -5254,10 +6946,14 @@ class ToolsTest extends TestCase
             'altezza' => 3,
             'manovra' => NODATA
         ];
+        $campi = [
+            'altezza',
+            'manovra'
+        ];
         
         $this->expectException(\Exception::class);
         
-        formulaPortataScarico2($formule, $parametri);
+        formulaPortataScarico2($formule, $parametri, $campi);
     }
     
     /**
@@ -5278,6 +6974,10 @@ class ToolsTest extends TestCase
                     'altezza' => 10,
                     'manovra' => 0.50
                 ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],
                 'expected' => 0.19792
             ],
             'by-pass sotto soglia' => [
@@ -5292,6 +6992,10 @@ class ToolsTest extends TestCase
                     'altezza' => -10,
                     'manovra' => 0.50
                 ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],
                 'expected' => 0
             ]
         ];
@@ -5304,9 +7008,9 @@ class ToolsTest extends TestCase
      * @group tools
      * @dataProvider formulaPortataScarico3Provider
      */
-    public function testFormulaPortataScarico3EqualsWithDelta(array $formule, array $parametri, float $expected) : void
+    public function testFormulaPortataScarico3EqualsWithDelta(array $formule, array $parametri, array $campi, float $expected) : void
     {
-        $actual = formulaPortataScarico3($formule, $parametri);
+        $actual = formulaPortataScarico3($formule, $parametri, $campi);
         
         $this->assertEqualsWithDelta($expected, $actual, 0.001);
     }
@@ -5328,10 +7032,14 @@ class ToolsTest extends TestCase
             'altezza' => NODATA,
             'manovra' => 0.50
         ];
+        $campi = [
+            'altezza',
+            'manovra'
+        ];
         
         $this->expectException(\Exception::class);
         
-        formulaPortataScarico3($formule, $parametri);
+        formulaPortataScarico3($formule, $parametri, $campi);
     }
     
     /**
@@ -5351,10 +7059,14 @@ class ToolsTest extends TestCase
             'altezza' => 10,
             'manovra' => NODATA
         ];
+        $campi = [
+            'altezza',
+            'manovra'
+        ];
         
         $this->expectException(\Exception::class);
         
-        formulaPortataScarico3($formule, $parametri);
+        formulaPortataScarico3($formule, $parametri, $campi);
     }
     
     /**
@@ -5377,6 +7089,10 @@ class ToolsTest extends TestCase
                     'altezza' => 1,
                     'manovra' => 45 / 180 * pi()
                 ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],
                 'expected' => 79.1638
             ],
             'ventola sotto soglia' => [
@@ -5393,6 +7109,10 @@ class ToolsTest extends TestCase
                     'altezza' => -1.5,
                     'manovra' => 45 / 180 * pi()
                 ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],
                 'expected' => 0
             ]
         ];
@@ -5405,9 +7125,9 @@ class ToolsTest extends TestCase
      * @group tools
      * @dataProvider formulaPortataVentolaProvider
      */
-    public function testFormulaPortataVentolaEqualsWithDelta(array $formule, array $parametri, float $expected) : void
+    public function testFormulaPortataVentolaEqualsWithDelta(array $formule, array $parametri, array $campi, float $expected) : void
     {
-        $actual = formulaPortataVentola($formule, $parametri);
+        $actual = formulaPortataVentola($formule, $parametri, $campi);
         
         $this->assertEqualsWithDelta($expected, $actual, 0.001);
     }
@@ -5431,10 +7151,14 @@ class ToolsTest extends TestCase
             'altezza' => NODATA,
             'manovra' => 0.50
         ];
+        $campi = [
+            'altezza',
+            'manovra'
+        ];
         
         $this->expectException(\Exception::class);
         
-        formulaPortataVentola($formule, $parametri);
+        formulaPortataVentola($formule, $parametri, $campi);
     }
     
     /**
@@ -5456,10 +7180,14 @@ class ToolsTest extends TestCase
             'altezza' => 10,
             'manovra' => NODATA
         ];
+        $campi = [
+            'altezza',
+            'manovra'
+        ];
         
         $this->expectException(\Exception::class);
         
-        formulaPortataVentola($formule, $parametri);
+        formulaPortataVentola($formule, $parametri, $campi);
     }
     
     /**
@@ -5480,6 +7208,10 @@ class ToolsTest extends TestCase
                     'altezza' => 30,
                     'manovra' => 0.6
                 ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],
                 'expected' => 9.7883
             ],
             'saracinesca sotto soglia' => [
@@ -5494,6 +7226,10 @@ class ToolsTest extends TestCase
                     'altezza' => 0.4,
                     'manovra' => 0.9
                 ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],
                 'expected' => 0
             ]
         ];
@@ -5506,9 +7242,9 @@ class ToolsTest extends TestCase
      * @group tools
      * @dataProvider formulaPortataSaracinescaProvider
      */
-    public function testFormulaPortataSaracinescaEqualsWithDelta(array $formule, array $parametri, float $expected) : void
+    public function testFormulaPortataSaracinescaEqualsWithDelta(array $formule, array $parametri, array $campi, float $expected) : void
     {
-        $actual = formulaPortataSaracinesca($formule, $parametri);
+        $actual = formulaPortataSaracinesca($formule, $parametri, $campi);
         
         $this->assertEqualsWithDelta($expected, $actual, 0.001);
     }
@@ -5530,10 +7266,14 @@ class ToolsTest extends TestCase
             'altezza' => NODATA,
             'manovra' => 0.6
         ];
+        $campi = [
+            'altezza',
+            'manovra'
+        ];
         
         $this->expectException(\Exception::class);
         
-        formulaPortataSaracinesca($formule, $parametri);
+        formulaPortataSaracinesca($formule, $parametri, $campi);
     }
     
     /**
@@ -5553,10 +7293,14 @@ class ToolsTest extends TestCase
             'altezza' => 30,
             'manovra' => NODATA
         ];
+        $campi = [
+            'altezza',
+            'manovra'
+        ];
         
         $this->expectException(\Exception::class);
         
-        formulaPortataSaracinesca($formule, $parametri);
+        formulaPortataSaracinesca($formule, $parametri, $campi);
     }
     
     /**
@@ -5581,6 +7325,11 @@ class ToolsTest extends TestCase
                     'altezza' => 5,
                     'manovra' => 2
                 ],
+                'campi' => [
+                    'livello',
+                    'altezza',
+                    'manovra'
+                ],
                 'expected' => 6.713206
             ],
             'galleria sbocco libero' => [
@@ -5598,6 +7347,11 @@ class ToolsTest extends TestCase
                     'livello' => 270,
                     'altezza' => 5.82,
                     'manovra' => 2
+                ],
+                'campi' => [
+                    'livello',
+                    'altezza',
+                    'manovra'
                 ],
                 'expected' => 7.2428
             ],
@@ -5617,6 +7371,11 @@ class ToolsTest extends TestCase
                     'altezza' => 1.82,
                     'manovra' => 2
                 ],
+                'campi' => [
+                    'livello',
+                    'altezza',
+                    'manovra'
+                ],
                 'expected' => 0
             ]
         ];
@@ -5629,9 +7388,9 @@ class ToolsTest extends TestCase
      * @group tools
      * @dataProvider formulaPortataGalleriaProvider
      */
-    public function testFormulaPortataGalleriaEqualsWithDelta(array $formule, array $parametri, float $expected) : void
+    public function testFormulaPortataGalleriaEqualsWithDelta(array $formule, array $parametri, array $campi, float $expected) : void
     {
-        $actual = formulaPortataGalleria($formule, $parametri);
+        $actual = formulaPortataGalleria($formule, $parametri, $campi);
         
         $this->assertEqualsWithDelta($expected, $actual, 0.001);
     }
@@ -5657,10 +7416,15 @@ class ToolsTest extends TestCase
             'altezza' => NODATA,
             'manovra' => 2
         ];
+        $campi = [
+            'livello',
+            'altezza',
+            'manovra'
+        ];
         
         $this->expectException(\Exception::class);
         
-        formulaPortataGalleria($formule, $parametri);
+        formulaPortataGalleria($formule, $parametri, $campi);
     }
     
     /**
@@ -5684,10 +7448,15 @@ class ToolsTest extends TestCase
             'altezza' => 5,
             'manovra' => NODATA
         ];
+        $campi = [
+            'livello',
+            'altezza',
+            'manovra'
+        ];
         
         $this->expectException(\Exception::class);
         
-        formulaPortataGalleria($formule, $parametri);
+        formulaPortataGalleria($formule, $parametri, $campi);
     }
     
     /**
@@ -5711,10 +7480,15 @@ class ToolsTest extends TestCase
             'altezza' => 5,
             'manovra' => 2
         ];
+        $campi = [
+            'livello',
+            'altezza',
+            'manovra'
+        ];
         
         $this->expectException(\Exception::class);
         
-        formulaPortataGalleria($formule, $parametri);
+        formulaPortataGalleria($formule, $parametri, $campi);
     }
     
     /**

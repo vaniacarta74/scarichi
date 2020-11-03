@@ -387,7 +387,7 @@ function addDelta(array $dati, string $nomeCampo) : array
 }
 
 
-function initVolumi(array $variabili, array $dati) : array
+function inizializza(array $variabili, array $dati, string $base) : array
 {
     try {
         $volumi = [];
@@ -395,7 +395,7 @@ function initVolumi(array $variabili, array $dati) : array
             if (array_key_exists('id_variabile', $variabili)) {
                 $volumi[$record]['variabile'] = $variabili['id_variabile'];
                 foreach ($campi as $campo => $valore) {
-                    if ($campo === 'data_e_ora') {
+                    if ($campo === $base) {
                         $volumi[$record][$campo] = $valore;
                     }
                 }
@@ -416,7 +416,11 @@ function addCategoria(array $volumi, array $dati_completi, string $categoria) : 
 {
     try {
         $categorie = [];
-        $dati = $dati_completi[$categoria];
+        if (array_key_exists($categoria, $dati_completi)) {
+            $dati = $dati_completi[$categoria];
+        } else {
+            throw new \Exception('Categoria inesistente');
+        }        
         if (count($volumi) !== count($dati)) {
             throw new \Exception('Array differenti');
         }
@@ -442,47 +446,21 @@ function addCategoria(array $volumi, array $dati_completi, string $categoria) : 
 }
 
 
-function addAltezza(array $dati, array $formule) : array
+function addAltezza(array $dati, array $coefficienti, array $fields) : array
 {
     try {
-        if (count($formule) === 0) {
+        if (count($coefficienti) === 0) {
             throw new \Exception('Formula scarico non definita');
         }
-        $quota = $formule['quota'];
-        $nomeCampo = 'media livello';
-        $nomeCampoAux = 'media livello valle';
+        $id_formula = count($fields);
+        $quota = $coefficienti['quota'];        
         $altezze = [];
-        foreach ($dati as $record => $campi) {
-            if (!array_key_exists($nomeCampoAux, $campi)) {
-                foreach ($campi as $campo => $valore) {
-                    $altezze[$record][$campo] = $valore;
-                    if ($campo === $nomeCampo) {
-                        if ($dati[$record][$campo] != NODATA) {
-                            $altezze[$record]['altezza'] = $dati[$record][$campo] - $quota;
-                        } else {
-                            $altezze[$record]['altezza'] = NODATA;
-                        }
-                    }
-                }
+        foreach ($dati as $record => $campi) {            
+            $function = __NAMESPACE__ . '\formulaAltezza' . $id_formula;
+            if (is_callable($function)) {
+                $altezze[$record] = call_user_func($function, $campi, $quota, $fields);
             } else {
-                foreach ($campi as $campo => $valore) {
-                    $altezze[$record][$campo] = $valore;
-                    if ($campo === $nomeCampo) {
-                        $livelloMonte = $dati[$record][$campo];
-                    }
-                    if ($campo === $nomeCampoAux) {
-                        $livelloValle = $dati[$record][$campo];
-                    }
-                }
-                if ($livelloMonte != NODATA && $livelloValle != NODATA) {
-                    if ($livelloValle > $quota) {
-                        $altezze[$record]['altezza'] = $livelloMonte - $livelloValle;
-                    } else {
-                        $altezze[$record]['altezza'] = $livelloMonte - $quota;
-                    }
-                } else {
-                    $altezze[$record]['altezza'] = NODATA;
-                }
+                throw new \Exception('Nome formula altezza non ammesso');
             }
         }
         return $altezze;
@@ -493,20 +471,83 @@ function addAltezza(array $dati, array $formule) : array
 }
 
 
-function addPortata(array $dati, array $formule) : array
+function formulaAltezza1(array $campi, float $quota, array $fields) : array
+{
+    try {        
+        $nomeCampo = $fields[0];
+        if (!array_key_exists($nomeCampo, $campi)) {
+            throw new \Exception('Parametro ' . $nomeCampo . ' non impostato');
+        }
+        $record = [];
+        foreach ($campi as $campo => $valore) {
+            $record[$campo] = $valore;
+            if ($campo === $nomeCampo) {
+                if ($valore != NODATA) {
+                    $record['altezza'] = $valore - $quota;
+                } else {
+                    $record['altezza'] = NODATA;
+                }
+            }
+        }      
+        return $record;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function formulaAltezza2(array $campi, float $quota, array $fields) : array
 {
     try {
-        if (count($formule) === 0) {
+        $nomeCampo = $fields[0];
+        $nomeCampoAux = $fields[1];
+        if (!array_key_exists($nomeCampo, $campi)) {
+            throw new \Exception('Parametro ' . $nomeCampo . ' non impostato');
+        }
+        if (!array_key_exists($nomeCampoAux, $campi)) {
+            throw new \Exception('Parametro ' . $nomeCampoAux . ' non impostato');
+        }
+        $record = [];        
+        foreach ($campi as $campo => $valore) {
+            $record[$campo] = $valore;
+            if ($campo === $nomeCampo) {
+                $livelloMonte = $valore;
+            }
+            if ($campo === $nomeCampoAux) {
+                $livelloValle = $valore;
+            }
+        }
+        if ($livelloMonte != NODATA && $livelloValle != NODATA) {
+            if ($livelloValle > $quota) {
+                $record['altezza'] = $livelloMonte - $livelloValle;
+            } else {
+                $record['altezza'] = $livelloMonte - $quota;
+            }
+        } else {
+            $record['altezza'] = NODATA;
+        }        
+        return $record;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function addPortata(array $dati, array $coefficienti, array $nomiCampo) : array
+{
+    try {
+        if (count($coefficienti) === 0) {
             throw new \Exception('Formula scarico non definita');
         }
-        $nomi_campo = ['livello', 'altezza', 'manovra'];
         $portate = [];
         foreach ($dati as $record => $campi) {
             $noData = false;
             $parametri = [];
             foreach ($campi as $campo => $valore) {
                 $portate[$record][$campo] = $valore;
-                if (in_array($campo, $nomi_campo)) {
+                if (in_array($campo, $nomiCampo)) {
                     if ($valore != NODATA) {
                         $parametri[$campo] = $valore;
                     } else {
@@ -517,7 +558,7 @@ function addPortata(array $dati, array $formule) : array
             if ($noData) {
                 $portate[$record]['portata'] = NODATA;
             } else {
-                $portate[$record]['portata'] = calcolaPortata($formule, $parametri);
+                $portate[$record]['portata'] = calcolaPortata($coefficienti, $parametri, $nomiCampo);
             }
         }
         return $portate;
@@ -528,7 +569,7 @@ function addPortata(array $dati, array $formule) : array
 }
 
 
-function addVolume(array $dati) : array
+function addVolume(array $dati, array $coefficienti, array $fields) : array
 {
     try {
         $volumi = [];
@@ -960,19 +1001,19 @@ function response(array $request, bool $printed) : string
     }
 }
 
-function calcolaPortata(array $formule, array $parametri) : float
+function calcolaPortata(array $coefficienti, array $parametri, array $campi) : float
 {
     try {
-        $alias = $formule['alias'];
+        $alias = $coefficienti['alias'];
         
         $function = __NAMESPACE__ . '\formulaPortata' . ucfirst($alias);
         if (is_callable($function)) {
-            $portata = call_user_func($function, $formule, $parametri);
+            $portata = call_user_func($function, $coefficienti, $parametri, $campi);
         } else {
             throw new \Exception('Nome opzione non ammesso');
         }
         
-        if ($portata > $formule['limite']) {
+        if ($portata > $coefficienti['limite']) {
             $portata = 0;
             //$portata = NODATA;
         }
@@ -984,16 +1025,17 @@ function calcolaPortata(array $formule, array $parametri) : float
 }
 
 
-function formulaPortataSfioro(array $formule, array $parametri) : float
+function formulaPortataSfioro(array $coefficienti, array $parametri, array $campi) : float
 {
     try {
-        if (!array_key_exists('altezza', $parametri) || $parametri['altezza'] == NODATA) {
-            throw new \Exception('Parametro altezza non impostato o nodata');
+        $altezza = $campi[0];
+        if (!array_key_exists($altezza, $parametri) || $parametri[$altezza] == NODATA) {
+            throw new \Exception('Parametro ' . $altezza . ' non impostato o nodata');
         }
         $g = 9.81;        
-        $altezza_idrostatica = $parametri['altezza'];
-        $mi = $formule['mi'];
-        $larghezza_soglia = $formule['larghezza'];
+        $altezza_idrostatica = $parametri[$altezza];
+        $mi = $coefficienti['mi'];
+        $larghezza_soglia = $coefficienti['larghezza'];
         if ($altezza_idrostatica > 0) {
             $portata = $mi * $larghezza_soglia * $altezza_idrostatica * sqrt(2 * $g * $altezza_idrostatica);
         } else {
@@ -1007,21 +1049,23 @@ function formulaPortataSfioro(array $formule, array $parametri) : float
 }
 
 
-function formulaPortataScarico1(array $formule, array $parametri) : float
+function formulaPortataScarico1(array $coefficienti, array $parametri, array $campi) : float
 {
     try {
-        if (!array_key_exists('altezza', $parametri) || $parametri['altezza'] == NODATA) {
-            throw new \Exception('Parametro altezza non impostato o nodata');
+        $altezza = $campi[0];
+        $manovra = $campi[1];
+        if (!array_key_exists($altezza, $parametri) || $parametri[$altezza] == NODATA) {
+            throw new \Exception('Parametro ' . $altezza . ' non impostato o nodata');
         }
-        if (!array_key_exists('manovra', $parametri) || $parametri['manovra'] == NODATA) {
-            throw new \Exception('Parametro manovra non impostato o nodata');
+        if (!array_key_exists($manovra, $parametri) || $parametri[$manovra] == NODATA) {
+            throw new \Exception('Parametro ' . $manovra . ' non impostato o nodata');
         }
         $g = 9.81;        
-        $altezza_idrostatica = $parametri['altezza'];
-        $apertura_paratoia = $parametri['manovra'];
-        $mi = $formule['mi'];
-        $larghezza_soglia = $formule['larghezza'];
-        $velocita = $formule['velocita'];
+        $altezza_idrostatica = $parametri[$altezza];
+        $apertura_paratoia = $parametri[$manovra];
+        $mi = $coefficienti['mi'];
+        $larghezza_soglia = $coefficienti['larghezza'];
+        $velocita = $coefficienti['velocita'];
         $altezza_cinetica = ($velocita ** 2) / (2 * $g);
 
         if ($altezza_idrostatica > 0) {
@@ -1037,20 +1081,22 @@ function formulaPortataScarico1(array $formule, array $parametri) : float
 }
 
 
-function formulaPortataScarico2(array $formule, array $parametri) : float
+function formulaPortataScarico2(array $coefficienti, array $parametri, array $campi) : float
 {
     try {
-        if (!array_key_exists('altezza', $parametri) || $parametri['altezza'] == NODATA) {
-            throw new \Exception('Parametro altezza non impostato o nodata');
+        $altezza = $campi[0];
+        $manovra = $campi[1];
+        if (!array_key_exists($altezza, $parametri) || $parametri[$altezza] == NODATA) {
+            throw new \Exception('Parametro ' . $altezza . ' non impostato o nodata');
         }
-        if (!array_key_exists('manovra', $parametri) || $parametri['manovra'] == NODATA) {
-            throw new \Exception('Parametro manovra non impostato o nodata');
+        if (!array_key_exists($manovra, $parametri) || $parametri[$manovra] == NODATA) {
+            throw new \Exception('Parametro ' . $manovra . ' non impostato o nodata');
         }
         $g = 9.81;        
-        $altezza_idrostatica = $parametri['altezza'];
-        $apertura_paratoia = $parametri['manovra'];
-        $mi = $formule['mi'];
-        $larghezza_soglia = $formule['larghezza'];
+        $altezza_idrostatica = $parametri[$altezza];
+        $apertura_paratoia = $parametri[$manovra];
+        $mi = $coefficienti['mi'];
+        $larghezza_soglia = $coefficienti['larghezza'];
 
         if ($altezza_idrostatica > 0) {
             $portata = $mi * $larghezza_soglia * $apertura_paratoia * sqrt(2 * $g * $altezza_idrostatica);
@@ -1065,20 +1111,22 @@ function formulaPortataScarico2(array $formule, array $parametri) : float
 }
 
 
-function formulaPortataScarico3(array $formule, array $parametri) : float
+function formulaPortataScarico3(array $coefficienti, array $parametri, array $campi) : float
 {
     try {
-        if (!array_key_exists('altezza', $parametri) || $parametri['altezza'] == NODATA) {
-            throw new \Exception('Parametro altezza non impostato o nodata');
+        $altezza = $campi[0];
+        $manovra = $campi[1];
+        if (!array_key_exists($altezza, $parametri) || $parametri[$altezza] == NODATA) {
+            throw new \Exception('Parametro ' . $altezza . ' non impostato o nodata');
         }
-        if (!array_key_exists('manovra', $parametri) || $parametri['manovra'] == NODATA) {
-            throw new \Exception('Parametro manovra non impostato o nodata');
+        if (!array_key_exists($manovra, $parametri) || $parametri[$manovra] == NODATA) {
+            throw new \Exception('Parametro ' . $manovra . ' non impostato o nodata');
         }
         $g = 9.81;        
-        $altezza_idrostatica = $parametri['altezza'];
-        $apertura_paratoia = $parametri['manovra'];
-        $mi = $formule['mi'];
-        $raggio = $formule['raggio'];
+        $altezza_idrostatica = $parametri[$altezza];
+        $apertura_paratoia = $parametri[$manovra];
+        $mi = $coefficienti['mi'];
+        $raggio = $coefficienti['raggio'];
         $area_sezione = pi() * $raggio ** 2;
 
         if ($altezza_idrostatica > 0) {
@@ -1094,23 +1142,25 @@ function formulaPortataScarico3(array $formule, array $parametri) : float
 }
 
 
-function formulaPortataVentola(array $formule, array $parametri) : float
+function formulaPortataVentola(array $coefficienti, array $parametri, array $campi) : float
 {
     try {
-        if (!array_key_exists('altezza', $parametri) || $parametri['altezza'] == NODATA) {
-            throw new \Exception('Parametro altezza non impostato o nodata');
+        $altezza = $campi[0];
+        $manovra = $campi[1];
+        if (!array_key_exists($altezza, $parametri) || $parametri[$altezza] == NODATA) {
+            throw new \Exception('Parametro ' . $altezza . ' non impostato o nodata');
         }
-        if (!array_key_exists('manovra', $parametri) || $parametri['manovra'] == NODATA) {
-            throw new \Exception('Parametro manovra non impostato o nodata');
+        if (!array_key_exists($manovra, $parametri) || $parametri[$manovra] == NODATA) {
+            throw new \Exception('Parametro ' . $manovra . ' non impostato o nodata');
         }
         $g = 9.81;        
-        $altezza_idrostatica = $parametri['altezza'];
-        $rad_ventola = $parametri['manovra'];
-        $mi = $formule['mi'];
-        $larghezza = $formule['larghezza'];
-        $angolo_max = $formule['angolo'];
+        $altezza_idrostatica = $parametri[$altezza];
+        $rad_ventola = $parametri[$manovra];
+        $mi = $coefficienti['mi'];
+        $larghezza = $coefficienti['larghezza'];
+        $angolo_max = $coefficienti['angolo'];
         $rad_max = $angolo_max / 180 * pi();
-        $altezza_max = $formule['altezza'];
+        $altezza_max = $coefficienti['altezza'];
         $profondita_ventola = $altezza_max / sin($rad_max);
         $apertura_ventola = $altezza_max - $profondita_ventola * sin($rad_max - $rad_ventola);
         $tirante = $altezza_idrostatica + $apertura_ventola;
@@ -1128,20 +1178,22 @@ function formulaPortataVentola(array $formule, array $parametri) : float
 }
 
 
-function formulaPortataSaracinesca(array $formule, array $parametri) : float
+function formulaPortataSaracinesca(array $coefficienti, array $parametri, array $campi) : float
 {
     try {
-        if (!array_key_exists('altezza', $parametri) || $parametri['altezza'] == NODATA) {
-            throw new \Exception('Parametro altezza non impostato o nodata');
+        $altezza = $campi[0];
+        $manovra = $campi[1];
+        if (!array_key_exists($altezza, $parametri) || $parametri[$altezza] == NODATA) {
+            throw new \Exception('Parametro ' . $altezza . ' non impostato o nodata');
         }
-        if (!array_key_exists('manovra', $parametri) || $parametri['manovra'] == NODATA) {
-            throw new \Exception('Parametro manovra non impostato o nodata');
+        if (!array_key_exists($manovra, $parametri) || $parametri[$manovra] == NODATA) {
+            throw new \Exception('Parametro ' . $manovra . ' non impostato o nodata');
         }
         $g = 9.81;        
-        $altezza_idrostatica = $parametri['altezza'];
-        $altezza_saracinesca = $parametri['manovra'];
-        $mi = $formule['mi'];
-        $raggio = $formule['raggio'];
+        $altezza_idrostatica = $parametri[$altezza];
+        $altezza_saracinesca = $parametri[$manovra];
+        $mi = $coefficienti['mi'];
+        $raggio = $coefficienti['raggio'];
         $k = ($raggio - $altezza_saracinesca) / $raggio;
         $rad_angolo = 2 * acos($k);
         $area_scarico = ($rad_angolo - sin($rad_angolo)) * ($raggio ** 2) / 2;
@@ -1160,29 +1212,32 @@ function formulaPortataSaracinesca(array $formule, array $parametri) : float
 }
 
 
-function formulaPortataGalleria(array $formule, array $parametri) : float
+function formulaPortataGalleria(array $coefficienti, array $parametri, array $campi) : float
 {
     try {
-        if (!array_key_exists('altezza', $parametri) || $parametri['altezza'] == NODATA) {
-            throw new \Exception('Parametro altezza non impostato o nodata');
+        $livello = $campi[0];
+        $altezza = $campi[1];
+        $manovra = $campi[2];
+        if (!array_key_exists($livello, $parametri) || $parametri[$livello] == NODATA) {
+            throw new \Exception('Parametro ' . $livello . ' non impostato o nodata');
         }
-        if (!array_key_exists('manovra', $parametri) || $parametri['manovra'] == NODATA) {
-            throw new \Exception('Parametro manovra non impostato o nodata');
+        if (!array_key_exists($altezza, $parametri) || $parametri[$altezza] == NODATA) {
+            throw new \Exception('Parametro ' . $altezza . ' non impostato o nodata');
         }
-        if (!array_key_exists('livello', $parametri) || $parametri['livello'] == NODATA) {
-            throw new \Exception('Parametro livello non impostato o nodata');
-        }
+        if (!array_key_exists($manovra, $parametri) || $parametri[$manovra] == NODATA) {
+            throw new \Exception('Parametro ' . $manovra . ' non impostato o nodata');
+        }        
         $g = 9.81;        
-        $livello_monte = $parametri['livello'];
-        $altezza_idrostatica = $parametri['altezza'];
-        $altezza_saracinesca = $parametri['manovra'];
+        $livello_monte = $parametri[$livello];
+        $altezza_idrostatica = $parametri[$altezza];
+        $altezza_saracinesca = $parametri[$manovra];
 
-        $scabrosita = $formule['scabrosita'];
-        $lunghezza_galleria = $formule['lunghezza'];
-        $raggio = $formule['raggio'];
-        $quota = $formule['quota'];
-        $angolo_limite = $formule['angolo'];
-        $quota_limite = $formule['limite'];
+        $scabrosita = $coefficienti['scabrosita'];
+        $lunghezza_galleria = $coefficienti['lunghezza'];
+        $raggio = $coefficienti['raggio'];
+        $quota = $coefficienti['quota'];
+        $angolo_limite = $coefficienti['angolo'];
+        $quota_limite = $coefficienti['limite'];
 
         $R = $raggio / 2;
         $chi = 87 / (1 + $scabrosita / sqrt($R));
@@ -2774,6 +2829,97 @@ function selectLastPrevData(string $db, array $parametri, array $dati, string $c
             $last = $dati;
         }
         return $last;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function addTable(array $variabili, array $scarichi, array $dati, array $formule) : array
+{
+    try {        
+        $id_modello = $scarichi[0]['modello'];
+        $models = CONFIG['modelli'];
+        if (!array_key_exists($id_modello, $models)) {
+            throw new \Exception('Modello non definito');
+        }
+        $model = $models[$id_modello];
+        $base = $model['base'];
+        $fieldsDati = $model['dati'];
+        $fieldsCalcoli = $model['calcoli'];
+        $fieldsFormule = $model['formule'];
+        $baseDati = $fieldsDati[0];
+        $datiVariabile = $variabili[0];
+        $coefficienti = $formule[0];
+        $table = [];
+        
+        $table = inizializza($datiVariabile, $dati[$baseDati], $base);
+        
+        $table = addCampiDati($table, $dati, $fieldsDati);
+        
+        $table = addCampiCalcoli($table, $fieldsCalcoli);
+        
+        $table = addCampiFormule($table, $coefficienti, $fieldsFormule);
+        
+        return $table;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function addCampiDati(array $table, array $dati, array $fieldsDati) : array
+{
+    try {
+        if (count($fieldsDati) === 0) {
+            throw new \Exception('Problemi di configurazione. Campi dati non definiti');
+        }
+        foreach ($fieldsDati as $field) {
+            $table = addCategoria($table, $dati, $field);
+        }        
+        return $table;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function addCampiCalcoli(array $table, array $fieldsCalcoli) : array
+{
+    try {
+        foreach ($fieldsCalcoli as $calcolo => $fields) {
+            foreach ($fields as $field) {
+                $function = __NAMESPACE__ . '\add' . ucfirst($calcolo);
+                if (is_callable($function)) {
+                    $table = call_user_func($function, $table, $field);
+                } else {
+                    throw new \Exception('Calcolo non ammesso');
+                }
+            }
+        }       
+        return $table;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function addCampiFormule(array $table, array $coefficienti, array $fieldsFormule) : array
+{
+    try {
+        foreach ($fieldsFormule as $formula => $fields) {
+            $function = __NAMESPACE__ . '\add' . ucfirst($formula);
+            if (is_callable($function)) {
+                $table = call_user_func($function, $table, $coefficienti, $fields);
+            } else {
+                throw new \Exception('Funzione non ammessa');
+            }
+        }        
+        return $table;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;

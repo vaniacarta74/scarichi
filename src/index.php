@@ -61,133 +61,16 @@ try {
         'scarico' => $scarichi[0]['scarico']
     ];
     $formule = getDataFromDb($db, $queryFileName, $parametri);
-
-    switch ($scarichi[0]['tipo']) {
-        case 'sfioratore di superficie':
-
-            $volumi = initVolumi($variabili[0], $dati_completi['livello']);
-
-            $volumi = addCategoria($volumi, $dati_completi, 'livello');
-
-            $volumi = addMedia($volumi, 'livello');
-
-            $volumi = addAltezza($volumi, $formule[0]);
-
-            $volumi = addPortata($volumi, $formule[0]);
-
-            $volumi = addDelta($volumi, 'data_e_ora');
-
-            $volumi = addVolume($volumi);
-
-            break;
-        case 'scarico di superficie':
-            
-            $volumi = initVolumi($variabili[0], $dati_completi['livello']);
-            
-            $volumi = addCategoria($volumi, $dati_completi, 'livello');
-            
-            $volumi = addMedia($volumi, 'livello');
-            
-            $volumi = addCategoria($volumi, $dati_completi, 'manovra');
-            
-            $volumi = addAltezza($volumi, $formule[0]);
-
-            $volumi = addPortata($volumi, $formule[0]);
-
-            $volumi = addDelta($volumi, 'data_e_ora');
-
-            $volumi = addVolume($volumi);
-
-            break;
-        case 'scarico di mezzofondo':
-            
-            $volumi = initVolumi($variabili[0], $dati_completi['livello']);
-            
-            $volumi = addCategoria($volumi, $dati_completi, 'livello');
-            
-            $volumi = addMedia($volumi, 'livello');
-            
-            $volumi = addCategoria($volumi, $dati_completi, 'manovra');
-            
-            $volumi = addAltezza($volumi, $formule[0]);
-
-            $volumi = addPortata($volumi, $formule[0]);
-
-            $volumi = addDelta($volumi, 'data_e_ora');
-
-            $volumi = addVolume($volumi);
-            
-            break;
-        case 'scarico di fondo':
-            
-            $volumi = initVolumi($variabili[0], $dati_completi['livello']);
-            
-            $volumi = addCategoria($volumi, $dati_completi, 'livello');
-            
-            $volumi = addMedia($volumi, 'livello');
-            
-            $volumi = addCategoria($volumi, $dati_completi, 'manovra');
-            
-            $volumi = addAltezza($volumi, $formule[0]);
-
-            $volumi = addPortata($volumi, $formule[0]);
-
-            $volumi = addDelta($volumi, 'data_e_ora');
-
-            $volumi = addVolume($volumi);
-
-            break;
-        case 'scarico by-pass':
-            
-            $volumi = initVolumi($variabili[0], $dati_completi['livello']);
-            
-            $volumi = addCategoria($volumi, $dati_completi, 'livello');
-            
-            $volumi = addMedia($volumi, 'livello');
-            
-            $volumi = addCategoria($volumi, $dati_completi, 'manovra');
-            
-            $volumi = addAltezza($volumi, $formule[0]);
-
-            $volumi = addPortata($volumi, $formule[0]);
-
-            $volumi = addDelta($volumi, 'data_e_ora');
-
-            $volumi = addVolume($volumi);
-
-            break;
-        case 'galleria':
-            
-            $volumi = initVolumi($variabili[0], $dati_completi['livello']);
-            
-            $volumi = addCategoria($volumi, $dati_completi, 'livello');
-            
-            $volumi = addMedia($volumi, 'livello');
-            
-            $volumi = addCategoria($volumi, $dati_completi, 'livello valle');
-            
-            $volumi = addMedia($volumi, 'livello valle');
-            
-            $volumi = addCategoria($volumi, $dati_completi, 'manovra');
-            
-            $volumi = addAltezza($volumi, $formule[0]);
-
-            $volumi = addPortata($volumi, $formule[0]);
-
-            $volumi = addDelta($volumi, 'data_e_ora');
-
-            $volumi = addVolume($volumi);
-
-            break;
-    }
-
-    $volumi = format($volumi, $request['field']);
     
-    $volumi = filter($volumi, $request['full'], 0);
-    
-    $volumi = filter($volumi, false, NODATA);
+    $tabella = addTable($variabili, $scarichi, $dati_completi, $formule);
 
-    $printed = divideAndPrint($volumi, $request['full'], $request['field']);
+    $tabella = format($tabella, $request['field']);
+    
+    $tabella = filter($tabella, $request['full'], 0);
+    
+    $tabella = filter($tabella, false, NODATA);
+
+    $printed = divideAndPrint($tabella, $request['full'], $request['field']);
     
     echo response($request, $printed);
 } catch (\Throwable $e) {
