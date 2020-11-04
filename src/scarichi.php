@@ -4,13 +4,13 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
+ * 
+ * $argc = 2;
+ ] $argv = ['scarichi.php', '-h'];
  */
 namespace vaniacarta74\Scarichi;
 
 require __DIR__ . '/../vendor/autoload.php';
-
-//$argc = 2;
-//$argv = ['scarichi.php', '-h'];
 
 try {
     $composer = COMPOSER;

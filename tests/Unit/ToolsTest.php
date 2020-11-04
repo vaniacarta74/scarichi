@@ -113,6 +113,11 @@ use function vaniacarta74\Scarichi\addCampiDati as addCampiDati;
 use function vaniacarta74\Scarichi\addCampiCalcoli as addCampiCalcoli;
 use function vaniacarta74\Scarichi\addCampiFormule as addCampiFormule;
 use function vaniacarta74\Scarichi\addTable as addTable;
+use function vaniacarta74\Scarichi\loadScarichi as loadScarichi;
+use function vaniacarta74\Scarichi\loadVariabiliScarichi as loadVariabiliScarichi;
+use function vaniacarta74\Scarichi\loadVariabili as loadVariabili;
+use function vaniacarta74\Scarichi\loadFormule as loadFormule;
+use function vaniacarta74\Scarichi\loadDatiAcquisiti as loadDatiAcquisiti;
 
 class ToolsTest extends TestCase
 {
@@ -15544,5 +15549,386 @@ class ToolsTest extends TestCase
         $this->expectException(\Exception::class);
         
         selectLastPrevData($db, $parametri, $dati, $categoria);
+    }    
+    
+    /**
+     * @group load
+     * covers loadScarichi()
+     */
+    public function testLoadScarichiEquals() : void
+    {
+        $request = [            
+            'var' => '30030'            
+        ];
+                
+        $expected = [
+            '0' => [
+                'scarico' => 1,
+                'denominazione' => 'Diga Flumineddu - Sfioratore di superficie',
+                'variabile' => 30030,
+                'tipo' => 'sfioratore di superficie',
+                'modello' => '1'
+            ]
+        ];
+        
+        $actual = loadScarichi($request);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group index
+     * covers loadScarichi()
+     */
+    public function testLoadScarichiExceptions()
+    {
+        $request = [
+            'variabile' => '30030'
+        ];
+                
+        $this->expectException(\Exception::class);
+        
+        loadScarichi($request);
+    }
+
+    /**
+     * @group index
+     * covers loadScarichi()
+     */
+    public function testLoadScarichiEmpty()
+    {
+        $request = [
+            'var' => '999999'
+        ];       
+        
+        $actual = loadScarichi($request);
+        
+        $this->assertEmpty($actual);
+    }
+    
+    /**
+     * @group load
+     * covers loadVariabiliScarichi()
+     */
+    public function testLoadVariabiliScarichiEquals() : void
+    {
+        $scarichi = [
+            '0' => [
+                'scarico' => '1'
+            ]
+        ];
+                
+        $expected = [
+            '0' => [
+                'scarico' => 1,
+                'db' => 'SSCP_data',
+                'variabile' => 42,
+                'tipo_dato' => 2,
+                'data_attivazione' => new \DateTime('1970-01-01 00:00:00', new \DateTimeZone('Europe/Rome')),
+                'data_disattivazione' => new \DateTime('2017-12-09 00:00:00', new \DateTimeZone('Europe/Rome')),
+                'categoria' => 'livello'
+            ],
+            '1' => [
+                'scarico' => 1,
+                'db' => 'SPT',
+                'variabile' => 165071,
+                'tipo_dato' => 2,
+                'data_attivazione' => new \DateTime('2017-12-09 00:00:00', new \DateTimeZone('Europe/Rome')),
+                'data_disattivazione' => new \DateTime('2070-01-01 00:00:00', new \DateTimeZone('Europe/Rome')),
+                'categoria' => 'livello'
+            ]
+        ];
+        
+        $actual = loadVariabiliScarichi($scarichi);
+        
+        $this->assertEquals($expected, $actual);
+}
+    
+    /**
+     * @group index
+     * covers loadVariabiliScarichi()
+     */
+    public function testLoadVariabiliScarichiExceptions()
+    {
+        $scarichi = [
+            '0' => [
+                'variabile' => '30030'
+            ]            
+        ];
+                
+        $this->expectException(\Exception::class);
+        
+        loadVariabiliScarichi($scarichi);
+    }
+
+    /**
+     * @group index
+     * covers loadVariabiliScarichi()
+     */
+    public function testLoadVariabiliScarichiEmpty()
+    {
+        $scarichi = [
+            '0' => [
+                'scarico' => '999'
+            ]            
+        ];       
+        
+        $actual = loadVariabiliScarichi($scarichi);
+        
+        $this->assertEmpty($actual);
+    }
+    
+    /**
+     * @group load
+     * covers loadVariabili()
+     */
+    public function testLoadVariabiliEquals() : void
+    {
+        $scarichi = [
+            '0' => [
+                'variabile' => '30030'
+            ]
+        ];
+                
+        $expected = [
+            '0' => [
+                'id_variabile' => 30030,
+                'impianto' => 75,
+                'unita_misura' => 'mc'
+            ]
+        ];
+        
+        $actual = loadVariabili($scarichi);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group index
+     * covers loadVariabili()
+     */
+    public function testLoadVariabiliExceptions()
+    {
+        $scarichi = [
+            '0' => [
+                'scarico' => '1'
+            ]            
+        ];
+                
+        $this->expectException(\Exception::class);
+        
+        loadVariabili($scarichi);
+    }
+
+    /**
+     * @group index
+     * covers loadVariabili()
+     */
+    public function testLoadVariabiliEmpty()
+    {
+        $scarichi = [
+            '0' => [
+                'variabile' => '99999'
+            ]            
+        ];       
+        
+        $actual = loadVariabili($scarichi);
+        
+        $this->assertEmpty($actual);
+    }
+    
+    /**
+     * @group load
+     * covers loadFormule()
+     */
+    public function testLoadFormuleEquals() : void
+    {
+        $scarichi = [
+            '0' => [
+                'scarico' => '1'
+            ]
+        ];
+                
+        $expected = [
+            '0' => [
+                'tipo_formula' => 'portata sfiorante',
+                'alias' => 'sfioro',
+                'scarico' => 1,
+                'mi' => 0.47,
+                'scabrosita' => null,
+                'lunghezza' => null,
+                'larghezza' => 40.5,
+                'altezza' => null,
+                'angolo' => null,
+                'raggio' => null,
+                'quota' => 276.5,
+                'velocita' => null,
+                'limite' => 942.67
+            ]
+        ];
+        
+        $actual = loadFormule($scarichi);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group index
+     * covers loadFormule()
+     */
+    public function testLoadFormuleExceptions()
+    {
+        $scarichi = [
+            '0' => [
+                'variabile' => '30030'
+            ]            
+        ];
+                
+        $this->expectException(\Exception::class);
+        
+        loadFormule($scarichi);
+    }
+
+    /**
+     * @group index
+     * covers loadFormule()
+     */
+    public function testLoadFormuleEmpty()
+    {
+        $scarichi = [
+            '0' => [
+                'scarico' => '999'
+            ]            
+        ];       
+        
+        $actual = loadFormule($scarichi);
+        
+        $this->assertEmpty($actual);
+    }
+    
+    /**
+     * @group load
+     * covers loadDatiAcquisiti()
+     */
+    public function testLoadDatiAcquisitiEquals() : void
+    {
+        $request = [
+            'datefrom' => new \DateTime('2018-01-02 00:00:00'),
+            'dateto' => new \DateTime('2018-01-02 00:15:00')
+        ];
+        
+        $variabili_scarichi = [
+            '0' => [
+                'scarico' => 1,
+                'db' => 'SSCP_data',
+                'variabile' => 42,
+                'tipo_dato' => 2,
+                'data_attivazione' => new \DateTime('1970-01-01 00:00:00', new \DateTimeZone('Europe/Rome')),
+                'data_disattivazione' => new \DateTime('2017-12-09 00:00:00', new \DateTimeZone('Europe/Rome')),
+                'categoria' => 'livello'
+            ],
+            '1' => [
+                'scarico' => 1,
+                'db' => 'SPT',
+                'variabile' => 165071,
+                'tipo_dato' => 2,
+                'data_attivazione' => new \DateTime('2017-12-09 00:00:00', new \DateTimeZone('Europe/Rome')),
+                'data_disattivazione' => new \DateTime('2070-01-01 00:00:00', new \DateTimeZone('Europe/Rome')),
+                'categoria' => 'livello'
+            ]
+        ];
+        
+        $expected = [
+            'livello' => [
+                '0' => [
+                    'variabile' => 165071,
+                    'valore' => 266.206,
+                    'unita_misura' => 'm',
+                    'data_e_ora' => new \DateTime('2018-01-02 00:00:00', new \DateTimeZone('Europe/Rome')),
+                    'tipo_dato' => 2
+                ]
+            ]
+        ];
+        
+        $actual = loadDatiAcquisiti($request, $variabili_scarichi);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group index
+     * covers loadDatiAcquisiti()
+     */
+    public function testLoadDatiAcquisitiExceptions()
+    {
+        $request = [
+            'pippo' => new \DateTime('2018-01-02 00:00:00'),
+            'dateto' => new \DateTime('2018-01-02 00:15:00')
+        ];
+        
+        $variabili_scarichi = [
+            '0' => [
+                'scarico' => 1,
+                'db' => 'SSCP_data',
+                'variabile' => 42,
+                'tipo_dato' => 2,
+                'data_attivazione' => new \DateTime('1970-01-01 00:00:00', new \DateTimeZone('Europe/Rome')),
+                'data_disattivazione' => new \DateTime('2017-12-09 00:00:00', new \DateTimeZone('Europe/Rome')),
+                'categoria' => 'livello'
+            ],
+            '1' => [
+                'scarico' => 1,
+                'db' => 'SPT',
+                'variabile' => 165071,
+                'tipo_dato' => 2,
+                'data_attivazione' => new \DateTime('2017-12-09 00:00:00', new \DateTimeZone('Europe/Rome')),
+                'data_disattivazione' => new \DateTime('2070-01-01 00:00:00', new \DateTimeZone('Europe/Rome')),
+                'categoria' => 'livello'
+            ]
+        ];
+                
+        $this->expectException(\Exception::class);
+        
+        loadDatiAcquisiti($request, $variabili_scarichi);
+    }
+
+    /**
+     * @group index
+     * covers loadDatiAcquisiti()
+     */
+    public function testLoadDatiAcquisitiEmpty()
+    {
+        $request = [
+            'datefrom' => new \DateTime('2070-01-02 00:00:00'),
+            'dateto' => new \DateTime('2070-01-02 00:15:00')
+        ];
+        
+        $variabili_scarichi = [
+            '0' => [
+                'scarico' => 1,
+                'db' => 'SSCP_data',
+                'variabile' => 42,
+                'tipo_dato' => 2,
+                'data_attivazione' => new \DateTime('1970-01-01 00:00:00', new \DateTimeZone('Europe/Rome')),
+                'data_disattivazione' => new \DateTime('2017-12-09 00:00:00', new \DateTimeZone('Europe/Rome')),
+                'categoria' => 'livello'
+            ],
+            '1' => [
+                'scarico' => 1,
+                'db' => 'SPT',
+                'variabile' => 165071,
+                'tipo_dato' => 2,
+                'data_attivazione' => new \DateTime('2017-12-09 00:00:00', new \DateTimeZone('Europe/Rome')),
+                'data_disattivazione' => new \DateTime('2070-01-01 00:00:00', new \DateTimeZone('Europe/Rome')),
+                'categoria' => 'livello'
+            ]
+        ];
+        
+        $expected = [
+            'livello' =>[]
+        ];
+        $actual = loadDatiAcquisiti($request, $variabili_scarichi);
+        
+        $this->assertEquals($expected, $actual);
     }
 }

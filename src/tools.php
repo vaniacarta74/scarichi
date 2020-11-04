@@ -2925,3 +2925,124 @@ function addCampiFormule(array $table, array $coefficienti, array $fieldsFormule
         throw $e;
     }
 }
+
+
+function loadScarichi(array $request) : array
+{
+    try {
+        if (!array_key_exists('var', $request)) {
+            throw new \Exception('Parametro url non definito');
+        }
+        $db = 'dbcore';
+        $queryFileName = 'query_scarichi';
+        $parametri = [
+            'variabile' => $request['var']
+        ];
+        $scarichi = getDataFromDb($db, $queryFileName, $parametri);
+        
+        return $scarichi;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function loadVariabiliScarichi(array $scarichi) : array
+{
+    try {
+        $scarico = $scarichi[0];
+        if (!array_key_exists('scarico', $scarico)) {
+            throw new \Exception('Chiave scarico non definita');
+        }        
+        $db = 'dbcore';
+        $queryFileName = 'query_variabili_scarichi';
+        $parametri = [
+            'scarico' => $scarico['scarico']
+        ];
+        $variabili_scarichi = getDataFromDb($db, $queryFileName, $parametri);
+        
+        return $variabili_scarichi;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function loadVariabili(array $scarichi) : array
+{
+    try {
+        $scarico = $scarichi[0];
+        if (!array_key_exists('variabile', $scarico)) {
+            throw new \Exception('Chiave variabile non definita');
+        }        
+        $db = 'SSCP_data';
+        $queryFileName = 'query_variabili';
+        $parametri = [
+            'variabile' => $scarico['variabile']
+        ];
+        $variabili = getDataFromDb($db, $queryFileName, $parametri);
+        
+        return $variabili;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function loadFormule(array $scarichi) : array
+{
+    try {
+        $scarico = $scarichi[0];
+        if (!array_key_exists('scarico', $scarico)) {
+            throw new \Exception('Chiave scarico non definita');
+        }        
+        $db = 'dbcore';
+        $queryFileName = 'query_formule';
+        $parametri = [
+            'scarico' => $scarico['scarico']
+        ];
+        $formule = getDataFromDb($db, $queryFileName, $parametri);
+        
+        return $formule;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function loadDatiAcquisiti(array $request, array $variabili_scarichi) : array
+{
+    try {
+        if (!array_key_exists('datefrom', $request) || !array_key_exists('dateto', $request)) {
+            throw new \Exception('Chiave datefrom e/o dateto non definite');
+        }       
+        $dati_acquisiti = [];
+        foreach ($variabili_scarichi as $record) {
+            $dati = [];
+            $categoria = $record['categoria'];   
+            $db = $record['db'];
+            $queryFileName = 'query_dati_acquisiti';
+            $parametri = [
+                'variabile' => $record['variabile'],
+                'tipo_dato' => $record['tipo_dato'],
+                'data_iniziale' => $request['datefrom'],
+                'data_finale' => $request['dateto'],
+                'data_attivazione' => $record['data_attivazione'],
+                'data_disattivazione' => $record['data_disattivazione']
+            ];
+            $dati[$categoria] = getDataFromDb($db, $queryFileName, $parametri);
+
+            $dati_manovra = selectLastPrevData($db, $parametri, $dati, 'manovra');
+
+            $dati_acquisiti = array_merge_recursive($dati_acquisiti, $dati_manovra);
+        }
+        return $dati_acquisiti;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
