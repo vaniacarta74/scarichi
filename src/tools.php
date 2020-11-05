@@ -1738,7 +1738,7 @@ function setMsgDefault(array $composer, array $help, string $eol) : string
         
         $message = $header . $eol;
         $message .= $command . ' ' . $params . $eol;
-        $message .= substr(TZSTART, 0, -7) . $eol;
+        $message .= substr(START, 0, -7) . $eol;
         
         return $message;
     } catch (\Throwable $e) {
@@ -1793,7 +1793,7 @@ function setMsgOk(array $composer, array $help, string $eol) : string
         $header = setHeader($composer);
         
         $message = $header . $eol;
-        $message .= substr(TZSTART, 0, -7) . $eol;
+        $message .= substr(START, 0, -7) . $eol;
                       
         return $message;
     } catch (\Throwable $e) {

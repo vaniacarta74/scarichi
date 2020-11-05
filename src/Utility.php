@@ -106,11 +106,11 @@ class Utility
     public static function benchmark(string $strDateTime) : string
     {
         try {
-            $start = \dateTime::createFromFormat('Y-m-d H:i:s.u', $strDateTime);
+            $start = \dateTime::createFromFormat('Y-m-d H:i:s.u', $strDateTime, new \DateTimeZone('Europe/Rome'));
             if (!$start) {
                 throw new \Exception('Data inizio benchmark inesistente');
             }
-            $end = new \DateTime();
+            $end = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
             $dateInterval = date_diff($start, $end);
             if ($dateInterval->format('%h') === '0') {
                 if ($dateInterval->format('%i') === '0') {
