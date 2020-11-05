@@ -15,9 +15,10 @@ class ScarichiTest extends TestCase
     {
         $composer = COMPOSER;
         $description = $composer['description'];
-        $header = setHeader($composer);
-        $single = '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/01/2019 al 02/01/2019 avvenuta con successo. File CSV full esportati.' . PHP_EOL;
-        $double = $single . '2) 30040: Elaborazione dati Volume variabile 30040 dal 01/01/2019 al 02/01/2019 avvenuta con successo. File CSV full esportati.' . PHP_EOL;
+        $header = setHeader($composer). PHP_EOL . '|';
+        $headerNoStart = setHeader($composer);
+        $single = '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/01/2019 al 02/01/2019 avvenuta con successo in | sec. File CSV full esportati.' . PHP_EOL;
+        $double = $single . '2) 30040: Elaborazione dati Volume variabile 30040 dal 01/01/2019 al 02/01/2019 avvenuta con successo in | sec. File CSV full esportati.' . PHP_EOL;
         
         $data = [
             'standard' => [
@@ -62,7 +63,7 @@ class ScarichiTest extends TestCase
                 'dateto' => '',
                 'nozero' => '',
                 'campo' => '',
-                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/05/2020 al ' . date('d/m/Y') . ' avvenuta con successo. File CSV full esportati.' . PHP_EOL
+                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/05/2020 al ' . date('d/m/Y') . ' avvenuta con successo in | sec. File CSV full esportati.' . PHP_EOL
             ],
             'datefrom costant' => [
                 'help' => null,
@@ -73,7 +74,7 @@ class ScarichiTest extends TestCase
                 'dateto' => '03/01/2019',
                 'nozero' => '',
                 'campo' => '',
-                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/01/2019 al 03/01/2019 avvenuta con successo. File CSV full esportati.' . PHP_EOL
+                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/01/2019 al 03/01/2019 avvenuta con successo in | sec. File CSV full esportati.' . PHP_EOL
             ],
             'only dateto' => [
                 'help' => null,
@@ -84,7 +85,7 @@ class ScarichiTest extends TestCase
                 'dateto' => '02/05/2019',
                 'nozero' => '',
                 'campo' => '',
-                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/05/2019 al 02/05/2019 avvenuta con successo. File CSV full esportati.' . PHP_EOL
+                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/05/2019 al 02/05/2019 avvenuta con successo in | sec. File CSV full esportati.' . PHP_EOL
             ],
             'field other' => [
                 'help' => null,
@@ -95,7 +96,7 @@ class ScarichiTest extends TestCase
                 'dateto' => '02/01/2019',
                 'nozero' => '',
                 'campo' => 'L',
-                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Livello variabile 30030 dal 01/01/2019 al 02/01/2019 avvenuta con successo. File CSV full esportati.' . PHP_EOL
+                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Livello variabile 30030 dal 01/01/2019 al 02/01/2019 avvenuta con successo in | sec. File CSV full esportati.' . PHP_EOL
             ],
             'full 0' => [
                 'help' => null,
@@ -106,7 +107,7 @@ class ScarichiTest extends TestCase
                 'dateto' => '02/01/2019',
                 'nozero' => 'TRUE',
                 'campo' => '',
-                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/01/2019 al 02/01/2019 avvenuta con successo. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
+                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal 01/01/2019 al 02/01/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
             ],
             'full 1' => [
                 'help' => null,
@@ -128,7 +129,7 @@ class ScarichiTest extends TestCase
                 'dateto' => '',
                 'nozero' => '',
                 'campo' => '',
-                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal ' . date('d/m/Y', strtotime(date('Y') . '-' . date('m') . '-' . (date('d') - 1))) . ' al ' . date('d/m/Y') . ' avvenuta con successo. Nessun file CSV full esportato per mancanza di dati.' . PHP_EOL
+                'expected' => $header . PHP_EOL . '1) 30030: Elaborazione dati Volume variabile 30030 dal ' . date('d/m/Y', strtotime(date('Y') . '-' . date('m') . '-' . (date('d') - 1))) . ' al ' . date('d/m/Y') . ' avvenuta con successo in | sec. Nessun file CSV full esportato per mancanza di dati.' . PHP_EOL
             ],
             'help' => [
                 'help' => '',
@@ -139,7 +140,7 @@ class ScarichiTest extends TestCase
                 'dateto' => null,
                 'nozero' => null,
                 'campo' => null,
-                'expected' => $header . PHP_EOL . $description . PHP_EOL
+                'expected' => $headerNoStart . PHP_EOL . $description . PHP_EOL
             ],
             'version' => [
                 'help' => null,
@@ -161,7 +162,7 @@ class ScarichiTest extends TestCase
                 'dateto' => null,
                 'nozero' => null,
                 'campo' => null,
-                'expected' => $header . PHP_EOL . 'php scarichi.php -V ALL -f YEAR -t NOW -c V -n FALSE' . PHP_EOL
+                'expected' => $headerNoStart . PHP_EOL . 'php scarichi.php -V ALL -f YEAR -t NOW -c V -n FALSE' . PHP_EOL . '|'
             ],
             'error' => [
                 'help' => null,
@@ -184,7 +185,7 @@ class ScarichiTest extends TestCase
      * covers scarichi.php
      * @dataProvider scarichiProvider
      */
-    public function testScarichiEquals(?string $help, ?string $version, ?string $default, ?string $var, ?string $dateFrom, ?string $dateTo, ?string $full, ?string $field, ?string $expected) : void
+    public function testScarichiEquals(?string $help, ?string $version, ?string $default, ?string $var, ?string $dateFrom, ?string $dateTo, ?string $full, ?string $field, ?string $response) : void
     {
         $paramsRaw = [
             '--help' => $help,
@@ -217,10 +218,15 @@ class ScarichiTest extends TestCase
             $this->assertEquals('default', 'default');
         } elseif ($arg === '-h' || $arg === '--help') {
             $actual = shell_exec($command);
-            $this->assertStringContainsString($expected, $actual);
+            $this->assertStringContainsString($response, $actual);
         } else {
             $actual = shell_exec($command);
-            $this->assertEquals($expected, $actual);
+            
+            $expecteds = explode('|', $response);
+        
+            foreach ($expecteds as $expected) {
+                $this->assertStringContainsString($expected, $actual);
+            } 
         }
     }
 }

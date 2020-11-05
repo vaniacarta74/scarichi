@@ -137,7 +137,7 @@ class ToolsTest extends TestCase
                     'field' => 'volume'
                 ],
                 'printed' => true,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo. File CSV <b>full</b> esportati.'
+                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
             ],
             'full no print' => [
                 'request' => [
@@ -148,7 +148,7 @@ class ToolsTest extends TestCase
                     'field' => 'volume'
                 ],
                 'printed' => false,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo. Nessun file CSV <b>full</b> esportato per mancanza di dati.'
+                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>full</b> esportato per mancanza di dati.'
             ],
             'only datefrom full print' => [
                 'request' => [
@@ -159,7 +159,7 @@ class ToolsTest extends TestCase
                     'field' => 'volume'
                 ],
                 'printed' => true,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/05/2020</b> al <b>' . date('d/m/Y') . '</b> avvenuta con successo. File CSV <b>full</b> esportati.'
+                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/05/2020</b> al <b>' . date('d/m/Y') . '</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
             ],
             'field other full print' => [
                 'request' => [
@@ -170,7 +170,7 @@ class ToolsTest extends TestCase
                     'field' => 'livello'
                 ],
                 'printed' => true,
-                'expected' => 'Elaborazione dati <b>Livello</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo. File CSV <b>full</b> esportati.'
+                'expected' => 'Elaborazione dati <b>Livello</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
             ],
             'field other no 0 no print' => [
                 'request' => [
@@ -181,7 +181,7 @@ class ToolsTest extends TestCase
                     'field' => 'livello'
                 ],
                 'printed' => false,
-                'expected' => 'Elaborazione dati <b>Livello</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.'
+                'expected' => 'Elaborazione dati <b>Livello</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.'
             ]
         ];
         
@@ -306,7 +306,7 @@ class ToolsTest extends TestCase
                     '0' => [
                         'id_variabile' => 30030,
                         'impianto' => 75,
-                        'unita_misura' => 'mc'
+                        'unita_misura' => 'm3'
                     ]
                 ]
             ],
@@ -412,7 +412,7 @@ class ToolsTest extends TestCase
                     'row' => [
                         'id variabile' => 30030,
                         'impianto' => 75,
-                        'unita misura' => 'mc'
+                        'unita misura' => 'm3'
                     ]
                 ]
             ],
@@ -483,7 +483,7 @@ class ToolsTest extends TestCase
                     'row' => [
                         'id variabile' => 30030,
                         'impianto' => 75,
-                        'unita misura' => 'mc'
+                        'unita misura' => 'm3'
                     ]
                 ]
             ],
@@ -2197,7 +2197,7 @@ class ToolsTest extends TestCase
         $variabili = [
             'id_variabile' => 30030,
             'impianto' => 75,
-            'unita_misura' => 'mc'
+            'unita_misura' => 'm3'
         ];
         
         $dati = [
@@ -2255,7 +2255,7 @@ class ToolsTest extends TestCase
         $variabili = [
             'id_variabile' => 30030,
             'impianto' => 75,
-            'unita_misura' => 'mc'
+            'unita_misura' => 'm3'
         ];
         $dati = [];
         $base = 'data_e_ora';
@@ -2275,7 +2275,7 @@ class ToolsTest extends TestCase
         $variabili = [
             'variabile' => 30030,
             'impianto' => 75,
-            'unita_misura' => 'mc'
+            'unita_misura' => 'm3'
         ];
         
         $dati = [
@@ -3128,7 +3128,7 @@ class ToolsTest extends TestCase
                     '0' => [
                         'id_variabile' => 30030,
                         'impianto' => 75,
-                        'unita_misura' => 'mc'
+                        'unita_misura' => 'm3'
                     ]
                 ],
                 'scarichi' => [
@@ -3199,7 +3199,7 @@ class ToolsTest extends TestCase
                     '0' => [
                         'id_variabile' => 30030,
                         'impianto' => 75,
-                        'unita_misura' => 'mc'
+                        'unita_misura' => 'm3'
                     ]
                 ],
                 'scarichi' => [
@@ -3289,7 +3289,7 @@ class ToolsTest extends TestCase
                     '0' => [
                         'id_variabile' => 30030,
                         'impianto' => 75,
-                        'unita_misura' => 'mc'
+                        'unita_misura' => 'm3'
                     ]
                 ],
                 'scarichi' => [
@@ -3430,7 +3430,7 @@ class ToolsTest extends TestCase
             '0' => [
                 'id_variabile' => 30030,
                 'impianto' => 75,
-                'unita_misura' => 'mc'
+                'unita_misura' => 'm3'
             ]
         ];
         
@@ -6289,11 +6289,15 @@ class ToolsTest extends TestCase
      * covers response()
      * @dataProvider responseProvider
      */
-    public function testResponseEquals(array $request, bool $printed, string $expected) : void
+    public function testResponseEquals(array $request, bool $printed, string $response) : void
     {
+        $expecteds = explode('|', $response);
+        
         $actual = response($request, $printed);
         
-        $this->assertEquals($expected, $actual);
+        foreach ($expecteds as $expected) {
+            $this->assertStringContainsString($expected, $actual);
+        }
     }
     
     /**
@@ -15022,8 +15026,8 @@ class ToolsTest extends TestCase
     public function goCurlProvider() : array
     {
         $url = CONFIG['command']['url'];
-        $single = '1) 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
-        $multi = $single . '2) 30040: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        $single = '1) 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        $multi = $single . '2) 30040: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         
         $data = [
             'no post values' => [
@@ -15112,11 +15116,15 @@ class ToolsTest extends TestCase
      * covers goCurl()
      * @dataProvider goCurlProvider
      */
-    public function testGoCurlEquals(array $postParam, string $url, bool $async, string $expected) : void
+    public function testGoCurlStringContainsString(array $postParam, string $url, bool $async, string $response) : void
     {
+        $expecteds = explode('|', $response);
+        
         $actual = goCurl($postParam, $url, $async);
         
-        $this->assertEquals($expected, $actual);
+        foreach ($expecteds as $expected) {
+            $this->assertStringContainsString($expected, $actual);
+        }        
     }
     
     /**
@@ -15212,8 +15220,8 @@ class ToolsTest extends TestCase
     public function goSingleCurlProvider() : array
     {
         $url = CONFIG['command']['url'];
-        $single = '1) 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
-        $multi = $single . '2) 30040: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        $single = '1) 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        $multi = $single . '2) 30040: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         
         $data = [            
             'single post' => [
@@ -15259,11 +15267,15 @@ class ToolsTest extends TestCase
      * covers goSingleCurl()
      * @dataProvider goSingleCurlProvider
      */
-    public function testGoSingleCurlEquals(array $postParam, string $url, string $expected) : void
+    public function testGoSingleCurlEquals(array $postParam, string $url, string $response) : void
     {
+        $expecteds = explode('|', $response);
+        
         $actual = goSingleCurl($postParam, $url);
         
-        $this->assertEquals($expected, $actual);
+        foreach ($expecteds as $expected) {
+            $this->assertStringContainsString($expected, $actual);
+        }
     }
     
     /**
@@ -15286,8 +15298,8 @@ class ToolsTest extends TestCase
     public function goMultiCurlProvider() : array
     {
         $url = CONFIG['command']['url'];
-        $single = '1) 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
-        $multi = $single . '2) 30040: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        $single = '1) 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        $multi = $single . '2) 30040: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         
         $data = [            
             'single post' => [
@@ -15333,11 +15345,17 @@ class ToolsTest extends TestCase
      * covers goMultiCurl()
      * @dataProvider goMultiCurlProvider
      */
-    public function testGoMultiCurlOutputString(array $postParam, string $url, string $expected) : void
+    public function testGoMultiCurlOutputString(array $postParam, string $url, string $response) : void
     {
-        $this->expectOutputString($expected);
+        $expecteds = explode('|', $response);
         
-        goMultiCurl($postParam, $url);  
+        goMultiCurl($postParam, $url);       
+        
+        $actual = $this->getActualOutput();
+        
+        foreach ($expecteds as $expected) {
+            $this->assertStringContainsString($expected, $actual);
+        }          
     }
     
     /**
@@ -15694,7 +15712,7 @@ class ToolsTest extends TestCase
             '0' => [
                 'id_variabile' => 30030,
                 'impianto' => 75,
-                'unita_misura' => 'mc'
+                'unita_misura' => 'm3'
             ]
         ];
         

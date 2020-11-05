@@ -18,7 +18,7 @@ class IndexTest extends TestCase
                 'dateto' => '02/01/2017',
                 'full' => '1',
                 'field' => 'volume',
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo. File CSV <b>full</b> esportati.'
+                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
             ],
             'no full and field' => [
                 'var' => '30030',
@@ -26,7 +26,7 @@ class IndexTest extends TestCase
                 'dateto' => '02/01/2017',
                 'full' => null,
                 'field' => null,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo. File CSV <b>full</b> esportati.'
+                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
             ],
             'only datefrom' => [
                 'var' => '30030',
@@ -34,7 +34,7 @@ class IndexTest extends TestCase
                 'dateto' => null,
                 'full' => null,
                 'field' => null,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/05/2020</b> al <b>' . date('d/m/Y') . '</b> avvenuta con successo. File CSV <b>full</b> esportati.'
+                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/05/2020</b> al <b>' . date('d/m/Y') . '</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
             ],
             'only dateto' => [
                 'var' => '30030',
@@ -42,7 +42,7 @@ class IndexTest extends TestCase
                 'dateto' => '01/01/2017',
                 'full' => null,
                 'field' => null,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo. File CSV <b>full</b> esportati.'
+                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
             ],
             'variable' => [
                 'variable' => '30030',
@@ -50,7 +50,7 @@ class IndexTest extends TestCase
                 'dateto' => '02/01/2017',
                 'full' => null,
                 'field' => null,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo. File CSV <b>full</b> esportati.'
+                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
             ],
             'variabile' => [
                 'variabile' => '30030',
@@ -58,7 +58,7 @@ class IndexTest extends TestCase
                 'dateto' => '02/01/2017',
                 'full' => null,
                 'field' => null,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo. File CSV <b>full</b> esportati.'
+                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
             ],
             'field other' => [
                 'var' => '30030',
@@ -66,7 +66,7 @@ class IndexTest extends TestCase
                 'dateto' => '02/01/2017',
                 'full' => null,
                 'field' => 'livello',
-                'expected' => 'Elaborazione dati <b>Livello</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo. File CSV <b>full</b> esportati.'
+                'expected' => 'Elaborazione dati <b>Livello</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
             ],
             'full 0' => [
                 'var' => '30030',
@@ -74,7 +74,7 @@ class IndexTest extends TestCase
                 'dateto' => '02/01/2017',
                 'full' => '0',
                 'field' => null,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.'
+                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.'
             ],
             'full 1' => [
                 'var' => '30030',
@@ -82,7 +82,7 @@ class IndexTest extends TestCase
                 'dateto' => '02/01/2017',
                 'full' => '1',
                 'field' => null,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo. File CSV <b>full</b> esportati.'
+                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
             ]
         ];
         
@@ -94,7 +94,7 @@ class IndexTest extends TestCase
      * covers index.php
      * @dataProvider indexProvider
      */
-    public function testIndexEquals(?string $var, ?string $dateFrom, ?string $dateTo, ?string $full, ?string $field, ?string $expected) : void
+    public function testIndexEquals(?string $var, ?string $dateFrom, ?string $dateTo, ?string $full, ?string $field, ?string $response) : void
     {
         $paramsRaw = [
             'var' => $var,
@@ -122,6 +122,10 @@ class IndexTest extends TestCase
         
         curl_close($ch);
         
-        $this->assertEquals($expected, $actual);
+        $expecteds = explode('|', $response);
+        
+        foreach ($expecteds as $expected) {
+            $this->assertStringContainsString($expected, $actual);
+        }
     }
 }

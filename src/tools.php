@@ -987,7 +987,7 @@ function response(array $request, bool $printed) : string
         
         $type = $request['full'] ? 'full' : 'senza zeri';
         
-        $html = 'Elaborazione dati <b>' . ucfirst($request['field']) . '</b> variabile <b>' . $request['var'] . '</b> dal <b>' . $request['datefrom']->format('d/m/Y') . '</b> al <b>' . $request['dateto']->format('d/m/Y') . '</b> avvenuta con successo.';
+        $html = 'Elaborazione dati <b>' . ucfirst($request['field']) . '</b> variabile <b>' . $request['var'] . '</b> dal <b>' . $request['datefrom']->format('d/m/Y') . '</b> al <b>' . $request['dateto']->format('d/m/Y') . '</b> avvenuta con successo in <b>' . Utility::benchmark(START) . '</b>.';
         
         if ($printed) {
             $html .= ' File CSV <b>' . $type . '</b> esportati.';
@@ -1738,7 +1738,8 @@ function setMsgDefault(array $composer, array $help, string $eol) : string
         
         $message = $header . $eol;
         $message .= $command . ' ' . $params . $eol;
-                      
+        $message .= substr(START, 0, -7) . $eol;
+        
         return $message;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -1792,6 +1793,7 @@ function setMsgOk(array $composer, array $help, string $eol) : string
         $header = setHeader($composer);
         
         $message = $header . $eol;
+        $message .= substr(START, 0, -7) . $eol;
                       
         return $message;
     } catch (\Throwable $e) {
@@ -2763,7 +2765,7 @@ function goMultiCurl(array $postParams, string $url) : void
                 $ch = $info['handle'];
                 $key = array_search($ch, $handlers);
                 $report = curl_multi_getcontent($ch);
-                $response = checkCurlResponse($report, DEBUG_LEVEL);            
+                $response = checkCurlResponse($report, DEBUG_LEVEL);                
                 echo $i . ') ' . $key . ': ' . $response . PHP_EOL;
                 $i++;
             }

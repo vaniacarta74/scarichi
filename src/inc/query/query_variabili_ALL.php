@@ -8,7 +8,6 @@ $queryString = "SELECT
                 WHERE
                     id_variabile >= 30000 AND
                     id_variabile <= 39999 AND
-                    unita_misura = 'mc'";
-                    //unita_misura = 'm3'";
+                    unita_misura = 'm3'";
 
 $paramNames = [];
