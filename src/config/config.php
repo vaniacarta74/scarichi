@@ -5,6 +5,8 @@ use vaniacarta74\Scarichi\Utility;
 
 $now = new \DateTime();
 define('START', $now->format('Y-m-d H:i:s.u'));
+$now->setTimezone(new \DateTimeZone('Europe/Rome'));
+define('TZSTART', $now->format('Y-m-d H:i:s.u'));
 
 define('COMPOSER', Utility::getJsonArray(__DIR__ . '/../../composer.json'));
 define('CONFIG', Utility::getJsonArray(__DIR__ . '/config.json'));
