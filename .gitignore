@@ -5,3 +5,4 @@
 /docs/
 /vendor/
 /log/
+/tests/Unit/FtpTest.php

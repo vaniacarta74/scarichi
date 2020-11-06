@@ -860,11 +860,18 @@ function getDataFromDb(string $db, string $queryFileName, array $parametri) : ar
 
 function printToCSV(array $dati, string $fileName) : void
 {
-    $mode = 'w';
-    $delimiter = ';';
-    
     try {
-        $handle = @fopen($fileName, $mode);
+        $mode = 'w';
+        $delimiter = ';';
+        
+        $stream_options = [
+            'ftp' => [
+                'overwrite' => true
+            ]
+        ];
+        $stream_context = stream_context_create($stream_options);
+        
+        $handle = @fopen($fileName, $mode, false, $stream_context);
         
         if ($handle) {
             $nomiCampi = array_keys($dati[0]);
@@ -939,6 +946,7 @@ function printPart(array $printableData, int $i, bool $filtered, string $field) 
         $path = setPath($variabile, CSV, MAKESUBDIR);
         $fileName = setFile($variabile, $dateTimes, $filtered, $field, $path);
         printToCSV($printableData, $fileName);
+        ftpChmode($fileName, 0777);
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
@@ -3043,6 +3051,34 @@ function loadDatiAcquisiti(array $request, array $variabili_scarichi) : array
             $dati_acquisiti = array_merge_recursive($dati_acquisiti, $dati_manovra);
         }
         return $dati_acquisiti;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function ftpChmode(string $url, int $mode) : string
+{
+    try {
+        $permessi = '';
+        $schema = parse_url($url, PHP_URL_SCHEME);
+        if ($schema === 'ftp') {
+            $user = parse_url($url, PHP_URL_USER);
+            $password = parse_url($url, PHP_URL_PASS);
+            $host = parse_url($url, PHP_URL_HOST);
+            $file = parse_url($url, PHP_URL_PATH);            
+            
+            $conn = @ftp_connect($host);
+            if ($conn) {
+                $isLogged = ftp_login($conn, $user, $password);
+                $permessi = sprintf('%o', ftp_chmod($conn, $mode, $file));
+                ftp_close($conn);
+            } else {
+                throw new \Exception('Connessione al server ftp non riuscita');
+            }
+        }
+        return $permessi;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
