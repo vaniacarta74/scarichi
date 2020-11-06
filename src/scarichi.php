@@ -16,8 +16,7 @@ try {
     $composer = COMPOSER;
     $help = CONFIG;
     $parameters = $help['parameters'];
-    $url = $help['command']['url'];
-    $async = $help['command']['async'];
+    $url = $help['command']['url'];    
 
     $type = shuntTypes($parameters, $argv);
     echo getMessage($composer, $help, $type);
@@ -25,7 +24,7 @@ try {
     
     $filledValues = fillParameters($parameters, $values);
     $postParams = setPostParameters($parameters, $filledValues);
-    echo goCurl($postParams, $url, $async); 
+    echo goCurl($postParams, $url, ASYNC); 
 } catch (\Throwable $e) {
     Error::errorHandler($e, DEBUG_LEVEL, true);
     exit();

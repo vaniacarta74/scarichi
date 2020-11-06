@@ -12,7 +12,7 @@
         "csv": {
             "nodata": -9999,        
             "maxrecord": 10000,        
-            "subdirectory": true
+            "subdirectory": false
         }
     },
     "modelli": {
@@ -276,7 +276,8 @@
                     "M",
                     "D",
                     "H",
-                    "Q"
+                    "Q",
+                    "P"
                 ],
                 "limits": [],
                 "alias": [
@@ -285,13 +286,14 @@
                     "media",
                     "delta",
                     "altezza",
-                    "portata"
+                    "portata",
+                    "manovra"
                 ]  
             },
             "regex": "\/^[V|L|M|D|H|Q]$\/",
             "descriptions": [
                 "Esporta i dati di volume(V), livello(L), media(M)",
-                "delta(D), altezza(H) o portata(Q). Default V."
+                "delta(D), altezza(H), portata(Q) o manovra(P). Default V."
             ],
             "type": "group"
         },

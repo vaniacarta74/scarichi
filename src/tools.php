@@ -946,7 +946,7 @@ function printPart(array $printableData, int $i, bool $filtered, string $field) 
         $path = setPath($variabile, CSV, MAKESUBDIR);
         $fileName = setFile($variabile, $dateTimes, $filtered, $field, $path);
         printToCSV($printableData, $fileName);
-        ftpChmode($fileName, 0777);
+        changeMode(CSV, $fileName, 0777);
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
@@ -3058,27 +3058,42 @@ function loadDatiAcquisiti(array $request, array $variabili_scarichi) : array
 }
 
 
-function ftpChmode(string $url, int $mode) : string
+function changeMode(string $path, string $url, int $mode) : bool
 {
     try {
-        $permessi = '';
-        $schema = parse_url($url, PHP_URL_SCHEME);
-        if ($schema === 'ftp') {
-            $user = parse_url($url, PHP_URL_USER);
-            $password = parse_url($url, PHP_URL_PASS);
-            $host = parse_url($url, PHP_URL_HOST);
-            $file = parse_url($url, PHP_URL_PATH);            
-            
-            $conn = @ftp_connect($host);
-            if ($conn) {
-                $isLogged = ftp_login($conn, $user, $password);
-                $permessi = sprintf('%o', ftp_chmod($conn, $mode, $file));
-                ftp_close($conn);
-            } else {
-                throw new \Exception('Connessione al server ftp non riuscita');
+        $isFtp = (parse_url($path, PHP_URL_SCHEME) === 'ftp') ? true : false;
+        if (ASYNC && MAKESUBDIR && $isFtp) {
+            //@codeCoverageIgnoreStart
+            $response = false;
+            //@codeCoverageIgnoreEnd
+        } else {
+            $response = true;
+            $pathDiff = explode($path . '/', $url);
+            $pathParts = explode('/', $pathDiff[1]);
+            foreach ($pathParts as $part) {
+                $path .= '/' . $part;                
+                if ($isFtp) {
+                    $user = parse_url($path, PHP_URL_USER);
+                    $password = parse_url($path, PHP_URL_PASS);
+                    $host = parse_url($path, PHP_URL_HOST);
+                    $file = parse_url($path, PHP_URL_PATH);    
+                    $conn = @ftp_connect($host);
+                    if ($conn) {
+                        $isLogged = ftp_login($conn, $user, $password);
+                        $isOk = boolval(ftp_chmod($conn, $mode, $file));
+                        ftp_close($conn);
+                    } else {
+                        throw new \Exception('Connessione al server ftp non riuscita');
+                    }
+                } else {
+                    $isOk = @chmod($path, $mode);
+                }
+                if($isOk === false) {
+                    $response = false;
+                }
             }
-        }
-        return $permessi;
+        }        
+        return $response;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
