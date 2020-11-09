@@ -10,6 +10,7 @@ define('COMPOSER', Utility::getJsonArray(__DIR__ . '/../../composer.json'));
 define('CONFIG', Utility::getJsonArray(__DIR__ . '/config.json'));
 
 define('ASYNC', boolval(CONFIG['command']['async']));
+define('URL', CONFIG['command']['url']);
 
 define('NODATA', intval(CONFIG['define']['csv']['nodata']));
 define('MAXRECORD', intval(CONFIG['define']['csv']['maxrecord']));

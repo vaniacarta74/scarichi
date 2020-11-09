@@ -903,8 +903,8 @@ class ToolsTest extends TestCase
                 date('d/m/Y')
             ],
             'to' => [
-                '01/04/2020',
-                '02/04/2020'
+                '31/03/2020',
+                '01/04/2020'
             ],
             'from and to' => [
                 '01/01/2020',
@@ -1656,7 +1656,7 @@ class ToolsTest extends TestCase
     }
        
     /**
-     * @group index
+     * @group toCsv
      * covers checkRequest()
      * @dataProvider nullProvider
      * @dataProvider datesProvider
@@ -1671,7 +1671,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers checkRequest()
      * @dataProvider responseUrlProvider
      */
@@ -1686,7 +1686,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers checkRequest()
      * @dataProvider responseUrlProvider
      */
@@ -1701,7 +1701,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers checkRequest()
      * @dataProvider responseUrlProvider
      */
@@ -1716,7 +1716,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers checkRequest()
      * @dataProvider responseUrlProvider
      */
@@ -2129,7 +2129,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers getDataFromDb()
      * @dataProvider getDataFromDbProvider
      */
@@ -2167,7 +2167,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers getDataFromDb()
      */
     public function testGetDataFromDbExceptions()
@@ -2184,7 +2184,7 @@ class ToolsTest extends TestCase
     }
 
     /**
-     * @group index
+     * @group toCsv
      * covers getDataFromDb()
      */
     public function testGetDataFromDbEmpty()
@@ -6297,7 +6297,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers response()
      * @dataProvider responseProvider
      */
@@ -6313,7 +6313,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers response()
      */
     public function testResponseException() : void
@@ -6333,7 +6333,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers response()
      */
     public function testResponseException1() : void
@@ -8257,7 +8257,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers uniformaCategorie()
      */
     public function testUniformaCategorieEquals() : array
@@ -8546,7 +8546,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers uniformaCategorie()
      */
     public function testUniformaCategorieEquals1() : void
@@ -8623,7 +8623,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers uniformaCategorie()
      */
     public function testUniformaCategorieEquals2() : array
@@ -8943,7 +8943,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers uniformaCategorie()
      */
     public function testUniformaCategorieNoManovreEquals() : array
@@ -9045,7 +9045,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers uniformaCategorie()
      */
     public function testUniformaCategorieNoCategoryEquals() : void
@@ -9068,7 +9068,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers uniformaCategorie()
      */
     public function testUniformaCategorieException() : void
@@ -9082,7 +9082,7 @@ class ToolsTest extends TestCase
     
     /**
      * covers completaDati().
-     * @group index
+     * @group toCsv
      */
     public function testCompletaDatiEquals() : void
     {
@@ -9461,7 +9461,7 @@ class ToolsTest extends TestCase
     
     /**
      * covers completaDati().
-     * @group index
+     * @group toCsv
      */
     public function testCompletaDatiNoDataEquals() : void
     {
@@ -9840,7 +9840,7 @@ class ToolsTest extends TestCase
     
     /**
      * covers completaDati().
-     * @group index
+     * @group toCsv
      */
     public function testCompletaDatiNoCategoryEquals() : void
     {
@@ -9863,7 +9863,7 @@ class ToolsTest extends TestCase
     
     /**
      * covers completaDati()
-     * @group index
+     * @group toCsv
      */
     public function testCompletaDatiException() : void
     {
@@ -10860,7 +10860,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers eraseDoubleDate()
      */
     public function testEraseDoubleDateEquals() : array
@@ -11044,7 +11044,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers eraseDoubleDate()
      */
     public function testEraseDoubleDateSomeDataEquals() : void
@@ -11118,7 +11118,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers eraseDoubleDate()
      */
     public function testEraseDoubleDateNoDataEquals() : void
@@ -11142,7 +11142,7 @@ class ToolsTest extends TestCase
     
     /**
      * covers eraseDoubleDate().
-     * @group index
+     * @group toCsv
      */
     public function testEraseDoubleDateException() : void
     {
@@ -15049,7 +15049,7 @@ class ToolsTest extends TestCase
      */
     public function goCurlProvider() : array
     {
-        $url = CONFIG['command']['url'];
+        $url = URL;
         $single = '1) 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         $multi = $single . '2) 30040: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         
@@ -15171,7 +15171,7 @@ class ToolsTest extends TestCase
      */
     public function initCurlProvider() : array
     {
-        $url = CONFIG['command']['url'];
+        $url = URL;
         
         $data = [            
             'single' => [
@@ -15231,7 +15231,7 @@ class ToolsTest extends TestCase
     public function testInitCurlDataException() : void
     {
         $postParam = [];
-        $url = CONFIG['command']['url'];
+        $url = URL;
         
         $this->expectException(\Exception::class);
         
@@ -15243,7 +15243,7 @@ class ToolsTest extends TestCase
      */
     public function goSingleCurlProvider() : array
     {
-        $url = CONFIG['command']['url'];
+        $url = URL;
         $single = '1) 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         $multi = $single . '2) 30040: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         
@@ -15309,7 +15309,7 @@ class ToolsTest extends TestCase
     public function testGoSingleCurlDataException() : void
     {
         $postParam = [];
-        $url = CONFIG['command']['url'];
+        $url = URL;
         
         $this->expectException(\Exception::class);
         
@@ -15321,7 +15321,7 @@ class ToolsTest extends TestCase
      */
     public function goMultiCurlProvider() : array
     {
-        $url = CONFIG['command']['url'];
+        $url = URL;
         $single = '1) 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         $multi = $single . '2) 30040: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         
@@ -15389,7 +15389,7 @@ class ToolsTest extends TestCase
     public function testGoMultiCurlDataException() : void
     {
         $postParam = [];
-        $url = CONFIG['command']['url'];
+        $url = URL;
         
         $this->expectException(\Exception::class);
         
@@ -15619,7 +15619,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers loadScarichi()
      */
     public function testLoadScarichiExceptions()
@@ -15634,7 +15634,7 @@ class ToolsTest extends TestCase
     }
 
     /**
-     * @group index
+     * @group toCsv
      * covers loadScarichi()
      */
     public function testLoadScarichiEmpty()
@@ -15687,7 +15687,7 @@ class ToolsTest extends TestCase
 }
     
     /**
-     * @group index
+     * @group toCsv
      * covers loadVariabiliScarichi()
      */
     public function testLoadVariabiliScarichiExceptions()
@@ -15704,7 +15704,7 @@ class ToolsTest extends TestCase
     }
 
     /**
-     * @group index
+     * @group toCsv
      * covers loadVariabiliScarichi()
      */
     public function testLoadVariabiliScarichiEmpty()
@@ -15746,7 +15746,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers loadVariabili()
      */
     public function testLoadVariabiliExceptions()
@@ -15763,7 +15763,7 @@ class ToolsTest extends TestCase
     }
 
     /**
-     * @group index
+     * @group toCsv
      * covers loadVariabili()
      */
     public function testLoadVariabiliEmpty()
@@ -15815,7 +15815,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers loadFormule()
      */
     public function testLoadFormuleExceptions()
@@ -15832,7 +15832,7 @@ class ToolsTest extends TestCase
     }
 
     /**
-     * @group index
+     * @group toCsv
      * covers loadFormule()
      */
     public function testLoadFormuleEmpty()
@@ -15898,7 +15898,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group index
+     * @group toCsv
      * covers loadDatiAcquisiti()
      */
     public function testLoadDatiAcquisitiExceptions()
@@ -15935,7 +15935,7 @@ class ToolsTest extends TestCase
     }
 
     /**
-     * @group index
+     * @group toCsv
      * covers loadDatiAcquisiti()
      */
     public function testLoadDatiAcquisitiEmpty()

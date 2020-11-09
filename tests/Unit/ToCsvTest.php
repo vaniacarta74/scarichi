@@ -3,13 +3,13 @@ namespace vaniacarta74\Scarichi\tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 
-class IndexTest extends TestCase
+class ToCsvTest extends TestCase
 {
     
     /**
      * coversNothing
      */
-    public function indexProvider() : array
+    public function toCsvProvider() : array
     {
         $data = [
             'standard' => [
@@ -42,7 +42,7 @@ class IndexTest extends TestCase
                 'dateto' => '01/01/2017',
                 'full' => null,
                 'field' => null,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
+                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>31/12/2016</b> al <b>01/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
             ],
             'variable' => [
                 'variable' => '30030',
@@ -91,10 +91,10 @@ class IndexTest extends TestCase
     
     /**
      * @group main
-     * covers index.php
-     * @dataProvider indexProvider
+     * covers toCsv.php
+     * @dataProvider toCsvProvider
      */
-    public function testIndexEquals(?string $var, ?string $dateFrom, ?string $dateTo, ?string $full, ?string $field, ?string $response) : void
+    public function testToCsvEquals(?string $var, ?string $dateFrom, ?string $dateTo, ?string $full, ?string $field, ?string $response) : void
     {
         $paramsRaw = [
             'var' => $var,
@@ -110,7 +110,7 @@ class IndexTest extends TestCase
         
         $ch = curl_init();
         
-        curl_setopt($ch, CURLOPT_URL, "http://localhost/telecontrollo/scarichi/github/src/index.php");
+        curl_setopt($ch, CURLOPT_URL, URL);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_POST, true);

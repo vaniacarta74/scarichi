@@ -2,7 +2,7 @@
 /**
  * Progetto scarichi funzioni di utilità.
  *
- * In questo file sono contenute tutte le funzioni utilizzate nel file index.php per il calcolo del volume
+ * In questo file sono contenute tutte le funzioni utilizzate per il calcolo del volume
  * scaricato da un invaso attraverso un particolare organo di scarico.
  *
  * @author Vania Carta
@@ -190,10 +190,20 @@ function checkInterval(?array $request) : array
             $dateTo = formatDate($request['dateto']);
         } elseif (isset($request['datefrom'])) {
             $dateFrom = formatDate($request['datefrom']);
-            $dateTo = date('Y-m-d');
+            
+            $defaultTo = CONFIG['parameters']['dateto']['default'];
+            $dateToTime = new \DateTime($defaultTo);
+            
+            $dateTo = $dateToTime->format('Y-m-d');
         } elseif (isset($request['dateto'])) {
-            $dateFrom = formatDate($request['dateto']);
-            $dateTo = date('Y-m-d', strtotime($dateFrom . ' +1 day'));
+            $dateTo = formatDate($request['dateto']);
+            
+            $defaultFrom = CONFIG['parameters']['datefrom']['default'];
+            $interval = new \DateInterval('P' . $defaultFrom);           
+            $dateToTime = new \DateTime($dateTo);
+            $dateFromTime = $dateToTime->sub($interval);
+            
+            $dateFrom = $dateFromTime->format('Y-m-d');            
         } else {
             throw new \Exception('Parametri intervallo date assenti. Indicare uno o entrambi i parametri "datefrom" e "dateto"');
         }
@@ -2678,7 +2688,7 @@ function goCurl(array $postParams, string $url, bool $async) : string
         $http = '(http[s]?:)[\/]{2}';
         $ip = '([0-9][.]|[1-9][0-9][.]|[1][0-9][0-9][.]|[2][0-4][0-9][.]|[2][5][0-5][.]){3}([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5]){1}';
         $root = '((localhost)|' . $ip . ')';
-        $path = '([\/][\w._-]+)*[\/](index\.php)';
+        $path = '([\/][\w._-]+)*[\/][\w._-]+[\.](php)';
         $regex = $http . $root . $path;
         if (!preg_match('/^' . $regex . '$/', $url)) {
             throw new \Exception('Url non valido');

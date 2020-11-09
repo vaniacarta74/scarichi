@@ -105,7 +105,7 @@
     },
     "command": { 
         "sintax": "php scarichi.php",
-        "url": "http://localhost/telecontrollo/scarichi/github/src/index.php",
+        "url": "http://localhost/scarichi/tocsv.php",
         "async": true
     },
     "global": {

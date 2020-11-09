@@ -19,15 +19,14 @@ try {
     $composer = COMPOSER;
     $help = CONFIG;
     $parameters = $help['parameters'];
-    $url = $help['command']['url'];    
-
+    
     $type = shuntTypes($parameters, $argv);
     echo getMessage($composer, $help, $type);
     $values = setParameters($parameters, $argv, $type);
     
     $filledValues = fillParameters($parameters, $values);
     $postParams = setPostParameters($parameters, $filledValues);
-    echo goCurl($postParams, $url, ASYNC); 
+    echo goCurl($postParams, URL, ASYNC); 
 } catch (\Throwable $e) {
     Error::errorHandler($e, DEBUG_LEVEL, true);
     exit();
