@@ -1094,17 +1094,29 @@ class ToolsTest extends TestCase
                 ],
                 'livello'
             ],
+            'livello valle' => [
+                [
+                    'field' => 'livello valle'
+                ],
+                'livello valle'
+            ],
             'portata' => [
                 [
                     'field' => 'portata'
                 ],
                 'portata'
             ],
-            'media' => [
+            'media livello' => [
                 [
-                    'field' => 'media'
+                    'field' => 'media livello'
                 ],
-                'media'
+                'media livello'
+            ],
+            'media livello valle' => [
+                [
+                    'field' => 'media livello valle'
+                ],
+                'media livello valle'
             ],
             'delta' => [
                 [
@@ -13463,7 +13475,11 @@ class ToolsTest extends TestCase
                 'value' => 'L',
                 'expected' => ['livello']
             ],
-            'poertata' => [
+            'livello valle' => [
+                'value' => 'LV',
+                'expected' => ['livello valle']
+            ],
+            'portata' => [
                 'value' => 'Q',
                 'expected' => ['portata']
             ],
@@ -13475,9 +13491,17 @@ class ToolsTest extends TestCase
                 'value' => 'D',
                 'expected' => ['delta']
             ],
-            'media' => [
-                'value' => 'M',
-                'expected' => ['media']
+            'media livello' => [
+                'value' => 'ML',
+                'expected' => ['media livello']
+            ],
+            'media livello valle' => [
+                'value' => 'MLV',
+                'expected' => ['media livello valle']
+            ],
+            'manovra' => [
+                'value' => 'P',
+                'expected' => ['manovra']
             ]
         ];
         

@@ -6,11 +6,14 @@
  * and open the template in the editor.
  * 
  * $argc = 2;
- ] $argv = ['scarichi.php', '-h'];
+ * $argv = ['scarichi.php', '-h'];
  */
 namespace vaniacarta74\Scarichi;
 
 require __DIR__ . '/../vendor/autoload.php';
+
+//$argc = 2;
+//$argv = ['scarichi.php', '-V', '-f', '6M', '-t', '-c', 'ML', '-n'];
 
 try {
     $composer = COMPOSER;

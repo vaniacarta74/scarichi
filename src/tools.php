@@ -629,10 +629,11 @@ function setFile(string $variabile, array $dates, bool $filtered, string $field,
             throw new \Exception('Directory inesistente');
         }
         
+        $fieldName = str_replace(' ', '_', $field);        
         $dateFrom = $dates['datefrom']->format('YmdHi');
         $dateTo = $dates['dateto']->format('YmdHi');
         
-        $fileName = $path . '/' . ucfirst($field) . '_' . $variabile . '_' . $dateFrom . '_' . $dateTo;
+        $fileName = $path . '/' . ucfirst($fieldName) . '_' . $variabile . '_' . $dateFrom . '_' . $dateTo;
         
         if ($filtered) {
             $fileName .= '_no0.csv';

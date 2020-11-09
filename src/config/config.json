@@ -5,7 +5,7 @@
             "memory_limit": "2048M"
         },
         "log": {
-            "debug_level": 2,
+            "debug_level": 1,
             "log_path": "/../../log",
             "error_log": "error.log"
         },
@@ -271,26 +271,30 @@
             "options": {
                 "variables": [],
                 "costants": [
-                    "V",
                     "L",
-                    "M",
-                    "D",
+                    "LV",
+                    "P",
+                    "ML",
+                    "MLV",
                     "H",
                     "Q",
-                    "P"
+                    "D",                    
+                    "V"
                 ],
                 "limits": [],
                 "alias": [
-                    "volume",
                     "livello",
-                    "media",
-                    "delta",
+                    "livello valle",
+                    "manovra",
+                    "media livello",
+                    "media livello valle",
                     "altezza",
                     "portata",
-                    "manovra"
+                    "delta",                    
+                    "volume"                    
                 ]  
             },
-            "regex": "\/^[V|L|M|D|H|Q]$\/",
+            "regex": "\/^([L][V]?|[P]|[M][L][V]?|[H]|[Q]|[D]|[V])$\/",
             "descriptions": [
                 "Esporta i dati di volume(V), livello(L), media(M)",
                 "delta(D), altezza(H), portata(Q) o manovra(P). Default V."
