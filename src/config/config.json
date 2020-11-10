@@ -5,7 +5,7 @@
             "memory_limit": "2048M"
         },
         "log": {
-            "debug_level": 1,
+            "debug_level": 2,
             "log_path": "/../../log",
             "error_log": "error.log"
         },

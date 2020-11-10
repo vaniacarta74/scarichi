@@ -28,6 +28,6 @@ try {
     $postParams = setPostParameters($parameters, $filledValues);
     echo goCurl($postParams, URL, ASYNC); 
 } catch (\Throwable $e) {
-    Error::errorHandler($e, DEBUG_LEVEL, true);
+    Error::errorHandler($e, DEBUG_LEVEL, 'cli');
     exit();
 }

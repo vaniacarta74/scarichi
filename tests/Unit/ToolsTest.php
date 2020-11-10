@@ -118,6 +118,7 @@ use function vaniacarta74\Scarichi\loadVariabiliScarichi as loadVariabiliScarich
 use function vaniacarta74\Scarichi\loadVariabili as loadVariabili;
 use function vaniacarta74\Scarichi\loadFormule as loadFormule;
 use function vaniacarta74\Scarichi\loadDatiAcquisiti as loadDatiAcquisiti;
+use function vaniacarta74\Scarichi\addCostants as addCostants;
 
 class ToolsTest extends TestCase
 {
@@ -1667,7 +1668,7 @@ class ToolsTest extends TestCase
     {
         $this->expectException(\Exception::class);
         
-        checkRequest($data);
+        checkRequest($data, true);
     }
     
     /**
@@ -1677,7 +1678,7 @@ class ToolsTest extends TestCase
      */
     public function testCheckRequestEquals(array $data, array $expected) : void
     {
-        $actual = checkRequest($data);
+        $actual = checkRequest($data, true);
                 
         $this->assertEquals(
             $expected['var'],
@@ -1692,7 +1693,7 @@ class ToolsTest extends TestCase
      */
     public function testCheckRequestEquals1(array $data, array $expected) : void
     {
-        $actual = checkRequest($data);
+        $actual = checkRequest($data, true);
                 
         $this->assertEquals(
             $expected['full'],
@@ -1707,7 +1708,7 @@ class ToolsTest extends TestCase
      */
     public function testCheckRequestEquals2(array $data, array $expected) : void
     {
-        $actual = checkRequest($data);
+        $actual = checkRequest($data, true);
                 
         $this->assertEquals(
             $expected['field'],
@@ -1722,7 +1723,7 @@ class ToolsTest extends TestCase
      */
     public function testCheckRequestEquals3(array $data, array $expected) : void
     {
-        $actual = checkRequest($data);
+        $actual = checkRequest($data, true);
                 
         $this->assertEquals(
             $expected['datefrom'],
@@ -1733,6 +1734,83 @@ class ToolsTest extends TestCase
             $expected['dateto'],
             $actual['dateto']->format('d/m/Y')
         );
+    }
+    
+    /**
+     * coversNothing
+     */
+    public function checkRequestFalseProvider() : array
+    {
+        $dateTimeFrom = \DateTime::createFromFormat('d/m/Y h:i:s', '01/01/2020 00:00:00');
+        $dateTimeTo = \DateTime::createFromFormat('d/m/Y h:i:s', '01/02/2020 00:00:00');
+        
+        $data = [
+            'complete' => [
+                'data' => [
+                    'var' => '30030',
+                    'datefrom' => '01/01/2020',
+                    'dateto' => '01/02/2020',
+                    'full' => '1',
+                    'field' => 'livello'
+                ],
+                'expected' => [
+                    'var' => '30030',
+                    'datefrom' => $dateTimeFrom,
+                    'dateto' => $dateTimeTo
+                ]
+            ],
+            'only var and dates' => [
+                'data' => [
+                    'var' => '30030',
+                    'datefrom' => '01/01/2020',
+                    'dateto' => '01/02/2020'
+                ],
+                'expected' => [
+                    'var' => '30030',
+                    'datefrom' => $dateTimeFrom,
+                    'dateto' => $dateTimeTo
+                ]
+            ],
+            'alias var' => [
+                'data' => [
+                    'variabile' => '30030',
+                    'datefrom' => '01/01/2020',
+                    'dateto' => '01/02/2020'
+                ],
+                'expected' => [
+                    'var' => '30030',
+                    'datefrom' => $dateTimeFrom,
+                    'dateto' => $dateTimeTo
+                ]
+            ],
+            'field' => [
+                'data' => [
+                    'var' => '30030',
+                    'datefrom' => '01/01/2020',
+                    'dateto' => '01/02/2020',
+                    'field' => 'livello'
+                ],
+                'expected' => [
+                    'var' => '30030',
+                    'datefrom' => $dateTimeFrom,
+                    'dateto' => $dateTimeTo
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group toCsv
+     * covers checkRequest()
+     * @dataProvider checkRequestFalseProvider
+     */
+    public function testCheckRequestFalseEquals(array $data, array $expected) : void
+    {
+        $actual = checkRequest($data, false);
+                
+        $this->assertEquals($expected, $actual);
     }
     
     /**
@@ -3367,6 +3445,7 @@ class ToolsTest extends TestCase
                     '0' => [
                         'tipo_formula' => 'portata galleria',
                         'alias' => 'galleria',
+                        'scarico' => 32,
                         'scabrosita' => 0.1,
                         'lunghezza' => 6890,
                         'angolo' => 301,
@@ -15972,5 +16051,365 @@ class ToolsTest extends TestCase
         $actual = loadDatiAcquisiti($request, $variabili_scarichi);
         
         $this->assertEquals($expected, $actual);
+    }
+    
+    /*
+     * @coversNothing
+     */
+    public function addCostantsProvider() : array
+    {
+        $dati = [              
+            'modello 1' => [
+                'parametri' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 270.206,
+                        'delta' => 0,
+                        'media livello' => 270.206,
+                        'altezza' => 4.106,
+                        'portata' => 701.505,
+                        'volume' => 0
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-02-01 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 270.140,
+                        'delta' => 900,
+                        'media livello' => 270.173,
+                        'altezza' => 4.073,
+                        'portata' => 693.065,
+                        'volume' => 623758.544
+                    ]
+                ],
+                'formule' => [
+                    '0' => [
+                        'tipo_formula' => 'portata sfiorante',
+                        'alias' => 'sfioro',
+                        'scarico' => 1,
+                        'mi' => 0.47,
+                        'scabrosita' => null,
+                        'lunghezza' => null,                        
+                        'larghezza' => 40.5,
+                        'altezza' => null,
+                        'angolo' => null,
+                        'raggio' => null,
+                        'quota' => 266.1,
+                        'velocita' => null,
+                        'limite' => 942.67
+                    ]
+                ],
+                'expected' => [
+                    '0' => [
+                        'tipo_formula' => 'portata sfiorante',
+                        'alias' => 'sfioro',
+                        'scarico' => 1,
+                        'mi' => 0.47,
+                        'larghezza' => 40.5,
+                        'quota' => 266.1,
+                        'limite' => 942.67,
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 270.206,
+                        'delta' => 0,
+                        'media livello' => 270.206,
+                        'altezza' => 4.106,
+                        'portata' => 701.505,
+                        'volume' => 0
+                    ],
+                    '1' => [
+                        'tipo_formula' => 'portata sfiorante',
+                        'alias' => 'sfioro',
+                        'scarico' => 1,
+                        'mi' => 0.47,
+                        'larghezza' => 40.5,
+                        'quota' => 266.1,
+                        'limite' => 942.67,
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-02-01 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 270.140,
+                        'delta' => 900,
+                        'media livello' => 270.173,
+                        'altezza' => 4.073,
+                        'portata' => 693.065,
+                        'volume' => 623758.544
+                    ]
+                ]
+            ],
+            'modello 2' => [
+                'parametri' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 270.206,
+                        'manovra' => 0.5,
+                        'delta' => 0,
+                        'media livello' => 270.206,
+                        'altezza' => 4.156,
+                        'portata' => 1414.346,
+                        'volume' => 0
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-02-01 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 270.140,
+                        'manovra' => 0.2,
+                        'delta' => 900,
+                        'media livello' => 270.173,
+                        'altezza' => 4.123,
+                        'portata' => 559.061,
+                        'volume' => 503155.240
+                    ]
+                ],
+                'formule' => [
+                    '0' => [
+                        'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
+                        'alias' => 'scarico1',
+                        'scarico' => 22,
+                        'mi' => 0.47,
+                        'scabrosita' => null,
+                        'lunghezza' => null,
+                        'larghezza' => 158.61,
+                        'altezza' => null,
+                        'angolo' => null,
+                        'raggio' => null,
+                        'quota' => 266.05,
+                        'velocita' => 0.8,
+                        'limite' => 2000                        
+                    ]
+                ],
+                'expected' => [
+                    '0' => [
+                        'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
+                        'alias' => 'scarico1',
+                        'scarico' => 22,
+                        'mi' => 0.47,
+                        'larghezza' => 158.61,
+                        'quota' => 266.05,
+                        'limite' => 2000,
+                        'velocita' => 0.8,
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 270.206,
+                        'manovra' => 0.5,
+                        'delta' => 0,
+                        'media livello' => 270.206,
+                        'altezza' => 4.156,
+                        'portata' => 1414.346,
+                        'volume' => 0
+                    ],
+                    '1' => [
+                        'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
+                        'alias' => 'scarico1',
+                        'scarico' => 22,
+                        'mi' => 0.47,
+                        'larghezza' => 158.61,
+                        'quota' => 266.05,
+                        'limite' => 2000,
+                        'velocita' => 0.8,
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-02-01 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 270.140,
+                        'manovra' => 0.2,
+                        'delta' => 900,
+                        'media livello' => 270.173,
+                        'altezza' => 4.123,
+                        'portata' => 559.061,
+                        'volume' => 503155.240
+                    ]
+                ]
+            ],
+            'modello 3' => [
+                'parametri' => [
+                    '0' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 270.206,
+                        'livello valle' => 266.206,
+                        'manovra' => 0.5,
+                        'delta' => 0,
+                        'media livello' => 270.206,
+                        'media livello valle' => 266.206, 
+                        'altezza' => 4,
+                        'portata' => 1.501,
+                        'volume' => 0
+                    ],
+                    '1' => [
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-02-01 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 270.140,
+                        'livello valle' => 259.14,
+                        'manovra' => 0.2,
+                        'delta' => 900,
+                        'media livello' => 270.173,
+                        'media livello valle' => 262.673,
+                        'altezza' => 5.993,
+                        'portata' => 0.735,
+                        'volume' => 661.468
+                    ]
+                ],
+                'formule' => [
+                    '0' => [
+                        'tipo_formula' => 'portata galleria',
+                        'alias' => 'galleria',
+                        'scarico' => 32,
+                        'mi' => null,                        
+                        'scabrosita' => 0.1,
+                        'lunghezza' => 6890,
+                        'larghezza' => null,
+                        'altezza' => null,
+                        'angolo' => 301,
+                        'raggio' => 1.25,
+                        'quota' => 264.18,
+                        'velocita' => null,
+                        'limite' => 266.247
+                    ]
+                ],
+                'expected' => [
+                    '0' => [
+                        'tipo_formula' => 'portata galleria',
+                        'alias' => 'galleria',
+                        'scarico' => 32,
+                        'scabrosita' => 0.1,
+                        'lunghezza' => 6890,
+                        'angolo' => 301,
+                        'raggio' => 1.25,
+                        'quota' => 264.18,
+                        'limite' => 266.247,
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),                
+                        'tipo_dato' => 1,
+                        'livello' => 270.206,
+                        'livello valle' => 266.206,
+                        'manovra' => 0.5,
+                        'delta' => 0,
+                        'media livello' => 270.206,
+                        'media livello valle' => 266.206, 
+                        'altezza' => 4,
+                        'portata' => 1.501,
+                        'volume' => 0
+                    ],
+                    '1' => [
+                        'tipo_formula' => 'portata galleria',
+                        'alias' => 'galleria',
+                        'scarico' => 32,
+                        'scabrosita' => 0.1,
+                        'lunghezza' => 6890,
+                        'angolo' => 301,
+                        'raggio' => 1.25,
+                        'quota' => 264.18,
+                        'limite' => 266.247,
+                        'variabile' => 30030,
+                        'data_e_ora' => new \DateTime('2018-02-01 00:15:00'),
+                        'tipo_dato' => 1,
+                        'livello' => 270.140,
+                        'livello valle' => 259.14,
+                        'manovra' => 0.2,
+                        'delta' => 900,
+                        'media livello' => 270.173,
+                        'media livello valle' => 262.673,
+                        'altezza' => 5.993,
+                        'portata' => 0.735,
+                        'volume' => 661.468
+                    ]
+                ]
+            ]
+        ];        
+        return $dati;
+    }
+    
+    /**
+     * @group table
+     * covers addCostants()
+     * @dataProvider addCostantsProvider
+     */
+    public function testAddCostantsEqualsWithDelta(array $parametri, array $formule, array $expected) : void
+    {
+        $actual = addCostants($parametri, $formule);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+            }
+        }
+    }
+    
+    /**
+     * @group depends
+     * covers addCostants()
+     */
+    public function testAddCostantsNoDataException() : void
+    {
+        $parametri = [
+            '0' => [
+                'variabile' => 30055,
+                'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),                
+                'tipo_dato' => 1,
+                'livello' => -9999,
+                'manovra' => 0.5,
+                'delta' => 0,
+                'media livello' => -9999,
+                'altezza' => -9999,
+                'portata' => -9999,
+                'volume' => -9999
+            ]
+        ];
+        
+        $formule = [
+            '0' => [
+                'tipo_formula' => 'portata sfiorante',
+                'alias' => 'sfioro',
+                'scarico' => 1,
+                'mi' => 0.47,
+                'larghezza' => 40.5,
+                'quota' => 266.1,
+                'limite' => 942.67
+            ]
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        addCostants($parametri, $formule);
+    }
+            
+    /**
+     * @group depends
+     * covers addCostants()
+     */
+    public function testAddCostantsCountException() : void
+    {
+        $parametri = [];
+        
+        $formule = [
+            '0' => [
+                'tipo_formula' => 'portata sfiorante',
+                'alias' => 'sfioro',
+                'scarico' => 1,
+                'mi' => 0.47,
+                'larghezza' => 40.5,
+                'quota' => 266.1,
+                'limite' => 942.67
+            ]
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        addCostants($parametri, $formule);
     }
 }

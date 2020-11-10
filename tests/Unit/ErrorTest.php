@@ -100,34 +100,51 @@ class ErrorTest extends TestCase
     }
     
     /**
-     * @covers \vaniacarta74\Scarichi\Error::defineMessage
+     * @covers \vaniacarta74\Scarichi\Error::errorMsgCli
      */
-    public function testDefineMessageCliContainsString() : void
+    public function testErrorMsgCliContainsString() : void
     {
         try {
             if (true) {
-                throw new \Exception('Test if defineMessage() contains a string');
+                throw new \Exception('Test if errorMsgCli() contains a string');
             }
         } catch (\Exception $e) {
             $expected = 'Messaggio di errore: ' . $e->getMessage() . PHP_EOL;
-            $actual = Error::defineMessage($e, true);
+            $actual = Error::errorMsgCli($e);
 
             $this->assertStringContainsString($expected, $actual);
         }
     }
     
     /**
-     * @covers \vaniacarta74\Scarichi\Error::defineMessage
+     * @covers \vaniacarta74\Scarichi\Error::errorMsgHtml
      */
-    public function testDefineMessageWwwContainsString() : void
+    public function testErrorMsgHtmlContainsString() : void
     {
         try {
             if (true) {
-                throw new \Exception('Test if defineMessage() contains a string');
+                throw new \Exception('Test if errorMsgHtml() contains a string');
             }
         } catch (\Exception $e) {
             $expected = 'Messaggio di errore: <b>' . $e->getMessage() . '</b><br/>';
-            $actual = Error::defineMessage($e, false);
+            $actual = Error::errorMsgHtml($e);
+
+            $this->assertStringContainsString($expected, $actual);
+        }
+    }
+    
+    /**
+     * @covers \vaniacarta74\Scarichi\Error::errorMsgJson
+     */
+    public function testErrorMsgJsonContainsString() : void
+    {
+        try {
+            if (true) {
+                throw new \Exception('Test if errorMsgJson() contains a string');
+            }
+        } catch (\Exception $e) {
+            $expected = '"Messaggio di errore":"' . $e->getMessage() . '"';
+            $actual = Error::errorMsgJson($e);
 
             $this->assertStringContainsString($expected, $actual);
         }
@@ -147,7 +164,7 @@ class ErrorTest extends TestCase
         
             $this->expectOutputString($expected);
             
-            Error::errorHandler($e, 0, true);
+            Error::errorHandler($e, 0, 'cli');
         }
     }
     
@@ -166,7 +183,7 @@ class ErrorTest extends TestCase
         } catch (\Exception $e) {
             $expected = 'Messaggio di errore: ' . $e->getMessage() . PHP_EOL;
 
-            Error::errorHandler($e, 1, true);
+            Error::errorHandler($e, 1, 'cli');
 
             $actual = file_get_contents(Error::$logFile);
 
@@ -189,14 +206,14 @@ class ErrorTest extends TestCase
             
             $this->expectOutputRegex($regex);
             
-            Error::errorHandler($e, 2, true);
+            Error::errorHandler($e, 2, 'cli');
         }
     }
     
     /**
      * @covers \vaniacarta74\Scarichi\Error::errorHandler
      */
-    public function testErrorHandlerWwwOutputRegex() : void
+    public function testErrorHandlerHtmlOutputRegex() : void
     {
         try {
             if (true) {
@@ -208,7 +225,7 @@ class ErrorTest extends TestCase
             
             $this->expectOutputRegex($regex);
             
-            Error::errorHandler($e, 2, false);
+            Error::errorHandler($e, 2, 'html');
         }
     }
 }

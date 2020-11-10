@@ -14,19 +14,18 @@ use vaniacarta74\Scarichi\Error;
 require_once('php_MSSQL_router.inc.php');
 
 
-function checkRequest(?array $request) : array
+function checkRequest(?array $request, bool $fullCheck) : array
 {
     try {
-        $variables['var'] = checkVariable($request);
-        
-        $dates = checkInterval($request);
-        
-        $filters['full'] = checkFilter($request);
-        
-        $fields['field'] = checkField($request);
-        
-        $checked = array_merge($variables, $dates, $filters, $fields);
-        
+        $variables['var'] = checkVariable($request);        
+        $dates = checkInterval($request);        
+        if ($fullCheck) {
+            $filters['full'] = checkFilter($request);        
+            $fields['field'] = checkField($request);
+            $checked = array_merge($variables, $dates, $filters, $fields);
+        } else {
+            $checked = array_merge($variables, $dates);
+        }
         return $checked;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -2355,7 +2354,7 @@ function checkCliVar(string $value) : array
             try {
                 $values[] = checkVariable($request);
             } catch (\Throwable $e) {
-                Error::errorHandler($e, DEBUG_LEVEL, true);
+                Error::errorHandler($e, DEBUG_LEVEL, 'cli');
             }
         }
         if (count($values) === 0) {
@@ -2377,7 +2376,7 @@ function checkCliDatefrom(string $value) : array
             try {
                 $values[] = formatDate($matches[0]);
             } catch (\Throwable $e) {
-                Error::errorHandler($e, DEBUG_LEVEL, true);
+                Error::errorHandler($e, DEBUG_LEVEL, 'cli');
             }
         } else {
             $values[] = $value;
@@ -2400,7 +2399,7 @@ function checkCliDateto(string $value) : array
         try {
             $values[] = formatDate($value);
         } catch (\Throwable $e) {
-            Error::errorHandler($e, DEBUG_LEVEL, true);
+            Error::errorHandler($e, DEBUG_LEVEL, 'cli');
         }
         if (count($values) === 0) {
             throw new \Exception('Valori parametro "dateto" non ammissibili.');
@@ -2421,7 +2420,7 @@ function checkCliField(string $value) : array
             $request['field'] = $value;
             $values[] = checkField($request);
         } catch (\Throwable $e) {
-            Error::errorHandler($e, DEBUG_LEVEL, true);
+            Error::errorHandler($e, DEBUG_LEVEL, 'cli');
         }
         if (count($values) === 0) {
             throw new \Exception('Valori parametro "field" non ammissibili.');
@@ -2448,7 +2447,7 @@ function checkCliFull(string $value) : array
             }
             $values[] = checkFilter($request);
         } catch (\Throwable $e) {
-            Error::errorHandler($e, DEBUG_LEVEL, true);
+            Error::errorHandler($e, DEBUG_LEVEL, 'cli');
         }
         if (count($values) === 0) {
             throw new \Exception('Valori parametro "full" non ammissibili.');
@@ -3105,6 +3104,36 @@ function changeMode(string $path, string $url, int $mode) : bool
             }
         }        
         return $response;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+    
+    
+function addCostants(array $parametri, array $formule) : array
+{
+    try {        
+        if (count($parametri) > 0) {
+            array_walk($parametri[0], function ($value) {
+                if (!is_a($value, 'DateTime') && $value == NODATA) {
+                    throw new \Exception('Presenti NoData per le date selezionate');
+                }            
+            });
+        } else {
+            throw new \Exception('Non ci sono dati per le date selezionate');
+        }        
+        $costanti = [];        
+        $formula = [];
+        array_walk($formule[0], function ($value, $key) use (&$formula) {
+            if (!is_null($value)) {
+                $formula[$key] = $value;
+            }            
+        });        
+        foreach ($parametri as $record => $campi) {
+            $costanti[$record] = array_merge($formula, $campi); 
+        }
+        return $costanti;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;

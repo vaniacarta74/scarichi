@@ -20,7 +20,9 @@
         <whitelist>
             <directory suffix=".php">../src/</directory>
             <exclude>
-                <file>../src/toCsv.php</file>
+                <file>../src/tocsv.php</file>
+                <file>../src/tojson.php</file>
+                <file>../src/topbi.php</file>
                 <file>../src/scarichi.php</file>
                 <file>../src/config/config.php</file>
             </exclude>
