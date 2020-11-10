@@ -4,7 +4,7 @@ namespace vaniacarta74\Scarichi;
 require __DIR__ . '/../vendor/autoload.php';
 
 try {
-    $request = checkRequest($_REQUEST);
+    $request = checkRequest($_REQUEST, true);
     
     $scarichi = loadScarichi($request);    
     $variabili_scarichi = loadVariabiliScarichi($scarichi);
@@ -27,6 +27,6 @@ try {
     
     echo response($request, $printed);
 } catch (\Throwable $e) {
-    Error::errorHandler($e, DEBUG_LEVEL, false);
+    Error::errorHandler($e, DEBUG_LEVEL, 'html');
     exit();
 }
