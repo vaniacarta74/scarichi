@@ -17,10 +17,10 @@ require_once('php_MSSQL_router.inc.php');
 function checkRequest(?array $request, bool $fullCheck) : array
 {
     try {
-        $variables['var'] = checkVariable($request);        
-        $dates = checkInterval($request);        
+        $variables['var'] = checkVariable($request);
+        $dates = checkInterval($request);
         if ($fullCheck) {
-            $filters['full'] = checkFilter($request);        
+            $filters['full'] = checkFilter($request);
             $fields['field'] = checkField($request);
             $checked = array_merge($variables, $dates, $filters, $fields);
         } else {
@@ -198,11 +198,11 @@ function checkInterval(?array $request) : array
             $dateTo = formatDate($request['dateto']);
             
             $defaultFrom = CONFIG['parameters']['datefrom']['default'];
-            $interval = new \DateInterval('P' . $defaultFrom);           
+            $interval = new \DateInterval('P' . $defaultFrom);
             $dateToTime = new \DateTime($dateTo);
             $dateFromTime = $dateToTime->sub($interval);
             
-            $dateFrom = $dateFromTime->format('Y-m-d');            
+            $dateFrom = $dateFromTime->format('Y-m-d');
         } else {
             throw new \Exception('Parametri intervallo date assenti. Indicare uno o entrambi i parametri "datefrom" e "dateto"');
         }
@@ -429,7 +429,7 @@ function addCategoria(array $volumi, array $dati_completi, string $categoria) : 
             $dati = $dati_completi[$categoria];
         } else {
             throw new \Exception('Categoria inesistente');
-        }        
+        }
         if (count($volumi) !== count($dati)) {
             throw new \Exception('Array differenti');
         }
@@ -462,9 +462,9 @@ function addAltezza(array $dati, array $coefficienti, array $fields) : array
             throw new \Exception('Formula scarico non definita');
         }
         $id_formula = count($fields);
-        $quota = $coefficienti['quota'];        
+        $quota = $coefficienti['quota'];
         $altezze = [];
-        foreach ($dati as $record => $campi) {            
+        foreach ($dati as $record => $campi) {
             $function = __NAMESPACE__ . '\formulaAltezza' . $id_formula;
             if (is_callable($function)) {
                 $altezze[$record] = call_user_func($function, $campi, $quota, $fields);
@@ -482,7 +482,7 @@ function addAltezza(array $dati, array $coefficienti, array $fields) : array
 
 function formulaAltezza1(array $campi, float $quota, array $fields) : array
 {
-    try {        
+    try {
         $nomeCampo = $fields[0];
         if (!array_key_exists($nomeCampo, $campi)) {
             throw new \Exception('Parametro ' . $nomeCampo . ' non impostato');
@@ -497,7 +497,7 @@ function formulaAltezza1(array $campi, float $quota, array $fields) : array
                     $record['altezza'] = NODATA;
                 }
             }
-        }      
+        }
         return $record;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -517,7 +517,7 @@ function formulaAltezza2(array $campi, float $quota, array $fields) : array
         if (!array_key_exists($nomeCampoAux, $campi)) {
             throw new \Exception('Parametro ' . $nomeCampoAux . ' non impostato');
         }
-        $record = [];        
+        $record = [];
         foreach ($campi as $campo => $valore) {
             $record[$campo] = $valore;
             if ($campo === $nomeCampo) {
@@ -535,7 +535,7 @@ function formulaAltezza2(array $campi, float $quota, array $fields) : array
             }
         } else {
             $record['altezza'] = NODATA;
-        }        
+        }
         return $record;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -638,7 +638,7 @@ function setFile(string $variabile, array $dates, bool $filtered, string $field,
             throw new \Exception('Directory inesistente');
         }
         
-        $fieldName = str_replace(' ', '_', $field);        
+        $fieldName = str_replace(' ', '_', $field);
         $dateFrom = $dates['datefrom']->format('YmdHi');
         $dateTo = $dates['dateto']->format('YmdHi');
         
@@ -1050,7 +1050,7 @@ function formulaPortataSfioro(array $coefficienti, array $parametri, array $camp
         if (!array_key_exists($altezza, $parametri) || $parametri[$altezza] == NODATA) {
             throw new \Exception('Parametro ' . $altezza . ' non impostato o nodata');
         }
-        $g = 9.81;        
+        $g = 9.81;
         $altezza_idrostatica = $parametri[$altezza];
         $mi = $coefficienti['mi'];
         $larghezza_soglia = $coefficienti['larghezza'];
@@ -1058,7 +1058,7 @@ function formulaPortataSfioro(array $coefficienti, array $parametri, array $camp
             $portata = $mi * $larghezza_soglia * $altezza_idrostatica * sqrt(2 * $g * $altezza_idrostatica);
         } else {
             $portata = 0;
-        }    
+        }
         return $portata;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -1078,7 +1078,7 @@ function formulaPortataScarico1(array $coefficienti, array $parametri, array $ca
         if (!array_key_exists($manovra, $parametri) || $parametri[$manovra] == NODATA) {
             throw new \Exception('Parametro ' . $manovra . ' non impostato o nodata');
         }
-        $g = 9.81;        
+        $g = 9.81;
         $altezza_idrostatica = $parametri[$altezza];
         $apertura_paratoia = $parametri[$manovra];
         $mi = $coefficienti['mi'];
@@ -1110,7 +1110,7 @@ function formulaPortataScarico2(array $coefficienti, array $parametri, array $ca
         if (!array_key_exists($manovra, $parametri) || $parametri[$manovra] == NODATA) {
             throw new \Exception('Parametro ' . $manovra . ' non impostato o nodata');
         }
-        $g = 9.81;        
+        $g = 9.81;
         $altezza_idrostatica = $parametri[$altezza];
         $apertura_paratoia = $parametri[$manovra];
         $mi = $coefficienti['mi'];
@@ -1140,7 +1140,7 @@ function formulaPortataScarico3(array $coefficienti, array $parametri, array $ca
         if (!array_key_exists($manovra, $parametri) || $parametri[$manovra] == NODATA) {
             throw new \Exception('Parametro ' . $manovra . ' non impostato o nodata');
         }
-        $g = 9.81;        
+        $g = 9.81;
         $altezza_idrostatica = $parametri[$altezza];
         $apertura_paratoia = $parametri[$manovra];
         $mi = $coefficienti['mi'];
@@ -1171,7 +1171,7 @@ function formulaPortataVentola(array $coefficienti, array $parametri, array $cam
         if (!array_key_exists($manovra, $parametri) || $parametri[$manovra] == NODATA) {
             throw new \Exception('Parametro ' . $manovra . ' non impostato o nodata');
         }
-        $g = 9.81;        
+        $g = 9.81;
         $altezza_idrostatica = $parametri[$altezza];
         $rad_ventola = $parametri[$manovra];
         $mi = $coefficienti['mi'];
@@ -1207,7 +1207,7 @@ function formulaPortataSaracinesca(array $coefficienti, array $parametri, array 
         if (!array_key_exists($manovra, $parametri) || $parametri[$manovra] == NODATA) {
             throw new \Exception('Parametro ' . $manovra . ' non impostato o nodata');
         }
-        $g = 9.81;        
+        $g = 9.81;
         $altezza_idrostatica = $parametri[$altezza];
         $altezza_saracinesca = $parametri[$manovra];
         $mi = $coefficienti['mi'];
@@ -1244,8 +1244,8 @@ function formulaPortataGalleria(array $coefficienti, array $parametri, array $ca
         }
         if (!array_key_exists($manovra, $parametri) || $parametri[$manovra] == NODATA) {
             throw new \Exception('Parametro ' . $manovra . ' non impostato o nodata');
-        }        
-        $g = 9.81;        
+        }
+        $g = 9.81;
         $livello_monte = $parametri[$livello];
         $altezza_idrostatica = $parametri[$altezza];
         $altezza_saracinesca = $parametri[$manovra];
@@ -2696,7 +2696,7 @@ function goCurl(array $postParams, string $url, bool $async) : string
         $n_param = count($postParams);
         if ($n_param > 0) {
             if ($async && $n_param > 1) {
-                goMultiCurl($postParams, $url);            
+                goMultiCurl($postParams, $url);
             } else {
                 $message = goSingleCurl($postParams, $url);
             }
@@ -2717,7 +2717,7 @@ function initCurl(array $postParams, string $url) : array
         }
         $handlers = [];
         foreach ($postParams as $params) {
-            $ch = curl_init();        
+            $ch = curl_init();
             
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -2725,7 +2725,7 @@ function initCurl(array $postParams, string $url) : array
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, TIMEOUT);
-            curl_setopt($ch, CURLOPT_TIMEOUT, TIMEOUT);            
+            curl_setopt($ch, CURLOPT_TIMEOUT, TIMEOUT);
             
             $handlers[$params['var']] = $ch;
         }
@@ -2750,10 +2750,10 @@ function goSingleCurl(array $postParams, string $url) : string
             $report = curl_exec($ch);
             curl_close($ch);
             
-            $response = checkCurlResponse($report, DEBUG_LEVEL);            
+            $response = checkCurlResponse($report, DEBUG_LEVEL);
             $message .= $i . ') ' . $key . ': ' . $response . PHP_EOL;
             $i++;
-        }        
+        }
         return $message;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -2768,9 +2768,9 @@ function goMultiCurl(array $postParams, string $url) : void
         if (count($postParams) === 0) {
             throw new \Exception('Parametri curl non definiti');
         }
-        $mh = curl_multi_init();        
-        $handlers = initCurl($postParams, $url);        
-        foreach ($handlers as $ch) {            
+        $mh = curl_multi_init();
+        $handlers = initCurl($postParams, $url);
+        foreach ($handlers as $ch) {
             curl_multi_add_handle($mh, $ch);
         }
         $i = 1;
@@ -2783,16 +2783,16 @@ function goMultiCurl(array $postParams, string $url) : void
                 $ch = $info['handle'];
                 $key = array_search($ch, $handlers);
                 $report = curl_multi_getcontent($ch);
-                $response = checkCurlResponse($report, DEBUG_LEVEL);                
+                $response = checkCurlResponse($report, DEBUG_LEVEL);
                 echo $i . ') ' . $key . ': ' . $response . PHP_EOL;
                 $i++;
             }
-        } while ($still_running && $status == CURLM_OK);        
-        foreach ($handlers as $ch) {            
+        } while ($still_running && $status == CURLM_OK);
+        foreach ($handlers as $ch) {
             curl_multi_remove_handle($mh, $ch);
             curl_close($ch);
-        }        
-        curl_multi_close($mh);       
+        }
+        curl_multi_close($mh);
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
@@ -2813,7 +2813,7 @@ function checkCurlResponse(string $response, int $debug_level) : string
             }
         } else {
             $message = htmlspecialchars(strip_tags($response));
-        }        
+        }
         return $message;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -2858,7 +2858,7 @@ function selectLastPrevData(string $db, array $parametri, array $dati, string $c
 
 function addTable(array $variabili, array $scarichi, array $dati, array $formule) : array
 {
-    try {        
+    try {
         $id_modello = $scarichi[0]['modello'];
         $models = CONFIG['modelli'];
         if (!array_key_exists($id_modello, $models)) {
@@ -2898,7 +2898,7 @@ function addCampiDati(array $table, array $dati, array $fieldsDati) : array
         }
         foreach ($fieldsDati as $field) {
             $table = addCategoria($table, $dati, $field);
-        }        
+        }
         return $table;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -2919,7 +2919,7 @@ function addCampiCalcoli(array $table, array $fieldsCalcoli) : array
                     throw new \Exception('Calcolo non ammesso');
                 }
             }
-        }       
+        }
         return $table;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -2938,7 +2938,7 @@ function addCampiFormule(array $table, array $coefficienti, array $fieldsFormule
             } else {
                 throw new \Exception('Funzione non ammessa');
             }
-        }        
+        }
         return $table;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -2974,7 +2974,7 @@ function loadVariabiliScarichi(array $scarichi) : array
         $scarico = $scarichi[0];
         if (!array_key_exists('scarico', $scarico)) {
             throw new \Exception('Chiave scarico non definita');
-        }        
+        }
         $db = 'dbcore';
         $queryFileName = 'query_variabili_scarichi';
         $parametri = [
@@ -2996,7 +2996,7 @@ function loadVariabili(array $scarichi) : array
         $scarico = $scarichi[0];
         if (!array_key_exists('variabile', $scarico)) {
             throw new \Exception('Chiave variabile non definita');
-        }        
+        }
         $db = 'SSCP_data';
         $queryFileName = 'query_variabili';
         $parametri = [
@@ -3018,7 +3018,7 @@ function loadFormule(array $scarichi) : array
         $scarico = $scarichi[0];
         if (!array_key_exists('scarico', $scarico)) {
             throw new \Exception('Chiave scarico non definita');
-        }        
+        }
         $db = 'dbcore';
         $queryFileName = 'query_formule';
         $parametri = [
@@ -3039,11 +3039,11 @@ function loadDatiAcquisiti(array $request, array $variabili_scarichi) : array
     try {
         if (!array_key_exists('datefrom', $request) || !array_key_exists('dateto', $request)) {
             throw new \Exception('Chiave datefrom e/o dateto non definite');
-        }       
+        }
         $dati_acquisiti = [];
         foreach ($variabili_scarichi as $record) {
             $dati = [];
-            $categoria = $record['categoria'];   
+            $categoria = $record['categoria'];
             $db = $record['db'];
             $queryFileName = 'query_dati_acquisiti';
             $parametri = [
@@ -3075,18 +3075,18 @@ function changeMode(string $path, string $url, int $mode) : bool
         if (ASYNC && MAKESUBDIR && $isFtp) {
             //@codeCoverageIgnoreStart
             $response = false;
-            //@codeCoverageIgnoreEnd
+        //@codeCoverageIgnoreEnd
         } else {
             $response = true;
             $pathDiff = explode($path . '/', $url);
             $pathParts = explode('/', $pathDiff[1]);
             foreach ($pathParts as $part) {
-                $path .= '/' . $part;                
+                $path .= '/' . $part;
                 if ($isFtp) {
                     $user = parse_url($path, PHP_URL_USER);
                     $password = parse_url($path, PHP_URL_PASS);
                     $host = parse_url($path, PHP_URL_HOST);
-                    $file = parse_url($path, PHP_URL_PATH);    
+                    $file = parse_url($path, PHP_URL_PATH);
                     $conn = @ftp_connect($host);
                     if ($conn) {
                         $isLogged = ftp_login($conn, $user, $password);
@@ -3098,11 +3098,11 @@ function changeMode(string $path, string $url, int $mode) : bool
                 } else {
                     $isOk = @chmod($path, $mode);
                 }
-                if($isOk === false) {
+                if ($isOk === false) {
                     $response = false;
                 }
             }
-        }        
+        }
         return $response;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -3113,25 +3113,25 @@ function changeMode(string $path, string $url, int $mode) : bool
     
 function addCostants(array $parametri, array $formule) : array
 {
-    try {        
+    try {
         if (count($parametri) > 0) {
             array_walk($parametri[0], function ($value) {
                 if (!is_a($value, 'DateTime') && $value == NODATA) {
                     throw new \Exception('Presenti NoData per le date selezionate');
-                }            
+                }
             });
         } else {
             throw new \Exception('Non ci sono dati per le date selezionate');
-        }        
-        $costanti = [];        
+        }
+        $costanti = [];
         $formula = [];
         array_walk($formule[0], function ($value, $key) use (&$formula) {
             if (!is_null($value)) {
                 $formula[$key] = $value;
-            }            
-        });        
+            }
+        });
         foreach ($parametri as $record => $campi) {
-            $costanti[$record] = array_merge($formula, $campi); 
+            $costanti[$record] = array_merge($formula, $campi);
         }
         return $costanti;
     } catch (\Throwable $e) {

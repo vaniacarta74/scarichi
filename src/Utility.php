@@ -98,7 +98,7 @@ class Utility
      *
      * Il metodo benchmark() fornisce l'intervallo di tempo intercorso da una
      * certa data. Viene utilizzato per calcolare il tempo di esecuzione della
-     * procedura. 
+     * procedura.
      *
      * @param string $strDateTime Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
      * @return string Intervallo intercorso nel formato "secondi,millisecondi"
@@ -120,12 +120,12 @@ class Utility
                 }
             } else {
                 $interval = $dateInterval->format('%h ora, %i min e %s sec');
-            }           
+            }
             
             return $interval;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
-    }    
+    }
 }

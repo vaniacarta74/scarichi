@@ -2452,7 +2452,7 @@ class ToolsTest extends TestCase
         $expected = [
             '0' => [
                 'variabile' => 30030,
-                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'tipo_dato' => 1,
                 'livello' => 266.206,
                 'manovra' => 1
@@ -2462,7 +2462,7 @@ class ToolsTest extends TestCase
                 'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
                 'tipo_dato' => 1,
                 'livello' => 266.140,
-                'manovra' => 1                
+                'manovra' => 1
             ]
         ];
         
@@ -2536,7 +2536,7 @@ class ToolsTest extends TestCase
                 'table' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 266.206,
                         'livello valle' => 170.058,
@@ -2548,7 +2548,7 @@ class ToolsTest extends TestCase
                         'tipo_dato' => 1,
                         'livello' => 266.140,
                         'livello valle' => 170.098,
-                        'manovra' => 1                
+                        'manovra' => 1
                     ]
                 ],
                 'campi' => [
@@ -2559,7 +2559,7 @@ class ToolsTest extends TestCase
                 'expected' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 266.206,
                         'livello valle' => 170.058,
@@ -2581,7 +2581,7 @@ class ToolsTest extends TestCase
                 'table' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 266.206,
                         'livello valle' => 170.058,
@@ -2593,7 +2593,7 @@ class ToolsTest extends TestCase
                         'tipo_dato' => 1,
                         'livello' => 266.140,
                         'livello valle' => 170.098,
-                        'manovra' => 1                
+                        'manovra' => 1
                     ]
                 ],
                 'campi' => [
@@ -2604,7 +2604,7 @@ class ToolsTest extends TestCase
                 'expected' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 266.206,
                         'livello valle' => 170.058,
@@ -2626,7 +2626,7 @@ class ToolsTest extends TestCase
                 'table' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 266.206,
                         'livello valle' => 170.058,
@@ -2638,7 +2638,7 @@ class ToolsTest extends TestCase
                         'tipo_dato' => 1,
                         'livello' => 266.140,
                         'livello valle' => 170.098,
-                        'manovra' => 1                
+                        'manovra' => 1
                     ]
                 ],
                 'campi' => [
@@ -2653,7 +2653,7 @@ class ToolsTest extends TestCase
                 'expected' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 266.206,
                         'livello valle' => 170.058,
@@ -2675,7 +2675,7 @@ class ToolsTest extends TestCase
                     ]
                 ]
             ]
-        ];        
+        ];
         return $dati;
     }
     
@@ -2710,7 +2710,7 @@ class ToolsTest extends TestCase
         $table = [
             '0' => [
                 'variabile' => 30030,
-                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'tipo_dato' => 1,
                 'livello' => 266.206,
                 'livello valle' => 170.058,
@@ -2722,7 +2722,7 @@ class ToolsTest extends TestCase
                 'tipo_dato' => 1,
                 'livello' => 266.140,
                 'livello valle' => 170.098,
-                'manovra' => 1                
+                'manovra' => 1
             ]
         ];
         
@@ -2747,7 +2747,7 @@ class ToolsTest extends TestCase
                 'table' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 266.206,
                         'delta' => 0,
@@ -2779,7 +2779,7 @@ class ToolsTest extends TestCase
                 'expected' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 266.206,
                         'delta' => 0,
@@ -2801,7 +2801,7 @@ class ToolsTest extends TestCase
                 'table' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 266.206,
                         'livello valle' => 266.058,
@@ -2840,7 +2840,7 @@ class ToolsTest extends TestCase
                 'expected' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 266.206,
                         'livello valle' => 266.058,
@@ -2868,7 +2868,7 @@ class ToolsTest extends TestCase
                 'table' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 266.206,
                         'delta' => 0,
@@ -2902,7 +2902,7 @@ class ToolsTest extends TestCase
                 'expected' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 266.206,
                         'delta' => 0,
@@ -2926,7 +2926,7 @@ class ToolsTest extends TestCase
                 'table' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 266.206,
                         'manovra' => 1,
@@ -2964,7 +2964,7 @@ class ToolsTest extends TestCase
                 'expected' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 266.206,
                         'manovra' => 1,
@@ -2990,7 +2990,7 @@ class ToolsTest extends TestCase
                 'table' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 270.206,
                         'livello valle' => 266.058,
@@ -3033,7 +3033,7 @@ class ToolsTest extends TestCase
                 'expected' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 270.206,
                         'livello valle' => 266.058,
@@ -3063,7 +3063,7 @@ class ToolsTest extends TestCase
                 'table' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 270.206,
                         'livello valle' => 266.058,
@@ -3107,7 +3107,7 @@ class ToolsTest extends TestCase
                 'expected' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 270.206,
                         'livello valle' => 266.058,
@@ -3134,8 +3134,8 @@ class ToolsTest extends TestCase
                         'volume' => 5519.7
                     ]
                 ]
-            ]            
-        ];        
+            ]
+        ];
         return $dati;
     }
     
@@ -3170,7 +3170,7 @@ class ToolsTest extends TestCase
         $table = [
             '0' => [
                 'variabile' => 30030,
-                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),                
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
                 'tipo_dato' => 1,
                 'livello' => 266.206,
                 'livello valle' => 170.058,
@@ -3182,7 +3182,7 @@ class ToolsTest extends TestCase
                 'tipo_dato' => 1,
                 'livello' => 266.140,
                 'livello valle' => 170.098,
-                'manovra' => 1                
+                'manovra' => 1
             ]
         ];
         
@@ -3212,7 +3212,7 @@ class ToolsTest extends TestCase
      */
     public function addTableProvider() : array
     {
-        $dati = [              
+        $dati = [
             'modello 1' => [
                 'variabili' => [
                     '0' => [
@@ -3262,7 +3262,7 @@ class ToolsTest extends TestCase
                 'expected' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 270.206,
                         'delta' => 0,
@@ -3316,7 +3316,7 @@ class ToolsTest extends TestCase
                             'unita_misura' => 'mslm',
                             'data_e_ora' => new \DateTime('02/01/2018 00:15:00'),
                             'tipo_dato' => 2
-                        ]                        
+                        ]
                     ],
                     'manovra' => [
                         '0' => [
@@ -3350,7 +3350,7 @@ class ToolsTest extends TestCase
                 'expected' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 270.206,
                         'manovra' => 0.5,
@@ -3406,7 +3406,7 @@ class ToolsTest extends TestCase
                             'unita_misura' => 'mslm',
                             'data_e_ora' => new \DateTime('02/01/2018 00:15:00'),
                             'tipo_dato' => 2
-                        ]                        
+                        ]
                     ],
                     'livello valle' => [
                         '0' => [
@@ -3422,7 +3422,7 @@ class ToolsTest extends TestCase
                             'unita_misura' => 'mslm',
                             'data_e_ora' => new \DateTime('02/01/2018 00:15:00'),
                             'tipo_dato' => 2
-                        ]                        
+                        ]
                     ],
                     'manovra' => [
                         '0' => [
@@ -3457,14 +3457,14 @@ class ToolsTest extends TestCase
                 'expected' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 270.206,
                         'livello valle' => 266.206,
                         'manovra' => 0.5,
                         'delta' => 0,
                         'media livello' => 270.206,
-                        'media livello valle' => 266.206, 
+                        'media livello valle' => 266.206,
                         'altezza' => 4,
                         'portata' => 1.501,
                         'volume' => 0
@@ -3485,7 +3485,7 @@ class ToolsTest extends TestCase
                     ]
                 ]
             ]
-        ];        
+        ];
         return $dati;
     }
     
@@ -4821,7 +4821,7 @@ class ToolsTest extends TestCase
                 'tipo_dato' => 1,
                 'manovra' => 1
             ]
-        ];       
+        ];
         
         $specifiche = [
             'tipo_formula' => 'portata scarico a sezione rettangolare con velocita e apertura percentuale',
@@ -6198,7 +6198,7 @@ class ToolsTest extends TestCase
                 'tipo_dato' => '1',
                 'valore' => '2278,234'
             ]
-        ];        
+        ];
         
         $subDir = MAKESUBDIR ? '/v30030' : '';
         $expected = CSV . $subDir . '/Livello_30030_201803252030_201803252045_full.csv';
@@ -15227,7 +15227,7 @@ class ToolsTest extends TestCase
         
         foreach ($expecteds as $expected) {
             $this->assertStringContainsString($expected, $actual);
-        }        
+        }
     }
     
     /**
@@ -15252,7 +15252,7 @@ class ToolsTest extends TestCase
     {
         $url = URL;
         
-        $data = [            
+        $data = [
             'single' => [
                 'post' => [
                     [
@@ -15298,7 +15298,7 @@ class ToolsTest extends TestCase
     {
         $actuals = initCurl($postParam, $url);
         
-        foreach ($actuals as $actual) {        
+        foreach ($actuals as $actual) {
             $this->assertIsResource($actual);
         }
     }
@@ -15326,7 +15326,7 @@ class ToolsTest extends TestCase
         $single = '1) 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         $multi = $single . '2) 30040: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         
-        $data = [            
+        $data = [
             'single post' => [
                 'post' => [
                     [
@@ -15404,7 +15404,7 @@ class ToolsTest extends TestCase
         $single = '1) 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         $multi = $single . '2) 30040: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         
-        $data = [            
+        $data = [
             'single post' => [
                 'post' => [
                     [
@@ -15452,13 +15452,13 @@ class ToolsTest extends TestCase
     {
         $expecteds = explode('|', $response);
         
-        goMultiCurl($postParam, $url);       
+        goMultiCurl($postParam, $url);
         
         $actual = $this->getActualOutput();
         
         foreach ($expecteds as $expected) {
             $this->assertStringContainsString($expected, $actual);
-        }          
+        }
     }
     
     /**
@@ -15670,7 +15670,7 @@ class ToolsTest extends TestCase
         $this->expectException(\Exception::class);
         
         selectLastPrevData($db, $parametri, $dati, $categoria);
-    }    
+    }
     
     /**
      * @group load
@@ -15678,8 +15678,8 @@ class ToolsTest extends TestCase
      */
     public function testLoadScarichiEquals() : void
     {
-        $request = [            
-            'var' => '30030'            
+        $request = [
+            'var' => '30030'
         ];
                 
         $expected = [
@@ -15720,7 +15720,7 @@ class ToolsTest extends TestCase
     {
         $request = [
             'var' => '999999'
-        ];       
+        ];
         
         $actual = loadScarichi($request);
         
@@ -15763,7 +15763,7 @@ class ToolsTest extends TestCase
         $actual = loadVariabiliScarichi($scarichi);
         
         $this->assertEquals($expected, $actual);
-}
+    }
     
     /**
      * @group toCsv
@@ -15774,7 +15774,7 @@ class ToolsTest extends TestCase
         $scarichi = [
             '0' => [
                 'variabile' => '30030'
-            ]            
+            ]
         ];
                 
         $this->expectException(\Exception::class);
@@ -15791,8 +15791,8 @@ class ToolsTest extends TestCase
         $scarichi = [
             '0' => [
                 'scarico' => '999'
-            ]            
-        ];       
+            ]
+        ];
         
         $actual = loadVariabiliScarichi($scarichi);
         
@@ -15833,7 +15833,7 @@ class ToolsTest extends TestCase
         $scarichi = [
             '0' => [
                 'scarico' => '1'
-            ]            
+            ]
         ];
                 
         $this->expectException(\Exception::class);
@@ -15850,8 +15850,8 @@ class ToolsTest extends TestCase
         $scarichi = [
             '0' => [
                 'variabile' => '99999'
-            ]            
-        ];       
+            ]
+        ];
         
         $actual = loadVariabili($scarichi);
         
@@ -15902,7 +15902,7 @@ class ToolsTest extends TestCase
         $scarichi = [
             '0' => [
                 'variabile' => '30030'
-            ]            
+            ]
         ];
                 
         $this->expectException(\Exception::class);
@@ -15919,8 +15919,8 @@ class ToolsTest extends TestCase
         $scarichi = [
             '0' => [
                 'scarico' => '999'
-            ]            
-        ];       
+            ]
+        ];
         
         $actual = loadFormule($scarichi);
         
@@ -16058,12 +16058,12 @@ class ToolsTest extends TestCase
      */
     public function addCostantsProvider() : array
     {
-        $dati = [              
+        $dati = [
             'modello 1' => [
                 'parametri' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 270.206,
                         'delta' => 0,
@@ -16091,7 +16091,7 @@ class ToolsTest extends TestCase
                         'scarico' => 1,
                         'mi' => 0.47,
                         'scabrosita' => null,
-                        'lunghezza' => null,                        
+                        'lunghezza' => null,
                         'larghezza' => 40.5,
                         'altezza' => null,
                         'angolo' => null,
@@ -16111,7 +16111,7 @@ class ToolsTest extends TestCase
                         'quota' => 266.1,
                         'limite' => 942.67,
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 270.206,
                         'delta' => 0,
@@ -16144,7 +16144,7 @@ class ToolsTest extends TestCase
                 'parametri' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 270.206,
                         'manovra' => 0.5,
@@ -16181,7 +16181,7 @@ class ToolsTest extends TestCase
                         'raggio' => null,
                         'quota' => 266.05,
                         'velocita' => 0.8,
-                        'limite' => 2000                        
+                        'limite' => 2000
                     ]
                 ],
                 'expected' => [
@@ -16195,7 +16195,7 @@ class ToolsTest extends TestCase
                         'limite' => 2000,
                         'velocita' => 0.8,
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 270.206,
                         'manovra' => 0.5,
@@ -16231,14 +16231,14 @@ class ToolsTest extends TestCase
                 'parametri' => [
                     '0' => [
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 270.206,
                         'livello valle' => 266.206,
                         'manovra' => 0.5,
                         'delta' => 0,
                         'media livello' => 270.206,
-                        'media livello valle' => 266.206, 
+                        'media livello valle' => 266.206,
                         'altezza' => 4,
                         'portata' => 1.501,
                         'volume' => 0
@@ -16263,7 +16263,7 @@ class ToolsTest extends TestCase
                         'tipo_formula' => 'portata galleria',
                         'alias' => 'galleria',
                         'scarico' => 32,
-                        'mi' => null,                        
+                        'mi' => null,
                         'scabrosita' => 0.1,
                         'lunghezza' => 6890,
                         'larghezza' => null,
@@ -16287,14 +16287,14 @@ class ToolsTest extends TestCase
                         'quota' => 264.18,
                         'limite' => 266.247,
                         'variabile' => 30030,
-                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),                
+                        'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),
                         'tipo_dato' => 1,
                         'livello' => 270.206,
                         'livello valle' => 266.206,
                         'manovra' => 0.5,
                         'delta' => 0,
                         'media livello' => 270.206,
-                        'media livello valle' => 266.206, 
+                        'media livello valle' => 266.206,
                         'altezza' => 4,
                         'portata' => 1.501,
                         'volume' => 0
@@ -16324,7 +16324,7 @@ class ToolsTest extends TestCase
                     ]
                 ]
             ]
-        ];        
+        ];
         return $dati;
     }
     
@@ -16359,7 +16359,7 @@ class ToolsTest extends TestCase
         $parametri = [
             '0' => [
                 'variabile' => 30055,
-                'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),                
+                'data_e_ora' => new \DateTime('2018-02-01 00:00:00'),
                 'tipo_dato' => 1,
                 'livello' => -9999,
                 'manovra' => 0.5,

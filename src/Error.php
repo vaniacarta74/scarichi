@@ -88,7 +88,7 @@ class Error
     {
         file_put_contents(self::$logFile, $message, FILE_APPEND);
         chmod(self::$logFile, 0777);
-    }   
+    }
     
     /**
      * Formatta il messagio d'errore in funzione del contesto.
@@ -121,7 +121,7 @@ class Error
         foreach ($arrStack as $line) {
             $message .= $line !== '' ? str_pad($line, strlen($line) + $offset, ' ', STR_PAD_LEFT) : '';
         }
-        $message .= PHP_EOL;        
+        $message .= PHP_EOL;
         return $message;
     }
     
@@ -150,7 +150,7 @@ class Error
         $message .= '<br/><b>Stack</b>';
         foreach ($arrStack as $line) {
             $message .= $line . '<br/>';
-        }       
+        }
         return $message;
     }
     
@@ -173,15 +173,15 @@ class Error
                 'Linea' => $e->getLine(),
                 'Codice errore' => $e->getCode(),
                 'Messaggio di errore' => $e->getMessage()
-            ]                   
+            ]
         ];
         $arrStack = explode('#', $e->getTraceAsString());
         array_walk($arrStack, function ($value, $key) use (&$arrJson) {
             if ($value !== '') {
                 $arrJson['Stack'][$key - 1] = substr($value, 2);
-            }            
+            }
         });
-        $message = json_encode($arrJson);    
+        $message = json_encode($arrJson);
         return $message;
     }
 }

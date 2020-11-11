@@ -9,22 +9,22 @@ header("Content-Type: application/json; charset=UTF-8");
 try {
     $request = checkRequest($_REQUEST, false);
     
-    $scarichi = loadScarichi($request);    
+    $scarichi = loadScarichi($request);
     $variabili_scarichi = loadVariabiliScarichi($scarichi);
-    $variabili = loadVariabili($scarichi);    
+    $variabili = loadVariabili($scarichi);
     $formule = loadFormule($scarichi);
 
-    $dati_acquisiti = loadDatiAcquisiti($request, $variabili_scarichi);    
+    $dati_acquisiti = loadDatiAcquisiti($request, $variabili_scarichi);
     
     $dati_distinti = eraseDoubleDate($dati_acquisiti);
-    $dati_uniformati = uniformaCategorie($dati_distinti);    
+    $dati_uniformati = uniformaCategorie($dati_distinti);
     $dati_completi = completaDati($dati_uniformati);
     
-    $parametri = addTable($variabili, $scarichi, $dati_completi, $formule);    
+    $parametri = addTable($variabili, $scarichi, $dati_completi, $formule);
     $costanti = addCostants($parametri, $formule);
     
     http_response_code(200);
-    echo json_encode($costanti);    
+    echo json_encode($costanti);
 } catch (\Throwable $e) {
     http_response_code(400);
     Error::errorHandler($e, DEBUG_LEVEL, 'json');

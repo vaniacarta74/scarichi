@@ -226,7 +226,7 @@ class ScarichiTest extends TestCase
         
             foreach ($expecteds as $expected) {
                 $this->assertStringContainsString($expected, $actual);
-            } 
+            }
         }
     }
 }
