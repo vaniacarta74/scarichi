@@ -13,6 +13,9 @@
             "nodata": -9999,        
             "maxrecord": 10000,        
             "subdirectory": false
+        },
+        "telegram": {
+            "send": false
         }
     },
     "modelli": {

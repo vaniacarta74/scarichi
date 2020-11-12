@@ -11,7 +11,7 @@ namespace vaniacarta74\Scarichi;
 
 use vaniacarta74\Scarichi\Error;
 
-require_once('php_MSSQL_router.inc.php');
+require_once('php_Router.inc.php');
 
 
 function checkRequest(?array $request, bool $fullCheck) : array
@@ -2717,16 +2717,7 @@ function initCurl(array $postParams, string $url) : array
         }
         $handlers = [];
         foreach ($postParams as $params) {
-            $ch = curl_init();
-            
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_HEADER, false);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, TIMEOUT);
-            curl_setopt($ch, CURLOPT_TIMEOUT, TIMEOUT);
-            
+            $ch = Utility::cUrlSet($params, $url);
             $handlers[$params['var']] = $ch;
         }
         return $handlers;
@@ -2747,9 +2738,7 @@ function goSingleCurl(array $postParams, string $url) : string
         $message = '';
         $i = 1;
         foreach ($handlers as $key => $ch) {
-            $report = curl_exec($ch);
-            curl_close($ch);
-            
+            $report = Utility::cUrlExec($ch);
             $response = checkCurlResponse($report, DEBUG_LEVEL);
             $message .= $i . ') ' . $key . ': ' . $response . PHP_EOL;
             $i++;
@@ -3134,6 +3123,25 @@ function addCostants(array $parametri, array $formule) : array
             $costanti[$record] = array_merge($formula, $campi);
         }
         return $costanti;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function sendTelegram(string $message, ?bool $force = false) : string
+{
+    try {
+        if ($force || TELEGRAM) {
+            $isOk = Bot::secureSend($message);
+            if ($isOk) {
+                $message .= ' Messaggio Telegram inviato con successo.';
+            } else {
+                $message .= ' Invio messaggio Telegram fallito.';
+            }
+        }
+        return $message;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;

@@ -16,6 +16,8 @@ define('NODATA', intval(CONFIG['define']['csv']['nodata']));
 define('MAXRECORD', intval(CONFIG['define']['csv']['maxrecord']));
 define('MAKESUBDIR', boolval(CONFIG['define']['csv']['subdirectory']));
 
+define('TELEGRAM', boolval(CONFIG['define']['telegram']['send']));
+
 define('DEBUG_LEVEL', intval(CONFIG['define']['log']['debug_level']));
 define('LOG_PATH', __DIR__ . CONFIG['define']['log']['log_path']);
 define('ERROR_LOG', CONFIG['define']['log']['error_log']);

@@ -128,4 +128,80 @@ class Utility
             throw $e;
         }
     }
+    
+    /**
+     * Stampa il tempo trascorso da una certa data.
+     *
+     * Il metodo benchmark() fornisce l'intervallo di tempo intercorso da una
+     * certa data. Viene utilizzato per calcolare il tempo di esecuzione della
+     * procedura.
+     *
+     * @param string $strDateTime Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
+     * @return string Intervallo intercorso nel formato "secondi,millisecondi"
+     */
+    public static function cUrl(array $params, string $url) : string
+    {
+        try {
+            $ch = self::cUrlSet($params, $url);
+            $report = self::cUrlExec($ch);
+            
+            return $report;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    /**
+     * Stampa il tempo trascorso da una certa data.
+     *
+     * Il metodo benchmark() fornisce l'intervallo di tempo intercorso da una
+     * certa data. Viene utilizzato per calcolare il tempo di esecuzione della
+     * procedura.
+     *
+     * @param string $strDateTime Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
+     * @return string Intervallo intercorso nel formato "secondi,millisecondi"
+     */
+    public static function cUrlExec($ch) : string
+    {
+        try {
+            $report = curl_exec($ch);
+            curl_close($ch);
+            
+            return $report;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    /**
+     * Stampa il tempo trascorso da una certa data.
+     *
+     * Il metodo benchmark() fornisce l'intervallo di tempo intercorso da una
+     * certa data. Viene utilizzato per calcolare il tempo di esecuzione della
+     * procedura.
+     *
+     * @param string $strDateTime Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
+     * @return string Intervallo intercorso nel formato "secondi,millisecondi"
+     */
+    public static function cUrlSet(array $params, string $url)
+    {
+        try {
+            $ch = curl_init();
+            
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HEADER, false);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, TIMEOUT);
+            curl_setopt($ch, CURLOPT_TIMEOUT, TIMEOUT);
+            
+            return $ch;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
 }
