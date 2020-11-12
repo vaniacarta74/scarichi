@@ -309,4 +309,108 @@ class UtilityTest extends TestCase
         
         Utility::benchmark($date);
     }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::cUrlSet     
+     */
+    public function testCurlSetIsResource()
+    {
+        $params = [
+            'var' => '30030',
+            'datefrom' => '30/12/2019',
+            'dateto' => '31/12/2019',
+            'field' => 'portata',
+            'full' => '0'
+        ];
+        $url = URL;
+        
+        $actual = Utility::cUrlSet($params, $url);
+        
+        $this->assertIsResource($actual);
+        
+        return $actual;
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::cUrlSet
+     */
+    public function testCurlSetException() : void
+    {
+        $params = [];
+        $url = URL;
+        
+        $this->expectException(\Exception::class);
+        
+        Utility::cUrlSet($params, $url);
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::cUrlExec
+     * @depends testCurlSetIsResource
+     */
+    public function testCurlExecContainsString($ch) : void
+    {
+        $response = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.';
+        $expecteds = explode('|', $response);
+        
+        $actual = Utility::cUrlExec($ch);
+        
+        foreach ($expecteds as $expected) {
+            $this->assertStringContainsString($expected, $actual);
+        }
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::cUrlExec
+     */
+    public function testCurlExecException() : void
+    {
+        $ch = null;
+        
+        $this->expectException(\Exception::class);
+        
+        Utility::cUrlExec($ch);
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::cUrl
+     */
+    public function testCurlContainsString() : void
+    {
+        $params = [
+            'var' => '30030',
+            'datefrom' => '30/12/2019',
+            'dateto' => '31/12/2019',
+            'field' => 'portata',
+            'full' => '0'
+        ];
+        $url = URL;
+        $response = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.';
+        $expecteds = explode('|', $response);
+        
+        $actual = Utility::cUrl($params, $url);
+        
+        foreach ($expecteds as $expected) {
+            $this->assertStringContainsString($expected, $actual);
+        }
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::cUrl
+     */
+    public function testCurlException() : void
+    {
+        $params = [];
+        $url = URL;
+        
+        $this->expectException(\Exception::class);
+        
+        Utility::cUrl($params, $url);
+    }
 }

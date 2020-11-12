@@ -18,12 +18,12 @@ class Bot {
     private static $urlBot = 'https://api.telegram.org/bot' . TOKEN;
     private static $chatId = CHATID;
     
-    public static function sendMessage(string $message) : string
+    public static function sendMessage(string $message, ?string $chatId = null) : string
     {
         try {
             $url = self::$urlBot . '/sendMessage';            
             $params = [
-                'chat_id' => self::$chatId, 
+                'chat_id' => isset($chatId) ? $chatId : self::$chatId, 
                 'text' => $message, 
                 'parse_mode' => 'HTML'
             ];            
@@ -36,10 +36,11 @@ class Bot {
         }
     }
 
-    public static function secureSend(string $message) : bool
+    public static function secureSend(string $message, ?string $chatId = null) : bool
     {
         try {
-            $response = self::sendMessage($message);
+            $chat_id = isset($chatId) ? $chatId : self::$chatId;
+            $response = self::sendMessage($message, $chat_id);
             $arrJson = json_decode($response, true);            
             $isOk = $arrJson['ok'] === true ? true : false;
             

@@ -779,7 +779,7 @@ function checkDates(string $db, array $dates, bool $isLocalToUTC) : array
             }
         }
         return $checkedDates;
-        // @codeCoverageIgnoreStart
+    // @codeCoverageIgnoreStart
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
@@ -796,7 +796,7 @@ function setToLocal(string $db, array $dati) : array
             $locals[$record] = checkDates($db, $campi, false);
         }
         return $locals;
-        // @codeCoverageIgnoreStart
+    // @codeCoverageIgnoreStart
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
@@ -831,7 +831,7 @@ function changeDate(array $values) : array
             }
         }
         return $res;
-        // @codeCoverageIgnoreStart
+    // @codeCoverageIgnoreStart
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
@@ -1650,7 +1650,7 @@ function debugOnCSV(array $dati, string $fileName) : string
         $changedDatas = array_map('\vaniacarta74\Scarichi\changeDate', $dati);
         printToCSV($changedDatas, $filePath);
         return $filePath;
-        // @codeCoverageIgnoreStart
+    // @codeCoverageIgnoreStart
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
@@ -3064,7 +3064,7 @@ function changeMode(string $path, string $url, int $mode) : bool
         if (ASYNC && MAKESUBDIR && $isFtp) {
             //@codeCoverageIgnoreStart
             $response = false;
-        //@codeCoverageIgnoreEnd
+            //@codeCoverageIgnoreEnd
         } else {
             $response = true;
             $pathDiff = explode($path . '/', $url);
@@ -3130,20 +3130,24 @@ function addCostants(array $parametri, array $formule) : array
 }
 
 
-function sendTelegram(string $message, ?bool $force = false) : string
+function sendTelegram(string $message, ?bool $force = false, ?string $chatId = null) : string
 {
     try {
-        if ($force || TELEGRAM) {
-            $isOk = Bot::secureSend($message);
-            if ($isOk) {
-                $message .= ' Messaggio Telegram inviato con successo.';
-            } else {
-                $message .= ' Invio messaggio Telegram fallito.';
+        if ($message !== '') {
+            if ($force || TELEGRAM) {
+                $isOk = Bot::secureSend($message, $chatId);
+                if ($isOk) {
+                    $message .= ' Messaggio Telegram inviato con successo.';
+                } else {
+                    $message .= ' Invio messaggio Telegram fallito.';
+                }
             }
         }
         return $message;
-    } catch (\Throwable $e) {
+    //@codeCoverageIgnoreStart
+    } catch (\Throwable $e) {        
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-        throw $e;
+        throw $e;        
     }
+    //@codeCoverageIgnoreEnd
 }

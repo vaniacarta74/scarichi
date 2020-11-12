@@ -81,7 +81,6 @@ use function vaniacarta74\Scarichi\setMsgOk as setMsgOk;
 use function vaniacarta74\Scarichi\setMsgError as setMsgError;
 use function vaniacarta74\Scarichi\getMessage as getMessage;
 use function vaniacarta74\Scarichi\propertyToString as propertyToString;
-use function vaniacarta74\Scarichi\stringsToString as stringsToString;
 use function vaniacarta74\Scarichi\getProperties as getProperties;
 use function vaniacarta74\Scarichi\filterProperties as filterProperties;
 use function vaniacarta74\Scarichi\selectAllQuery as selectAllQuery;
@@ -97,7 +96,7 @@ use function vaniacarta74\Scarichi\shuntTypes as shuntTypes;
 use function vaniacarta74\Scarichi\setParameters as setParameters;
 use function vaniacarta74\Scarichi\fillParameters as fillParameters;
 use function vaniacarta74\Scarichi\fillVar as fillVar;
-use function vaniacarta74\Scarichi\fillDatefrom as fillDateFrom;
+use function vaniacarta74\Scarichi\fillDatefrom as fillDatefrom;
 use function vaniacarta74\Scarichi\fillDateto as fillDateto;
 use function vaniacarta74\Scarichi\fillField as fillField;
 use function vaniacarta74\Scarichi\fillFull as fillFull;
@@ -119,6 +118,7 @@ use function vaniacarta74\Scarichi\loadVariabili as loadVariabili;
 use function vaniacarta74\Scarichi\loadFormule as loadFormule;
 use function vaniacarta74\Scarichi\loadDatiAcquisiti as loadDatiAcquisiti;
 use function vaniacarta74\Scarichi\addCostants as addCostants;
+use function vaniacarta74\Scarichi\sendTelegram as sendTelegram;
 
 class ToolsTest extends TestCase
 {
@@ -12759,7 +12759,7 @@ class ToolsTest extends TestCase
     /**
      * @coversNothing
      */
-    public function PropertyToStringProvider() : array
+    public function propertyToStringProvider() : array
     {
         $parameters = [
             "var" => [
@@ -16411,5 +16411,58 @@ class ToolsTest extends TestCase
         $this->expectException(\Exception::class);
         
         addCostants($parametri, $formule);
+    }
+    
+    /**
+     * coversNothing
+     */
+    public function sendTelegramProvider() : array
+    {
+        $data = [            
+            'no message' => [
+                'message' => '',
+                'forced' => true,
+                'chat_id' => null,
+                'expected' => ''
+            ],
+            'no force' => [
+                'message' => 'Test funzione sendTelegram()',
+                'forced' => null,
+                'chat_id' => null,
+                'expected' => 'Test funzione sendTelegram()'
+            ],
+            'force false' => [
+                'message' => 'Test funzione sendTelegram()',
+                'forced' => false,
+                'chat_id' => null,
+                'expected' => 'Test funzione sendTelegram()'
+            ],
+            'standard' => [
+                'message' => 'Test funzione sendTelegram()',
+                'forced' => true,
+                'chat_id' => null,
+                'expected' => 'Test funzione sendTelegram() Messaggio Telegram inviato con successo.'
+            ],
+            'chat error' => [
+                'message' => 'Test funzione sendTelegram()',
+                'forced' => true,
+                'chat_id' => 'pippo',
+                'expected' => 'Test funzione sendTelegram() Invio messaggio Telegram fallito.'
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers sendTelegram()
+     * @dataProvider sendTelegramProvider
+     */
+    public function testSendTelegramEquals(string $message, ?bool $force, ?string $chatId, string $expected) : void
+    {
+        $actual = sendTelegram($message, $force, $chatId);
+        
+        $this->assertEquals($expected, $actual);
     }
 }
