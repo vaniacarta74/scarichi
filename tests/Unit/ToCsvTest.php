@@ -2,6 +2,7 @@
 namespace vaniacarta74\Scarichi\tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+use vaniacarta74\Scarichi\Curl;
 
 class ToCsvTest extends TestCase
 {
@@ -91,7 +92,7 @@ class ToCsvTest extends TestCase
     
     /**
      * @group main
-     * covers toCsv.php
+     * covers tocsv.php
      * @dataProvider toCsvProvider
      */
     public function testToCsvEquals(?string $var, ?string $dateFrom, ?string $dateTo, ?string $full, ?string $field, ?string $response) : void
@@ -106,21 +107,9 @@ class ToCsvTest extends TestCase
         
         $params = array_filter($paramsRaw, function ($value) {
             return !is_null($value) && $value !== '';
-        });
-        
-        $ch = curl_init();
-        
-        curl_setopt($ch, CURLOPT_URL, URL);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        
-        $actual = curl_exec($ch);
-        
-        curl_close($ch);
+        });        
+
+        $actual = Curl::run($params, URL);
         
         $expecteds = explode('|', $response);
         

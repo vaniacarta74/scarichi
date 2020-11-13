@@ -255,47 +255,50 @@ class UtilityTest extends TestCase
         
         Utility::getSubArray($master, $keys);
     }
-    
-    /**
-     * @coversNothing
-     */
-    public function benchmarkProvider() : array
-    {
-        $dateTimeSec = new \DateTime();
-        $dateTimeMin = new \DateTime();
-        $dateTimeOra = new \DateTime();
-        $dateTimeSec->sub(new \DateInterval('PT30S'));
-        $dateTimeMin->sub(new \DateInterval('PT30M'));
-        $dateTimeOra->sub(new \DateInterval('PT2H'));
-                
-        $data = [
-            'ore' => [
-                'data' => $dateTimeOra->format('Y-m-d H:i:s.u'),
-                'expected' => '2 ora, 0 min e 22 sec'
-            ],
-            'minuti' => [
-                'data' => $dateTimeMin->format('Y-m-d H:i:s.u'),
-                'expected' => '30 min e 22 sec'
-            ],
-            'secondi' => [
-                'data' => $dateTimeSec->format('Y-m-d H:i:s.u'),
-                'expected' => '52,527 sec'
-            ]
-        ];
         
-        return $data;
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::benchmark
+     */
+    public function testBenchmarkOraEquals() : void
+    {
+        $dateTimeOra = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
+        $dateTimeOra->sub(new \DateInterval('PT2H'));
+        $date = $dateTimeOra->format('Y-m-d H:i:s.u');
+        
+        $actual = Utility::benchmark($date);
+        
+        $this->assertRegExp('/^([1-9]\s(ora)[,]\s([1-5]?[0-9])\s(min)\s[e]\s([1-5]?[0-9])\s(sec))$/', $actual);
     }
     
     /**
      * @group utility
      * @covers \vaniacarta74\Scarichi\Utility::benchmark
-     * @dataProvider benchmarkProvider
      */
-    public function testBenchmarkEquals($date, $expected) : void
+    public function testBenchmarkMinEquals() : void
     {
+        $dateTimeMin = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
+        $dateTimeMin->sub(new \DateInterval('PT30M'));
+        $date = $dateTimeMin->format('Y-m-d H:i:s.u');
+        
         $actual = Utility::benchmark($date);
         
-        $this->assertRegExp('/^(([1-5]?[0-9])[,][0-9]{3}\s(sec))|(([1-9]|[1-5][0-9])\s(min)\s[e]\s([1-5]?[0-9])\s(sec))|([1-9]\s(ora)[,]\s([1-5]?[0-9])\s(min)\s[e]\s([1-5]?[0-9])\s(sec))$/', $actual);
+        $this->assertRegExp('/^(([1-9]|[1-5][0-9])\s(min)\s[e]\s([1-5]?[0-9])\s(sec))$/', $actual);
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::benchmark
+     */
+    public function testBenchmarkSecEquals() : void
+    {
+        $dateTimeSec = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
+        $dateTimeSec->sub(new \DateInterval('PT10S'));
+        $date = $dateTimeSec->format('Y-m-d H:i:s.u');
+        
+        $actual = Utility::benchmark($date);
+        
+        $this->assertRegExp('/^(([1-5]?[0-9])[,][0-9]{3}\s(sec))$/', $actual);
     }
     
     /**

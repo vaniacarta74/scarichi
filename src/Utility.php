@@ -111,9 +111,9 @@ class Utility
                 throw new \Exception('Data inizio benchmark inesistente');
             }
             $end = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
-            $dateInterval = date_diff($start, $end);
-            if ($dateInterval->format('%h') === '0') {
-                if ($dateInterval->format('%i') === '0') {
+            $dateInterval = date_diff($start, $end);            
+            if ($dateInterval->h === 0) {
+                if ($dateInterval->i === 0) {
                     $interval = substr($dateInterval->format('%s,%F'), 0, -3) . ' sec';
                 } else {
                     $interval = $dateInterval->format('%i min e %s sec');
@@ -121,7 +121,6 @@ class Utility
             } else {
                 $interval = $dateInterval->format('%h ora, %i min e %s sec');
             }
-            
             return $interval;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
