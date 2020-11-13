@@ -465,12 +465,8 @@ function addAltezza(array $dati, array $coefficienti, array $fields) : array
         $quota = $coefficienti['quota'];
         $altezze = [];
         foreach ($dati as $record => $campi) {
-            $function = __NAMESPACE__ . '\formulaAltezza' . $id_formula;
-            if (is_callable($function)) {
-                $altezze[$record] = call_user_func($function, $campi, $quota, $fields);
-            } else {
-                throw new \Exception('Nome formula altezza non ammesso');
-            }
+            $formulaAltezza = 'formulaAltezza' . $id_formula;
+            $altezze[$record] = Utility::callback($formulaAltezza, array($campi, $quota, $fields));
         }
         return $altezze;
     } catch (\Throwable $e) {
@@ -1023,13 +1019,9 @@ function calcolaPortata(array $coefficienti, array $parametri, array $campi) : f
 {
     try {
         $alias = $coefficienti['alias'];
+        $funzionePortata = 'formulaPortata' . ucfirst($alias);
         
-        $function = __NAMESPACE__ . '\formulaPortata' . ucfirst($alias);
-        if (is_callable($function)) {
-            $portata = call_user_func($function, $coefficienti, $parametri, $campi);
-        } else {
-            throw new \Exception('Nome opzione non ammesso');
-        }
+        $portata = Utility::callback($funzionePortata, array($coefficienti, $parametri, $campi));
         
         if ($portata > $coefficienti['limite']) {
             $portata = 0;
@@ -1666,12 +1658,9 @@ function getMessage(array $composer, array $help, string $type) : string
             throw new \Exception('Dati configurazione non presenti');
         }
         $eol = ($type === 'html') ? '<br/>' : PHP_EOL;
-        $function = __NAMESPACE__ . '\setMsg' . ucfirst($type);
-        if (is_callable($function)) {
-            $message = call_user_func($function, $composer, $help, $eol);
-        } else {
-            throw new \Exception('Nome opzione non ammesso');
-        }
+        $funzioneMessaggio = 'setMsg' . ucfirst($type);
+        $message = Utility::callback($funzioneMessaggio, array($composer, $help, $eol));
+
         return $message;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -1887,12 +1876,8 @@ function fillLineSections(array $properties, array $sections) : array
             throw new \Exception('Proprieta non definite');
         }
         foreach ($sections as $secName) {
-            $function = __NAMESPACE__ . '\format' . ucfirst($secName);
-            if (is_callable($function)) {
-                $cellsText[] = call_user_func(__NAMESPACE__ . '\format' . ucfirst($secName), $properties);
-            } else {
-                throw new \Exception('Nome sezione non ammesso');
-            }
+            $funzioneFormat = 'format' . ucfirst($secName);
+            $cellsText[] = Utility::callback($funzioneFormat, array($properties));
         }
         return $cellsText;
     } catch (\Throwable $e) {
@@ -2325,12 +2310,8 @@ function checkParameter(string $paramName, string $paramValue, string $regex, st
     try {
         $values = [];
         if (preg_match($regex, $paramValue, $matches)) {
-            $function = __NAMESPACE__ . '\checkCli' . ucfirst($paramName);
-            if (is_callable($function)) {
-                $values = call_user_func($function, $matches[0]);
-            } else {
-                throw new \Exception('Nome opzione ' . $paramName . ' non ammesso');
-            }
+            $funzioneCheck = 'checkCli' . ucfirst($paramName);
+            $values = Utility::callback($funzioneCheck, array($matches[0]));
         } elseif (preg_match('/^(' . $default . ')$/', $paramValue)) {
             $values[] = $default;
         } else {
@@ -2529,12 +2510,8 @@ function fillParameters(array $parameters, array $values) : array
         $postVars = [];
         $keys = array_keys($values);
         foreach ($keys as $key) {
-            $function = __NAMESPACE__ . '\fill' . ucfirst($key);
-            if (is_callable($function)) {
-                $postVars = call_user_func($function, $parameters, $values, $postVars);
-            } else {
-                throw new \Exception('Nome opzione non ammesso');
-            }
+            $funzioneFill = 'fill' . ucfirst($key);
+            $postVars = Utility::callback($funzioneFill, array($parameters, $values, $postVars));
         }
         return $postVars;
     } catch (\Throwable $e) {
@@ -2696,92 +2673,12 @@ function goCurl(array $postParams, string $url, bool $async) : string
         $n_param = count($postParams);
         if ($n_param > 0) {
             if ($async && $n_param > 1) {
-                goMultiCurl($postParams, $url);
+                Curl::runMultiAsync($postParams, $url, 'var', 'formatResponse');
             } else {
-                $message = goSingleCurl($postParams, $url);
+                $message = Curl::runMultiSync($postParams, $url, 'var', 'formatResponse');
             }
         }
         return $message;
-    } catch (\Throwable $e) {
-        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-        throw $e;
-    }
-}
-
-
-function initCurl(array $postParams, string $url) : array
-{
-    try {
-        if (count($postParams) === 0) {
-            throw new \Exception('Parametri curl non definiti');
-        }
-        $handlers = [];
-        foreach ($postParams as $params) {
-            $ch = Utility::cUrlSet($params, $url);
-            $handlers[$params['var']] = $ch;
-        }
-        return $handlers;
-    } catch (\Throwable $e) {
-        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-        throw $e;
-    }
-}
-
-
-function goSingleCurl(array $postParams, string $url) : string
-{
-    try {
-        if (count($postParams) === 0) {
-            throw new \Exception('Parametri curl non definiti');
-        }
-        $handlers = initCurl($postParams, $url);
-        $message = '';
-        $i = 1;
-        foreach ($handlers as $key => $ch) {
-            $report = Utility::cUrlExec($ch);
-            $response = checkCurlResponse($report, DEBUG_LEVEL);
-            $message .= $i . ') ' . $key . ': ' . $response . PHP_EOL;
-            $i++;
-        }
-        return $message;
-    } catch (\Throwable $e) {
-        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-        throw $e;
-    }
-}
-    
-    
-function goMultiCurl(array $postParams, string $url) : void
-{
-    try {
-        if (count($postParams) === 0) {
-            throw new \Exception('Parametri curl non definiti');
-        }
-        $mh = curl_multi_init();
-        $handlers = initCurl($postParams, $url);
-        foreach ($handlers as $ch) {
-            curl_multi_add_handle($mh, $ch);
-        }
-        $i = 1;
-        do {
-            $status = curl_multi_exec($mh, $still_running);
-            if ($still_running) {
-                curl_multi_select($mh);
-            }
-            while ($info = curl_multi_info_read($mh)) {
-                $ch = $info['handle'];
-                $key = array_search($ch, $handlers);
-                $report = curl_multi_getcontent($ch);
-                $response = checkCurlResponse($report, DEBUG_LEVEL);
-                echo $i . ') ' . $key . ': ' . $response . PHP_EOL;
-                $i++;
-            }
-        } while ($still_running && $status == CURLM_OK);
-        foreach ($handlers as $ch) {
-            curl_multi_remove_handle($mh, $ch);
-            curl_close($ch);
-        }
-        curl_multi_close($mh);
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
@@ -2901,12 +2798,8 @@ function addCampiCalcoli(array $table, array $fieldsCalcoli) : array
     try {
         foreach ($fieldsCalcoli as $calcolo => $fields) {
             foreach ($fields as $field) {
-                $function = __NAMESPACE__ . '\add' . ucfirst($calcolo);
-                if (is_callable($function)) {
-                    $table = call_user_func($function, $table, $field);
-                } else {
-                    throw new \Exception('Calcolo non ammesso');
-                }
+                $funzioneAdd = 'add' . ucfirst($calcolo);
+                $table = Utility::callback($funzioneAdd, array($table, $field));
             }
         }
         return $table;
@@ -2921,12 +2814,8 @@ function addCampiFormule(array $table, array $coefficienti, array $fieldsFormule
 {
     try {
         foreach ($fieldsFormule as $formula => $fields) {
-            $function = __NAMESPACE__ . '\add' . ucfirst($formula);
-            if (is_callable($function)) {
-                $table = call_user_func($function, $table, $coefficienti, $fields);
-            } else {
-                throw new \Exception('Funzione non ammessa');
-            }
+            $funzioneAdd = 'add' . ucfirst($formula);
+            $table = Utility::callback($funzioneAdd, array($table, $coefficienti, $fields));
         }
         return $table;
     } catch (\Throwable $e) {
@@ -3143,6 +3032,21 @@ function sendTelegram(string $message, ?bool $force = false, ?string $chatId = n
                 }
             }
         }
+        return $message;
+    //@codeCoverageIgnoreStart
+    } catch (\Throwable $e) {        
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;        
+    }
+    //@codeCoverageIgnoreEnd
+}
+
+
+function formatResponse(string $report, int $i, string $key) : string
+{
+    try {
+        $response = checkCurlResponse($report, DEBUG_LEVEL);
+        $message = $i . ') ' . $key . ': ' . $response . PHP_EOL;
         return $message;
     //@codeCoverageIgnoreStart
     } catch (\Throwable $e) {        

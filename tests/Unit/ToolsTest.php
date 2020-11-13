@@ -119,6 +119,7 @@ use function vaniacarta74\Scarichi\loadFormule as loadFormule;
 use function vaniacarta74\Scarichi\loadDatiAcquisiti as loadDatiAcquisiti;
 use function vaniacarta74\Scarichi\addCostants as addCostants;
 use function vaniacarta74\Scarichi\sendTelegram as sendTelegram;
+use function vaniacarta74\Scarichi\formatResponse as formatResponse;
 
 class ToolsTest extends TestCase
 {
@@ -15243,237 +15244,7 @@ class ToolsTest extends TestCase
         $this->expectException(\Exception::class);
         
         goCurl($postParam, $url, $async);
-    }
-    
-    /**
-     * @coversNothing
-     */
-    public function initCurlProvider() : array
-    {
-        $url = URL;
-        
-        $data = [
-            'single' => [
-                'post' => [
-                    [
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url
-            ],
-            'multi' => [
-                'post' => [
-                    [
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ],
-                    [
-                        'var' => '30040',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url
-            ]
-        ];
-        
-        return $data;
-    }
-    
-    /**
-     * @group test
-     * covers initCurl()
-     * @dataProvider initCurlProvider
-     */
-    public function testInitCurlIsResource(array $postParam, string $url) : void
-    {
-        $actuals = initCurl($postParam, $url);
-        
-        foreach ($actuals as $actual) {
-            $this->assertIsResource($actual);
-        }
-    }
-    
-    /**
-     * @group test
-     * covers initCurl()
-     */
-    public function testInitCurlDataException() : void
-    {
-        $postParam = [];
-        $url = URL;
-        
-        $this->expectException(\Exception::class);
-        
-        initCurl($postParam, $url);
-    }
-
-    /**
-     * @coversNothing
-     */
-    public function goSingleCurlProvider() : array
-    {
-        $url = URL;
-        $single = '1) 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
-        $multi = $single . '2) 30040: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
-        
-        $data = [
-            'single post' => [
-                'post' => [
-                    [
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'expected' => $single
-            ],
-            'multi post' => [
-                'post' => [
-                    [
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ],
-                    [
-                        'var' => '30040',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'expected' => $multi
-            ]
-        ];
-        
-        return $data;
-    }
-    
-    /**
-     * @group test
-     * covers goSingleCurl()
-     * @dataProvider goSingleCurlProvider
-     */
-    public function testGoSingleCurlEquals(array $postParam, string $url, string $response) : void
-    {
-        $expecteds = explode('|', $response);
-        
-        $actual = goSingleCurl($postParam, $url);
-        
-        foreach ($expecteds as $expected) {
-            $this->assertStringContainsString($expected, $actual);
-        }
-    }
-    
-    /**
-     * @group test
-     * covers goSingleCurl()
-     */
-    public function testGoSingleCurlDataException() : void
-    {
-        $postParam = [];
-        $url = URL;
-        
-        $this->expectException(\Exception::class);
-        
-        goSingleCurl($postParam, $url);
-    }
-    
-    /**
-     * @coversNothing
-     */
-    public function goMultiCurlProvider() : array
-    {
-        $url = URL;
-        $single = '1) 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
-        $multi = $single . '2) 30040: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
-        
-        $data = [
-            'single post' => [
-                'post' => [
-                    [
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'expected' => $single
-            ],
-            'multi post' => [
-                'post' => [
-                    [
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ],
-                    [
-                        'var' => '30040',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'expected' => $multi
-            ]
-        ];
-        
-        return $data;
-    }
-    
-    /**
-     * @group test
-     * covers goMultiCurl()
-     * @dataProvider goMultiCurlProvider
-     */
-    public function testGoMultiCurlOutputString(array $postParam, string $url, string $response) : void
-    {
-        $expecteds = explode('|', $response);
-        
-        goMultiCurl($postParam, $url);
-        
-        $actual = $this->getActualOutput();
-        
-        foreach ($expecteds as $expected) {
-            $this->assertStringContainsString($expected, $actual);
-        }
-    }
-    
-    /**
-     * @group test
-     * covers goMultiCurl()
-     */
-    public function testGoMultiCurlDataException() : void
-    {
-        $postParam = [];
-        $url = URL;
-        
-        $this->expectException(\Exception::class);
-        
-        goMultiCurl($postParam, $url);
-    }
+    }   
     
     /**
      * @coversNothing
@@ -16464,5 +16235,46 @@ class ToolsTest extends TestCase
         $actual = sendTelegram($message, $force, $chatId);
         
         $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function formatResponseProvider() : array
+    {
+        $data = [
+            'no response level 1' => [
+                'response' => '',
+                'i' => 1,
+                'key' => 'Topolino',
+                'expected' => '1) Topolino: Elaborazone fallita.'
+            ],
+            'no response level 2' => [
+                'response' => '',
+                'i' => 1,
+                'key' => 'Topolino',
+                'expected' => '1) Topolino: Elaborazone fallita.'
+            ],
+            'response' => [
+                'response' => '<b>Pippo<b/>',
+                'i' => 1,
+                'key' => 'L\'amico di Topolino',
+                'expected' => '1) L\'amico di Topolino: Pippo' . PHP_EOL
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers formatResponse()
+     * @dataProvider formatResponseProvider
+     */
+    public function testFormatResponseEquals(string $response, int $i, string $key, string $expected) : void
+    {
+        $actual = formatResponse($response, $i, $key);
+        
+        $this->assertStringContainsString($expected, $actual);
     }
 }

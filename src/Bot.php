@@ -27,7 +27,7 @@ class Bot {
                 'text' => $message, 
                 'parse_mode' => 'HTML'
             ];            
-            $response = Utility::cUrl($params, $url);
+            $response = Curl::run($params, $url);
             
             return $response;
         } catch (\Throwable $e) {

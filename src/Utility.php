@@ -139,77 +139,19 @@ class Utility
      * @param string $strDateTime Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
      * @return string Intervallo intercorso nel formato "secondi,millisecondi"
      */
-    public static function cUrl(array $params, string $url) : string
+    public static function callback(string $functionName, array $params)
     {
         try {
-            if (count($params) === 0) {
-                throw new \Exception('Parametri curl non definiti');
-            }
-            $ch = self::cUrlSet($params, $url);
-            $report = self::cUrlExec($ch);
-            
-            return $report;
-        } catch (\Throwable $e) {
+            $function = __NAMESPACE__ . '\\' . $functionName;
+            if (is_callable($function)) {
+                $result = call_user_func_array($function, $params);
+            } else {
+                throw new \Exception('Funzione inesistente');
+            }        
+            return $result;
+        } catch (\Throwable $e) {        
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-            throw $e;
-        }
-    }
-    
-    /**
-     * Stampa il tempo trascorso da una certa data.
-     *
-     * Il metodo benchmark() fornisce l'intervallo di tempo intercorso da una
-     * certa data. Viene utilizzato per calcolare il tempo di esecuzione della
-     * procedura.
-     *
-     * @param string $ch Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
-     * @return string Intervallo intercorso nel formato "secondi,millisecondi"
-     */
-    public static function cUrlExec($ch) : string
-    {
-        try {
-            if (!is_resource($ch)) {
-                throw new \Exception('Risorsa non definita');
-            }
-            $report = curl_exec($ch);
-            curl_close($ch);
-            
-            return $report;
-        } catch (\Throwable $e) {
-            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-            throw $e;
-        }
-    }
-    
-    /**
-     * Stampa il tempo trascorso da una certa data.
-     *
-     * Il metodo benchmark() fornisce l'intervallo di tempo intercorso da una
-     * certa data. Viene utilizzato per calcolare il tempo di esecuzione della
-     * procedura.
-     *
-     * @param string $strDateTime Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
-     * @return string Intervallo intercorso nel formato "secondi,millisecondi"
-     */
-    public static function cUrlSet(array $params, string $url)
-    {
-        try {
-            if (count($params) === 0) {
-                throw new \Exception('Parametri curl non definiti');
-            }
-            $ch = curl_init();            
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_HEADER, false);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, TIMEOUT);
-            curl_setopt($ch, CURLOPT_TIMEOUT, TIMEOUT);
-            
-            return $ch;
-        } catch (\Throwable $e) {
-            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-            throw $e;
+            throw $e;        
         }
     }
 }

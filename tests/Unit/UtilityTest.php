@@ -9,6 +9,7 @@ namespace vaniacarta74\Scarichi\tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use vaniacarta74\Scarichi\Utility;
+use function vaniacarta74\Scarichi\formulaPortataSfioro as formulaPortataSfioro;
 
 /**
  * Description of UtilityTest
@@ -312,105 +313,43 @@ class UtilityTest extends TestCase
     
     /**
      * @group utility
-     * @covers \vaniacarta74\Scarichi\Utility::cUrlSet     
+     * @covers \vaniacarta74\Scarichi\Utility::callback
      */
-    public function testCurlSetIsResource()
-    {
-        $params = [
-            'var' => '30030',
-            'datefrom' => '30/12/2019',
-            'dateto' => '31/12/2019',
-            'field' => 'portata',
-            'full' => '0'
+    public function testCallbackEqualsWithDelta() : void  
+    {        
+        $funzione = 'formulaPortataSfioro';
+        
+        $formule = [
+            'tipo_formula' => 'portata sfiorante',
+            'alias' => 'sfioro',
+            'mi' => 0.47,
+            'larghezza' => 0.387,
+            'limite' => 800
         ];
-        $url = URL;
-        
-        $actual = Utility::cUrlSet($params, $url);
-        
-        $this->assertIsResource($actual);
-        
-        return $actual;
-    }
-    
-    /**
-     * @group utility
-     * @covers \vaniacarta74\Scarichi\Utility::cUrlSet
-     */
-    public function testCurlSetException() : void
-    {
-        $params = [];
-        $url = URL;
-        
-        $this->expectException(\Exception::class);
-        
-        Utility::cUrlSet($params, $url);
-    }
-    
-    /**
-     * @group utility
-     * @covers \vaniacarta74\Scarichi\Utility::cUrlExec
-     * @depends testCurlSetIsResource
-     */
-    public function testCurlExecContainsString($ch) : void
-    {
-        $response = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.';
-        $expecteds = explode('|', $response);
-        
-        $actual = Utility::cUrlExec($ch);
-        
-        foreach ($expecteds as $expected) {
-            $this->assertStringContainsString($expected, $actual);
-        }
-    }
-    
-    /**
-     * @group utility
-     * @covers \vaniacarta74\Scarichi\Utility::cUrlExec
-     */
-    public function testCurlExecException() : void
-    {
-        $ch = null;
-        
-        $this->expectException(\Exception::class);
-        
-        Utility::cUrlExec($ch);
-    }
-    
-    /**
-     * @group utility
-     * @covers \vaniacarta74\Scarichi\Utility::cUrl
-     */
-    public function testCurlContainsString() : void
-    {
-        $params = [
-            'var' => '30030',
-            'datefrom' => '30/12/2019',
-            'dateto' => '31/12/2019',
-            'field' => 'portata',
-            'full' => '0'
+        $parametri = [
+            'altezza' => 10
         ];
-        $url = URL;
-        $response = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.';
-        $expecteds = explode('|', $response);
+        $campi = [
+            'altezza'
+        ];
         
-        $actual = Utility::cUrl($params, $url);
+        $expected = 25.478;
         
-        foreach ($expecteds as $expected) {
-            $this->assertStringContainsString($expected, $actual);
-        }
+        $actual = Utility::callback($funzione, array($formule, $parametri, $campi));
+        
+        $this->assertEqualsWithDelta($expected, $actual, 0.001);
     }
     
     /**
      * @group utility
-     * @covers \vaniacarta74\Scarichi\Utility::cUrl
+     * @covers \vaniacarta74\Scarichi\Utility::callback
      */
-    public function testCurlException() : void
-    {
-        $params = [];
-        $url = URL;
+    public function testCallbackException() : void    {
+        
+        $funzione = 'pippo';
         
         $this->expectException(\Exception::class);
         
-        Utility::cUrl($params, $url);
+        Utility::callback($funzione, array(1,2,3));
     }
 }
