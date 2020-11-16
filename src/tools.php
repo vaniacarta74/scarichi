@@ -1152,6 +1152,37 @@ function formulaPortataScarico3(array $coefficienti, array $parametri, array $ca
 }
 
 
+function formulaPortataScarico4(array $coefficienti, array $parametri, array $campi) : float
+{
+    try {
+        $altezza = $campi[0];
+        $manovra = $campi[1];
+        if (!array_key_exists($altezza, $parametri) || $parametri[$altezza] == NODATA) {
+            throw new \Exception('Parametro ' . $altezza . ' non impostato o nodata');
+        }
+        if (!array_key_exists($manovra, $parametri) || $parametri[$manovra] == NODATA) {
+            throw new \Exception('Parametro ' . $manovra . ' non impostato o nodata');
+        }
+        $g = 9.81;
+        $altezza_idrostatica = $parametri[$altezza];
+        $apertura_paratoia = $parametri[$manovra];
+        $mi = $coefficienti['mi'];
+        $larghezza_soglia = $coefficienti['larghezza'];
+        $tirante = $altezza_idrostatica - ($apertura_paratoia / 2);
+
+        if ($tirante > 0) {
+            $portata = $mi * $larghezza_soglia * $apertura_paratoia * sqrt(2 * $g * $tirante);
+        } else {
+            $portata = 0;
+        }
+        return $portata;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
 function formulaPortataVentola(array $coefficienti, array $parametri, array $campi) : float
 {
     try {

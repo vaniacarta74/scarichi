@@ -43,6 +43,7 @@ use function vaniacarta74\Scarichi\formulaPortataSfioro as formulaPortataSfioro;
 use function vaniacarta74\Scarichi\formulaPortataScarico1 as formulaPortataScarico1;
 use function vaniacarta74\Scarichi\formulaPortataScarico2 as formulaPortataScarico2;
 use function vaniacarta74\Scarichi\formulaPortataScarico3 as formulaPortataScarico3;
+use function vaniacarta74\Scarichi\formulaPortataScarico4 as formulaPortataScarico4;
 use function vaniacarta74\Scarichi\formulaPortataVentola as formulaPortataVentola;
 use function vaniacarta74\Scarichi\formulaPortataSaracinesca as formulaPortataSaracinesca;
 use function vaniacarta74\Scarichi\formulaPortataGalleria as formulaPortataGalleria;
@@ -7169,6 +7170,123 @@ class ToolsTest extends TestCase
         
         formulaPortataScarico3($formule, $parametri, $campi);
     }
+    
+    /**
+     * @coversNothing
+     */
+    public function formulaPortataScarico4Provider() : array
+    {
+        $dati = [
+            'fondo lineare' => [
+                'formule' => [
+                    'tipo_formula' => 'portata scarico a sezione rettangolare ad apertura lineare e baricentro mobile',
+                    'alias' => 'scarico4',
+                    'mi' => 0.76,
+                    'larghezza' => 2,
+                    'quota' => 173,
+                    'limite' => 52.15
+                ],
+                'parametri' => [
+                    'altezza' => 10,
+                    'manovra' => 1
+                ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],
+                'expected' => 20.7517
+            ],
+            'fondo lineare sotto soglia' => [
+                'formule' => [
+                    'tipo_formula' => 'portata scarico a sezione rettangolare ad apertura lineare e baricentro mobile',
+                    'alias' => 'scarico4',
+                    'mi' => 0.76,
+                    'larghezza' => 2,
+                    'quota' => 173,
+                    'limite' => 52.15
+                ],
+                'parametri' => [
+                    'altezza' => 1,
+                    'manovra' => 2
+                ],
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],
+                'expected' => 0
+            ]
+        ];
+        
+        return $dati;
+    }
+    
+    /**
+     * covers formulaPortataScarico4()
+     * @group tools
+     * @dataProvider formulaPortataScarico4Provider
+     */
+    public function testFormulaPortataScarico4EqualsWithDelta(array $formule, array $parametri, array $campi, float $expected) : void
+    {
+        $actual = formulaPortataScarico4($formule, $parametri, $campi);
+        
+        $this->assertEqualsWithDelta($expected, $actual, 0.001);
+    }
+    
+    /**
+     * @group tools
+     * covers formulaPortataScarico4()
+     */
+    public function testFormulaPortataScarico4AltezzaException() : void
+    {
+        $formule = [
+            'tipo_formula' => 'portata scarico a sezione rettangolare ad apertura lineare e baricentro mobile',
+            'alias' => 'scarico4',
+            'mi' => 0.76,
+            'larghezza' => 2,
+            'quota' => 173,
+            'limite' => 52.15
+        ];
+        $parametri = [
+            'altezza' => NODATA,
+            'manovra' => 1
+        ];
+        $campi = [
+            'altezza',
+            'manovra'
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formulaPortataScarico4($formule, $parametri, $campi);
+    }
+    
+    /**
+     * @group tools
+     * covers formulaPortataScarico4()
+     */
+    public function testFormulaPortataScarico4ManovraException() : void
+    {
+        $formule = [
+            'tipo_formula' => 'portata scarico a sezione rettangolare ad apertura lineare e baricentro mobile',
+            'alias' => 'scarico4',
+            'mi' => 0.76,
+            'larghezza' => 2,
+            'quota' => 173,
+            'limite' => 52.15
+        ];
+        $parametri = [
+            'altezza' => 3,
+            'manovra' => NODATA
+        ];
+        $campi = [
+            'altezza',
+            'manovra'
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        formulaPortataScarico4($formule, $parametri, $campi);
+    }    
     
     /**
      * @coversNothing
