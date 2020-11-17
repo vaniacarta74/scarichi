@@ -23,31 +23,35 @@ class Bot {
         try {
             $url = self::$urlBot . '/sendMessage';            
             $params = [
-                'chat_id' => isset($chatId) ? $chatId : self::$chatId, 
+                'chat_id' => $chatId ?? self::$chatId, 
                 'text' => $message, 
                 'parse_mode' => 'HTML'
             ];            
             $response = Curl::run($params, $url);
             
             return $response;
+        //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
+        //@codeCoverageIgnoreEnd
     }
 
     public static function secureSend(string $message, ?string $chatId = null) : bool
     {
         try {
-            $chat_id = isset($chatId) ? $chatId : self::$chatId;
+            $chat_id = $chatId ?? self::$chatId;
             $response = self::sendMessage($message, $chat_id);
             $arrJson = json_decode($response, true);            
-            $isOk = $arrJson['ok'] === true ? true : false;
+            $isOk = $arrJson['ok'] ?? false;
             
             return $isOk;
+        //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
+        //@codeCoverageIgnoreEnd
     }
 }

@@ -2243,7 +2243,7 @@ function filterProperties(array $parameters, ?string $field, ?string $value, boo
         if (count($parameters) === 0) {
             throw new \Exception('Array parametri di configurazione vuoto');
         }
-        if ($field === null || $value === null) {
+        if (!isset($field) || !isset($value)) {
             $filtered = $parameters;
         } else {
             $filtered = [];
