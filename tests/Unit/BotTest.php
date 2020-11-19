@@ -27,6 +27,7 @@ class BotTest extends TestCase
             'chat_id' => [
                 'message' => 'Test metodo sendMesssage() con chat_id',
                 'chatId' => '474912563',
+                'token' => null,
                 'expected' => '{
                     "ok": true,
                     "result": {
@@ -52,6 +53,7 @@ class BotTest extends TestCase
             'no chat_id' => [
                 'message' => 'Test metodo sendMesssage() senza chat_id',
                 'chatId' => null,
+                'token' => null,
                 'expected' => '{
                     "ok": true,
                     "result": {
@@ -77,6 +79,7 @@ class BotTest extends TestCase
             'chat_id error' => [
                 'message' => 'Test metodo sendMesssage() con chat_id errato',
                 'chatId' => 'pippo',
+                'token' => null,
                 'expected' => '{
                     "ok": false,
                     "error_code": 400,
@@ -86,6 +89,7 @@ class BotTest extends TestCase
             'no message' => [
                 'message' => '',
                 'chatId' => null,
+                'token' => null,
                 'expected' => '{
                     "ok": false,
                     "error_code": 400,
@@ -102,13 +106,13 @@ class BotTest extends TestCase
      * @covers \vaniacarta74\Scarichi\Bot::sendMessage
      * @dataProvider sendMessageProvider
      */
-    public function testSendMessageContainsString(string $message, ?string $chatId, string $notFormatted) : void
+    public function testSendMessageContainsString(string $message, ?string $chatId, ?string $token, string $notFormatted) : void
     {
         $noSpace = preg_replace('/[\s]/', '', $notFormatted);
         $withSpace = preg_replace('/[+]/', ' ', $noSpace);
         $expecteds = explode('*', $withSpace);
         
-        $actual = Bot::sendMessage($message, $chatId);
+        $actual = Bot::sendMessage($message, $chatId, $token);
         
         foreach ($expecteds as $expected) {
             $this->assertStringContainsString($expected, $actual);            
@@ -125,21 +129,25 @@ class BotTest extends TestCase
             'chat_id' => [
                 'message' => 'Test metodo secureSend() con chat_id',
                 'chatId' => '474912563',
+                'token' => null,
                 'expected' => true
             ],
             'no chat_id' => [
                 'message' => 'Test metodo secureSend() senza chat_id',
                 'chatId' => null,
+                'token' => null,
                 'expected' => true
             ],
             'chat_id error' => [
                 'message' => 'Test metodo secureSend() con chat_id inesistente',
                 'chatId' => 'pippo',
+                'token' => null,
                 'expected' => false
             ],
             'no message' => [
                 'message' => '',
                 'chatId' => null,
+                'token' => null,
                 'expected' => false
             ]             
         ];
@@ -152,9 +160,9 @@ class BotTest extends TestCase
      * @covers \vaniacarta74\Scarichi\Bot::secureSend
      * @dataProvider secureSendProvider
      */
-    public function testSecureSendEquals(string $message, ?string $chatId, bool $expected) : void
+    public function testSecureSendEquals(string $message, ?string $chatId, ?string $token, bool $expected) : void
     {
-        $actual = Bot::secureSend($message, $chatId);
+        $actual = Bot::secureSend($message, $chatId, $token);
         
         $this->assertEquals($expected, $actual); 
     }

@@ -7,6 +7,8 @@
 
 namespace vaniacarta74\Scarichi;
 
+use vaniacarta74\Scarichi\Error;
+
 /**
  * Classe gestione errori.
  *

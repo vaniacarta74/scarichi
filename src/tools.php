@@ -9,7 +9,10 @@
  */
 namespace vaniacarta74\Scarichi;
 
+use vaniacarta74\Scarichi\Bot;
+use vaniacarta74\Scarichi\Curl;
 use vaniacarta74\Scarichi\Error;
+use vaniacarta74\Scarichi\Utility;
 
 require_once('php_Router.inc.php');
 
