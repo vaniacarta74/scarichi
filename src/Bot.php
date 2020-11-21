@@ -49,7 +49,7 @@ class Bot {
             $params = [
                 'offset' => $offset ?? 0
             ];            
-            $response = Curl::run($params, $url);            
+            $response = Curl::run($params, $url, true);            
             $arrJson = json_decode($response, true);
             $isOk = $arrJson['ok'] ?? false;
             if ($isOk && count($arrJson['result']) > 1) {
@@ -90,7 +90,7 @@ class Bot {
                 'text' => $message, 
                 'parse_mode' => 'HTML'
             ];            
-            $response = Curl::run($params, $url);
+            $response = Curl::run($params, $url, true);
             
             return $response;
         //@codeCoverageIgnoreStart
@@ -195,7 +195,7 @@ class Bot {
             $tokenBot = $token ?? self::$defaultBot;
             foreach ($updates as $update) {
                 if (in_array($update['update_id'], $commands['not'])) {
-                    $message = 'Non sei autorizzato ad usare questo commando';
+                    $message = 'Non sei autorizzato ad usare questo comando';
                     $chatId = $update['message']['chat']['id'];
                     $isOk = self::secureSend($message, $chatId, $token);
                 } 
@@ -228,9 +228,11 @@ class Bot {
     {
         try {
             $command = self::parseCommand($text);
-            $functionName = $command['command'];
+            $functionCommand = $command['command'];
+            $functionMessage = $command['message'];
             $params = $command['params'];
-            $message = Utility::callback($functionName, $params);            
+            $response = Utility::callback($functionCommand, $params);
+            $message = Utility::callback($functionMessage, array($response));
             return $message;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -242,11 +244,13 @@ class Bot {
     {
         try {
             $params = explode(' ', $text);
-            $command['command'] = 'Bot::command' . ucfirst(substr($params[0], 1));
+            $commandName = ucfirst(substr($params[0], 1));
+            $command['command'] = 'Bot::command' . $commandName;
             $iMax = count($params);
             for ($i = 1; $i < $iMax; $i++) {
                 $command['params'][] = $params[$i];
             }
+            $command['message'] = 'Bot::msg' . $commandName;
             return $command;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -254,7 +258,7 @@ class Bot {
         }
     }
     
-    public static function commandVolume(string $variabile, string $datefrom, ?string $dateto = null) : string
+    public static function commandVolume(string $variabile, string $datefrom, ?string $dateto = null) : array
     {
         try {
             $dateTime = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
@@ -264,22 +268,42 @@ class Bot {
                 'var' => $variabile,
                 'datefrom' => $datefrom,
                 'dateto' => $dateto ?? $date,
-                'field' => 'volume'
+                'field' => 'cumulato'
             ];
-            $json = Curl::run($params, $url, true);
-            
+            $json = Curl::run($params, $url, true);            
             $arrJson = json_decode($json, true);
             
-            if (count($arrJson) > 0) {
-                $volume = $arrJson[0];
+            return $arrJson;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    public static function msgVolume(array $response) : string
+    {
+        try {
+            if (count($response) > 0) {
+                $volume = end($response);
                 $variabile = $volume['variabile'];
-                $data = $volume['data_e_ora'];
+                $iniziale = $response[0]['data_e_ora'];
+                $arrIniziale = explode(' ', $iniziale);
+                $dataIniziale = $arrIniziale[0];
+                $oraIniziale = $arrIniziale[1];
+                $finale = $volume['data_e_ora'];
+                $arrFinale = explode(' ', $finale);
+                $dataFinale = $arrFinale[0];
+                $oraFinale = $arrFinale[1];
                 $valore = $volume['valore'];
-                $message = 'Il volume scaricato dalla variabile ' . $variabile . ' in data ' . $data . ' é: ' . $valore . ' mc';
+                $arrValore = explode(',', $valore);                
+                $cumulato = number_format($arrValore[0], 0, ',', '.') . ',' . $arrValore[1];
+                $message = 'Il volume movimentato da <b>' . $variabile . '</b>' . PHP_EOL;
+                $message .= 'dal <i>' . $dataIniziale . '</i> alle <i>' . $oraIniziale . '</i>' . PHP_EOL;
+                $message .= 'al <i>' . $dataFinale . '</i> alle <i>' . $oraFinale . '</i>' . PHP_EOL;
+                $message .= 'é di <b>' . $cumulato . ' mc</b>';
             } else {
                 $message = 'error';
-            }
-            
+            }            
             return $message;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);

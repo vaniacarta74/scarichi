@@ -43,6 +43,11 @@
                     "portata",
                     "delta"
                 ]
+            },
+            "sommatorie": {
+                "cumulato": [
+                    "volume"
+                ]
             }
         },
         "2": {
@@ -70,6 +75,11 @@
                 "volume": [
                     "portata",
                     "delta"
+                ]
+            },
+            "sommatorie": {
+                "cumulato": [
+                    "volume"
                 ]
             }
         },
@@ -102,6 +112,11 @@
                 "volume": [
                     "portata",
                     "delta"
+                ]
+            },
+            "sommatorie": {
+                "cumulato": [
+                    "volume"
                 ]
             }
         }
@@ -282,7 +297,8 @@
                     "H",
                     "Q",
                     "D",                    
-                    "V"
+                    "V",
+                    "C"
                 ],
                 "limits": [],
                 "alias": [
@@ -294,13 +310,14 @@
                     "altezza",
                     "portata",
                     "delta",                    
-                    "volume"                    
+                    "volume",
+                    "cumulato"
                 ]  
             },
-            "regex": "\/^([L][V]?|[P]|[M][L][V]?|[H]|[Q]|[D]|[V])$\/",
+            "regex": "\/^([L][V]?|[P]|[M][L][V]?|[H]|[Q]|[D]|[V]|[C])$\/",
             "descriptions": [
-                "Esporta i dati di volume(V), livello(L), media(M)",
-                "delta(D), altezza(H), portata(Q) o manovra(P). Default V."
+                "Esporta i dati di volume(V), livello(L), media(M), delta(D)",
+                "altezza(H), portata(Q), manovra(P) o cumulato(C). Default V."
             ],
             "type": "group"
         },

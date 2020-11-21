@@ -19,12 +19,7 @@ class ToJsonTest extends TestCase
                 'dateto' => '02/01/2017',
                 'full' => '1',
                 'field' => 'volume',
-                'expected' => [
-                    'variabile' => '30030',
-                    'data_e_ora' => '01/01/2017 00:00:00',
-                    'tipo_dato' => '1',
-                    'valore' => '0'
-                ]
+                'provider' => 'toJsonStandard.json'
             ],
             'no full and field' => [
                 'var' => '30030',
@@ -32,38 +27,23 @@ class ToJsonTest extends TestCase
                 'dateto' => '02/01/2017',
                 'full' => null,
                 'field' => null,
-                'expected' => [
-                    'variabile' => '30030',
-                    'data_e_ora' => '01/01/2017 00:00:00',
-                    'tipo_dato' => '1',
-                    'valore' => '0'
-                ]
+                'provider' => 'toJsonStandard.json'
             ],
             'only datefrom' => [
                 'var' => '30030',
-                'datefrom' => '01/05/2020',
+                'datefrom' => '29/05/2020',
                 'dateto' => null,
                 'full' => null,
                 'field' => null,
-                'expected' => [
-                    'variabile' => '30030',
-                    'data_e_ora' => '01/05/2020 00:00:00',
-                    'tipo_dato' => '1',
-                    'valore' => '0'
-                ]
+                'provider' => 'toJsonDatefrom.json'
             ],
             'only dateto' => [
                 'var' => '30030',
                 'datefrom' => null,
-                'dateto' => '01/01/2017',
+                'dateto' => '02/01/2017',
                 'full' => null,
                 'field' => null,
-                'expected' => [
-                    'variabile' => '30030',
-                    'data_e_ora' => '31/12/2016 00:00:00',
-                    'tipo_dato' => '1',
-                    'valore' => '0'
-                ]
+                'provider' => 'toJsonStandard.json'
             ],
             'variable' => [
                 'variable' => '30030',
@@ -71,25 +51,7 @@ class ToJsonTest extends TestCase
                 'dateto' => '02/01/2017',
                 'full' => null,
                 'field' => null,
-                'expected' => [
-                    'variabile' => '30030',
-                    'data_e_ora' => '01/01/2017 00:00:00',
-                    'tipo_dato' => '1',
-                    'valore' => '0'
-                ]
-            ],
-            'variabile' => [
-                'variabile' => '30030',
-                'datefrom' => '01/01/2017',
-                'dateto' => '02/01/2017',
-                'full' => null,
-                'field' => null,
-                'expected' => [
-                    'variabile' => '30030',
-                    'data_e_ora' => '01/01/2017 00:00:00',
-                    'tipo_dato' => '1',
-                    'valore' => '0'
-                ]
+                'provider' => 'toJsonStandard.json'
             ],
             'field other' => [
                 'var' => '30030',
@@ -97,12 +59,7 @@ class ToJsonTest extends TestCase
                 'dateto' => '02/01/2017',
                 'full' => null,
                 'field' => 'livello',
-                'expected' => [
-                    'variabile' => '30030',
-                    'data_e_ora' => '01/01/2017 00:00:00',
-                    'tipo_dato' => '1',
-                    'valore' => '269,109'
-                ]
+                'provider' => 'toJsonOther.json'
             ],
             'full 0' => [
                 'var' => '30030',
@@ -110,12 +67,7 @@ class ToJsonTest extends TestCase
                 'dateto' => '02/01/2017',
                 'full' => '0',
                 'field' => 'livello',
-                'expected' => [
-                    'variabile' => '30030',
-                    'data_e_ora' => '01/01/2017 00:00:00',
-                    'tipo_dato' => '1',
-                    'valore' => '269,109'
-                ]
+                'provider' => 'toJsonNoFull.json'
             ],
             'full 1' => [
                 'var' => '30030',
@@ -123,12 +75,7 @@ class ToJsonTest extends TestCase
                 'dateto' => '02/01/2017',
                 'full' => '1',
                 'field' => null,
-                'expected' => [
-                    'variabile' => '30030',
-                    'data_e_ora' => '01/01/2017 00:00:00',
-                    'tipo_dato' => '1',
-                    'valore' => '0'
-                ]
+                'provider' => 'toJsonStandard.json'
             ]
         ];
         
@@ -140,7 +87,7 @@ class ToJsonTest extends TestCase
      * covers tojson.php
      * @dataProvider toJsonProvider
      */
-    public function testToJsonEquals(?string $var, ?string $dateFrom, ?string $dateTo, ?string $full, ?string $field, ?array $expected) : void
+    public function testToJsonJsonStringEqualsJsonFile(?string $var, ?string $dateFrom, ?string $dateTo, ?string $full, ?string $field, string $provider) : void
     {
         $url = 'http://localhost/scarichi/tojson.php';
         
@@ -154,14 +101,13 @@ class ToJsonTest extends TestCase
         
         $params = array_filter($paramsRaw, function ($value) {
             return !is_null($value) && $value !== '';
-        });        
+        });
 
-        $json = Curl::run($params, $url);
+        $expected = __DIR__ . '/../providers/' . $provider;
+
+        $actual = Curl::run($params, $url);
         
-        $arrJson = json_decode($json, true);
-        $actual = $arrJson[0];
-        
-        $this->assertEquals($expected, $actual);             
+        $this->assertJsonStringEqualsJsonFile($expected, $actual);             
     }
     
     /**
@@ -180,18 +126,10 @@ class ToJsonTest extends TestCase
             'field' => 'pippo'
         ]; 
         
-        $expected = [
-            'File' => '/var/www/html/telecontrollo/scarichi/github/src/tools.php',
-            'Linea' => 80,
-            'Codice errore' => 0,
-            'Messaggio di errore' => 'Nome campo non supportato. Valori ammessi: livello, livello valle, manovra, media livello, media livello valle, altezza, portata, delta, volume o L, LV, P, ML, MLV, H, Q, D, V'
-        ];
+        $expected = __DIR__ . '/../providers/toJsonException.json';
                 
-        $json = Curl::run($params, $url);
+        $actual = Curl::run($params, $url);
         
-        $arrJson = json_decode($json, true);
-        $actual = $arrJson['Descrizione errore'];
-        
-        $this->assertEquals($expected, $actual);        
+        $this->assertJsonStringEqualsJsonFile($expected, $actual);        
     }
 }

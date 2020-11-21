@@ -381,7 +381,7 @@ function addDelta(array $dati, string $nomeCampo) : array
                         throw new \Exception('Per calcolare il delta temporale è neccessario che gli elementi del campo scelto siano del tipo \'DateTime\'');
                     }
                     if ($record === 0) {
-                        $deltaT = 0;
+                        $deltaT = NODATA;
                     } else {
                         $timestamp0 = $delta[$record - 1][$campo]->getTimestamp();
                         $timestamp1 = $valore->getTimestamp();
@@ -588,13 +588,38 @@ function addVolume(array $dati, array $coefficienti, array $fields) : array
             foreach ($campi as $campo => $valore) {
                 $volumi[$record][$campo] = $valore;
             }
-            if ($volumi[$record]['portata'] != NODATA) {
+            if ($volumi[$record]['portata'] != NODATA && $volumi[$record]['delta'] != NODATA) {
                 $volumi[$record]['volume'] = $volumi[$record]['portata'] * $volumi[$record]['delta'];
             } else {
                 $volumi[$record]['volume'] = NODATA;
             }
         }
         return $volumi;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function addCumulato(array $dati, array $fields) : array
+{
+    try {
+        $cumulati = [];
+        $cumulato = 0;
+        foreach ($dati as $record => $campi) {
+            if (!array_key_exists('volume', $campi)) {
+                throw new \Exception('Dati di volume assente impossibile calcolare volume cumulato');
+            }
+            foreach ($campi as $campo => $valore) {
+                $cumulati[$record][$campo] = $valore;
+            }
+            if ($cumulati[$record]['volume'] != NODATA) {
+                $cumulato += $cumulati[$record]['volume'];
+            }
+            $cumulati[$record]['cumulato'] = $cumulato;
+        }
+        return $cumulati;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
@@ -1415,8 +1440,8 @@ function completaDati(array $dati_uniformi) : array
         }
         $completi = [];
         foreach ($dati_uniformi as $categoria => $dati) {
-            if (count($dati)) {
-                $completi[$categoria] = riempiCode($dati);
+            if (count($dati) > 0) {
+                $completi[$categoria] = riempiCode($dati, $categoria);
                 if ($categoria === 'manovra') {
                     $completi[$categoria] = riempiNull($completi[$categoria]);
                 } else {
@@ -1434,18 +1459,21 @@ function completaDati(array $dati_uniformi) : array
 }
 
 
-function riempiCode(array $dati) : array
+function riempiCode(array $dati, string $categoria) : array
 {
     try {
+        if (count($dati) === 0) {
+            throw new \Exception('Nessun dato presente per questa categoria');
+        }
         $boundaries = [];
-        $capi = trovaCapi($dati);
+        $capi = trovaCapi($dati, $categoria);
 
         foreach ($dati as $record => $campi) {
             foreach ($campi as $key => $valore) {
                 if ($key === 'valore') {
-                    if ($record < $capi['testa']['id']) {
+                    if ($record <= $capi['testa']['id']) {
                         $boundaries[$record][$key] = $capi['testa']['valore'];
-                    } elseif ($record > $capi['coda']['id']) {
+                    } elseif ($record >= $capi['coda']['id']) {
                         $boundaries[$record][$key] = $capi['coda']['valore'];
                     } else {
                         $boundaries[$record][$key] = $valore;
@@ -1463,10 +1491,36 @@ function riempiCode(array $dati) : array
 }
 
 
-function trovaCapi(array $dati) : array
+function trovaCapi(array $dati, string $categoria) : array
 {
     try {
-        $capi = [];
+        if (count($dati) === 0) {
+            throw new \Exception('Nessun dato presente impossibile trovare i capi');
+        }
+        if ($categoria === 'manovra') {
+            $testa = trovaTesta($dati);
+            $coda = trovaCoda($dati);
+            $capi = [
+                'testa' => $testa,
+                'coda' => $coda
+            ];
+        } else {
+            $capi = trovaEntrambi($dati);
+        }
+        return $capi;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function trovaEntrambi(array $dati) : array
+{
+    try {
+        if (count($dati) === 0) {
+            throw new \Exception('Nessun dato presente impossibile determinarne gli estremi');
+        }
         $iMax = count($dati) - 1;
         if (isset($dati[0]['valore']) && isset($dati[$iMax]['valore'])) {
             $testa = [
@@ -1494,16 +1548,75 @@ function trovaCapi(array $dati) : array
                     }
                 }
             }
+        }        
+        $capi = [
+            'testa' => $testa ?? ['id' => 0, 'valore' => NODATA],
+            'coda' => $coda ?? ['id' => $iMax, 'valore' => NODATA]
+        ];
+        return $capi;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function trovaTesta(array $dati) : array
+{
+    try {
+        if (count($dati) === 0) {
+            throw new \Exception('Nessun dato presente impossibile determinare la testa');
         }
-        if (isset($testa) && isset($coda)) {
-            $capi = [
-                'testa' => $testa,
-                'coda' => $coda
+        $testa['id'] = 0;
+        if (isset($dati[0]['valore'])) {
+            $testa['valore'] = $dati[0]['valore'];
+        } else {
+            $dummy['dummy'] = [];
+            $parametri = [
+                'variabile' => $dati[0]['variabile'],
+                'tipo_dato' => $dati[0]['tipo_dato'],
+                'data_iniziale' => $dati[0]['data_e_ora']    
+            ];
+            $lastPrevData = selectLastPrevData('SSCP_data', $parametri, $dummy, 'dummy');
+            if (count($lastPrevData['dummy']) > 0) {
+                $testa['valore'] = $lastPrevData['dummy'][0]['valore'];                
+            } else {
+                $testa['valore'] = NODATA;
+            }
+        }
+        return $testa;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function trovaCoda(array $dati) : array
+{
+    try {
+        if (count($dati) === 0) {
+            throw new \Exception('Nessun dato presente impossibile determinare la coda');
+        }
+        $iMax = count($dati) - 1;
+        if (isset($dati[$iMax]['valore'])) {
+            $coda = [
+                'id' => $iMax,
+                'valore' => $dati[$iMax]['valore']
             ];
         } else {
-            throw new \Exception('Nessun valore di riferimento trovato');
+            foreach ($dati as $record => $campi) {
+                foreach ($campi as $key => $valore) {
+                    if ($key === 'valore' && isset($valore)) {                        
+                        $coda = [
+                            'id' => $record,
+                            'valore' => $valore
+                        ];
+                    }
+                }
+            }
         }
-        return $capi;
+        return $coda ?? ['id' => $iMax, 'valore' => NODATA];
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
@@ -1612,26 +1725,30 @@ function convertiUnita(array $dati, string $categoria) : float
         } else {
             throw new \Exception('Conversione non riuscita: valore o unita di misura non trovati');
         }
-        switch ($categoria) {
-            case 'manovra':
-                switch ($unita) {
-                    case '%':
-                        $converted = $valore / 100;
-                        break;
-                    case 'cm':
-                        $converted = $valore / 100;
-                        break;
-                    case 'gradi':
-                        $converted = $valore / 180 * pi();
-                        break;
-                    default:
-                        $converted = $valore;
-                        break;
-                }
-                break;
-            default:
-                $converted = $valore;
-                break;
+        if ($valore != NODATA) {
+            switch ($categoria) {
+                case 'manovra':
+                    switch ($unita) {
+                        case '%':
+                            $converted = $valore / 100;
+                            break;
+                        case 'cm':
+                            $converted = $valore / 100;
+                            break;
+                        case 'gradi':
+                            $converted = $valore / 180 * pi();
+                            break;
+                        default:
+                            $converted = $valore;
+                            break;
+                    }
+                    break;
+                default:
+                    $converted = $valore;
+                    break;
+            }
+        } else {
+            $converted = $valore;
         }
         return $converted;
     } catch (\Throwable $e) {
@@ -2789,6 +2906,7 @@ function addTable(array $variabili, array $scarichi, array $dati, array $formule
         $fieldsDati = $model['dati'];
         $fieldsCalcoli = $model['calcoli'];
         $fieldsFormule = $model['formule'];
+        $fieldsSommatorie = $model['sommatorie'];
         $baseDati = $fieldsDati[0];
         $datiVariabile = $variabili[0];
         $coefficienti = $formule[0];
@@ -2801,6 +2919,8 @@ function addTable(array $variabili, array $scarichi, array $dati, array $formule
         $table = addCampiCalcoli($table, $fieldsCalcoli);
         
         $table = addCampiFormule($table, $coefficienti, $fieldsFormule);
+        
+        $table = addCampiSommatorie($table, $fieldsSommatorie);
         
         return $table;
     } catch (\Throwable $e) {
@@ -2850,6 +2970,21 @@ function addCampiFormule(array $table, array $coefficienti, array $fieldsFormule
         foreach ($fieldsFormule as $formula => $fields) {
             $funzioneAdd = 'add' . ucfirst($formula);
             $table = Utility::callback($funzioneAdd, array($table, $coefficienti, $fields));
+        }
+        return $table;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function addCampiSommatorie(array $table, array $fieldsSommatorie) : array
+{
+    try {
+        foreach ($fieldsSommatorie as $sommatoria => $fields) {
+            $funzioneAdd = 'add' . ucfirst($sommatoria);
+            $table = Utility::callback($funzioneAdd, array($table, $fields));
         }
         return $table;
     } catch (\Throwable $e) {
@@ -2967,9 +3102,7 @@ function loadDatiAcquisiti(array $request, array $variabili_scarichi) : array
                 'data_disattivazione' => $record['data_disattivazione']
             ];
             $dati[$categoria] = getDataFromDb($db, $queryFileName, $parametri);
-
             $dati_manovra = selectLastPrevData($db, $parametri, $dati, 'manovra');
-
             $dati_acquisiti = array_merge_recursive($dati_acquisiti, $dati_manovra);
         }
         return $dati_acquisiti;
@@ -3026,13 +3159,16 @@ function changeMode(string $path, string $url, int $mode) : bool
 function addCostants(array $parametri, array $formule) : array
 {
     try {
-        if (count($parametri) > 0) {
-            array_walk($parametri[0], function ($value) {
-                if (!is_a($value, 'DateTime') && $value == NODATA) {
-                    throw new \Exception('Presenti NoData per le date selezionate');
-                }
-            });
-        } else {
+//        if (count($parametri) > 0) {
+//            array_walk($parametri[0], function ($value) {
+//                if (!is_a($value, 'DateTime') && $value == NODATA) {
+//                    throw new \Exception('Presenti NoData per le date selezionate');
+//                }
+//            });
+//        } else {
+//            throw new \Exception('Non ci sono dati per le date selezionate');
+//        }
+        if (count($parametri) === 0) {
             throw new \Exception('Non ci sono dati per le date selezionate');
         }
         $costanti = [];

@@ -30,7 +30,7 @@ class CurlTest extends TestCase
             'field' => 'portata',
             'full' => '0'
         ];
-        $url = URL;
+        $url = 'http://localhost/scarichi/tocsv.php';
         
         $actual = Curl::set($params, $url);
         
@@ -46,11 +46,47 @@ class CurlTest extends TestCase
     public function testSetException() : void
     {
         $params = [];
-        $url = URL;
+        $url = 'http://localhost/scarichi/tocsv.php';
         
         $this->expectException(\Exception::class);
         
         Curl::set($params, $url);
+    }
+    
+    /**
+     * @group curl
+     * @covers \vaniacarta74\Scarichi\Curl::setJson     
+     */
+    public function testSetJsonIsResource()
+    {
+        $params = [
+            'var' => '30030',
+            'datefrom' => '30/12/2019',
+            'dateto' => '31/12/2019',
+            'field' => 'portata',
+            'full' => '0'
+        ];
+        $url = 'http://localhost/scarichi/tojson.php';
+        
+        $actual = Curl::setJson($params, $url);
+        
+        $this->assertIsResource($actual);
+        
+        return $actual;
+    }
+    
+    /**
+     * @group curl
+     * @covers \vaniacarta74\Scarichi\Curl::setJson
+     */
+    public function testSetJsonException() : void
+    {
+        $params = [];
+        $url = 'http://localhost/scarichi/tojson.php';
+        
+        $this->expectException(\Exception::class);
+        
+        Curl::setJson($params, $url);
     }
     
     /**
@@ -96,11 +132,12 @@ class CurlTest extends TestCase
             'field' => 'portata',
             'full' => '0'
         ];
-        $url = URL;
+        $url = 'http://localhost/scarichi/tocsv.php';
+        $json = false;
         $response = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.';
         $expecteds = explode('|', $response);
         
-        $actual = Curl::run($params, $url);
+        $actual = Curl::run($params, $url, $json);
         
         foreach ($expecteds as $expected) {
             $this->assertStringContainsString($expected, $actual);
@@ -111,10 +148,32 @@ class CurlTest extends TestCase
      * @group curl
      * @covers \vaniacarta74\Scarichi\Curl::run
      */
+    public function testRunJsonStringEqualsJsonFile() : void
+    {
+        $params = [
+            'var' => '30030',
+            'datefrom' => '23/04/2020',
+            'dateto' => '24/04/2020',
+            'field' => 'portata',
+            'full' => '0'
+        ];
+        $url = 'http://localhost/scarichi/tojson.php';
+        $json = true;
+        $expected = __DIR__ . '/../providers/curlRunTest.json';
+        
+        $actual = Curl::run($params, $url, $json);
+        
+        $this->assertJsonStringEqualsJsonFile($expected, $actual);
+    }
+    
+    /**
+     * @group curl
+     * @covers \vaniacarta74\Scarichi\Curl::run
+     */
     public function testRunException() : void
     {
         $params = [];
-        $url = URL;
+        $url = 'http://localhost/scarichi/tocsv.php';
         
         $this->expectException(\Exception::class);
         
