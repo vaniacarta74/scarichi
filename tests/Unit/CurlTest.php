@@ -297,13 +297,14 @@ class CurlTest extends TestCase
     public function runMultiSyncProvider() : array
     {
         $url = URL;
-        $single = '1) 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
-        $multi = $single . '2) 30040: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        $single = '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        $multi = $single . '2) PID 1: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         
         $data = [
             'no callback' => [
                 'post' => [
                     [
+                        'id' => '0',
                         'var' => '30030',
                         'datefrom' => '30/12/2019',
                         'dateto' => '31/12/2019',
@@ -312,13 +313,14 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'url' => $url,
-                'key' => 'var',
+                'key' => 'id',
                 'callback' => null,
                 'expected' => 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.'
             ],
             'no key' => [
                 'post' => [
                     [
+                        'id' => '0',
                         'var' => '30030',
                         'datefrom' => '30/12/2019',
                         'dateto' => '31/12/2019',
@@ -329,11 +331,12 @@ class CurlTest extends TestCase
                 'url' => $url,
                 'key' => null,
                 'callback' => 'formatResponse',
-                'expected' => '1) 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
+                'expected' => '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
             ],
             'single post' => [
                 'post' => [
                     [
+                        'id' => '0',
                         'var' => '30030',
                         'datefrom' => '30/12/2019',
                         'dateto' => '31/12/2019',
@@ -342,13 +345,14 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'url' => $url,
-                'key' => 'var',
+                'key' => 'id',
                 'callback' => 'formatResponse',
                 'expected' => $single
             ],
             'multi post' => [
                 'post' => [
                     [
+                        'id' => '0',
                         'var' => '30030',
                         'datefrom' => '30/12/2019',
                         'dateto' => '31/12/2019',
@@ -356,6 +360,7 @@ class CurlTest extends TestCase
                         'full' => '0'
                     ],
                     [
+                        'id' => '1',
                         'var' => '30040',
                         'datefrom' => '30/12/2019',
                         'dateto' => '31/12/2019',
@@ -364,7 +369,7 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'url' => $url,
-                'key' => 'var',
+                'key' => 'id',
                 'callback' => 'formatResponse',
                 'expected' => $multi
             ]
@@ -397,7 +402,7 @@ class CurlTest extends TestCase
     {
         $postParam = [];
         $url = URL;
-        $key = 'var';
+        $key = 'id';
         $funcName = 'formatResponse';
         
         $this->expectException(\Exception::class);
@@ -411,13 +416,14 @@ class CurlTest extends TestCase
     public function runMultiAsyncProvider() : array
     {
         $url = URL;
-        $single = '1) 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
-        $multi = $single . '2) 30040: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        $single = '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        $multi = $single . '2) PID 1: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         
         $data = [
             'no callback' => [
                 'post' => [
                     [
+                        'id' => '0',
                         'var' => '30030',
                         'datefrom' => '30/12/2019',
                         'dateto' => '31/12/2019',
@@ -426,13 +432,14 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'url' => $url,
-                'key' => 'var',
+                'key' => 'id',
                 'callback' => null,
                 'expected' => 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.'
             ],
             'no key' => [
                 'post' => [
                     [
+                        'id' => '0',
                         'var' => '30030',
                         'datefrom' => '30/12/2019',
                         'dateto' => '31/12/2019',
@@ -443,11 +450,12 @@ class CurlTest extends TestCase
                 'url' => $url,
                 'key' => null,
                 'callback' => 'formatResponse',
-                'expected' => '1) 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
+                'expected' => '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
             ],
             'single post' => [
                 'post' => [
                     [
+                        'id' => '0',
                         'var' => '30030',
                         'datefrom' => '30/12/2019',
                         'dateto' => '31/12/2019',
@@ -456,13 +464,14 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'url' => $url,
-                'key' => 'var',
+                'key' => 'id',
                 'callback' => 'formatResponse',
                 'expected' => $single
             ],
             'multi post' => [
                 'post' => [
                     [
+                        'id' => '0',
                         'var' => '30030',
                         'datefrom' => '30/12/2019',
                         'dateto' => '31/12/2019',
@@ -470,6 +479,7 @@ class CurlTest extends TestCase
                         'full' => '0'
                     ],
                     [
+                        'id' => '1',
                         'var' => '30040',
                         'datefrom' => '30/12/2019',
                         'dateto' => '31/12/2019',
@@ -478,7 +488,7 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'url' => $url,
-                'key' => 'var',
+                'key' => 'id',
                 'callback' => 'formatResponse',
                 'expected' => $multi
             ]
@@ -513,7 +523,7 @@ class CurlTest extends TestCase
     {
         $postParam = [];
         $url = URL;
-        $key = 'var';
+        $key = 'id';
         $funcName = 'formatResponse';
         
         $this->expectException(\Exception::class);

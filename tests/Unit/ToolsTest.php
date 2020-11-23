@@ -100,6 +100,7 @@ use function vaniacarta74\Scarichi\setParameter as setParameter;
 use function vaniacarta74\Scarichi\shuntTypes as shuntTypes;
 use function vaniacarta74\Scarichi\setParameters as setParameters;
 use function vaniacarta74\Scarichi\fillParameters as fillParameters;
+use function vaniacarta74\Scarichi\limitDates as limitDates;
 use function vaniacarta74\Scarichi\fillVar as fillVar;
 use function vaniacarta74\Scarichi\fillDatefrom as fillDatefrom;
 use function vaniacarta74\Scarichi\fillDateto as fillDateto;
@@ -15966,6 +15967,13 @@ class ToolsTest extends TestCase
                "default" => "YEAR",
                "expected" => ['2020-12-31']
             ],
+            "datefrom interval" => [
+               "name" => "datefrom",
+               "value" => "2Y6M15D",
+               "regex" => "/^([1-9][Y])?(([1-9]|[1][0-1])[M])?(([1-9]|[1-4][0-9]|[5][0-1])[W])?(([1-9]|[1-9][0-9]|[1-2][0-9][0-9]|[3][0-5][0-9]|[3][6][0-4])[D])?$/",
+               "default" => "YEAR",
+               "expected" => ['2Y6M15D']
+            ],
             "datefrom default" => [
                "name" => "datefrom",
                "value" => "YEAR",
@@ -16412,7 +16420,7 @@ class ToolsTest extends TestCase
                "name" => "datefrom",
                "short" => "f",
                "long" => "datefrom",
-               "regex" => "/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/",
+               "regex" => "/^([0-9]{2}[\/][0-9]{2}[\/][0-9]{4}|([1-9][Y])?(([1-9]|[1][0-1])[M])?(([1-9]|[1-4][0-9]|[5][0-1])[W])?(([1-9]|[1-9][0-9]|[1-2][0-9][0-9]|[3][0-5][0-9]|[3][6][0-4])[D])?)$/",
                "default" => "YEAR",
                "type" => "group"
             ],
@@ -16501,6 +16509,18 @@ class ToolsTest extends TestCase
                     'datefrom' => ['2020-12-31'],
                     'dateto' => ['NOW'],
                     'field' => ['portata'],
+                    'full' => ['FALSE']
+                ]
+            ],
+            'ok interval' => [
+                'parameters' => $parameters,
+                'argv' => ['scarichi.php', '-V', '30030', '--datefrom', '2Y6M15D', '-t', '31/12/2018', '-c', '-n'],
+                'type' => 'ok',
+                'expected' => [
+                    'var' => ['30030'],
+                    'datefrom' => ['2Y6M15D'],
+                    'dateto' => ['2018-12-31'],
+                    'field' => ['V'],
                     'full' => ['FALSE']
                 ]
             ],
@@ -16681,6 +16701,23 @@ class ToolsTest extends TestCase
                 'expected' => [
                     'var' => ['30030','30040'],
                     'datefrom' => '30/12/2020',
+                    'dateto' => '31/12/2020',
+                    'field' => 'portata',
+                    'full' => '0'
+                ]
+            ],
+            'interval' => [
+                'parameters' => $parameters,
+                'values' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => ['2Y6M15D'],
+                    'dateto' => ['2020-12-31'],
+                    'field' => ['portata'],
+                    'full' => [true]
+                ],
+                'expected' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '16/06/2018',
                     'dateto' => '31/12/2020',
                     'field' => 'portata',
                     'full' => '0'
@@ -16884,6 +16921,20 @@ class ToolsTest extends TestCase
                 'expected' => [
                     'var' => ['30030','30040'],
                     'datefrom' => '30/12/2020'
+                 ]
+            ],
+            'complex interval' => [
+                'parameters' => $parameters,
+                'values' => [
+                    'datefrom' => ['2Y6M15D'],
+                    'dateto' => ['2020-12-31'],
+                ],
+                'postArray' => [
+                    'var' => ['30030','30040']
+                ],
+                'expected' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => '16/06/2018'
                  ]
             ],
             'indipendent' => [
@@ -17283,15 +17334,44 @@ class ToolsTest extends TestCase
                 'parameters' => $parameters,
                 'filled values' => [
                     'var' => ['30030'],
-                    'datefrom' => '30/12/2020',
-                    'dateto' => '31/12/2020',
+                    'datefrom' => ['30/12/2020'],
+                    'dateto' => ['31/12/2020'],
                     'field' => 'portata',
                     'full' => '0'
                 ],
                 'expected' => [
                     [
+                        'id' => '0',
                         'var' => '30030',
                         'datefrom' => '30/12/2020',
+                        'dateto' => '31/12/2020',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ]
+            ],
+            'single var multi dates' => [
+                'parameters' => $parameters,
+                'filled values' => [
+                    'var' => ['30030'],
+                    'datefrom' => ['01/01/2020', '31/05/2020'],
+                    'dateto' => ['01/06/2020', '31/12/2020'],
+                    'field' => 'portata',
+                    'full' => '0'
+                ],
+                'expected' => [
+                    [
+                        'id' => '0',
+                        'var' => '30030',
+                        'datefrom' => '01/01/2020',
+                        'dateto' => '01/06/2020',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ],
+                    [
+                        'id' => '1',
+                        'var' => '30030',
+                        'datefrom' => '31/05/2020',
                         'dateto' => '31/12/2020',
                         'field' => 'portata',
                         'full' => '0'
@@ -17302,13 +17382,14 @@ class ToolsTest extends TestCase
                 'parameters' => $parameters,
                 'filled values' => [
                     'var' => ['30030','30040'],
-                    'datefrom' => '30/12/2020',
-                    'dateto' => '31/12/2020',
+                    'datefrom' => ['30/12/2020'],
+                    'dateto' => ['31/12/2020'],
                     'field' => 'portata',
                     'full' => '0'
                 ],
                 'expected' => [
                     [
+                        'id' => '0',
                         'var' => '30030',
                         'datefrom' => '30/12/2020',
                         'dateto' => '31/12/2020',
@@ -17316,8 +17397,53 @@ class ToolsTest extends TestCase
                         'full' => '0'
                     ],
                     [
+                        'id' => '1',
                         'var' => '30040',
                         'datefrom' => '30/12/2020',
+                        'dateto' => '31/12/2020',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ]
+            ],
+            'multi multi' => [
+                'parameters' => $parameters,
+                'filled values' => [
+                    'var' => ['30030','30040'],
+                    'datefrom' => ['01/01/2020', '31/05/2020'],
+                    'dateto' => ['01/06/2020', '31/12/2020'],
+                    'field' => 'portata',
+                    'full' => '0'
+                ],
+                'expected' => [
+                    [
+                        'id' => '0',
+                        'var' => '30030',
+                        'datefrom' => '01/01/2020',
+                        'dateto' => '01/06/2020',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ],
+                    [
+                        'id' => '1',
+                        'var' => '30030',
+                        'datefrom' => '31/05/2020',
+                        'dateto' => '31/12/2020',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ],
+                    [
+                        'id' => '2',
+                        'var' => '30040',
+                        'datefrom' => '01/01/2020',
+                        'dateto' => '01/06/2020',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ],
+                    [
+                        'id' => '3',
+                        'var' => '30040',
+                        'datefrom' => '31/05/2020',
                         'dateto' => '31/12/2020',
                         'field' => 'portata',
                         'full' => '0'
@@ -17405,8 +17531,8 @@ class ToolsTest extends TestCase
     public function goCurlProvider() : array
     {
         $url = URL;
-        $single = '1) 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
-        $multi = $single . '2) 30040: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        $single = '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        $multi = $single . '2) PID 1: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         
         $data = [
             'no post values' => [
@@ -17418,6 +17544,7 @@ class ToolsTest extends TestCase
             'single' => [
                 'post' => [
                     [
+                        'id' => '0',
                         'var' => '30030',
                         'datefrom' => '30/12/2019',
                         'dateto' => '31/12/2019',
@@ -17432,6 +17559,7 @@ class ToolsTest extends TestCase
             'multi' => [
                 'post' => [
                     [
+                        'id' => '0',
                         'var' => '30030',
                         'datefrom' => '30/12/2019',
                         'dateto' => '31/12/2019',
@@ -17439,6 +17567,7 @@ class ToolsTest extends TestCase
                         'full' => '0'
                     ],
                     [
+                        'id' => '1',
                         'var' => '30040',
                         'datefrom' => '30/12/2019',
                         'dateto' => '31/12/2019',
@@ -17453,6 +17582,7 @@ class ToolsTest extends TestCase
             'single async' => [
                 'post' => [
                     [
+                        'id' => '0',
                         'var' => '30030',
                         'datefrom' => '30/12/2019',
                         'dateto' => '31/12/2019',
@@ -17467,6 +17597,7 @@ class ToolsTest extends TestCase
             'multi async' => [
                 'post' => [
                     [
+                        'id' => '0',
                         'var' => '30030',
                         'datefrom' => '30/12/2019',
                         'dateto' => '31/12/2019',
@@ -17474,6 +17605,7 @@ class ToolsTest extends TestCase
                         'full' => '0'
                     ],
                     [
+                        'id' => '1',
                         'var' => '30040',
                         'datefrom' => '30/12/2019',
                         'dateto' => '31/12/2019',
@@ -18484,19 +18616,19 @@ class ToolsTest extends TestCase
                 'response' => '',
                 'i' => 1,
                 'key' => 'Topolino',
-                'expected' => '1) Topolino: Elaborazone fallita.'
+                'expected' => '1) PID Topolino: Elaborazone fallita.'
             ],
             'no response level 2' => [
                 'response' => '',
                 'i' => 1,
                 'key' => 'Topolino',
-                'expected' => '1) Topolino: Elaborazone fallita.'
+                'expected' => '1) PID Topolino: Elaborazone fallita.'
             ],
             'response' => [
                 'response' => '<b>Pippo<b/>',
                 'i' => 1,
                 'key' => 'L\'amico di Topolino',
-                'expected' => '1) L\'amico di Topolino: Pippo' . PHP_EOL
+                'expected' => '1) PID L\'amico di Topolino: Pippo' . PHP_EOL
             ]
         ];
         
@@ -18514,4 +18646,120 @@ class ToolsTest extends TestCase
         
         $this->assertStringContainsString($expected, $actual);
     }
+    
+    /**
+     * @coversNothing
+     */
+    public function limitDatesProvider() : array
+    {
+        $data = [
+            'no values' => [
+                'values' => [],
+                'limit' => '1M',
+                'offset' => '1D',
+                'expected' => []
+            ],
+            'default' => [                
+                'values' => [
+                    'var' => ['30030', '30040'],
+                    'datefrom' => '01/01/2018',
+                    'dateto' => '01/01/2019',
+                    'field' => 'volume',
+                    'full' => '1'
+                ],
+                'limit' => '6M',
+                'offset' => '1D',
+                'expected' => [
+                    'var' => ['30030', '30040'],
+                    'datefrom' => ['01/01/2018', '30/06/2018'],
+                    'dateto' => ['01/07/2018', '01/01/2019'],
+                    'field' => 'volume',
+                    'full' => '1'
+                ]
+            ],
+            'no field or full' => [                
+                'values' => [
+                    'var' => ['30030', '30040'],
+                    'datefrom' => '01/01/2018',
+                    'dateto' => '01/01/2019'
+                ],
+                'limit' => '6M',
+                'offset' => '1D',
+                'expected' => [
+                    'var' => ['30030', '30040'],
+                    'datefrom' => ['01/01/2018', '30/06/2018'],
+                    'dateto' => ['01/07/2018', '01/01/2019']
+                ]
+            ],
+            'limit too high' => [                
+                'values' => [
+                    'var' => ['30030', '30040'],
+                    'datefrom' => '01/01/2018',
+                    'dateto' => '01/01/2019',
+                    'field' => 'volume',
+                    'full' => '1'
+                ],
+                'limit' => '2Y',
+                'offset' => '1D',
+                'expected' => [
+                    'var' => ['30030', '30040'],
+                    'datefrom' => ['01/01/2018'],
+                    'dateto' => ['01/01/2019'],
+                    'field' => 'volume',
+                    'full' => '1'
+                ]
+            ],
+            'offset null' => [                
+                'values' => [
+                    'var' => ['30030', '30040'],
+                    'datefrom' => '01/01/2018',
+                    'dateto' => '01/01/2019',
+                    'field' => 'volume',
+                    'full' => '1'
+                ],
+                'limit' => '6M',
+                'offset' => '0D',
+                'expected' => [
+                    'var' => ['30030', '30040'],
+                    'datefrom' => ['01/01/2018', '01/07/2018'],
+                    'dateto' => ['01/07/2018', '01/01/2019'],
+                    'field' => 'volume',
+                    'full' => '1'
+                ]
+            ]            
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers limitDates()
+     * @dataProvider limitDatesProvider
+     */
+    public function testLimitDatesEquals(array $values, string $limit, string $offset, array $expected) : void
+    {
+        $actual = limitDates($values, $limit, $offset);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group test
+     * covers limitDates()
+     */
+    public function testLimitDatesException() : void
+    {
+        $values = [
+            'var' => ['30030','30040'],
+            'field' => ['portata'],
+            'full' => [true]
+        ];
+        $limit = '1M';
+        $offset = '1D';
+        
+        $this->expectException(\Exception::class);
+        
+        limitDates($values, $limit, $offset);
+    }    
 }

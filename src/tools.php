@@ -2791,13 +2791,23 @@ function setPostParameters(array $parameters, array $filledValues) : array
             if (array_diff($keys, array_keys($parameters)) || (!array_key_exists('var', $filledValues))) {
                 throw new \Exception('Parametri errati');
             }
-            foreach ($filledValues['var'] as $nvar => $variable) {
-                foreach ($keys as $key) {
-                    if ($key === 'var') {
-                        $postParams[$nvar][$key] = $variable;
-                    } else {
-                        $postParams[$nvar][$key] = $filledValues[$key];
+            $i = 0;
+            foreach ($filledValues['var'] as $variable) {
+                foreach ($filledValues['datefrom'] as $period => $datefrom) {
+                    $dateto = $filledValues['dateto'][$period];
+                    $postParams[$i]['id'] = $i;
+                    foreach ($keys as $key) {
+                        if ($key === 'var') {
+                            $postParams[$i][$key] = $variable;
+                        } elseif ($key === 'datefrom') {
+                            $postParams[$i][$key] = $datefrom;
+                        } elseif ($key === 'dateto') {
+                            $postParams[$i][$key] = $dateto;
+                        } else {
+                            $postParams[$i][$key] = $filledValues[$key];
+                        }                        
                     }
+                    $i++;
                 }
             }
         }
@@ -2824,9 +2834,9 @@ function goCurl(array $postParams, string $url, bool $async) : string
         $n_param = count($postParams);
         if ($n_param > 0) {
             if ($async && $n_param > 1) {
-                Curl::runMultiAsync($postParams, $url, 'var', 'formatResponse');
+                Curl::runMultiAsync($postParams, $url, 'id', 'formatResponse');
             } else {
-                $message = Curl::runMultiSync($postParams, $url, 'var', 'formatResponse');
+                $message = Curl::runMultiSync($postParams, $url, 'id', 'formatResponse');
             }
         }
         return $message;
@@ -3216,7 +3226,7 @@ function formatResponse(string $report, int $i, string $key) : string
 {
     try {
         $response = checkCurlResponse($report, DEBUG_LEVEL);
-        $message = $i . ') ' . $key . ': ' . $response . PHP_EOL;
+        $message = $i . ') PID ' . $key . ': ' . $response . PHP_EOL;
         return $message;
     //@codeCoverageIgnoreStart
     } catch (\Throwable $e) {        
@@ -3224,4 +3234,44 @@ function formatResponse(string $report, int $i, string $key) : string
         throw $e;        
     }
     //@codeCoverageIgnoreEnd
+}
+
+
+function limitDates(array $values, string $dateLimit, string $dateOffset) : array
+{
+    try {
+        $limited = [];
+        if (count($values) > 0) {
+            if (!array_key_exists('datefrom', $values) || !array_key_exists('datefrom', $values)) {
+                throw new \Exception('Parametri date mancanti');
+            }
+            $keys = array_keys($values);
+            foreach ($keys as $key) {
+                if ($key !== 'datefrom' && $key !== 'dateto') {
+                    $limited[$key] = $values[$key];
+                }
+            }
+            $dateStart = \DateTime::createFromFormat('d/m/Y', $values['datefrom'], new \DateTimeZone('Europe/Rome'));
+            $dateEnd = \DateTime::createFromFormat('d/m/Y', $values['dateto'], new \DateTimeZone('Europe/Rome'));
+            $interval = new \DateInterval('P' . $dateLimit);
+            $offset = new \DateInterval('P' . $dateOffset);
+            $periods = new \DatePeriod($dateStart, $interval, $dateEnd);
+            $i = 0;
+            foreach ($periods as $period) {
+                $datefrom = clone $period;
+                $datefrom->sub($offset);
+                $dateto = clone $period;
+                $dateto->add($interval);            
+                $limited['datefrom'][$i] = $datefrom->format('d/m/Y');
+                $limited['dateto'][$i] = $dateto->format('d/m/Y');
+                $i++;
+            }
+            $limited['datefrom'][0] = $values['datefrom'];
+            $limited['dateto'][$i - 1] = $values['dateto']; 
+        }
+        return $limited;
+    } catch (\Throwable $e) {        
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;        
+    }
 }

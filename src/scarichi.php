@@ -12,8 +12,8 @@ namespace vaniacarta74\Scarichi;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-//$argc = 2;
-//$argv = ['scarichi.php', '-V', '-f', '6M', '-t', '-c', 'ML', '-n'];
+//$argc = 9;
+//$argv = ['scarichi.php', '-V', '30030,30040', '-f', '2Y6M15D', '-t', '01/02/2018', '-c', '-n'];
 
 try {
     $composer = COMPOSER;
@@ -25,7 +25,8 @@ try {
     $values = setParameters($parameters, $argv, $type);
     
     $filledValues = fillParameters($parameters, $values);
-    $postParams = setPostParameters($parameters, $filledValues);
+    $limitedValues = limitDates($filledValues, PERIOD, OFFSET);
+    $postParams = setPostParameters($parameters, $limitedValues);
     echo goCurl($postParams, URL, ASYNC);
 } catch (\Throwable $e) {
     Error::errorHandler($e, DEBUG_LEVEL, 'cli');

@@ -9,6 +9,8 @@ define('START', $now->format('Y-m-d H:i:s.u'));
 define('COMPOSER', Utility::getJsonArray(__DIR__ . '/../../composer.json'));
 define('CONFIG', Utility::getJsonArray(__DIR__ . '/config.json'));
 
+define('PERIOD', CONFIG['command']['period']);
+define('OFFSET', CONFIG['command']['offset']);
 define('ASYNC', boolval(CONFIG['command']['async']));
 define('URL', CONFIG['command']['url']);
 
