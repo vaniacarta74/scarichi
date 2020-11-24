@@ -24,6 +24,7 @@
                 <file>../src/tojson.php</file>
                 <file>../src/topbi.php</file>
                 <file>../src/scarichi.php</file>
+                <file>../src/telegram.php</file>
                 <file>../src/config/config.php</file>
             </exclude>
         </whitelist>

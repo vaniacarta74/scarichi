@@ -29,29 +29,66 @@ class Bot {
     private $autorized;
     private $commands;
     
-    public function __construct(array $bot) {
+    public function __construct(array $bot)
+    {
         $this->token = $bot['token'];
         $this->start = $bot['offset'];
+        $this->end = $bot['offset'];
         $this->chats = $bot['chats'];
-        $this->updates = self::getUpdates($this->start, $this->token);
-        $this->end = self::updateOffset($this->start, $this->updates);
-        $this->autorized = self::getAutorized($this->updates, $this->chats);
-        $this->commands = self::getCommands($this->updates, $this->autorized);
-        self::sendRejections($this->updates, $this->commands, $this->token);
-        self::sendReplies($this->updates, $this->commands, $this->token);
+        $this->updates = [];
+        $this->autorized = [
+            'yes' => [],
+            'not' => []
+        ];
+        $this->commands = [
+            'yes' => [],
+            'not' => []
+        ];
     } 
     
-    public static function getUpdates(?int $offset = null, ?string $token = null) : array
+    public function run() : void
+    {
+        $this->updates = self::secureUpdate($this->start, $this->token);
+        $this->updateOffset();
+        $this->setAutorized();
+        $this->setCommands();
+        
+        //$this->commands = self::getCommands($this->updates, $this->autorized);
+        self::sendRejections($this->updates, $this->commands, $this->token);
+        self::sendReplies($this->updates, $this->commands, $this->token);
+    }
+    
+    public static function getUpdates(int $offset, string $token) : string
     {
         try {
-            $tokenBot = $token ?? self::$defaultBot;
-            $url = self::$url . $tokenBot . '/getUpdates'; 
+            $url = self::$url . $token . '/getUpdates'; 
             $params = [
-                'offset' => $offset ?? 0
+                'offset' => $offset
             ];            
-            $response = Curl::run($params, $url, true);            
-            $arrJson = json_decode($response, true);
-            $isOk = $arrJson['ok'] ?? false;
+            return Curl::run($params, $url, true);            
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    public static function secureUpdate(?int $offset = null, ?string $token = null) : array
+    {
+        try {
+            $n = 5;
+            $delay = 10000;
+            $tokenBot = $token ?? self::$defaultBot;
+            $offsetBot = $offset ?? 0;
+            for ($i = 1; $i <= $n; $i++) {
+                $response = Bot::getUpdates($offsetBot, $tokenBot);                       
+                $arrJson = json_decode($response, true);
+                $isOk = $arrJson['ok'] ?? false;
+                if ($isOk) {
+                    break;
+                } else {
+                    usleep($delay);
+                }
+            }            
             if ($isOk && count($arrJson['result']) > 1) {
                 $updates = self::arrayShift($arrJson['result']);
             } else {
@@ -67,6 +104,9 @@ class Bot {
     public static function arrayShift(array $results) : array
     {
         try {
+            if (count(array_filter(array_keys($results), 'is_string')) > 0) {
+                throw new \Exception('Array associativo');
+            }
             $updates = [];
             foreach ($results as $key => $result) {
                 if ($key > 0) {
@@ -80,55 +120,66 @@ class Bot {
         }
     }
     
-    public static function sendMessage(string $message, ?string $chatId = null, ?string $token = null) : string
+    public static function sendMessage(string $message, string $chatId, string $token) : string
     {
         try {
-            $tokenBot = $token ?? self::$defaultBot;
-            $url = self::$url . $tokenBot . '/sendMessage';            
+            if ($message === '') {
+                throw new \Exception('Non è possibile inviare messaggi vuoti');
+            }
+            $url = self::$url . $token . '/sendMessage';            
             $params = [
-                'chat_id' => $chatId ?? self::$defaultChatId, 
+                'chat_id' => $chatId, 
                 'text' => $message, 
                 'parse_mode' => 'HTML'
             ];            
             $response = Curl::run($params, $url, true);
             
             return $response;
-        //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
-        //@codeCoverageIgnoreEnd
     }
 
     public static function secureSend(string $message, ?string $chatId = null, ?string $token = null) : bool
     {
         try {
+            if ($message === '') {
+                throw new \Exception('Non è possibile inviare messaggi vuoti');
+            }
+            $n = 5;
+            $delay = 10000;
             $tokenBot = $token ?? self::$defaultBot;
             $chat_id = $chatId ?? self::$defaultChatId;
-            $response = self::sendMessage($message, $chat_id, $tokenBot);
-            $arrJson = json_decode($response, true);            
-            $isOk = $arrJson['ok'] ?? false;
-            
+            for ($i = 1; $i <= $n; $i++) {
+                $response = self::sendMessage($message, $chat_id, $tokenBot);
+                $arrJson = json_decode($response, true);            
+                $isOk = $arrJson['ok'] ?? false;
+                if ($isOk) {
+                    break;
+                } else {
+                    usleep($delay);
+                }
+            }
             return $isOk;
-        //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
-        //@codeCoverageIgnoreEnd
     }
     
-    public static function updateOffset(int $start, array $updates) : int
+    private function updateOffset() : void
     {
         try {
+            $start = $this->start;
+            $updates = $this->updates;
             if (count($updates) > 0) {
                 $last = end($updates);
                 $updateId = $last['update_id'];
             } else {
                 $updateId = $start;
             }            
-            return $updateId;
+            $this->end = $updateId;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
@@ -151,10 +202,13 @@ class Bot {
         }
     }
     
-    public static function getAutorized(array $updates, array $chats) : array
+    private function setAutorized() : void
     {
         try {
-            $autorized = [];
+            $updates = $this->updates;
+            $chats = $this->chats;
+            $autorized['yes'] = [];
+            $autorized['not'] = [];
             foreach ($updates as $update) {
                 if (in_array($update['message']['chat']['id'], $chats)) {
                     $autorized['yes'][] = $update['update_id'];
@@ -162,19 +216,23 @@ class Bot {
                     $autorized['not'][] = $update['update_id'];
                 }   
             }
-            return $autorized;
+            $this->autorized = $autorized;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
     }
     
-    public static function getCommands(array $updates, array $autorized) : array
+    private function setCommands() : void
     {
         try {
-            $commands = [];
+            $updates = $this->updates;
+            $autorized = $this->autorized;
+            $commands['yes'] = [];
+            $commands['not'] = [];
             foreach ($updates as $update) {
-                if ($update['message']['entities'][0]['type'] === 'bot_command') {
+                $message = $update['message'];
+                if (array_key_exists('entities', $message) && $message['entities'][0]['type'] === 'bot_command') {
                     if (in_array($update['update_id'], $autorized['yes'])) {                        
                         $commands['yes'][] = $update['update_id'];
                     } elseif (in_array($update['update_id'], $autorized['not'])) {
@@ -182,7 +240,7 @@ class Bot {
                     }
                 }
             }
-            return $commands;
+            $this->commands = $commands;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
@@ -193,12 +251,14 @@ class Bot {
     {
         try {
             $tokenBot = $token ?? self::$defaultBot;
-            foreach ($updates as $update) {
-                if (in_array($update['update_id'], $commands['not'])) {
-                    $message = 'Non sei autorizzato ad usare questo comando';
-                    $chatId = $update['message']['chat']['id'];
-                    $isOk = self::secureSend($message, $chatId, $token);
-                } 
+            if (count($commands['not']) > 0) {
+                foreach ($updates as $update) {
+                    if (in_array($update['update_id'], $commands['not'])) {
+                        $message = 'Non sei autorizzato ad usare questo comando';
+                        $chatId = $update['message']['chat']['id'];
+                        $isOk = self::secureSend($message, $chatId, $token);
+                    } 
+                }
             }
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -210,13 +270,15 @@ class Bot {
     {
         try {
             $tokenBot = $token ?? self::$defaultBot;
-            foreach ($updates as $update) {
-                if (in_array($update['update_id'], $commands['yes'])) {
-                    $text = $update['message']['text'];
-                    $message = self::getCommandReply($text);
-                    $chatId = $update['message']['chat']['id'];
-                    $isOk = self::secureSend($message, $chatId, $token);
-                } 
+            if (count($commands['yes']) > 0) {
+                foreach ($updates as $update) {
+                    if (in_array($update['update_id'], $commands['yes'])) {
+                        $text = $update['message']['text'];
+                        $message = self::getCommandReply($text);
+                        $chatId = $update['message']['chat']['id'];
+                        $isOk = self::secureSend($message, $chatId, $token);
+                    } 
+                }
             }
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);

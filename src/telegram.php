@@ -8,7 +8,8 @@ try {
     $jsonIn = Utility::getJsonArray($path);
     $bots = $jsonIn['bots'];    
     foreach ($bots as $bot) {
-        $objBot = new Bot($bot);        
+        $objBot = new Bot($bot);
+        $objBot->run();
         $telegram['bots'][] = $objBot->getProperties();
     }
     $jsonOut = json_encode($telegram);
