@@ -5,7 +5,7 @@
             "memory_limit": "2048M"
         },
         "log": {
-            "debug_level": 2,
+            "debug_level": 1,
             "log_path": "/../../log",
             "error_log": "error.log"
         },
@@ -15,7 +15,8 @@
             "subdirectory": false
         },
         "telegram": {
-            "send": false
+            "send": false,
+            "path": "/../../../telegram.json"
         }
     },
     "modelli": {

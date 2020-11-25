@@ -75,6 +75,35 @@ class Error
     }
     
     /**
+     * Gestisce il messagio d'errore in funzione del livello di debug.
+     *
+     * Il metodo errorHandler() viene utilizzato per gestire il messaggio di errore
+     * in funzione sia del livello di debug che del contesto in cui viene chiamato.
+     * Se il livello di debug è uguale a 0 l'errore non viene gestito. Se è uguale
+     * ad 1 il messaggio di errore viene stampato nell'error log, mentre se è uguale
+     * a 2 viene stampato sul terminale o in html a seconda del contesto.
+     *
+     * @param \Throwable $e Oggetto che gestisce l'errore/eccezione/notifica
+     * @param int $debug_level Livello di debug
+     * @param bool $isCli Vero o falso a seconda del contesto
+     * @return void
+     */
+    public static function noticeHandler(\Throwable $e, int $debug_level, string $type) : void
+    {
+        switch ($debug_level) {
+            case 0:
+                break;
+            case 1:
+                $message = self::noticeMsgCli($e);
+                self::appendToFile($message);
+                break;
+            case 2:
+                echo call_user_func('self::noticeMsg' . ucfirst($type), $e);
+                break;
+        }
+    }
+    
+    /**
      * Stampa su file il messaggio di errore.
      *
      * Il metodo appendToFile() stampa su file error log il messaggio di errore
@@ -109,7 +138,7 @@ class Error
         $lines[] = 'File: ' . $e->getFile() . PHP_EOL;
         $lines[] = 'Linea: ' . $e->getLine() . PHP_EOL;
         $lines[] = 'Codice errore: ' . $e->getCode() . PHP_EOL;
-        $lines[] = 'Messaggio di errore: ' . $e->getMessage() . PHP_EOL;
+        $lines[] = 'Messaggio di errore: ' . htmlspecialchars(strip_tags($e->getMessage())) . PHP_EOL;
 
         foreach ($lines as $line) {
             $message .= str_pad($line, strlen($line) + $offset, ' ', STR_PAD_LEFT);
@@ -172,7 +201,7 @@ class Error
                 'File' => $e->getFile(),
                 'Linea' => $e->getLine(),
                 'Codice errore' => $e->getCode(),
-                'Messaggio di errore' => $e->getMessage()
+                'Messaggio di errore' => htmlspecialchars(strip_tags($e->getMessage()))
             ]
         ];
         $arrStack = explode('#', $e->getTraceAsString());
@@ -183,5 +212,56 @@ class Error
         });
         $message = json_encode($arrJson);
         return $message;
+    }
+    
+    /**
+     * Formatta il messagio d'errore in funzione del contesto.
+     *
+     * Il metodo defineErrorMsg() viene utilizzato per formattare il messaggio di
+     * errore in funzione del contesto in cui viene chiamato. In particolare, se
+     * il messaggio deve essere stampato su terminale o file vengono impostati
+     * codici di fine riga e formato diverso rispetto alla formattazione html.
+     *
+     * @param \Throwable $e Oggetto che gestisce l'errore/eccezione/notifica
+     * @return string Messaggio di errore formattato
+     */
+    public static function noticeMsgCli(\Throwable $e) : string
+    {
+        return 'Notifica: ' . htmlspecialchars(strip_tags($e->getMessage())) . PHP_EOL;       
+    }
+    
+    /**
+     * Formatta il messagio d'errore in funzione del contesto.
+     *
+     * Il metodo defineErrorMsg() viene utilizzato per formattare il messaggio di
+     * errore in funzione del contesto in cui viene chiamato. In particolare, se
+     * il messaggio deve essere stampato su terminale o file vengono impostati
+     * codici di fine riga e formato diverso rispetto alla formattazione html.
+     *
+     * @param \Throwable $e Oggetto che gestisce l'errore/eccezione/notifica
+     * @return string Messaggio di errore formattato
+     */
+    public static function noticeMsgHtml(\Throwable $e) : string
+    {
+        return '<b>Notifica:</b> ' . $e->getMessage() . '<br/>';
+    }
+    
+    /**
+     * Formatta il messagio d'errore in funzione del contesto.
+     *
+     * Il metodo defineErrorMsg() viene utilizzato per formattare il messaggio di
+     * errore in funzione del contesto in cui viene chiamato. In particolare, se
+     * il messaggio deve essere stampato su terminale o file vengono impostati
+     * codici di fine riga e formato diverso rispetto alla formattazione html.
+     *
+     * @param \Throwable $e Oggetto che gestisce l'errore/eccezione/notifica
+     * @return string Messaggio di errore formattato
+     */
+    public static function noticeMsgJson(\Throwable $e) : string
+    {
+        $arrJson = [
+            'Notifica' => htmlspecialchars(strip_tags($e->getMessage()))
+        ];
+        return json_encode($arrJson);
     }
 }

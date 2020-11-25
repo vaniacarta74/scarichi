@@ -23,7 +23,7 @@ class BotTest extends TestCase
     
     protected function setUp() : void
     {
-        $json = Utility::getJsonArray(__DIR__ . '/../../../telegram.json');
+        $json = Utility::getJsonArray(BOTPATH);
         $bot = $json['bots'][0];
         
         $this->bot = new Bot($bot);
@@ -426,60 +426,114 @@ class BotTest extends TestCase
     
     /**
      * @group bot
-     * @covers \vaniacarta74\Scarichi\Bot::setAutorized
+     * @coversNothing
      */
-    public function testSetAutorizedEquals() : void
+    public function setAutorizedProvider() : array
     {
-        $updates = [
-            [
-                'update_id' => 999,
-                'message' => [
-                    'chat' => [
-                        'id' => 7777
+        $data = [
+            'standard' => [
+                'updates' => [
+                    [
+                        'update_id' => 999,
+                        'message' => [
+                            'chat' => [
+                                'id' => 7777
+                            ]
+                        ]
+                    ],
+                    [
+                        'update_id' => 1000,
+                        'message' => [
+                            'chat' => [
+                                'id' => 9999
+                            ]
+                        ]
+                    ],
+                    [
+                        'update_id' => 1001,
+                        'message' => [
+                            'chat' => []
+                        ]
+                    ],
+                    [
+                        'update_id' => 1002,
+                        'message' => [
+                            'chat' => [
+                                'id' => 8888
+                            ]
+                        ]
+                    ],
+                    [
+                        'update_id' => 1003,
+                        'message' => [
+                            'chat' => [
+                                'id' => 6666
+                            ]
+                        ]
+                    ]
+                ],
+                'chats' => [
+                    7777,
+                    8888
+                ],
+                'expecteds' => [
+                    'yes' => [
+                        999,
+                        1002
+                    ],
+                    'not' => [
+                        1000,
+                        1003
+                    ],
+                    'undef' => [
+                        1001
                     ]
                 ]
             ],
-            [
-                'update_id' => 1000,
-                'message' => [
-                    'chat' => [
-                        'id' => 9999
+            'no chat' => [
+                'updates' => [
+                    [
+                        'update_id' => 999,
+                        'message' => [
+                            'chat' => [
+                                'id' => 7777
+                            ]
+                        ]
                     ]
+                ],
+                'chats' => [],
+                'expecteds' => [
+                    'yes' => [],
+                    'not' => [
+                        999
+                    ],
+                    'undef' => []
                 ]
             ],
-            [
-                'update_id' => 1001,
-                'message' => [
-                    'chat' => [
-                        'id' => 8888
-                    ]
+            'no updates' => [
+                'updates' => [],
+                'chats' => [
+                    7777,
+                    8888
+                ],
+                'expecteds' => [
+                    'yes' => [],
+                    'not' => [],
+                    'undef' => []
                 ]
-            ],
-            [
-                'update_id' => 1002,
-                'message' => [
-                    'chat' => [
-                        'id' => 6666
-                    ]
-                ]
-            ]
-            
-        ];
-        $chats = [
-            7777,
-            8888
-        ];
-        $expected = [
-            'yes' => [
-                999,
-                1001
-            ],
-            'not' => [
-                1000,
-                1002
             ]
         ];
         
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::setAutorized
+     * @dataProvider setAutorizedProvider
+     */
+    public function testSetAutorizedEquals(array $updates, array $chats, array $expected) : void
+    {
         Reflections::setProperty($this->bot, 'updates', $updates);
         Reflections::setProperty($this->bot, 'chats', $chats);
         Reflections::invokeMethod($this->bot, 'setAutorized');
@@ -491,79 +545,163 @@ class BotTest extends TestCase
     
     /**
      * @group bot
-     * @covers \vaniacarta74\Scarichi\Bot::setCommands
+     * @covers \vaniacarta74\Scarichi\Bot::setAutorized
      */
-    public function testSetCommandsEquals() : void
+    public function testSetAutorizedException() : void
     {
         $updates = [
             [
-                'update_id' => 999,
                 'message' => [
                     'chat' => [
                         'id' => 7777
-                    ],
-                    'entities' => [
-                        [
-                            'type' => 'bot_command'
-                        ]
                     ]
                 ]
-            ],
-            [
-                'update_id' => 1000,
-                'message' => [
-                    'chat' => [
-                        'id' => 9999
-                    ],
-                    'entities' => [
-                        [
-                            'type' => 'bot_command'
-                        ]
-                    ]
-                ]
-            ],
-            [
-                'update_id' => 1001,
-                'message' => [
-                    'chat' => [
-                        'id' => 8888
-                    ],
-                    'entities' => [
-                        [
-                            'type' => 'canal'
-                        ]
-                    ]
-                ]
-            ],
-            [
-                'update_id' => 1002,
-                'message' => [
-                    'chat' => [
-                        'id' => 6666
-                    ]
-                ]
-            ]
-            
+            ]                
         ];        
-        $autorized = [
-            'yes' => [
-                999,
-                1001
+        $chats = [
+            7777,
+            8888
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        Reflections::setProperty($this->bot, 'updates', $updates);
+        Reflections::setProperty($this->bot, 'chats', $chats);
+        Reflections::invokeMethod($this->bot, 'setAutorized');
+    }
+    
+    /**
+     * @group bot
+     * @coversNothing
+     */
+    public function setCommandsProvider() : array
+    {
+        $data = [
+            'standard' => [
+                'updates' => [
+                    [
+                        'update_id' => 999,
+                        'message' => [
+                            'chat' => [
+                                'id' => 7777
+                            ],
+                            'entities' => [
+                                [
+                                    'type' => 'bot_command'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'update_id' => 1000,
+                        'message' => [
+                            'chat' => [
+                                'id' => 9999
+                            ],
+                            'entities' => [
+                                [
+                                    'type' => 'bot_command'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'update_id' => 1001,
+                        'message' => [
+                            'chat' => [
+                                'id' => 8888
+                            ],
+                            'entities' => [
+                                [
+                                    'type' => 'canal'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'update_id' => 1002,
+                        'message' => [
+                            'chat' => [
+                                'id' => 6666
+                            ]
+                        ]
+                    ]
+                ],
+                'autorized' => [
+                    'yes' => [
+                        999,
+                        1001
+                    ],
+                    'not' => [
+                        1000,
+                        1002
+                    ]
+                ],
+                'expecteds' => [
+                    'yes' => [
+                        999
+                    ],
+                    'not' => [
+                        1000
+                    ],
+                    'undef' => [
+                        1002
+                    ]
+                ]
             ],
-            'not' => [
-                1000,
-                1002
-            ]
-        ];        
-        $expected = [
-            'yes' => [
-                999
+            'undef autorized' => [
+                'updates' => [
+                    [
+                        'update_id' => 999,
+                        'message' => [                           
+                            'entities' => [
+                                [
+                                    'type' => 'bot_command'
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'autorized' => [
+                    'yes' => [],
+                    'not' => [],
+                    'undef' => [
+                        999
+                    ]
+                ],
+                'expecteds' => [
+                    'yes' => [],
+                    'not' => [],
+                    'undef' => [
+                        999
+                    ]
+                ]
             ],
-            'not' => [
-                1000
+            'no updates' => [
+                'updates' => [],
+                'autorized' => [
+                    'yes' => [],
+                    'not' => [],
+                    'undef' => []
+                ],
+                'expecteds' => [
+                    'yes' => [],
+                    'not' => [],
+                    'undef' => []
+                ]
             ]
         ];
         
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::setCommands
+     * @dataProvider setCommandsProvider
+     */
+    public function testSetCommandsEquals(array $updates, array $autorized, array $expected) : void
+    {
         Reflections::setProperty($this->bot, 'updates', $updates);
         Reflections::setProperty($this->bot, 'autorized', $autorized);
         Reflections::invokeMethod($this->bot, 'setCommands');
@@ -571,5 +709,33 @@ class BotTest extends TestCase
         $actual = Reflections::getProperty($this->bot, 'commands');
         
         $this->assertEquals($expected, $actual);         
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::setCommands
+     */
+    public function testSetCommandsException() : void
+    {
+        $updates = [
+            [
+                'message' => [
+                    'chat' => [
+                        'id' => 7777
+                    ]
+                ]
+            ]                
+        ];        
+        $autorized = [
+            'yes' => [],
+            'not' => [],
+            'undef' => []
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        Reflections::setProperty($this->bot, 'updates', $updates);
+        Reflections::setProperty($this->bot, 'chats', $autorized);
+        Reflections::invokeMethod($this->bot, 'setCommands');
     }
 }

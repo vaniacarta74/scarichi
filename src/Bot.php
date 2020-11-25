@@ -31,31 +31,47 @@ class Bot {
     
     public function __construct(array $bot)
     {
-        $this->token = $bot['token'];
-        $this->start = $bot['offset'];
-        $this->end = $bot['offset'];
-        $this->chats = $bot['chats'];
-        $this->updates = [];
-        $this->autorized = [
-            'yes' => [],
-            'not' => []
-        ];
-        $this->commands = [
-            'yes' => [],
-            'not' => []
-        ];
+        try {
+            if (array_key_exists('token', $bot) && is_string($bot['token'])) {
+                $this->token = $bot['token'];
+            } else {
+                throw new \Exception('Token non presente o errato');
+            }
+            if (array_key_exists('offset', $bot) && is_int($bot['offset'])) {
+                $this->start = $bot['offset'];
+                $this->end = $bot['offset'];
+            } else {
+                throw new \Exception('Offset non presente o errato');
+            }
+            if (array_key_exists('chats', $bot) && is_array($bot['chats'])) {
+                $this->chats = $bot['chats'];
+            } else {
+                throw new \Exception('Chats non presente o errato');
+            }            
+            $this->updates = [];
+            $this->autorized = ['yes' => [],'not' => [],'undef' => []];
+            $this->commands = ['yes' => [],'not' => [],'undef' => []];
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
     } 
     
     public function run() : void
     {
-        $this->updates = self::secureUpdate($this->start, $this->token);
-        $this->updateOffset();
-        $this->setAutorized();
-        $this->setCommands();
-        
-        //$this->commands = self::getCommands($this->updates, $this->autorized);
-        self::sendRejections($this->updates, $this->commands, $this->token);
-        self::sendReplies($this->updates, $this->commands, $this->token);
+        try {
+            $this->updates = self::secureUpdate($this->start, $this->token);
+            $this->updateOffset();
+            $this->setAutorized();
+            $this->setCommands();
+
+            self::sendRejections($this->updates, $this->commands, $this->token);
+            self::sendReplies($this->updates, $this->commands, $this->token);
+            
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
     }
     
     public static function getUpdates(int $offset, string $token) : string
@@ -171,13 +187,15 @@ class Bot {
     private function updateOffset() : void
     {
         try {
-            $start = $this->start;
-            $updates = $this->updates;
-            if (count($updates) > 0) {
-                $last = end($updates);
-                $updateId = $last['update_id'];
+            if (count($this->updates) > 0) {
+                $last = end($this->updates);
+                if (array_key_exists('update_id', $last)) {
+                    $updateId = $last['update_id'];
+                } else {
+                    throw new \Exception("Parametro update id mancante");
+                }                
             } else {
-                $updateId = $start;
+                $updateId = $this->start;
             }            
             $this->end = $updateId;
         } catch (\Throwable $e) {
@@ -205,16 +223,21 @@ class Bot {
     private function setAutorized() : void
     {
         try {
-            $updates = $this->updates;
-            $chats = $this->chats;
-            $autorized['yes'] = [];
-            $autorized['not'] = [];
-            foreach ($updates as $update) {
-                if (in_array($update['message']['chat']['id'], $chats)) {
-                    $autorized['yes'][] = $update['update_id'];
+            $autorized = ['yes' => [],'not' => [],'undef' => []];            
+            foreach ($this->updates as $update) {
+                if (array_key_exists('update_id', $update)) {
+                    if (!self::checkStruct($update, ['message','chat','id'])) {
+                        $autorized['undef'][] = $update['update_id'];
+                        continue;
+                    }
+                    if (in_array($update['message']['chat']['id'], $this->chats)) {
+                        $autorized['yes'][] = $update['update_id'];
+                    } else {
+                        $autorized['not'][] = $update['update_id'];
+                    }
                 } else {
-                    $autorized['not'][] = $update['update_id'];
-                }   
+                    throw new \Exception("Update id non definito");
+                }
             }
             $this->autorized = $autorized;
         } catch (\Throwable $e) {
@@ -226,18 +249,24 @@ class Bot {
     private function setCommands() : void
     {
         try {
-            $updates = $this->updates;
-            $autorized = $this->autorized;
-            $commands['yes'] = [];
-            $commands['not'] = [];
-            foreach ($updates as $update) {
-                $message = $update['message'];
-                if (array_key_exists('entities', $message) && $message['entities'][0]['type'] === 'bot_command') {
-                    if (in_array($update['update_id'], $autorized['yes'])) {                        
-                        $commands['yes'][] = $update['update_id'];
-                    } elseif (in_array($update['update_id'], $autorized['not'])) {
-                        $commands['not'][] = $update['update_id'];
+            $commands = ['yes' => [], 'not' => [],'undef' => []];
+            foreach ($this->updates as $update) {
+                if (array_key_exists('update_id', $update)) {
+                    if (!self::checkStruct($update, ['message','entities',0,'type'])) {
+                        $commands['undef'][] = $update['update_id'];
+                        continue;
                     }
+                    if ($update['message']['entities'][0]['type'] === 'bot_command') {
+                        if (in_array($update['update_id'], $this->autorized['yes'])) {                        
+                            $commands['yes'][] = $update['update_id'];
+                        } elseif (in_array($update['update_id'], $this->autorized['not'])) {
+                            $commands['not'][] = $update['update_id'];
+                        } else {
+                            $commands['undef'][] = $update['update_id'];
+                        }
+                    }
+                } else {
+                    throw new \Exception("Update id non definito");
                 }
             }
             $this->commands = $commands;
@@ -357,8 +386,14 @@ class Bot {
                 $dataFinale = $arrFinale[0];
                 $oraFinale = $arrFinale[1];
                 $valore = $volume['valore'];
-                $arrValore = explode(',', $valore);                
-                $cumulato = number_format($arrValore[0], 0, ',', '.') . ',' . $arrValore[1];
+                $arrValore = explode(',', $valore);
+                if (isset($arrValore[1]) && intval($arrValore[0]) > 0) {
+                    $cumulato = number_format($arrValore[0], 0, ',', '.') . ',' . $arrValore[1];
+                } elseif (intval($arrValore[0]) > 0) {
+                    $cumulato = number_format($arrValore[0], 0, ',', '.');
+                } else {
+                    $cumulato = '0';
+                }
                 $message = 'Il volume movimentato da <b>' . $variabile . '</b>' . PHP_EOL;
                 $message .= 'dal <i>' . $dataIniziale . '</i> alle <i>' . $oraIniziale . '</i>' . PHP_EOL;
                 $message .= 'al <i>' . $dataFinale . '</i> alle <i>' . $oraFinale . '</i>' . PHP_EOL;
@@ -370,6 +405,18 @@ class Bot {
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
+        }
+    }
+    
+    public static function checkStruct(array $update, array $keys) : bool
+    {
+        try {
+            Utility::getSubArray($update, $keys);
+            return true;
+        } catch (\Throwable $e) {
+            Error::noticeHandler(new \Exception("Struttura updates id <b>" . $update['update_id'] . "</b> non compatibile"), DEBUG_LEVEL, 'html');
+            file_put_contents(LOG_PATH . '/Telegram_' . $update['update_id'] . '.json' , json_encode($update));
+            return false;
         }
     }
 }

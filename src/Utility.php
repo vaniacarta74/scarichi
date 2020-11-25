@@ -74,7 +74,7 @@ class Utility
      * @param int $debug_level Livello di debug
      * @return void
      */
-    public static function getSubArray(array $master, array $keys) : array
+    public static function getSubArray(array $master, array $keys) //: array
     {
         try {
             $key = $keys[0];
@@ -86,7 +86,7 @@ class Utility
                     $subArray = $master[$key];
                 }
             } else {
-                throw new \Exception('Problemi con il file json. Chiave inesistente');
+                throw new \Exception('Problemi con l\'array. Chiave inesistente');
             }
             return $subArray;
         } catch (\Throwable $e) {
