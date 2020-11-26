@@ -5,9 +5,16 @@ require __DIR__ . '/../vendor/autoload.php';
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Max-Age: 3600");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 try {
-    $request = checkRequest($_REQUEST, false);
+    $post = @file_get_contents('php://input');
+    $arrPost = json_decode($post, true);
+    $params = $arrPost ?? $_REQUEST;    
+    
+    $request = checkRequest($params, true);
     
     $scarichi = loadScarichi($request);
     $variabili_scarichi = loadVariabiliScarichi($scarichi);
@@ -27,6 +34,7 @@ try {
     echo json_encode($costanti);
 } catch (\Throwable $e) {
     http_response_code(400);
-    Error::errorHandler($e, DEBUG_LEVEL, 'json');
+    Error::errorHandler($e, 1, 'cli');
+    Error::noticeHandler($e, 2, 'json');
     exit();
 }

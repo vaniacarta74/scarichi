@@ -37,6 +37,7 @@ try {
     echo json_encode($dati_ripuliti);
 } catch (\Throwable $e) {
     http_response_code(400);
-    Error::errorHandler($e, DEBUG_LEVEL, 'json');
+    Error::errorHandler($e, 1, 'cli');
+    Error::noticeHandler($e, 2, 'json');
     exit();
 }

@@ -29,6 +29,218 @@ class BotTest extends TestCase
         $this->bot = new Bot($bot);
     }
     
+    protected function tearDown() : void
+    {
+        $this->bot = null;
+    }
+    
+    /**
+     * @group bot
+     * @coversNothing
+     */
+    public function getUpdatesProvider() : array
+    {
+        $data = [
+            'default param' => [
+                'offset' => 0,
+                'token' => TOKEN,
+                'expected' => true
+            ],
+            'negative' => [
+                'offset' => -20,
+                'token' => TOKEN,
+                'expected' => true
+            ],
+            'token error' => [
+                'offset' => -20,
+                'token' => 'TOKEN',
+                'expected' => false
+            ]            
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::getUpdates
+     * @dataProvider getUpdatesProvider
+     */
+    public function testGetUpdatesEquals(int $offset, string $token, bool $expected) : void
+    {
+        $json = Bot::getUpdates($offset, $token);
+        $arrJson = json_decode($json, true);
+        $actual = $arrJson['ok'];
+        
+        $this->assertEquals($expected, $actual);          
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::getUpdates
+     */
+    public function testGetUpdatesReflectorEquals() : void
+    {
+        $offset = Reflections::getProperty($this->bot, 'start');
+        $token = Reflections::getProperty($this->bot, 'token');
+        $expected = true;
+        
+        $json = Bot::getUpdates($offset, $token);
+        $arrJson = json_decode($json, true);
+        $actual = $arrJson['ok'];
+        
+        $this->assertEquals($expected, $actual);          
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::getUpdates
+     */
+    public function testGetUpdatesException() : void    
+    {
+        $offset = 0;
+        $token = TOKEN;
+        
+        Reflections::setStaticProperty(get_class($this->bot), 'url', 'pippo');
+        
+        $this->expectException(\Exception::class);
+        
+        Bot::getUpdates($offset, $token);
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::secureUpdate
+     */
+    public function testSecureUpdateUsleepEquals() : void
+    {
+        $offset = 0;
+        $token = TOKEN;
+        $expected = [];
+        
+        $actual = Bot::secureUpdate($offset, $token);
+        
+        $this->assertEquals($expected, $actual);          
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::secureUpdate
+     */
+    public function testSecureUpdateMoreEquals() : void
+    {
+        $offset = 0;
+        $token = 'token';
+        $expected = [
+            '0' => [
+                "update_id" => 949891731,
+                "message" => [
+                    "message_id" => 1242,
+                    "from" => [
+                        "id" => 474912563,
+                        "is_bot" => false,
+                        "first_name" => "Vania",
+                        "last_name" => "Carta",
+                        "username" => "vaniacarta",
+                        "language_code" => "it" 
+                    ],
+                    "chat" => [
+                        "id" => 474912563,
+                        "first_name" => "Vania",
+                        "last_name" => "Carta",
+                        "username" => "vaniacarta",
+                        "type" => "private"
+                    ],
+                    "date" => 1606407576,
+                    "text" => "/volume 30040 20/01/2020 27/01/2020",
+                    "entities" => [
+                        [
+                            "offset" => 0,
+                            "length" => 7,
+                            "type" => "bot_command"
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        
+        Reflections::setStaticProperty(get_class($this->bot), 'url', 'http://localhost/tests/providers/');
+        
+        $actual = Bot::secureUpdate($offset, $token);
+        
+        $this->assertEquals($expected, $actual);          
+    }
+    
+    /**
+     * @group bot
+     * @coversNothing
+     */
+    public function secureUpdateProvider() : array
+    {
+        $data = [
+            'no param' => [
+                'offset' => null,
+                'token' => null,
+                'expected' => []
+            ],
+            'default param' => [
+                'offset' => 0,
+                'token' => TOKEN,
+                'expected' => []
+            ],
+            'negative' => [
+                'offset' => -20,
+                'token' => TOKEN,
+                'expected' => []
+            ]           
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::secureUpdate
+     * @dataProvider secureUpdateProvider
+     */
+    public function testSecureUpdateEquals(?int $offset, ?string $token, array $expected) : void
+    {
+        Reflections::setStaticProperty(get_class($this->bot), 'url', 'https://api.telegram.org/bot');
+        
+        $actual = Bot::secureUpdate($offset, $token);
+        
+        $this->assertEquals($expected, $actual);          
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::secureUpdate
+     */
+    public function testSecureUpdateReflectorEquals() : void
+    {
+        $offset = Reflections::getProperty($this->bot, 'start');
+        $token = Reflections::getProperty($this->bot, 'token');
+        $expected = [];
+        
+        $actual = Bot::secureUpdate($offset, $token);
+        
+        $this->assertEquals($expected, $actual);          
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::secureUpdate
+     */
+    public function testSecureUpdateError() : void
+    {
+        $offset = 0;
+        $token = 'TOKEN';
+            
+        $this->expectException(\Error::class);
+        
+        $actual = Bot::secureUpdate($offset, $token);
+    }
+        
     /**
      * @group bot
      * @coversNothing
@@ -259,124 +471,7 @@ class BotTest extends TestCase
         
         Bot::arrayShift($results);
     }
-    
-    /**
-     * @group bot
-     * @coversNothing
-     */
-    public function getUpdatesProvider() : array
-    {
-        $data = [
-            'default param' => [
-                'offset' => 0,
-                'token' => TOKEN,
-                'expected' => true
-            ],
-            'negative' => [
-                'offset' => -20,
-                'token' => TOKEN,
-                'expected' => true
-            ],
-            'token error' => [
-                'offset' => -20,
-                'token' => 'TOKEN',
-                'expected' => false
-            ]            
-        ];
         
-        return $data;
-    }
-    
-    /**
-     * @group bot
-     * @covers \vaniacarta74\Scarichi\Bot::getUpdates
-     * @dataProvider getUpdatesProvider
-     */
-    public function testGetUpdatesEquals(int $offset, string $token, bool $expected) : void
-    {
-        $json = Bot::getUpdates($offset, $token);
-        $arrJson = json_decode($json, true);
-        $actual = $arrJson['ok'];
-        
-        $this->assertEquals($expected, $actual);          
-    }
-    
-    /**
-     * @group bot
-     * @covers \vaniacarta74\Scarichi\Bot::getUpdates
-     */
-    public function testGetUpdatesReflectorEquals() : void
-    {
-        $offset = Reflections::getProperty($this->bot, 'start');
-        $token = Reflections::getProperty($this->bot, 'token');
-        $expected = true;
-        
-        $json = Bot::getUpdates($offset, $token);
-        $arrJson = json_decode($json, true);
-        $actual = $arrJson['ok'];
-        
-        $this->assertEquals($expected, $actual);          
-    }
-    
-    /**
-     * @group bot
-     * @coversNothing
-     */
-    public function secureUpdateProvider() : array
-    {
-        $data = [
-            'no param' => [
-                'offset' => null,
-                'token' => null,
-                'expected' => []
-            ],
-            'default param' => [
-                'offset' => 0,
-                'token' => TOKEN,
-                'expected' => []
-            ],
-            'negative' => [
-                'offset' => -20,
-                'token' => TOKEN,
-                'expected' => []
-            ],
-            'token error' => [
-                'offset' => -20,
-                'token' => 'TOKEN',
-                'expected' => []
-            ]            
-        ];
-        
-        return $data;
-    }
-    
-    /**
-     * @group bot
-     * @covers \vaniacarta74\Scarichi\Bot::secureUpdate
-     * @dataProvider secureUpdateProvider
-     */
-    public function testSecureUpdateEquals(?int $offset, ?string $token, array $expected) : void
-    {
-        $actual = Bot::secureUpdate($offset, $token);
-        
-        $this->assertEquals($expected, $actual);          
-    }
-    
-    /**
-     * @group bot
-     * @covers \vaniacarta74\Scarichi\Bot::secureUpdate
-     */
-    public function testSecureUpdateReflectorEquals() : void
-    {
-        $offset = Reflections::getProperty($this->bot, 'start');
-        $token = Reflections::getProperty($this->bot, 'token');
-        $expected = [];
-        
-        $actual = Bot::secureUpdate($offset, $token);
-        
-        $this->assertEquals($expected, $actual);          
-    }
-    
     /**
      * @group bot
      * @covers \vaniacarta74\Scarichi\Bot::updateOffset
@@ -422,6 +517,31 @@ class BotTest extends TestCase
         $actual = Reflections::getProperty($this->bot, 'end');
         
         $this->assertEquals($expected, $actual);         
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::updateOffset
+     */
+    public function testUpdateOffsetException() : void
+    {
+        $start = 67895678;
+                
+        $updates = [
+            [
+                'message' => [
+                    'chat' => [
+                        'id' => 7777
+                    ]
+                ]
+            ]                
+        ];        
+        
+        $this->expectException(\Exception::class);
+        
+        Reflections::setProperty($this->bot, 'start', $start);
+        Reflections::setProperty($this->bot, 'updates', $updates);
+        Reflections::invokeMethod($this->bot, 'updateOffset');
     }
     
     /**
@@ -738,4 +858,141 @@ class BotTest extends TestCase
         Reflections::setProperty($this->bot, 'chats', $autorized);
         Reflections::invokeMethod($this->bot, 'setCommands');
     }
+    
+    /**
+     * @group bot
+     * @coversNothing
+     */
+    public function constructorProvider() : array
+    {
+        $data = [
+            'standard' => [
+                'args' => [
+                    'token' => TOKEN,
+                    'offset' => 0,
+                    'chats' => [
+                        99908766,
+                        98047382
+                    ]
+                ],    
+                'expecteds' => [
+                    'token' => TOKEN,
+                    'start' => 0,
+                    'end' => 0,
+                    'chats' => [
+                        99908766,
+                        98047382
+                    ],
+                    'updates' => [],
+                    'autorized' => [
+                        'yes' => [],
+                        'not' => [],
+                        'undef' => []                        
+                    ],
+                    'commands'=> [
+                        'yes' => [],
+                        'not' => [],
+                        'undef' => []
+                    ]
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::__construct
+     * @dataProvider constructorProvider
+     */
+    public function testConstructorEquals(array $args, array $expected) : void
+    {
+        Reflections::invokeConstructor($this->bot, array($args));
+        
+        $actual['token'] = Reflections::getProperty($this->bot, 'token');
+        $actual['start'] = Reflections::getProperty($this->bot, 'start');
+        $actual['end'] = Reflections::getProperty($this->bot, 'end');
+        $actual['chats'] = Reflections::getProperty($this->bot, 'chats');
+        $actual['updates'] = Reflections::getProperty($this->bot, 'updates');
+        $actual['autorized'] = Reflections::getProperty($this->bot, 'autorized');
+        $actual['commands'] = Reflections::getProperty($this->bot, 'commands');
+        
+        $this->assertEquals($expected, $actual);         
+    }
+    
+    /**
+     * @group bot
+     * @coversNothing
+     */
+    public function constructorExceptionProvider() : array
+    {
+        $data = [
+            'token' => [
+                'args' => [
+                    'token' => 23456789,
+                    'offset' => 0,
+                    'chats' => []
+                ]
+            ],
+            'offset' => [
+                'args' => [
+                    'token' => TOKEN,
+                    'offset' => 'pippo',
+                    'chats' => []
+                ]
+            ],
+            'chats' => [
+                'args' => [
+                    'token' => TOKEN,
+                    'offset' => 0,
+                    'chats' => 45673456
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::__construct
+     * @dataProvider constructorExceptionProvider
+     */
+    public function testConstructorException(array $args) : void
+    {
+        $this->expectException(\Exception::class);
+        
+        Reflections::invokeConstructor($this->bot, array($args));
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::getProperties
+     */
+    public function testGetPropertiesEquals() : void
+    {
+        $expected = [
+            'token' => Reflections::getProperty($this->bot, 'token'), 
+            'offset' => Reflections::getProperty($this->bot, 'end'),
+            'chats' => Reflections::getProperty($this->bot, 'chats')
+        ];
+        
+        $actual = $this->bot->getProperties();
+        
+        $this->assertEquals($expected, $actual); 
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::getProperties
+     */
+    public function testGetPropertiesException() : void
+    {
+        Reflections::setProperty($this->bot, 'token', null);
+        
+        $this->expectException(\Exception::class);
+        
+        $actual = $this->bot->getProperties();
+    }   
 }

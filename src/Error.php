@@ -260,7 +260,9 @@ class Error
     public static function noticeMsgJson(\Throwable $e) : string
     {
         $arrJson = [
-            'Notifica' => htmlspecialchars(strip_tags($e->getMessage()))
+            'ok' => false,
+            'codice errore' => 400,
+            'descrizione errore' => htmlspecialchars(strip_tags($e->getMessage()))
         ];
         return json_encode($arrJson);
     }

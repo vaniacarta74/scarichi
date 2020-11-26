@@ -228,4 +228,150 @@ class ErrorTest extends TestCase
             Error::errorHandler($e, 2, 'html');
         }
     }
+    
+    /**
+     * @covers \vaniacarta74\Scarichi\Error::noticeMsgCli
+     */
+    public function testNoticeMsgCliContainsString() : void
+    {
+        try {
+            if (true) {
+                throw new \Exception('Test if noticeMsgCli() contains a string');
+            }
+        } catch (\Exception $e) {
+            $expected = 'Notifica: ' . $e->getMessage() . PHP_EOL;
+            $actual = Error::noticeMsgCli($e);
+
+            $this->assertStringContainsString($expected, $actual);
+        }
+    }
+    
+    /**
+     * @covers \vaniacarta74\Scarichi\Error::noticeMsgHtml
+     */
+    public function testNoticeMsgHtmlContainsString() : void
+    {
+        try {
+            if (true) {
+                throw new \Exception('Test if noticeMsgHtml() contains a string');
+            }
+        } catch (\Exception $e) {
+            $expected = '<b>Notifica:</b> ' . $e->getMessage() . '<br/>';
+            $actual = Error::noticeMsgHtml($e);
+
+            $this->assertStringContainsString($expected, $actual);
+        }
+    }
+    
+    /**
+     * @covers \vaniacarta74\Scarichi\Error::noticeMsgJson
+     */
+    public function testNoticeMsgJsonContainsString() : void
+    {
+        try {
+            if (true) {
+                throw new \Exception('Test if noticeMsgJson() contains a string');
+            }
+        } catch (\Exception $e) {
+            $expected = '{"ok":false,"codice errore":400,"descrizione errore":"' . $e->getMessage() . '"}';
+            $actual = Error::noticeMsgJson($e);
+
+            $this->assertStringContainsString($expected, $actual);
+        }
+    }
+    
+    /**
+     * @covers \vaniacarta74\Scarichi\Error::noticeHandler
+     */
+    public function testNoticeHandlerNoOutput() : void
+    {
+        try {
+            if (true) {
+                throw new \Exception('Test if noticeHandler() return a string');
+            }
+        } catch (\Exception $e) {
+            $expected = '';
+        
+            $this->expectOutputString($expected);
+            
+            Error::noticeHandler($e, 0, 'cli');
+        }
+    }
+    
+    /**
+     * @covers \vaniacarta74\Scarichi\Error::noticeHandler
+     */
+    public function testNoticeHandlerOutputFile() : void
+    {
+        try {
+            if (true) {
+                throw new \Exception('Test if noticeHandler() return a string');
+            }
+        } catch (\Exception $e) {
+            $expected = 'Notifica: ' . $e->getMessage() . PHP_EOL;
+
+            Error::noticeHandler($e, 1, 'cli');
+
+            $actual = file_get_contents(Error::$logFile);
+
+            $this->assertStringContainsString($expected, $actual);
+        }
+    }
+    
+    /**
+     * @covers \vaniacarta74\Scarichi\Error::noticeHandler
+     */
+    public function testNoticeHandlerCliOutputRegex() : void
+    {
+        try {
+            if (true) {
+                throw new \Exception('Test if noticeHandler return a cli string');
+            }
+        } catch (\Exception $e) {
+            $expected = 'Notifica\: ' . htmlspecialchars(strip_tags($e->getMessage())) . '\\n';
+            $regex = '/(' . $expected . ')/';
+            
+            $this->expectOutputRegex($regex);
+            
+            Error::noticeHandler($e, 2, 'cli');
+        }
+    }
+    
+    /**
+     * @covers \vaniacarta74\Scarichi\Error::noticeHandler
+     */
+    public function testNoticeHandlerCliTagInputRegex() : void
+    {
+        try {
+            if (true) {
+                throw new \Exception('Test if <b>noticeHandler</b> return a cli string');
+            }
+        } catch (\Exception $e) {
+            $expected = 'Notifica\: ' . htmlspecialchars(strip_tags($e->getMessage())) . '\\n';
+            $regex = '/(' . $expected . ')/';
+            
+            $this->expectOutputRegex($regex);
+            
+            Error::noticeHandler($e, 2, 'cli');
+        }
+    }
+    
+    /**
+     * @covers \vaniacarta74\Scarichi\Error::noticeHandler
+     */
+    public function testNoticeHandlerHtmlOutputRegex() : void
+    {
+        try {
+            if (true) {
+                throw new \Exception('Test if noticeHandler return a www string');
+            }
+        } catch (\Exception $e) {
+            $expected = '<b>Notifica:<\/b> ' . $e->getMessage() . '<br\/>';
+            $regex = '/(' . $expected . ')/';
+            
+            $this->expectOutputRegex($regex);
+            
+            Error::noticeHandler($e, 2, 'html');
+        }
+    }
 }

@@ -18578,10 +18578,10 @@ class ToolsTest extends TestCase
                 'expected' => 'Test funzione sendTelegram()'
             ],
             'standard' => [
-                'message' => 'Test funzione sendTelegram()',
+                'message' => 'Test funzione sendTelegram(Standard)',
                 'forced' => true,
                 'chat_id' => null,
-                'expected' => 'Test funzione sendTelegram() Messaggio Telegram inviato con successo.'
+                'expected' => 'Test funzione sendTelegram(Standard) Messaggio Telegram inviato con successo.'
             ],
             'chat error' => [
                 'message' => 'Test funzione sendTelegram()',
@@ -18595,7 +18595,7 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * @group test
+     * @group bot
      * covers sendTelegram()
      * @dataProvider sendTelegramProvider
      */

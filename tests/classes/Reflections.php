@@ -19,6 +19,19 @@ class Reflections
      * @group reflections
      * @coversNothing
      */
+    public static function invokeConstructor(object &$object, ?array $args = [])
+    {
+        $class = new \ReflectionClass($object);
+        
+        $constructor = $class->getConstructor();
+        
+        $constructor->invokeArgs($object, $args);
+    }
+    
+    /**
+     * @group reflections
+     * @coversNothing
+     */
     public static function invokeMethod(object &$object, string $methodName, ?array $args = [])
     {
         $class = new \ReflectionClass($object);
@@ -55,5 +68,29 @@ class Reflections
         $property->setAccessible(true);
         
         return $property->setValue($object, $value);
+    }
+    
+    /**
+     * @group reflections
+     * @coversNothing
+     */
+    public static function getStaticProperty(string $className, string $propertyName)
+    {
+        $property = new \ReflectionProperty($className, $propertyName);
+        $property->setAccessible(true);
+        
+        return $property->getValue(null);
+    }
+    
+    /**
+     * @group reflections
+     * @coversNothing
+     */
+    public static function setStaticProperty(string $className, string $propertyName, $value)
+    {
+        $property = new \ReflectionProperty($className, $propertyName);
+        $property->setAccessible(true);
+        
+        return $property->setValue(null, $value);
     }
 }
