@@ -568,19 +568,19 @@ class BotTest extends TestCase
                                 'id' => 9999
                             ]
                         ]
-                    ],
+                    ],                    
                     [
                         'update_id' => 1001,
                         'message' => [
-                            'chat' => []
+                            'chat' => [
+                                'id' => 8888
+                            ]
                         ]
                     ],
                     [
                         'update_id' => 1002,
                         'message' => [
-                            'chat' => [
-                                'id' => 8888
-                            ]
+                            'chat' => []
                         ]
                     ],
                     [
@@ -599,14 +599,14 @@ class BotTest extends TestCase
                 'expecteds' => [
                     'yes' => [
                         999,
-                        1002
+                        1001
                     ],
                     'not' => [
                         1000,
                         1003
                     ],
                     'undef' => [
-                        1001
+                        1002
                     ]
                 ]
             ],
@@ -765,6 +765,7 @@ class BotTest extends TestCase
                         1000
                     ],
                     'undef' => [
+                        1001,
                         1002
                     ]
                 ]
@@ -857,6 +858,324 @@ class BotTest extends TestCase
         Reflections::setProperty($this->bot, 'updates', $updates);
         Reflections::setProperty($this->bot, 'chats', $autorized);
         Reflections::invokeMethod($this->bot, 'setCommands');
+    }
+    
+    /**
+     * @group bot
+     * @coversNothing
+     */
+    public function sendRepliesProvider() : array
+    {
+        $data = [
+            'rejections sended' => [
+                'autorized' => false,
+                'updates' => [
+                    [
+                        'update_id' => 1000,
+                        'message' => [
+                            'chat' => [
+                                'id' => 474912563
+                            ],
+                            'entities' => [
+                                [
+                                    'type' => 'bot_command'
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'commands' => [
+                    'yes' => [],
+                    'not' => [
+                        1000,
+                    ]
+                ],
+                'token' => TOKEN,
+                'expected' => true
+            ],
+            'rejections null to send' => [
+                'autorized' => false,
+                'updates' => [
+                    [
+                        'update_id' => 1000,
+                        'message' => [
+                            'chat' => [
+                                'id' => 474912563
+                            ],
+                            'entities' => [
+                                [
+                                    'type' => 'bot_command'
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'commands' => [
+                    'yes' => [],
+                    'not' => []
+                ],
+                'token' => TOKEN,
+                'expected' => true
+            ],
+            'rejections not sended' => [
+                'autorized' => false,
+                'updates' => [
+                    [
+                        'update_id' => 1000,
+                        'message' => [
+                            'chat' => [
+                                'id' => 9999
+                            ],
+                            'entities' => [
+                                [
+                                    'type' => 'bot_command'
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'commands' => [
+                    'yes' => [],
+                    'not' => [
+                        1000,
+                    ]
+                ],
+                'token' => TOKEN,
+                'expected' => false
+            ],
+            'rejections bad update' => [
+                'autorized' => false,
+                'updates' => [
+                    [
+                        'update_id' => 1002,
+                        'pluto' => [
+                            'pippo' => [
+                                'paperino' => 9999
+                            ],
+                            'entities' => [
+                                [
+                                    'type' => 'bot_command'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'update_id' => 1003,
+                        'message' => [
+                            'chat' => [
+                                'id' => 474912563
+                            ],
+                            'entities' => [
+                                [
+                                    'type' => 'bot_command'
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'commands' => [
+                    'yes' => [],
+                    'not' => [
+                        1002,
+                        1003
+                    ]
+                ],
+                'token' => TOKEN,
+                'expected' => false
+            ],
+            'replies sended' => [
+                'autorized' => true,
+                'updates' => [
+                    [
+                        'update_id' => 1000,
+                        'message' => [
+                            'chat' => [
+                                'id' => 474912563
+                            ],
+                            'text' => '/volume 30030 20/01/2020 27/01/2020',
+                            'entities' => [
+                                [
+                                    'type' => 'bot_command'
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'commands' => [
+                    'yes' => [
+                        1000
+                    ],
+                    'not' => []
+                ],
+                'token' => TOKEN,
+                'expected' => true
+            ],
+            'replies not sended' => [
+                'autorized' => true,
+                'updates' => [
+                    [
+                        'update_id' => 1000,
+                        'message' => [
+                            'chat' => [
+                                'id' => 9999
+                            ],
+                            'text' => '/volume 30030 20/01/2020 27/01/2020',
+                            'entities' => [
+                                [
+                                    'type' => 'bot_command'
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'commands' => [
+                    'yes' => [
+                        1000
+                    ],
+                    'not' => []
+                ],
+                'token' => TOKEN,
+                'expected' => false
+            ],
+            'replies no chat id' => [
+                'autorized' => true,
+                'updates' => [
+                    [
+                        'update_id' => 1000,
+                        'pippo' => [
+                            'chat' => [
+                                'id' => 474912563
+                            ],
+                            'text' => '/volume 30030 20/01/2020 27/01/2020',
+                            'entities' => [
+                                [
+                                    'type' => 'bot_command'
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'commands' => [
+                    'yes' => [
+                        1000
+                    ],
+                    'not' => []
+                ],
+                'token' => TOKEN,
+                'expected' => false
+            ],
+            'replies no text' => [
+                'autorized' => true,
+                'updates' => [
+                    [
+                        'update_id' => 1000,
+                        'message' => [
+                            'chat' => [
+                                'id' => 474912563
+                            ],
+                            'entities' => [
+                                [
+                                    'type' => 'bot_command'
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'commands' => [
+                    'yes' => [
+                        1000
+                    ],
+                    'not' => []
+                ],
+                'token' => TOKEN,
+                'expected' => false
+            ],
+            'replies bad command' => [
+                'autorized' => true,
+                'updates' => [
+                    [
+                        'update_id' => 1000,
+                        'message' => [
+                            'chat' => [
+                                'id' => 474912563
+                            ],
+                            'text' => '/volume',
+                            'entities' => [
+                                [
+                                    'type' => 'bot_command'
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'commands' => [
+                    'yes' => [
+                        1000
+                    ],
+                    'not' => []
+                ],
+                'token' => TOKEN,
+                'expected' => false
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::sendReplies
+     * @dataProvider sendRepliesProvider
+     */
+    public function testSendRepliesEquals(bool $autorized, array $updates, array $commands, string $token, bool $expected) : void
+    {
+        Reflections::setProperty($this->bot, 'updates', $updates);
+        Reflections::setProperty($this->bot, 'commands', $commands);
+        Reflections::setProperty($this->bot, 'token', $token);
+        $actual = Reflections::invokeMethod($this->bot, 'sendReplies', array($autorized));
+        
+        $this->assertEquals($expected, $actual);         
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::sendReplies
+     */
+    public function testSendRepliesException() : void
+    {
+        $autorized = false;
+        $updates = [
+            [
+                'message' => [
+                    'chat' => [
+                        'id' => 7777
+                    ]
+                ]
+            ],
+            [
+                'update_id' => 1002,
+                'message' => [
+                    'chat' => [
+                        'id' => 6666
+                    ]
+                ]
+            ]
+        ];        
+        $commands = [
+            'yes' => [],
+            'not' => [
+                1002
+            ],
+            'undef' => []
+        ];
+        $token = TOKEN;
+        
+        $this->expectException(\Exception::class);
+        
+        Reflections::setProperty($this->bot, 'updates', $updates);
+        Reflections::setProperty($this->bot, 'commands', $commands);
+        Reflections::setProperty($this->bot, 'token', $token);
+        Reflections::invokeMethod($this->bot, 'sendReplies', array($autorized));
     }
     
     /**
@@ -994,5 +1313,47 @@ class BotTest extends TestCase
         $this->expectException(\Exception::class);
         
         $actual = $this->bot->getProperties();
-    }   
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function checkStructProvider() : array
+    {
+        $update = [
+            'update_id' => 1002,
+            'message' => [
+                'chat' => [
+                    'id' => 6666
+                ]
+            ]
+        ];
+        
+        $data = [
+            'true' => [
+                'master' => $update,
+                'keys' => ['message','chat','id'],
+                'expected' => true
+            ],
+            'false' => [
+                'master' => $update,
+                'keys' => ['parameters'],
+                'expected' => false
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::checkStruct
+     * @dataProvider checkStructProvider
+     */
+    public function testCheckStructEquals($master, $keys, $expected) : void
+    {
+        $actual = Bot::checkStruct($master, $keys);
+        
+        $this->assertEquals($expected, $actual);
+    }
 }

@@ -32,8 +32,7 @@ class Error
      */
     public static function printErrorInfo(string $functionName, int $debug_level) : void
     {
-        $date = new \DateTime();
-        $date->setTimezone(new \DateTimeZone('Europe/Rome'));
+        $date = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
         switch ($debug_level) {
             case 0:
             case 2:
@@ -90,11 +89,12 @@ class Error
      */
     public static function noticeHandler(\Throwable $e, int $debug_level, string $type) : void
     {
+        $date = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
         switch ($debug_level) {
             case 0:
                 break;
             case 1:
-                $message = self::noticeMsgCli($e);
+                $message = $date->format('d/m/Y H:i:s') . ' ' . self::noticeMsgCli($e);
                 self::appendToFile($message);
                 break;
             case 2:

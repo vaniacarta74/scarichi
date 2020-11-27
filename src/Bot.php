@@ -64,10 +64,8 @@ class Bot {
             $this->updateOffset();
             $this->setAutorized();
             $this->setCommands();
-
-            self::sendRejections($this->updates, $this->commands, $this->token);
-            self::sendReplies($this->updates, $this->commands, $this->token);
-            
+            $this->sendReplies(false);
+            $this->sendReplies(true);
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
@@ -237,15 +235,16 @@ class Bot {
         try {
             $autorized = ['yes' => [],'not' => [],'undef' => []];            
             foreach ($this->updates as $update) {
-                if (array_key_exists('update_id', $update)) {
-                    if (!self::checkStruct($update, ['message','chat','id'])) {
-                        $autorized['undef'][] = $update['update_id'];
-                        continue;
-                    }
-                    if (in_array($update['message']['chat']['id'], $this->chats)) {
-                        $autorized['yes'][] = $update['update_id'];
+                if (array_key_exists('update_id', $update)) {                    
+                    $chatId = $this->getChatId($update);
+                    if ($chatId > 0) {
+                        if (in_array($chatId, $this->chats)) {
+                            $autorized['yes'][] = $update['update_id'];
+                        } else {
+                            $autorized['not'][] = $update['update_id'];
+                        }
                     } else {
-                        $autorized['not'][] = $update['update_id'];
+                        $autorized['undef'][] = $update['update_id'];
                     }
                 } else {
                     throw new \Exception("Update id non definito");
@@ -263,12 +262,9 @@ class Bot {
         try {
             $commands = ['yes' => [], 'not' => [],'undef' => []];
             foreach ($this->updates as $update) {
-                if (array_key_exists('update_id', $update)) {
-                    if (!self::checkStruct($update, ['message','entities',0,'type'])) {
-                        $commands['undef'][] = $update['update_id'];
-                        continue;
-                    }
-                    if ($update['message']['entities'][0]['type'] === 'bot_command') {
+                if (array_key_exists('update_id', $update)) {                    
+                    $entType = $this->getEntityType($update);
+                    if ($entType !== '' && $entType === 'bot_command') {
                         if (in_array($update['update_id'], $this->autorized['yes'])) {                        
                             $commands['yes'][] = $update['update_id'];
                         } elseif (in_array($update['update_id'], $this->autorized['not'])) {
@@ -276,6 +272,8 @@ class Bot {
                         } else {
                             $commands['undef'][] = $update['update_id'];
                         }
+                    } else {
+                        $commands['undef'][] = $update['update_id'];
                     }
                 } else {
                     throw new \Exception("Update id non definito");
@@ -288,39 +286,29 @@ class Bot {
         }
     }
     
-    public static function sendRejections(array $updates, array $commands, ?string $token = null) : void
+    private function sendReplies(bool $isAutorized) : bool
     {
         try {
-            $tokenBot = $token ?? self::$defaultBot;
-            if (count($commands['not']) > 0) {
-                foreach ($updates as $update) {
-                    if (in_array($update['update_id'], $commands['not'])) {
-                        $message = 'Non sei autorizzato ad usare questo comando';
-                        $chatId = $update['message']['chat']['id'];
-                        $isOk = self::secureSend($message, $chatId, $token);
-                    } 
+            $isAllOk = true;
+            $autorized = $isAutorized ? 'yes' : 'not';
+            if (count($this->commands[$autorized]) > 0) {
+                foreach ($this->updates as $update) {
+                    if (array_key_exists('update_id', $update)) {
+                        $updateId = $update['update_id'];                        
+                        if (in_array($updateId, $this->commands[$autorized])) {                            
+                            $message = $this->prepareReply($update, $isAutorized);
+                            $isOk = $this->sendReply($update, $message);
+                            if (!$isOk) {
+                                Error::noticeHandler(new \Exception('Risposta update id <b>' . $updateId . '</b> non inviata'), DEBUG_LEVEL, 'html');
+                                $isAllOk = false;
+                            }
+                        } 
+                    } else {
+                        throw new \Exception("Update id non definito");
+                    }
                 }
             }
-        } catch (\Throwable $e) {
-            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-            throw $e;
-        }
-    }
-    
-    public static function sendReplies(array $updates, array $commands, ?string $token = null) : void
-    {
-        try {
-            $tokenBot = $token ?? self::$defaultBot;
-            if (count($commands['yes']) > 0) {
-                foreach ($updates as $update) {
-                    if (in_array($update['update_id'], $commands['yes'])) {
-                        $text = $update['message']['text'];
-                        $message = self::getCommandReply($text);
-                        $chatId = $update['message']['chat']['id'];
-                        $isOk = self::secureSend($message, $chatId, $token);
-                    } 
-                }
-            }
+            return $isAllOk;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
@@ -429,6 +417,84 @@ class Bot {
             Error::noticeHandler(new \Exception("Struttura updates id <b>" . $update['update_id'] . "</b> non compatibile"), DEBUG_LEVEL, 'html');
             file_put_contents(LOG_PATH . '/Telegram_' . $update['update_id'] . '.json' , json_encode($update));
             return false;
+        }
+    }
+    
+    public function getChatId(array $update) : int
+    {
+        try {
+            $chatId = 0;
+            if (self::checkStruct($update, ['message','chat','id'])) {
+                $chatId = $update['message']['chat']['id'];                                
+            }
+            return $chatId;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    private function getText(array $update) : string
+    {
+        try {
+            $text = '';
+            if (self::checkStruct($update, ['message','text'])) {
+                $text = $update['message']['text'];                                
+            }
+            return $text;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    private function getEntityType(array $update) : string
+    {
+        try {            
+            $type = '';
+            if (self::checkStruct($update, ['message','entities',0,'type'])) {
+                $type = $update['message']['entities'][0]['type'];                                
+            }
+            return $type;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    private function prepareReply(array $update, bool $isAutorized) : string
+    {
+        try {
+            $message = '';
+            if ($isAutorized) {
+                $text = $this->getText($update);
+                if ($text !== '') {
+                    $message = self::getCommandReply($text);
+                }
+            } else {
+                $message = 'Non sei autorizzato ad usare questo comando';
+            }
+            return $message;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    private function sendReply(array $update, ?string $message = null) : bool
+    {
+        try {
+            $isOk = false;
+            if ($message !== '') {
+                $chatId = $this->getChatId($update);
+                if ($chatId > 0) {
+                    $isOk = self::secureSend($message, $chatId, $this->token);
+                }
+            }
+            return $isOk;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
         }
     }
 }
