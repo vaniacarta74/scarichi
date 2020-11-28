@@ -24,6 +24,7 @@ class Bot {
     private $token;
     private $start;
     private $end;
+    private $botCommands;
     private $chats;
     private $updates;
     private $autorized;
@@ -42,6 +43,11 @@ class Bot {
                 $this->end = $bot['offset'];
             } else {
                 throw new \Exception('Offset non presente o errato');
+            }
+            if (array_key_exists('commands', $bot) && is_array($bot['commands'])) {
+                $this->botCommands = $bot['commands'];
+            } else {
+                throw new \Exception('Commands non presente o errato');
             }
             if (array_key_exists('chats', $bot) && is_array($bot['chats'])) {
                 $this->chats = $bot['chats'];
@@ -214,10 +220,11 @@ class Bot {
     public function getProperties() : array
     {
         try {
-            if (isset($this->token) && isset($this->end) && isset($this->chats)) {
+            if (isset($this->token) && isset($this->end) && isset($this->botCommands) && isset($this->chats)) {
                 $properties = [
                     'token' => $this->token,
                     'offset' => $this->end,
+                    'commands' => $this->botCommands,
                     'chats' => $this->chats
                 ];
             } else {
@@ -315,15 +322,88 @@ class Bot {
         }
     }
     
-    public static function getCommandReply(string $text) : string
+    public static function checkStruct(array $update, array $keys) : bool
     {
         try {
-            $command = self::parseCommand($text);
-            $functionCommand = $command['command'];
-            $functionMessage = $command['message'];
-            $params = $command['params'];
-            $response = Utility::callback($functionCommand, $params);
-            $message = Utility::callback($functionMessage, array($response));
+            Utility::getSubArray($update, $keys);
+            return true;
+        } catch (\Throwable $e) {
+            Error::noticeHandler(new \Exception("Struttura updates id <b>" . $update['update_id'] . "</b> non compatibile"), DEBUG_LEVEL, 'html');
+            file_put_contents(LOG_PATH . '/Telegram_' . $update['update_id'] . '.json' , json_encode($update));
+            return false;
+        }
+    }
+    
+    private function getChatId(array $update) : int
+    {
+        try {
+            if (count($update) > 0) {
+                $chatId = 0;
+                if (self::checkStruct($update, ['message','chat','id'])) {
+                    $chatId = $update['message']['chat']['id'];                                
+                }
+            } else {
+                throw new \Exception("Array update vuoto");
+            }
+            return $chatId;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    private function getText(array $update) : string
+    {
+        try {
+            if (count($update) > 0) {
+                $text = '';
+                if (self::checkStruct($update, ['message','text'])) {
+                    $text = $update['message']['text'];                                
+                }
+            } else {
+                throw new \Exception("Array update vuoto");
+            }
+            return $text;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    private function getEntityType(array $update) : string
+    {
+        try { 
+            if (count($update) > 0) {
+                $type = '';
+                if (self::checkStruct($update, ['message','entities',0,'type'])) {
+                    $type = $update['message']['entities'][0]['type'];                                
+                }
+            } else {
+                throw new \Exception("Array update vuoto");
+            }
+            return $type;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    private function prepareReply(array $update, bool $isAutorized) : string
+    {
+        try {
+            if (count($update) > 0) {
+                $message = '';
+                if ($isAutorized) {
+                    $text = $this->getText($update);
+                    if ($text !== '') {
+                        $message = $this->getCommandReply($text);
+                    }
+                } else {
+                    $message = 'Non sei autorizzato ad usare i comandi di BotScarichi.';
+                }
+            } else {
+                throw new \Exception("Array update vuoto");
+            }
             return $message;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -331,17 +411,79 @@ class Bot {
         }
     }
     
-    public static function parseCommand(string $text) : array
+    private function sendReply(array $update, string $message) : bool
     {
         try {
-            $params = explode(' ', $text);
-            $commandName = ucfirst(substr($params[0], 1));
-            $command['command'] = 'Bot::command' . $commandName;
-            $iMax = count($params);
-            for ($i = 1; $i < $iMax; $i++) {
-                $command['params'][] = $params[$i];
+            if (count($update) > 0) {
+                $isOk = false;
+                if ($message !== '') {
+                    $chatId = $this->getChatId($update);
+                    if ($chatId > 0) {
+                        $isOk = self::secureSend($message, $chatId, $this->token);
+                    }
+                }
+            } else {
+                throw new \Exception("Array update vuoto");
             }
-            $command['message'] = 'Bot::msg' . $commandName;
+            return $isOk;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    private function getCommandReply(string $text) : string
+    {
+        try {
+            if ($text !== '') {
+                $command = $this->parseCommand($text);
+                if (count($command) > 0) {
+                    $tested = Utility::callback($command['tester'], array($command['params']));
+                    if ($tested['ok']) {
+                        $response = Utility::callback($command['command'], $tested['params']);
+                        if ($response['ok']) {
+                            $message = Utility::callback($command['messager'], array($response['records']));
+                        } else {
+                            $message = $response['descrizione errore'];
+                        }
+                    } else {
+                        $message = implode(PHP_EOL, $tested['errors']);
+                    }
+                } else {
+                    $message = 'Comando inesistente.';
+                }
+            } else {
+                throw new \Exception("Il testo non contiene un comando");
+            }
+            return $message;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    private function parseCommand(string $text) : array
+    {
+        try {
+            if ($text !== '') {
+                $params = explode(' ', $text);
+                $botCommand = substr($params[0], 1);
+                if (in_array($botCommand, $this->botCommands)) {
+                    $commandName = ucfirst($botCommand);
+                    $command['tester'] = 'Bot::tester' . $commandName;
+                    $command['command'] = 'Bot::command' . $commandName;
+                    $command['messager'] = 'Bot::msg' . $commandName;                
+                    $command['params'] = [];
+                    $iMax = count($params);
+                    for ($i = 1; $i < $iMax; $i++) {
+                        $command['params'][] = $params[$i];
+                    }
+                } else {
+                    $command = [];
+                }
+            } else {
+                throw new \Exception("Il testo non contiene un comando");
+            }
             return $command;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -349,16 +491,136 @@ class Bot {
         }
     }
     
-    public static function commandVolume(string $variabile, string $datefrom, ?string $dateto = null) : array
+    public static function testerVolume(array $params) : array
     {
         try {
-            $dateTime = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
-            $date = $dateTime->format('d/m/Y');
+            $n_params = count($params);
+            switch ($n_params) {
+                case 0:
+                    $testNames = [];
+                    $errors[] = 'Parametri non definiti (es. <i>/volume 30030 01/01/2020 02/01/2020</i>).';
+                    break;
+                case 1:
+                    $testNames = [];
+                    $errors[] = 'Numero parametri non sufficiente:' . PHP_EOL . 'inserire l\'id della variabile e almeno una data.';
+                    break;
+                default:
+                    $testNames = ['variabile','datefrom','dateto'];
+                    break;
+            }
+            foreach ($testNames as $testName) {
+                $functionName = 'Bot::test' . ucfirst($testName);
+                $resTest = Utility::callback($functionName, array($params));
+                if ($resTest['ok']) {
+                    $testedParams[] = $resTest['param'];
+                } else {
+                    $errors[] = $resTest['error'];
+                }
+            }
+            if (isset($errors)) {
+                $tested = ['ok' => false,'errors' => $errors];
+            } else {
+                $tested = ['ok' => true,'params' => $testedParams];
+            }
+            return $tested;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    public static function testVariabile(array $params) : array
+    {
+        try {
+            if (count($params) > 0) {
+                $raw = intval($params[0]);
+                if ($raw >= 30000 && $raw <= 39999) {
+                    $resTest = [
+                        'ok' => true,
+                        'param' => $raw
+                    ];
+                } else {
+                    $resTest = [
+                        'ok' => false,
+                        'error' => 'Il primo parametro deve essere l\'id della variabile:' . PHP_EOL . 'inserire un numero compreso fra 30000 e 39999.'
+                    ];
+                }
+            } else {
+                throw new \Exception("Numero parametri insufficiente. Impossibile testare la variabile");
+            }
+            return $resTest;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    public static function testDatefrom(array $params) : array
+    {
+        try {
+            if (count($params) > 1) {
+                $raw = strval($params[1]);
+                if (preg_match('/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/', $raw) && Utility::checkDate($raw)) {
+                    $resTest = [
+                        'ok' => true,
+                        'param' => $raw
+                    ];
+                } else {
+                    $resTest = [
+                        'ok' => false,
+                        'error' => 'Il secondo parametro deve essere una data valida:' . PHP_EOL . 'utilizzare il formato dd/mm/yyyy.'
+                    ];
+                }
+            } else {
+                throw new \Exception("Numero parametri insufficiente. Impossibile testare la data iniziale");
+            }
+            return $resTest;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    public static function testDateto(array $params) : array
+    {
+        try {
+            if (count($params) >= 2) {
+                if (isset($params[2])) {
+                    $raw = strval($params[2]);
+                } else {
+                    $dateTime = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
+                    $date = $dateTime->format('d/m/Y');
+                    $raw = $date;
+                }                
+                if (preg_match('/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/', $raw) && Utility::checkDate($raw)) {
+                    $resTest = [
+                        'ok' => true,
+                        'param' => $raw
+                    ];
+                } else {
+                    $resTest = [
+                        'ok' => false,
+                        'error' => 'Il terzo parametro deve essere una data valida:' . PHP_EOL . 'utilizzare il formato dd/mm/yyyy.'
+                    ];
+                }
+            } else {
+                throw new \Exception("Numero parametri insufficiente. Impossibile testare la data finale");
+            }
+            return $resTest;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    public static function commandVolume(string $variabile, string $datefrom, string $dateto) : array
+    {
+        try {
             $url = 'http://localhost/scarichi/tojson.php';
             $params = [
                 'var' => $variabile,
                 'datefrom' => $datefrom,
-                'dateto' => $dateto ?? $date,
+                'dateto' => $dateto,
                 'field' => 'cumulato'
             ];
             $json = Curl::run($params, $url, true);            
@@ -397,101 +659,11 @@ class Bot {
                 $message = 'Il volume movimentato da <b>' . $variabile . '</b>' . PHP_EOL;
                 $message .= 'dal <i>' . $dataIniziale . '</i> alle <i>' . $oraIniziale . '</i>' . PHP_EOL;
                 $message .= 'al <i>' . $dataFinale . '</i> alle <i>' . $oraFinale . '</i>' . PHP_EOL;
-                $message .= 'é di <b>' . $cumulato . ' mc</b>';
+                $message .= 'é di <b>' . $cumulato . ' mc</b>.';
             } else {
-                $message = 'error';
+                $message = 'Non ci sono dati per il periodo selezionato.';
             }            
             return $message;
-        } catch (\Throwable $e) {
-            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-            throw $e;
-        }
-    }
-    
-    public static function checkStruct(array $update, array $keys) : bool
-    {
-        try {
-            Utility::getSubArray($update, $keys);
-            return true;
-        } catch (\Throwable $e) {
-            Error::noticeHandler(new \Exception("Struttura updates id <b>" . $update['update_id'] . "</b> non compatibile"), DEBUG_LEVEL, 'html');
-            file_put_contents(LOG_PATH . '/Telegram_' . $update['update_id'] . '.json' , json_encode($update));
-            return false;
-        }
-    }
-    
-    public function getChatId(array $update) : int
-    {
-        try {
-            $chatId = 0;
-            if (self::checkStruct($update, ['message','chat','id'])) {
-                $chatId = $update['message']['chat']['id'];                                
-            }
-            return $chatId;
-        } catch (\Throwable $e) {
-            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-            throw $e;
-        }
-    }
-    
-    private function getText(array $update) : string
-    {
-        try {
-            $text = '';
-            if (self::checkStruct($update, ['message','text'])) {
-                $text = $update['message']['text'];                                
-            }
-            return $text;
-        } catch (\Throwable $e) {
-            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-            throw $e;
-        }
-    }
-    
-    private function getEntityType(array $update) : string
-    {
-        try {            
-            $type = '';
-            if (self::checkStruct($update, ['message','entities',0,'type'])) {
-                $type = $update['message']['entities'][0]['type'];                                
-            }
-            return $type;
-        } catch (\Throwable $e) {
-            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-            throw $e;
-        }
-    }
-    
-    private function prepareReply(array $update, bool $isAutorized) : string
-    {
-        try {
-            $message = '';
-            if ($isAutorized) {
-                $text = $this->getText($update);
-                if ($text !== '') {
-                    $message = self::getCommandReply($text);
-                }
-            } else {
-                $message = 'Non sei autorizzato ad usare questo comando';
-            }
-            return $message;
-        } catch (\Throwable $e) {
-            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-            throw $e;
-        }
-    }
-    
-    private function sendReply(array $update, ?string $message = null) : bool
-    {
-        try {
-            $isOk = false;
-            if ($message !== '') {
-                $chatId = $this->getChatId($update);
-                if ($chatId > 0) {
-                    $isOk = self::secureSend($message, $chatId, $this->token);
-                }
-            }
-            return $isOk;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;

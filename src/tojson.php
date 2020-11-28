@@ -33,8 +33,12 @@ try {
     $dati_filtrati = filter($dati_formattati, $request['full'], 0);
     $dati_ripuliti = filter($dati_filtrati, false, NODATA);
     
+    $response = [
+        'ok' => true,
+        'records' => $dati_ripuliti
+    ];    
     http_response_code(200);
-    echo json_encode($dati_ripuliti);
+    echo json_encode($response);
 } catch (\Throwable $e) {
     http_response_code(400);
     Error::errorHandler($e, 1, 'cli');

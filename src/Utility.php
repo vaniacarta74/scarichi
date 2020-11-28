@@ -155,4 +155,33 @@ class Utility
             throw $e;        
         }
     }
+    
+    /**
+     * Stampa il tempo trascorso da una certa data.
+     *
+     * Il metodo benchmark() fornisce l'intervallo di tempo intercorso da una
+     * certa data. Viene utilizzato per calcolare il tempo di esecuzione della
+     * procedura.
+     *
+     * @param string $strDateTime Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
+     * @return string Intervallo intercorso nel formato "secondi,millisecondi"
+     */
+    public static function checkDate(string $date) : bool
+    {
+        try {
+            if (preg_match('/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/', $date)) {
+                if (preg_match('/^(((0[1-9]|[12]\d|3[01])\/(0[13578]|1[02])\/((19|[2-9]\d)\d{2}))|((0[1-9]|[12]\d|30)\/(0[13456789]|1[012])\/((19|[2-9]\d)\d{2}))|((0[1-9]|1\d|2[0-8])\/02\/((19|[2-9]\d)\d{2}))|(29\/02\/((1[6-9]|[2-9]\d)(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00))))$/', $date)) {
+                    $isDate = true;
+                } else {
+                    $isDate = false;
+                }
+            } else {
+                throw new \Exception('Formato data non analizzabile. Utilizzare dd/mm/yyyy');
+            }
+            return $isDate;
+        } catch (\Throwable $e) {        
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;        
+        }
+    }
 }

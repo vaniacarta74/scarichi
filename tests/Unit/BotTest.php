@@ -1115,6 +1115,33 @@ class BotTest extends TestCase
                     'not' => []
                 ],
                 'token' => TOKEN,
+                'expected' => true
+            ],
+            'replies void command' => [
+                'autorized' => true,
+                'updates' => [
+                    [
+                        'update_id' => 1000,
+                        'message' => [
+                            'chat' => [
+                                'id' => 474912563
+                            ],
+                            'text' => '',
+                            'entities' => [
+                                [
+                                    'type' => 'bot_command'
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'commands' => [
+                    'yes' => [
+                        1000
+                    ],
+                    'not' => []
+                ],
+                'token' => TOKEN,
                 'expected' => false
             ]
         ];
@@ -1355,5 +1382,232 @@ class BotTest extends TestCase
         $actual = Bot::checkStruct($master, $keys);
         
         $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::getChatId
+     */
+    public function testGetChatIdEquals() : void
+    {
+        $update = [
+            'update_id' => 1002,
+            'message' => [
+                'chat' => [
+                    'id' => 6666
+                ]
+            ]
+        ];
+        $expected = 6666;
+        
+        $actual = Reflections::invokeMethod($this->bot, 'getChatId', array($update));
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::getChatId
+     */
+    public function testGetChatIdException() : void
+    {
+        $update = [];
+        
+        $this->expectException(\Exception::class);
+        
+        Reflections::invokeMethod($this->bot, 'getChatId', array($update));
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::getText
+     */
+    public function testGetTextEquals() : void
+    {
+        $update = [
+            'update_id' => 1002,
+            'message' => [
+                'chat' => [
+                    'id' => 6666
+                ],
+                'text' => '/volume'
+            ]
+        ];
+        $expected = '/volume';
+        
+        $actual = Reflections::invokeMethod($this->bot, 'getText', array($update));
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::getText
+     */
+    public function testGetTextException() : void
+    {
+        $update = [];
+        
+        $this->expectException(\Exception::class);
+        
+        Reflections::invokeMethod($this->bot, 'getText', array($update));
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::getEntityType
+     */
+    public function testGetEntityTypeEquals() : void
+    {
+        $update = [
+            'update_id' => 1002,
+            'message' => [
+                'chat' => [
+                    'id' => 6666
+                ],
+                'text' => '/volume',
+                'entities' => [
+                    [
+                        'type' => 'bot_command'
+                    ]
+                ]
+            ]
+        ];
+        $expected = 'bot_command';
+        
+        $actual = Reflections::invokeMethod($this->bot, 'getEntityType', array($update));
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::getEntityType
+     */
+    public function testGetEntityTypeException() : void
+    {
+        $update = [];
+        
+        $this->expectException(\Exception::class);
+        
+        Reflections::invokeMethod($this->bot, 'getEntityType', array($update));
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function prepareReplyProvider() : array
+    {
+        $update = [
+            'update_id' => 1002,
+            'message' => [
+                'chat' => [
+                    'id' => 6666
+                ],
+                'text' => '/volume 30030 20/01/2020 27/01/2020',
+                'entities' => [
+                    [
+                        'type' => 'bot_command'
+                    ]
+                ]
+            ]
+        ];
+        
+        $data = [
+            'autorized true' => [
+                'update' => $update,
+                'autorized' => true,
+                'expected' => 'Il volume movimentato da <b>30030</b>' . PHP_EOL . 'dal <i>20/01/2020</i> alle <i>00:00:00</i>' . PHP_EOL . 'al <i>26/01/2020</i> alle <i>23:30:00</i>' . PHP_EOL . 'é di <b>17.058.327,860 mc</b>'
+            ],
+            'autorized false' => [
+                'update' => $update,
+                'autorized' => false,
+                'expected' => 'Non sei autorizzato ad usare questo comando'
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::prepareReply
+     * @dataProvider prepareReplyProvider
+     */
+    public function testPrepareReplyEquals(array $update, bool $isAutorized, string $expected) : void
+    {
+        $actual = Reflections::invokeMethod($this->bot, 'prepareReply', array($update, $isAutorized));
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::prepareReply
+     */
+    public function testPrepareReplyException() : void
+    {
+        $update = [];
+        $isAutorized = true;
+        
+        $this->expectException(\Exception::class);
+        
+        Reflections::invokeMethod($this->bot, 'prepareReply', array($update, $isAutorized));
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function sendReplyProvider() : array
+    {
+        $update = [
+            'update_id' => 1002,
+            'message' => [
+                'chat' => [
+                    'id' => 474912563
+                ]
+            ]
+        ];
+        
+        $data = [
+            'standard' => [
+                'update' => $update,
+                'message' => 'Test metodo Bot::sendReply',
+                'expected' => true
+            ],
+            'no message' => [
+                'update' => $update,
+                'message' => '',
+                'expected' => false
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::sendReply
+     * @dataProvider sendReplyProvider
+     */
+    public function testSendReplyEquals(array $update, ?string $message, bool $expected) : void
+    {
+        $actual = Reflections::invokeMethod($this->bot, 'sendReply', array($update, $message));
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::sendReply
+     */
+    public function testSendReplyException() : void
+    {
+        $update = [];
+        $message = 'pippo';
+        
+        $this->expectException(\Exception::class);
+        
+        Reflections::invokeMethod($this->bot, 'sendReply', array($update, $message));
     }
 }

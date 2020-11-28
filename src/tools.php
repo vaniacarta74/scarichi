@@ -3030,7 +3030,7 @@ function loadVariabiliScarichi(array $scarichi) : array
     try {
         $scarico = $scarichi[0];
         if (!array_key_exists('scarico', $scarico)) {
-            throw new \Exception('Chiave scarico non definita');
+            throw new \Exception('Variabile non trovata. Scarico non ancora definito');
         }
         $db = 'dbcore';
         $queryFileName = 'query_variabili_scarichi';
