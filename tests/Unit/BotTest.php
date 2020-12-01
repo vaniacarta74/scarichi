@@ -1214,17 +1214,31 @@ class BotTest extends TestCase
         $data = [
             'standard' => [
                 'args' => [
+                    'botName' => 'BotScarichi',
                     'token' => TOKEN,
                     'offset' => 0,
+                    'commands' => [
+                        'volume'
+                    ],
                     'chats' => [
                         99908766,
                         98047382
                     ]
                 ],    
                 'expecteds' => [
+                    'botName' => 'BotScarichi',
                     'token' => TOKEN,
                     'start' => 0,
                     'end' => 0,
+                    'botCommands' => [
+                        'volume'
+                    ],
+                    'methods' => [
+                        'selector' => '',
+                        'tester' => '',
+                        'runner' => '',
+                        'messager' => ''
+                    ],
                     'chats' => [
                         99908766,
                         98047382
@@ -1256,9 +1270,12 @@ class BotTest extends TestCase
     {
         Reflections::invokeConstructor($this->bot, array($args));
         
+        $actual['botName'] = Reflections::getProperty($this->bot, 'botName');
         $actual['token'] = Reflections::getProperty($this->bot, 'token');
         $actual['start'] = Reflections::getProperty($this->bot, 'start');
         $actual['end'] = Reflections::getProperty($this->bot, 'end');
+        $actual['botCommands'] = Reflections::getProperty($this->bot, 'botCommands');
+        $actual['methods'] = Reflections::getProperty($this->bot, 'methods');
         $actual['chats'] = Reflections::getProperty($this->bot, 'chats');
         $actual['updates'] = Reflections::getProperty($this->bot, 'updates');
         $actual['autorized'] = Reflections::getProperty($this->bot, 'autorized');
@@ -1274,24 +1291,56 @@ class BotTest extends TestCase
     public function constructorExceptionProvider() : array
     {
         $data = [
-            'token' => [
+            'botName' => [
                 'args' => [
+                    'botName' => 12345,
                     'token' => 23456789,
                     'offset' => 0,
+                    'commands' => [
+                        'volume'
+                    ],
+                    'chats' => []
+                ]
+            ],
+            'token' => [
+                'args' => [
+                    'botName' => 'BotScarichi',
+                    'token' => 23456789,
+                    'offset' => 0,
+                    'commands' => [
+                        'volume'
+                    ],
                     'chats' => []
                 ]
             ],
             'offset' => [
                 'args' => [
+                    'botName' => 'BotScarichi',
                     'token' => TOKEN,
                     'offset' => 'pippo',
+                    'commands' => [
+                        'volume'
+                    ],
+                    'chats' => []
+                ]
+            ],
+            'command' => [
+                'args' => [
+                    'botName' => 'BotScarichi',
+                    'token' => TOKEN,
+                    'offset' => 0,
+                    'commands' => 'pippo',                    
                     'chats' => []
                 ]
             ],
             'chats' => [
                 'args' => [
+                    'botName' => 'BotScarichi',
                     'token' => TOKEN,
                     'offset' => 0,
+                    'commands' => [
+                        'volume'
+                    ],
                     'chats' => 45673456
                 ]
             ]
@@ -1319,8 +1368,10 @@ class BotTest extends TestCase
     public function testGetPropertiesEquals() : void
     {
         $expected = [
+            'botName' => Reflections::getProperty($this->bot, 'botName'),
             'token' => Reflections::getProperty($this->bot, 'token'), 
             'offset' => Reflections::getProperty($this->bot, 'end'),
+            'commands' => Reflections::getProperty($this->bot, 'botCommands'),
             'chats' => Reflections::getProperty($this->bot, 'chats')
         ];
         
@@ -1517,12 +1568,12 @@ class BotTest extends TestCase
             'autorized true' => [
                 'update' => $update,
                 'autorized' => true,
-                'expected' => 'Il volume movimentato da <b>30030</b>' . PHP_EOL . 'dal <i>20/01/2020</i> alle <i>00:00:00</i>' . PHP_EOL . 'al <i>26/01/2020</i> alle <i>23:30:00</i>' . PHP_EOL . 'é di <b>17.058.327,860 mc</b>'
+                'expected' => 'Il volume movimentato da <b>30030</b>' . PHP_EOL . 'dal <i>20/01/2020</i> alle <i>00:00:00</i>' . PHP_EOL . 'al <i>26/01/2020</i> alle <i>23:30:00</i>' . PHP_EOL . 'é di <b>17.058.327,860 mc</b>.'
             ],
             'autorized false' => [
                 'update' => $update,
                 'autorized' => false,
-                'expected' => 'Non sei autorizzato ad usare questo comando'
+                'expected' => 'Non sei autorizzato ad usare i comandi di BotScarichi.'
             ]
         ];
         
@@ -1609,5 +1660,1018 @@ class BotTest extends TestCase
         $this->expectException(\Exception::class);
         
         Reflections::invokeMethod($this->bot, 'sendReply', array($update, $message));
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function getCommandReplyProvider() : array
+    {
+        $data = [
+            'command no exist' => [
+                'text' => '/variabile',
+                'expected' => 'Comando inesistente.'
+            ],
+            'volume no param' => [
+                'text' => '/volume',
+                'expected' => 'Parametri non definiti (es. <i>/volume 30030 01/01/2020 02/01/2020</i>).'
+            ],
+            'volume param no suff' => [
+                'text' => '/volume 30030',
+                'expected' => 'Numero parametri non sufficiente:' . PHP_EOL . 'inserire l\'id della variabile e almeno una data.'
+            ],
+            'volume 2 param error' => [
+                'text' => '/volume pippo pluto',
+                'expected' => 'Il primo parametro deve essere l\'id della variabile:' . PHP_EOL . 'inserire un numero compreso fra 30000 e 39999.' . PHP_EOL . 'Il secondo parametro deve essere una data valida:' . PHP_EOL . 'utilizzare il formato dd/mm/yyyy.'
+            ],
+            'volume 3 param error' => [
+                'text' => '/volume pippo pluto paperino',
+                'expected' => 'Il primo parametro deve essere l\'id della variabile:' . PHP_EOL . 'inserire un numero compreso fra 30000 e 39999.' . PHP_EOL . 'Il secondo parametro deve essere una data valida:' . PHP_EOL . 'utilizzare il formato dd/mm/yyyy.' . PHP_EOL . 'Il terzo parametro deve essere una data valida:' . PHP_EOL . 'utilizzare il formato dd/mm/yyyy.'
+            ],
+            'volume var error' => [
+                'text' => '/volume 40000 01/01/2020',
+                'expected' => 'Il primo parametro deve essere l\'id della variabile:' . PHP_EOL . 'inserire un numero compreso fra 30000 e 39999.'
+            ],
+            'volume datefrom error' => [
+                'text' => '/volume 30030 32/01/2020',
+                'expected' => 'Il secondo parametro deve essere una data valida:' . PHP_EOL . 'utilizzare il formato dd/mm/yyyy.'
+            ],
+            'volume dateto error' => [
+                'text' => '/volume 30030 01/01/2020 32/01/2020',
+                'expected' => 'Il terzo parametro deve essere una data valida:' . PHP_EOL . 'utilizzare il formato dd/mm/yyyy.'
+            ],
+            'volume dateto now' => [
+                'text' => '/volume 30030 28/05/2020',
+                'expected' => 'Il volume movimentato da <b>30030</b>' . PHP_EOL . 'dal <i>28/05/2020</i> alle <i>00:00:00</i>' . PHP_EOL . 'al <i>29/05/2020</i> alle <i>22:00:00</i>' . PHP_EOL . 'é di <b>209.120,610 mc</b>.'
+            ],
+            'volume standard' => [
+                'text' => '/volume 30030 20/01/2020 27/01/2020',
+                'expected' => 'Il volume movimentato da <b>30030</b>' . PHP_EOL . 'dal <i>20/01/2020</i> alle <i>00:00:00</i>' . PHP_EOL . 'al <i>26/01/2020</i> alle <i>23:30:00</i>' . PHP_EOL . 'é di <b>17.058.327,860 mc</b>.'
+            ],
+            'volume data out range' => [
+                'text' => '/volume 30030 20/01/2020 27/01/2099',
+                'expected' => 'Il terzo parametro deve essere una data valida:' . PHP_EOL . 'utilizzare il formato dd/mm/yyyy.'
+            ],
+            'volume no data' => [
+                'text' => '/volume 30030 20/01/2079 05/06/2079',
+                'expected' => 'Non ci sono dati per il periodo selezionato.'
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::getCommandReply
+     * @dataProvider getCommandReplyProvider
+     */
+    public function testGetCommandReplyEquals(string $text, string $expected) : void
+    {
+        $actual = Reflections::invokeMethod($this->bot, 'getCommandReply', array($text));
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::getCommandReply
+     */
+    public function testGetCommandReplyException() : void
+    {
+        $text = '';
+        
+        $this->expectException(\Exception::class);
+        
+        Reflections::invokeMethod($this->bot, 'getCommandReply', array($text));
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function parseCommandProvider() : array
+    {
+        $data = [
+            'command no exist' => [
+                'text' => '/variabile',
+                'expected' => [
+                    'ok' => false,
+                    'error' => 'Comando inesistente.'
+                ]
+            ],
+            'volume no param' => [
+                'text' => '/volume',
+                'expected' => [
+                    'ok' => true,
+                    'params' => []
+                ]
+            ],
+            'volume param no suff' => [
+                'text' => '/volume 30030',
+                'expected' => [
+                    'ok' => true,
+                    'params' => [
+                        '30030'
+                    ]
+                ]
+            ],
+            'volume 2 param' => [
+                'text' => '/volume 30030 28/05/2020',
+                'expected' => [
+                    'ok' => true,
+                    'params' => [
+                        '30030',
+                        '28/05/2020'
+                    ]
+                ]
+            ],
+            'volume standard' => [
+                'text' => '/volume 30030 20/01/2020 27/01/2020',
+                'expected' => [
+                    'ok' => true,
+                    'params' => [
+                        '30030',
+                        '20/01/2020',
+                        '27/01/2020'
+                    ]
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::parseCommand
+     * @dataProvider parseCommandProvider
+     */
+    public function testParseCommandEquals(string $text, array $expected) : void
+    {
+        $actual = Reflections::invokeMethod($this->bot, 'parseCommand', array($text));
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::parseCommand
+     */
+    public function testParseCommandException() : void
+    {
+        $text = '';
+        
+        $this->expectException(\Exception::class);
+        
+        Reflections::invokeMethod($this->bot, 'parseCommand', array($text));
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function selectorVolumeProvider() : array
+    {
+        $data = [
+            'no param' => [
+                'params' => [],
+                'expected' => [
+                    'testNames' => [],
+                    'errors' => [
+                        'Parametri non definiti (es. <i>/volume 30030 01/01/2020 02/01/2020</i>).'
+                    ]
+                ]
+            ],
+            '1 param' => [
+                'params' => [
+                    '30030'
+                ],
+                'expected' => [
+                    'testNames' => [],
+                    'errors' => [
+                        'Numero parametri non sufficiente:' . PHP_EOL . 'inserire l\'id della variabile e almeno una data.'
+                    ]
+                ]
+            ],
+            'default 2' => [
+                'params' => [
+                    '30030',
+                    '27/01/2020'
+                ],
+                'expected' => [
+                    'testNames' => [
+                        'variabile',
+                        'datefrom',
+                        'dateto'
+                    ],
+                    'errors' => []
+                ]
+            ],
+            'default 3' => [
+                'params' => [
+                    '30030',
+                    '27/01/2020',
+                    '28/01/2020'
+                ],
+                'expected' => [
+                    'testNames' => [
+                        'variabile',
+                        'datefrom',
+                        'dateto'
+                    ],
+                    'errors' => []
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::selectorVolume
+     * @dataProvider selectorVolumeProvider
+     */
+    public function testSelectorVolumeEquals(array $params, array $expected) : void
+    {
+        $actual = Reflections::invokeMethod($this->bot, 'selectorVolume', array($params));
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function providerTesterVolume() : array
+    {
+        $dateTime = new \DateTime('NOW');
+        $now = $dateTime->format('d/m/Y');
+        
+        $data = [
+            'no param' => [
+                'tests' => [
+                    'testNames' => [],
+                    'errors' => [
+                        'Parametri non definiti (es. <i>/volume 30030 01/01/2020 02/01/2020</i>).'
+                    ]
+                ],
+                'params' => [],
+                'expected' => [
+                    'ok' => false,
+                    'errors' => [
+                        'Parametri non definiti (es. <i>/volume 30030 01/01/2020 02/01/2020</i>).'
+                    ]
+                ]
+            ],
+            '1 param' => [                
+                'tests' => [
+                    'testNames' => [],
+                    'errors' => [
+                        'Numero parametri non sufficiente:' . PHP_EOL . 'inserire l\'id della variabile e almeno una data.'
+                    ]
+                ],
+                'params' => [
+                    '30030'
+                ],
+                'expected' => [
+                    'ok' => false,
+                    'errors' => [
+                        'Numero parametri non sufficiente:' . PHP_EOL . 'inserire l\'id della variabile e almeno una data.'
+                    ]
+                ]
+            ],
+            'default 2' => [
+                'tests' => [
+                    'testNames' => [
+                        'variabile',
+                        'datefrom',
+                        'dateto'
+                    ],
+                    'errors' => []
+                ],
+                'params' => [
+                    '30030',
+                    '27/01/2020'
+                ],
+                'expected' => [
+                    'ok' => true,
+                    'params' => [
+                        '30030',
+                        '27/01/2020',
+                        $now
+                    ]
+                ]
+            ],
+            'default 3' => [
+                'tests' => [
+                    'testNames' => [
+                        'variabile',
+                        'datefrom',
+                        'dateto'
+                    ],
+                    'errors' => []
+                ],
+                'params' => [
+                    '30030',
+                    '27/01/2020',
+                    '28/01/2020'
+                ],
+                'expected' => [
+                    'ok' => true,
+                    'params' => [
+                        '30030',
+                        '27/01/2020',
+                        '28/01/2020'
+                    ]
+                ]
+            ],
+            'errors' => [
+                'tests' => [
+                    'testNames' => [
+                        'variabile',
+                        'datefrom',
+                        'dateto'
+                    ],
+                    'errors' => []
+                ],
+                'params' => [
+                    '40000',
+                    '32/01/2020',
+                    '28/01/2080'
+                ],
+                'expected' => [
+                    'ok' => false,
+                    'errors' => [
+                        'Il primo parametro deve essere l\'id della variabile:' . PHP_EOL . 'inserire un numero compreso fra 30000 e 39999.',
+                        'Il secondo parametro deve essere una data valida:' . PHP_EOL . 'utilizzare il formato dd/mm/yyyy.',
+                        'Il terzo parametro deve essere una data valida:' . PHP_EOL . 'utilizzare il formato dd/mm/yyyy.'
+                    ]
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::testerVolume
+     * @dataProvider providerTesterVolume
+     */
+    public function testTesterVolumeEquals(array $tests, array $params, array $expected) : void
+    {
+        $actual = Reflections::invokeMethod($this->bot, 'testerVolume', array($tests, $params));
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::testerVolume
+     */
+    public function testTesterVolumeException() : void
+    {
+        $tests = [
+            'testNames' => [],
+            'errors' => []
+        ];
+        $params = [
+            '30030',
+            '27/01/2020',
+            '28/01/2020'            
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        Reflections::invokeMethod($this->bot, 'testerVolume', array($tests, $params));
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function providerTestVariabile() : array
+    {
+        $data = [
+            'standard' => [                
+                'params' => [
+                    '30030',
+                    '01/01/2020',
+                    '02/01/2020'
+                ],
+                'expected' => [
+                    'ok' => true,
+                    'param' => '30030'
+                ]
+            ],
+            'out of range' => [                
+                'params' => [
+                    '40000',
+                    '01/01/2020',
+                    '02/01/2020'
+                ],
+                'expected' => [
+                    'ok' => false,
+                    'error' => 'Il primo parametro deve essere l\'id della variabile:' . PHP_EOL . 'inserire un numero compreso fra 30000 e 39999.'
+                ]
+            ],
+            'no number' => [                
+                'params' => [
+                    'pippo',
+                    '01/01/2020',
+                    '02/01/2020'
+                ],
+                'expected' => [
+                    'ok' => false,
+                    'error' => 'Il primo parametro deve essere l\'id della variabile:' . PHP_EOL . 'inserire un numero compreso fra 30000 e 39999.'
+                ]
+            ]
+            
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::testVariabile
+     * @dataProvider providerTestVariabile
+     */
+    public function testTestVariabileEquals(array $params, array $expected) : void
+    {
+        $actual = Bot::testVariabile($params);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::testVariabile
+     */
+    public function testTestVariabileException() : void
+    {
+        $params = [];
+        
+        $this->expectException(\Exception::class);
+        
+        Bot::testVariabile($params);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function providerTestDatefrom() : array
+    {
+        $data = [
+            'standard' => [                
+                'params' => [
+                    '30030',
+                    '01/01/2020',
+                    '02/01/2020'
+                ],
+                'expected' => [
+                    'ok' => true,
+                    'param' => '01/01/2020'
+                ]
+            ],
+            'only 2 params' => [                
+                'params' => [
+                    '30030',
+                    '01/01/2020'
+                ],
+                'expected' => [
+                    'ok' => true,
+                    'param' => '01/01/2020'
+                ]
+            ],
+            'out of range' => [                
+                'params' => [
+                    '30030',
+                    '01/01/2080',
+                    '02/01/2020'
+                ],
+                'expected' => [
+                    'ok' => false,
+                    'error' => 'Il secondo parametro deve essere una data valida:' . PHP_EOL . 'utilizzare il formato dd/mm/yyyy.'
+                ]
+            ],
+            'data error' => [                
+                'params' => [
+                    '30030',
+                    '32/01/2020',
+                    '02/01/2020'
+                ],
+                'expected' => [
+                    'ok' => false,
+                    'error' => 'Il secondo parametro deve essere una data valida:' . PHP_EOL . 'utilizzare il formato dd/mm/yyyy.'
+                ]
+            ],
+            'format error' => [                
+                'params' => [
+                    '30030',
+                    '2020-01-01',
+                    '02/01/2020'
+                ],
+                'expected' => [
+                    'ok' => false,
+                    'error' => 'Il secondo parametro deve essere una data valida:' . PHP_EOL . 'utilizzare il formato dd/mm/yyyy.'
+                ]
+            ]
+            
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::testDatefrom
+     * @dataProvider providerTestDatefrom
+     */
+    public function testTestDatefromEquals(array $params, array $expected) : void
+    {
+        $actual = Bot::testDatefrom($params);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::testDatefrom
+     */
+    public function testTestDatefromException() : void
+    {
+        $params = [
+            '30030'
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        Bot::testDatefrom($params);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function providerTestDateto() : array
+    {
+        $dateTime = new \DateTime('NOW');
+        $now = $dateTime->format('d/m/Y');
+        
+        $data = [
+            'standard' => [                
+                'params' => [
+                    '30030',
+                    '01/01/2020',
+                    '02/01/2020'
+                ],
+                'expected' => [
+                    'ok' => true,
+                    'param' => '02/01/2020'
+                ]
+            ],
+            'only 2 params' => [                
+                'params' => [
+                    '30030',
+                    '01/01/2020'
+                ],
+                'expected' => [
+                    'ok' => true,
+                    'param' => $now
+                ]
+            ],
+            'out of range' => [                
+                'params' => [
+                    '30030',
+                    '01/01/2020',
+                    '02/01/2080'
+                ],
+                'expected' => [
+                    'ok' => false,
+                    'error' => 'Il terzo parametro deve essere una data valida:' . PHP_EOL . 'utilizzare il formato dd/mm/yyyy.'
+                ]
+            ],
+            'data error' => [                
+                'params' => [
+                    '30030',
+                    '01/01/2020',
+                    '32/01/2020'
+                ],
+                'expected' => [
+                    'ok' => false,
+                    'error' => 'Il terzo parametro deve essere una data valida:' . PHP_EOL . 'utilizzare il formato dd/mm/yyyy.'
+                ]
+            ],
+            'format error' => [                
+                'params' => [
+                    '30030',
+                    '01/01/2020',
+                    '2020-01-01'
+                ],
+                'expected' => [
+                    'ok' => false,
+                    'error' => 'Il terzo parametro deve essere una data valida:' . PHP_EOL . 'utilizzare il formato dd/mm/yyyy.'
+                ]
+            ]
+            
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::testDateto
+     * @dataProvider providerTestDateto
+     */
+    public function testTestDatetoEquals(array $params, array $expected) : void
+    {
+        $actual = Bot::testDateto($params);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::testDateto
+     */
+    public function testTestDatetoException() : void
+    {
+        $params = [
+            '30030'
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        Bot::testDateto($params);
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::setMethods
+     */
+    public function testSetMethodsEquals() : void
+    {
+        $botCommand = 'volume';
+        $expected = [
+            'selector' => 'Bot::selectorVolume',
+            'tester' => 'Bot::testerVolume',
+            'runner' => 'Bot::runnerVolume',
+            'messager' => 'Bot::messagerVolume'
+        ];
+        
+        Reflections::invokeMethod($this->bot, 'setMethods', array($botCommand));
+        
+        $actual = Reflections::getProperty($this->bot, 'methods');
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::setMethods
+     */
+    public function testSetMethodsException() : void
+    {
+        $botCommand = 'pippo';
+        
+        $this->expectException(\Exception::class);
+        
+        Reflections::invokeMethod($this->bot, 'setMethods', array($botCommand));
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function runnerVolumeProvider() : array
+    {
+        $data = [            
+            'standard' => [
+                'variabile' => '30030',
+                'datefrom' => '01/01/2017',
+                'dateto' => '02/01/2017',
+                'provider' => __DIR__ . '/../providers/runnerVolumeTest.json'
+            ]        
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::runnerVolume
+     * @dataProvider runnerVolumeProvider
+     */
+    public function testRunnerVolumeEquals(string $variabile, string $datefrom, string $dateto, string $provider) : void
+    {
+        $expected = Utility::getJsonArray($provider);
+        
+        $actual = Bot::runnerVolume($variabile, $datefrom, $dateto);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function messagerVolumeProvider() : array
+    {
+        $data = [            
+            'standard' => [
+                'response' => [
+                    [
+                        'variabile' => 30030,
+                        'valore' => 0,
+                        'data_e_ora' => '01/01/2017 00:00:00',                
+                        'tipo_dato' => 1
+                    ],
+                    [
+                        'variabile' => 30030,
+                        'valore' => 17058327.861,
+                        'data_e_ora' => '02/01/2017 23:30:00',                
+                        'tipo_dato' => 1
+                    ]
+                ],
+                'expected' => 'Il volume movimentato da <b>30030</b>' . PHP_EOL . 'dal <i>01/01/2017</i> alle <i>00:00:00</i>' . PHP_EOL . 'al <i>02/01/2017</i> alle <i>23:30:00</i>' . PHP_EOL . 'é di <b>17.058.327,861 mc</b>.'
+            ],
+            'integer' => [
+                'response' => [
+                    [
+                        'variabile' => 30030,
+                        'valore' => 0,
+                        'data_e_ora' => '01/01/2017 00:00:00',                
+                        'tipo_dato' => 1
+                    ],
+                    [
+                        'variabile' => 30030,
+                        'valore' => 17058327,
+                        'data_e_ora' => '02/01/2017 23:30:00',                
+                        'tipo_dato' => 1
+                    ]
+                ],
+                'expected' => 'Il volume movimentato da <b>30030</b>' . PHP_EOL . 'dal <i>01/01/2017</i> alle <i>00:00:00</i>' . PHP_EOL . 'al <i>02/01/2017</i> alle <i>23:30:00</i>' . PHP_EOL . 'é di <b>17.058.327 mc</b>.'
+            ],
+            'decimal zero' => [
+                'response' => [
+                    [
+                        'variabile' => 30030,
+                        'valore' => 0,
+                        'data_e_ora' => '01/01/2017 00:00:00',                
+                        'tipo_dato' => 1
+                    ],
+                    [
+                        'variabile' => 30030,
+                        'valore' => 17058327.800,
+                        'data_e_ora' => '02/01/2017 23:30:00',                
+                        'tipo_dato' => 1
+                    ]
+                ],
+                'expected' => 'Il volume movimentato da <b>30030</b>' . PHP_EOL . 'dal <i>01/01/2017</i> alle <i>00:00:00</i>' . PHP_EOL . 'al <i>02/01/2017</i> alle <i>23:30:00</i>' . PHP_EOL . 'é di <b>17.058.327,800 mc</b>.'
+            ],
+            'void' => [
+                'response' => [],
+                'expected' => 'Non ci sono dati per il periodo selezionato.'
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::messagerVolume
+     * @dataProvider messagerVolumeProvider
+     */
+    public function testMessagerVolumeEquals(array $response, string $expected) : void
+    {
+        $actual = Bot::messagerVolume($response);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function extractVariabileProvider() : array
+    {
+        $data = [            
+            'standard' => [
+                'record' => [
+                    'variabile' => '30030',
+                    'valore' => '0',
+                    'data_e_ora' => '01/01/2017 00:00:00',                
+                    'tipo_dato' => '1'
+                ],
+                'expected' => '30030'
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::extractVariabile
+     * @dataProvider extractVariabileProvider
+     */
+    public function testExtractVariabileEquals(array $record, string $expected) : void
+    {
+        $actual = Bot::extractVariabile($record);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::extractVariabile
+     */
+    public function testExtractVariabileException() : void
+    {
+        $record = [
+            'var' => '30030',
+            'valore' => '0',
+            'data_e_ora' => '01/01/2017 00:00:00',                
+            'tipo_dato' => '1'
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        Bot::extractVariabile($record);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function extractDataOraProvider() : array
+    {
+        $data = [            
+            'standard' => [
+                'record' => [
+                    'variabile' => '30030',
+                    'valore' => '0',
+                    'data_e_ora' => '01/01/2017 00:00:00',                
+                    'tipo_dato' => '1'
+                ],
+                'expected' => [
+                    'data' => '01/01/2017',
+                    'ora' => '00:00:00'
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::extractDataOra
+     * @dataProvider extractDataOraProvider
+     */
+    public function testExtractDataOraEquals(array $record, array $expected) : void
+    {
+        $actual = Bot::extractDataOra($record);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::extractDataOra
+     */
+    public function testExtractDataOraException() : void
+    {
+        $record = [
+            'variabile' => '30030',
+            'valore' => '0',
+            'data' => '01/01/2017 00:00:00',                
+            'tipo_dato' => '1'
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        Bot::extractDataOra($record);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function extractValoreProvider() : array
+    {
+        $data = [            
+            'zero' => [
+                'record' => [
+                    'variabile' => '30030',
+                    'valore' => '0',
+                    'data_e_ora' => '01/01/2017 00:00:00',                
+                    'tipo_dato' => '1'
+                ],
+                'expected' => '0'
+            ],
+            'integer not 1000' => [
+                'record' => [
+                    'variabile' => '30030',
+                    'valore' => '30',
+                    'data_e_ora' => '01/01/2017 00:00:00',                
+                    'tipo_dato' => '1'
+                ],
+                'expected' => '30'
+            ],
+            'integer 1000' => [
+                'record' => [
+                    'variabile' => '30030',
+                    'valore' => '1030',
+                    'data_e_ora' => '01/01/2017 00:00:00',                
+                    'tipo_dato' => '1'
+                ],
+                'expected' => '1.030'
+            ],
+            'decimal 2 zeri' => [
+                'record' => [
+                    'variabile' => '30030',
+                    'valore' => '1030,100',
+                    'data_e_ora' => '01/01/2017 00:00:00',                
+                    'tipo_dato' => '1'
+                ],
+                'expected' => '1.030,100'
+            ],
+            'decimal 1 zero' => [
+                'record' => [
+                    'variabile' => '30030',
+                    'valore' => '1030,150',
+                    'data_e_ora' => '01/01/2017 00:00:00',                
+                    'tipo_dato' => '1'
+                ],
+                'expected' => '1.030,150'
+            ],
+            'decimal 1' => [
+                'record' => [
+                    'variabile' => '30030',
+                    'valore' => '1030,1',
+                    'data_e_ora' => '01/01/2017 00:00:00',                
+                    'tipo_dato' => '1'
+                ],
+                'expected' => '1.030,100'
+            ],
+            'decimal 10' => [
+                'record' => [
+                    'variabile' => '30030',
+                    'valore' => '1030,15',
+                    'data_e_ora' => '01/01/2017 00:00:00',                
+                    'tipo_dato' => '1'
+                ],
+                'expected' => '1.030,150'
+            ],
+            'decimal standard' => [
+                'record' => [
+                    'variabile' => '30030',
+                    'valore' => '1030,153',
+                    'data_e_ora' => '01/01/2017 00:00:00',                
+                    'tipo_dato' => '1'
+                ],
+                'expected' => '1.030,153'
+            ]            
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::extractValore
+     * @dataProvider extractValoreProvider
+     */
+    public function testExtractValoreEquals(array $record, string $expected) : void
+    {
+        $actual = Bot::extractValore($record);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::extractValore
+     */
+    public function testExtractValoreException() : void
+    {
+        $record = [
+            'variabile' => '30030',
+            'val' => '0',
+            'data' => '01/01/2017 00:00:00',                
+            'tipo_dato' => '1'
+        ];
+        
+        $this->expectException(\Exception::class);
+        
+        Bot::extractValore($record);
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::run
+     */
+    public function testRunEquals() : void
+    {
+        $expected = true;
+        $actual = $this->bot->run();
+        
+        $this->assertEquals($expected, $actual);
     }
 }

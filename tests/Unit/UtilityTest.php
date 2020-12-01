@@ -355,4 +355,66 @@ class UtilityTest extends TestCase
         
         Utility::callback($funzione, array(1,2,3));
     }
+    
+    /**
+     * @coversNothing
+     */
+    public function checkDateProvider() : array
+    {
+        $data = [
+            'standard' => [
+                'date' => '01/01/2020',
+                'small' => true,
+                'expected' => true
+            ],
+            'over' => [
+                'date' => '01/01/2080',
+                'small' => true,
+                'expected' => false
+            ],
+            'error' => [
+                'date' => '32/01/2020',
+                'small' => true,
+                'expected' => false
+            ],
+            'not over' => [
+                'date' => '01/01/2080',
+                'small' => false,
+                'expected' => true
+            ],
+            'small null' => [
+                'date' => '01/01/2020',
+                'small' => null,
+                'expected' => true
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::checkDate
+     * @dataProvider checkDateProvider
+     */
+    public function testCheckDateEquals(string $date, ?bool $isSmall, bool $expected) : void
+    {
+        $actual = Utility::checkDate($date, $isSmall);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::checkDate
+     */
+    public function testCheckDateException() : void    {
+        
+        $date = '2020-01-01';
+        $isSmall = true;
+        
+        $this->expectException(\Exception::class);
+        
+        Utility::checkDate($date, $isSmall);
+    }
 }

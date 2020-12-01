@@ -21,10 +21,12 @@ class Bot {
     private static $url = 'https://api.telegram.org/bot';
     private static $defaultBot = TOKEN;   
     private static $defaultChatId = CHATID;
+    private $botName;
     private $token;
     private $start;
     private $end;
     private $botCommands;
+    private $methods;
     private $chats;
     private $updates;
     private $autorized;
@@ -33,6 +35,11 @@ class Bot {
     public function __construct(array $bot)
     {
         try {
+            if (array_key_exists('botName', $bot) && is_string($bot['botName'])) {
+                $this->botName = $bot['botName'];
+            } else {
+                throw new \Exception('BotName non presente o errato');
+            }
             if (array_key_exists('token', $bot) && is_string($bot['token'])) {
                 $this->token = $bot['token'];
             } else {
@@ -57,25 +64,29 @@ class Bot {
             $this->updates = [];
             $this->autorized = ['yes' => [],'not' => [],'undef' => []];
             $this->commands = ['yes' => [],'not' => [],'undef' => []];
+            $this->methods = ['selector' => '','tester' => '','runner' => '','messager' => ''];
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
     } 
     
-    public function run() : void
+    public function run() : bool
     {
         try {
             $this->updates = self::secureUpdate($this->start, $this->token);
             $this->updateOffset();
             $this->setAutorized();
             $this->setCommands();
-            $this->sendReplies(false);
-            $this->sendReplies(true);
+            $isNotAuthOk = $this->sendReplies(false);
+            $isAuthOk = $this->sendReplies(true);
+            return ($isNotAuthOk && $isAuthOk);        
+        // @codeCoverageIgnoreStart    
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
+        // @codeCoverageIgnoreEnd
     }
     
     public static function getUpdates(int $offset, string $token) : string
@@ -206,7 +217,8 @@ class Bot {
                     $updateId = $last['update_id'];
                 } else {
                     throw new \Exception("Parametro update id mancante");
-                }                
+                }
+                self::secureUpdate($updateId, $this->token);
             } else {
                 $updateId = $this->start;
             }            
@@ -220,8 +232,9 @@ class Bot {
     public function getProperties() : array
     {
         try {
-            if (isset($this->token) && isset($this->end) && isset($this->botCommands) && isset($this->chats)) {
+            if (isset($this->botName) && isset($this->token) && isset($this->end) && isset($this->botCommands) && isset($this->chats)) {
                 $properties = [
+                    'botName' => $this->botName,
                     'token' => $this->token,
                     'offset' => $this->end,
                     'commands' => $this->botCommands,
@@ -432,36 +445,6 @@ class Bot {
         }
     }
     
-    private function getCommandReply(string $text) : string
-    {
-        try {
-            if ($text !== '') {
-                $command = $this->parseCommand($text);
-                if (count($command) > 0) {
-                    $tested = Utility::callback($command['tester'], array($command['params']));
-                    if ($tested['ok']) {
-                        $response = Utility::callback($command['command'], $tested['params']);
-                        if ($response['ok']) {
-                            $message = Utility::callback($command['messager'], array($response['records']));
-                        } else {
-                            $message = $response['descrizione errore'];
-                        }
-                    } else {
-                        $message = implode(PHP_EOL, $tested['errors']);
-                    }
-                } else {
-                    $message = 'Comando inesistente.';
-                }
-            } else {
-                throw new \Exception("Il testo non contiene un comando");
-            }
-            return $message;
-        } catch (\Throwable $e) {
-            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-            throw $e;
-        }
-    }
-    
     private function parseCommand(string $text) : array
     {
         try {
@@ -469,17 +452,14 @@ class Bot {
                 $params = explode(' ', $text);
                 $botCommand = substr($params[0], 1);
                 if (in_array($botCommand, $this->botCommands)) {
-                    $commandName = ucfirst($botCommand);
-                    $command['tester'] = 'Bot::tester' . $commandName;
-                    $command['command'] = 'Bot::command' . $commandName;
-                    $command['messager'] = 'Bot::msg' . $commandName;                
-                    $command['params'] = [];
+                    $this->setMethods($botCommand);
+                    $command = ['ok' => true,'params' => []];
                     $iMax = count($params);
                     for ($i = 1; $i < $iMax; $i++) {
                         $command['params'][] = $params[$i];
                     }
                 } else {
-                    $command = [];
+                    $command = ['ok' => false,'error' => 'Comando inesistente.'];
                 }
             } else {
                 throw new \Exception("Il testo non contiene un comando");
@@ -491,22 +471,102 @@ class Bot {
         }
     }
     
-    public static function testerVolume(array $params) : array
+    private function setMethods(string $botCommand) : void
+    {
+        try {
+            if (in_array($botCommand, $this->botCommands)) {
+                $methods = array_keys($this->methods);
+                foreach ($methods as $method) {
+                    $this->methods[$method] = 'Bot::' . $method . ucfirst($botCommand);
+                }
+            } else {
+                throw new \Exception("Comando bot non trovato");
+            }
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    private function getCommandReply(string $text) : string
+    {
+        try {
+            if ($text !== '') {
+                $command = $this->parseCommand($text);
+                if ($command['ok']) {
+                    $tests = Utility::callback($this->methods['selector'], array($command['params']));
+                    $tested = Utility::callback($this->methods['tester'], array($tests, $command['params']));
+                    if ($tested['ok']) {
+                        $response = Utility::callback($this->methods['runner'], $tested['params']);
+                        if ($response['ok']) {
+                            $message = Utility::callback($this->methods['messager'], array($response['records']));
+                        } else {
+                            $message = $response['descrizione errore'];
+                        }
+                    } else {
+                        $message = implode(PHP_EOL, $tested['errors']);
+                    }
+                } else {
+                    $message = $command['error'];
+                }
+            } else {
+                throw new \Exception("Il testo non contiene un comando");
+            }
+            return $message;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    public static function selectorVolume(array $params) : array
     {
         try {
             $n_params = count($params);
             switch ($n_params) {
                 case 0:
-                    $testNames = [];
-                    $errors[] = 'Parametri non definiti (es. <i>/volume 30030 01/01/2020 02/01/2020</i>).';
+                    $tests = [
+                        'testNames' => [],
+                        'errors' => [
+                            'Parametri non definiti (es. <i>/volume 30030 01/01/2020 02/01/2020</i>).'
+                        ]
+                    ];
                     break;
                 case 1:
-                    $testNames = [];
-                    $errors[] = 'Numero parametri non sufficiente:' . PHP_EOL . 'inserire l\'id della variabile e almeno una data.';
+                    $tests = [
+                        'testNames' => [],
+                        'errors' => [
+                            'Numero parametri non sufficiente:' . PHP_EOL . 'inserire l\'id della variabile e almeno una data.'
+                        ]
+                    ];
                     break;
                 default:
-                    $testNames = ['variabile','datefrom','dateto'];
+                    $tests = [
+                        'testNames' => [
+                            'variabile',
+                            'datefrom',
+                            'dateto'
+                        ],
+                        'errors' => []
+                    ];
                     break;
+            }
+            return $tests;
+        // @codeCoverageIgnoreStart
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+        // @codeCoverageIgnoreEnd
+    }
+    
+    public static function testerVolume(array $tests, array $params) : array
+    {
+        try {            
+            $testNames = $tests['testNames'];
+            $errors = $tests['errors'];
+            if (count($testNames) === 0 && count($errors) === 0)  {
+                throw new \Exception("Problemi con la selezione dei test");
             }
             foreach ($testNames as $testName) {
                 $functionName = 'Bot::test' . ucfirst($testName);
@@ -517,12 +577,7 @@ class Bot {
                     $errors[] = $resTest['error'];
                 }
             }
-            if (isset($errors)) {
-                $tested = ['ok' => false,'errors' => $errors];
-            } else {
-                $tested = ['ok' => true,'params' => $testedParams];
-            }
-            return $tested;
+            return (count($errors) > 0) ? ['ok' => false,'errors' => $errors] : ['ok' => true,'params' => $testedParams];
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
@@ -537,7 +592,7 @@ class Bot {
                 if ($raw >= 30000 && $raw <= 39999) {
                     $resTest = [
                         'ok' => true,
-                        'param' => $raw
+                        'param' => strval($raw)
                     ];
                 } else {
                     $resTest = [
@@ -560,7 +615,7 @@ class Bot {
         try {
             if (count($params) > 1) {
                 $raw = strval($params[1]);
-                if (preg_match('/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/', $raw) && Utility::checkDate($raw)) {
+                if (preg_match('/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/', $raw) && Utility::checkDate($raw, true)) {
                     $resTest = [
                         'ok' => true,
                         'param' => $raw
@@ -592,7 +647,7 @@ class Bot {
                     $date = $dateTime->format('d/m/Y');
                     $raw = $date;
                 }                
-                if (preg_match('/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/', $raw) && Utility::checkDate($raw)) {
+                if (preg_match('/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/', $raw) && Utility::checkDate($raw, true)) {
                     $resTest = [
                         'ok' => true,
                         'param' => $raw
@@ -613,7 +668,7 @@ class Bot {
         }
     }
     
-    public static function commandVolume(string $variabile, string $datefrom, string $dateto) : array
+    public static function runnerVolume(string $variabile, string $datefrom, string $dateto) : array
     {
         try {
             $url = 'http://localhost/scarichi/tojson.php';
@@ -627,43 +682,104 @@ class Bot {
             $arrJson = json_decode($json, true);
             
             return $arrJson;
+        // @codeCoverageIgnoreStart
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+        // @codeCoverageIgnoreEnd
+    }
+    
+    public static function messagerVolume(array $response) : string
+    {
+        try {
+            if (count($response) > 0) {
+                $startRecord = reset($response);
+                $endRecord = end($response);
+                
+                $variabile = Bot::extractVariabile($startRecord);
+                $iniziale = Bot::extractDataOra($startRecord);
+                $finale = Bot::extractDataOra($endRecord);
+                $valore = Bot::extractValore($endRecord);
+                
+                $message = 'Il volume movimentato da <b>' . $variabile . '</b>' . PHP_EOL;
+                $message .= 'dal <i>' . $iniziale['data'] . '</i> alle <i>' . $iniziale['ora'] . '</i>' . PHP_EOL;
+                $message .= 'al <i>' . $finale['data'] . '</i> alle <i>' . $finale['ora'] . '</i>' . PHP_EOL;
+                $message .= 'é di <b>' . $valore . ' mc</b>.';
+            } else {
+                $message = 'Non ci sono dati per il periodo selezionato.';
+            }            
+            return $message;
+        // @codeCoverageIgnoreStart
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+        // @codeCoverageIgnoreEnd
+    }
+    
+    public static function extractVariabile(array $record) : string
+    {
+        try {
+            if (array_key_exists('variabile', $record)) {
+                $variabile = $record['variabile'];
+            } else {
+                throw new \Exception("Campo variabile assente");
+            }
+            return $variabile;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
     }
     
-    public static function msgVolume(array $response) : string
+    public static function extractDataOra(array $record) : array
     {
         try {
-            if (count($response) > 0) {
-                $volume = end($response);
-                $variabile = $volume['variabile'];
-                $iniziale = $response[0]['data_e_ora'];
-                $arrIniziale = explode(' ', $iniziale);
-                $dataIniziale = $arrIniziale[0];
-                $oraIniziale = $arrIniziale[1];
-                $finale = $volume['data_e_ora'];
-                $arrFinale = explode(' ', $finale);
-                $dataFinale = $arrFinale[0];
-                $oraFinale = $arrFinale[1];
-                $valore = $volume['valore'];
-                $arrValore = explode(',', $valore);
-                if (isset($arrValore[1]) && intval($arrValore[0]) > 0) {
-                    $cumulato = number_format($arrValore[0], 0, ',', '.') . ',' . $arrValore[1];
-                } elseif (intval($arrValore[0]) > 0) {
-                    $cumulato = number_format($arrValore[0], 0, ',', '.');
-                } else {
-                    $cumulato = '0';
-                }
-                $message = 'Il volume movimentato da <b>' . $variabile . '</b>' . PHP_EOL;
-                $message .= 'dal <i>' . $dataIniziale . '</i> alle <i>' . $oraIniziale . '</i>' . PHP_EOL;
-                $message .= 'al <i>' . $dataFinale . '</i> alle <i>' . $oraFinale . '</i>' . PHP_EOL;
-                $message .= 'é di <b>' . $cumulato . ' mc</b>.';
+            if (array_key_exists('data_e_ora', $record)) {
+                $arrDataOra = explode(' ', $record['data_e_ora']);                
+                $dataOra = [
+                    'data' => $arrDataOra[0],
+                    'ora' => $arrDataOra[1],
+                ];
             } else {
-                $message = 'Non ci sono dati per il periodo selezionato.';
-            }            
-            return $message;
+                throw new \Exception("Campo data_e_ora assente");
+            }
+            return $dataOra;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    public static function extractValore(array $record) : string
+    {
+        try {
+            if (array_key_exists('valore', $record)) {
+                $valore = $record['valore'];
+                $arrValore = explode(',', $valore);                
+                $intera = intval($arrValore[0]);
+                $intForm = number_format($arrValore[0], 0, ',', '.');                
+                if (count($arrValore) > 1) {                    
+                    $decimale = intval($arrValore[1]);
+                    if ($decimale >= 100) {
+                        $cumulato = $intForm . ',' . $decimale;
+                    } elseif ($decimale >= 10) {
+                        $cumulato = $intForm . ',' . $decimale * 10;
+                    } else {
+                        $cumulato = $intForm . ',' . $decimale * 100;
+                    }
+                } else {
+                    if ($intera > 0) {
+                        $cumulato = $intForm;
+                    } else {
+                        $cumulato = '0';
+                    }
+                }                
+            } else {
+                throw new \Exception("Campo valore assente");
+            }
+            return $cumulato;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
