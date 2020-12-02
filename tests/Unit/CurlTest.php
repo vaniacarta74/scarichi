@@ -21,7 +21,7 @@ class CurlTest extends TestCase
      * @group curl
      * @covers \vaniacarta74\Scarichi\Curl::set     
      */
-    public function testSetIsResource()
+    public function testSetPostIsResource()
     {
         $params = [
             'var' => '30030',
@@ -32,7 +32,22 @@ class CurlTest extends TestCase
         ];
         $url = 'http://localhost/scarichi/tocsv.php';
         
-        $actual = Curl::set($params, $url);
+        $actual = Curl::set($url, $params);
+        
+        $this->assertIsResource($actual);
+        
+        return $actual;
+    }
+    
+    /**
+     * @group curl
+     * @covers \vaniacarta74\Scarichi\Curl::set     
+     */
+    public function testSetGetIsResource()
+    {
+        $url = 'http://localhost/scarichi/tocsv.php';
+        
+        $actual = Curl::set($url);
         
         $this->assertIsResource($actual);
         
@@ -50,7 +65,7 @@ class CurlTest extends TestCase
         
         $this->expectException(\Exception::class);
         
-        Curl::set($params, $url);
+        Curl::set($url, $params);
     }
     
     /**
@@ -68,7 +83,7 @@ class CurlTest extends TestCase
         ];
         $url = 'http://localhost/scarichi/tojson.php';
         
-        $actual = Curl::setJson($params, $url);
+        $actual = Curl::setJson($url, $params);
         
         $this->assertIsResource($actual);
         
@@ -86,13 +101,13 @@ class CurlTest extends TestCase
         
         $this->expectException(\Exception::class);
         
-        Curl::setJson($params, $url);
+        Curl::setJson($url, $params);
     }
     
     /**
      * @group curl
      * @covers \vaniacarta74\Scarichi\Curl::exec
-     * @depends testSetIsResource
+     * @depends testSetPostIsResource
      */
     public function testExecContainsString($ch) : void
     {
@@ -137,7 +152,24 @@ class CurlTest extends TestCase
         $response = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.';
         $expecteds = explode('|', $response);
         
-        $actual = Curl::run($params, $url, $json);
+        $actual = Curl::run($url, $params, $json);
+        
+        foreach ($expecteds as $expected) {
+            $this->assertStringContainsString($expected, $actual);
+        }
+    }
+    
+    /**
+     * @group curl
+     * @covers \vaniacarta74\Scarichi\Curl::run
+     */
+    public function testRunGetContainsString() : void
+    {
+        $url = 'http://localhost/scarichi/tocsv.php?var=30030&datefrom=30/12/2019&dateto=31/12/2019&field=portata&full=0';
+        $response = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.';
+        $expecteds = explode('|', $response);
+        
+        $actual = Curl::run($url);
         
         foreach ($expecteds as $expected) {
             $this->assertStringContainsString($expected, $actual);
@@ -161,7 +193,7 @@ class CurlTest extends TestCase
         $json = true;
         $expected = __DIR__ . '/../providers/curlRunTest.json';
         
-        $actual = Curl::run($params, $url, $json);
+        $actual = Curl::run($url, $params, $json);
         
         $this->assertJsonStringEqualsJsonFile($expected, $actual);
     }
@@ -177,7 +209,7 @@ class CurlTest extends TestCase
         
         $this->expectException(\Exception::class);
         
-        Curl::run($params, $url);
+        Curl::run($url, $params);
     }
     
     /**
@@ -246,7 +278,7 @@ class CurlTest extends TestCase
      */
     public function testMultiSetIsResource(array $postParam, string $url, ?string $key) : void
     {
-        $actuals = Curl::multiSet($postParam, $url, $key);
+        $actuals = Curl::multiSet($url, $postParam, $key);
         
         foreach ($actuals as $actual) {
             $this->assertIsResource($actual);
@@ -273,7 +305,7 @@ class CurlTest extends TestCase
         
         $this->expectException(\Exception::class);
         
-        Curl::multiSet($postParam, $url, $key);
+        Curl::multiSet($url, $postParam, $key);
     }
     
     /**
@@ -288,7 +320,7 @@ class CurlTest extends TestCase
         
         $this->expectException(\Exception::class);
         
-        Curl::multiSet($postParam, $url, $key);
+        Curl::multiSet($url, $postParam, $key);
     }
 
     /**
@@ -387,7 +419,7 @@ class CurlTest extends TestCase
     {
         $expecteds = explode('|', $response);
         
-        $actual = curl::runMultiSync($postParam, $url, $key, $funcName);
+        $actual = curl::runMultiSync($url, $postParam, $key, $funcName);
         
         foreach ($expecteds as $expected) {
             $this->assertStringContainsString($expected, $actual);
@@ -407,7 +439,7 @@ class CurlTest extends TestCase
         
         $this->expectException(\Exception::class);
         
-        curl::runMultiSync($postParam, $url, $key, $funcName);
+        curl::runMultiSync($url, $postParam, $key, $funcName);
     }
     
     /**
@@ -506,7 +538,7 @@ class CurlTest extends TestCase
     {
         $expecteds = explode('|', $response);
         
-        curl::runMultiAsync($postParam, $url, $key, $funcName);
+        curl::runMultiAsync($url, $postParam, $key, $funcName);
         
         $actual = $this->getActualOutput();
         
@@ -528,6 +560,6 @@ class CurlTest extends TestCase
         
         $this->expectException(\Exception::class);
         
-        curl::runMultiAsync($postParam, $url, $funcName);
+        curl::runMultiAsync($url, $postParam, $funcName);
     }
 }

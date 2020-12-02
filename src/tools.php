@@ -246,8 +246,8 @@ function setDateTimes(array $request) : array
 
 function connect(string $dbName) //: resource
 {
-    $n = 2;
-    $delay = 40000;
+    $n = 5;
+    $delay = 500000;
     $serverName = MSSQL_HOST;
     $connectionInfo = ['Database' => $dbName, 'UID' => MSSQL_USER, 'PWD' => MSSQL_PASSWORD];
     
@@ -2834,9 +2834,9 @@ function goCurl(array $postParams, string $url, bool $async) : string
         $n_param = count($postParams);
         if ($n_param > 0) {
             if ($async && $n_param > 1) {
-                Curl::runMultiAsync($postParams, $url, 'id', 'formatResponse');
+                Curl::runMultiAsync($url, $postParams, 'id', 'formatResponse');
             } else {
-                $message = Curl::runMultiSync($postParams, $url, 'id', 'formatResponse');
+                $message = Curl::runMultiSync($url, $postParams, 'id', 'formatResponse');
             }
         }
         return $message;

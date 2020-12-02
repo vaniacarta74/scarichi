@@ -96,7 +96,7 @@ class Bot {
             $params = [
                 'offset' => $offset
             ];
-            $response = Curl::run($params, $url, true);
+            $response = Curl::run($url, $params, true);
             if (!$response) {
                 throw new \Exception('Server Telegram non raggiungibile');
             }
@@ -172,7 +172,7 @@ class Bot {
                 'text' => $message, 
                 'parse_mode' => 'HTML'
             ];            
-            $response = Curl::run($params, $url, true);
+            $response = Curl::run($url, $params, true);
             
             return $response;
         } catch (\Throwable $e) {
@@ -678,7 +678,7 @@ class Bot {
                 'dateto' => $dateto,
                 'field' => 'cumulato'
             ];
-            $json = Curl::run($params, $url, true);            
+            $json = Curl::run($url, $params, true);            
             $arrJson = json_decode($json, true);
             
             return $arrJson;

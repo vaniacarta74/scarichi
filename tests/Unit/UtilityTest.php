@@ -159,6 +159,19 @@ class UtilityTest extends TestCase
         
         Utility::getJsonArray($path, $keys, $deepKey);
     }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::getJsonArray
+     */
+    public function testGetJsonPathException() : void
+    {
+        $path = 'pippo';
+        
+        $this->expectException(\Exception::class);
+        
+        Utility::getJsonArray($path);
+    }
 
     /**
      * @coversNothing
@@ -416,5 +429,131 @@ class UtilityTest extends TestCase
         $this->expectException(\Exception::class);
         
         Utility::checkDate($date, $isSmall);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function checkPathProvider() : array
+    {
+        $data = [
+            'readable' => [
+                'path' => '/var/www/html/telecontrollo/scarichi/github/src/telegram.php',
+                'mode' => 'r',
+                'expected' => true
+            ],
+            'csv' => [
+                'path' => '/var/www/html/telecontrollo/scarichi/github/tests/providers/test.csv',
+                'mode' => 'r',
+                'expected' => true
+            ],
+            'writable' => [
+                'path' => '/var/www/html/telecontrollo/scarichi/github/src/telegram.php',
+                'mode' => 'w',
+                'expected' => true
+            ],
+            'readable + writable' => [
+                'path' => '/var/www/html/telecontrollo/scarichi/github/src/telegram.php',
+                'mode' => 'rw',
+                'expected' => true
+            ],
+            'only path' => [
+                'path' => '/var/www/html/telecontrollo/scarichi/github/src/telegram.php',
+                'mode' => null,
+                'expected' => true
+            ],
+            'not exist' => [
+                'path' => '/var/www/html/telecontrollo/scarichi/github/src/telegramma.php',
+                'mode' => null,
+                'expected' => false
+            ],
+            'not path' => [
+                'path' => 'pippo',
+                'mode' => null,
+                'expected' => false
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::checkPath
+     * @dataProvider checkPathProvider
+     */
+    public function testCheckPathEquals(string $path, ?string $mode, bool $expected) : void
+    {
+        $actual = Utility::checkPath($path, $mode);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::checkPath
+     */
+    public function testCheckPathException() : void    {
+        
+        $path = '/var/www/html/telecontrollo/scarichi/github/src/telegram.php';
+        $mode = 'wr';
+        
+        $this->expectException(\Exception::class);
+        
+        Utility::checkPath($path, $mode);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function setDefaultProvider() : array
+    {
+        $data = [
+            'standard' => [
+                'array' => [
+                    'telegram.php',
+                    '/var/www/html/telecontrollo/scarichi/telegram.json'
+                ],
+                'key' => 1,
+                'default' => BOTPATH,
+                'method' => 'Utility::checkPath',
+                'params' => ['r'],
+                'expected' => '/var/www/html/telecontrollo/scarichi/telegram.json'
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::setDefault
+     * @dataProvider setDefaultProvider
+     */
+    public function testSetDefaultEquals(?array $array, ?int $key, ?string $default, ?string $checkMethod, ?array $methodParams, string $expected) : void
+    {
+        $actual = Utility::setDefault($array, $key, $default, $checkMethod, $methodParams);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::setDefault
+     */
+    public function testSetDefaultException() : void    {
+        
+        $array = [
+            'telegram.php',
+            '/var/www/html/telecontrollo/scarichi/telegram.json'
+        ];
+        $key = 2;
+        $default = BOTPATH;
+        $checkMethod = null;
+        $methodParams = null;
+        
+        $this->expectException(\Exception::class);
+        
+        Utility::setDefault($array, $key, $default, $checkMethod, $methodParams);
     }
 }

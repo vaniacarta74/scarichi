@@ -28,16 +28,20 @@ class Curl {
      * @param string $strDateTime Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
      * @return string Intervallo intercorso nel formato "secondi,millisecondi"
      */
-    public static function run(array $params, string $url, ?bool $json = false) : string
+    public static function run(string $url, ?array $params = null, ?bool $json = false) : string
     {
         try {
-            if (count($params) === 0) {
-                throw new \Exception('Parametri curl non definiti');
-            }
-            if ($json) {
-                $ch = self::setJson($params, $url);
+            if (isset($params)) {
+                if (count($params) === 0) {
+                    throw new \Exception('Parametri curl non definiti');
+                }
+                if ($json) {
+                    $ch = self::setJson($url, $params);
+                } else {
+                    $ch = self::set($url, $params);
+                }
             } else {
-                $ch = self::set($params, $url);
+                $ch = self::set($url);
             }
             $report = self::exec($ch);
             
@@ -84,21 +88,23 @@ class Curl {
      * @param string $strDateTime Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
      * @return string Intervallo intercorso nel formato "secondi,millisecondi"
      */
-    public static function set(array $params, string $url)
+    public static function set(string $url, ?array $params = null)
     {
         try {
-            if (count($params) === 0) {
-                throw new \Exception('Parametri curl non definiti');
-            }
             $ch = curl_init();            
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_HEADER, false);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, TIMEOUT);
-            curl_setopt($ch, CURLOPT_TIMEOUT, TIMEOUT);
-            
+            if (isset($params)) {
+                if (count($params) > 0) {              
+                    curl_setopt($ch, CURLOPT_POST, true);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+                    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, TIMEOUT);
+                    curl_setopt($ch, CURLOPT_TIMEOUT, TIMEOUT);
+                } else {
+                    throw new \Exception('Parametri POST non definiti');
+                }
+            }            
             return $ch;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -116,7 +122,7 @@ class Curl {
      * @param string $strDateTime Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
      * @return string Intervallo intercorso nel formato "secondi,millisecondi"
      */
-    public static function setJson(array $params, string $url)
+    public static function setJson(string $url, array $params)
     {
         try {
             if (count($params) === 0) {
@@ -154,7 +160,7 @@ class Curl {
      * @param string $strDateTime Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
      * @return string Intervallo intercorso nel formato "secondi,millisecondi"
      */
-    public static function multiSet(array $postParams, string $url, ?string $key = null) : array
+    public static function multiSet(string $url, array $postParams, ?string $key = null) : array
     {
         try {
             if (count($postParams) === 0) {
@@ -162,7 +168,7 @@ class Curl {
             }
             $handlers = [];
             foreach ($postParams as $params) {
-                $ch = self::set($params, $url);
+                $ch = self::set($url, $params);
                 if ($key) {
                     if (!array_key_exists($key, $params)) {
                         throw new \Exception('Chiave non presente nei parametri');
@@ -190,13 +196,13 @@ class Curl {
      * @param string $strDateTime Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
      * @return string Intervallo intercorso nel formato "secondi,millisecondi"
      */
-    public static function runMultiSync(array $postParams, string $url, ?string $paramsKey = null, ?string $funcName = null) : string
+    public static function runMultiSync(string $url, array $postParams, ?string $paramsKey = null, ?string $funcName = null) : string
     {
         try {
             if (count($postParams) === 0) {
                 throw new \Exception('Parametri curl non definiti');
             }
-            $handlers = self::multiSet($postParams, $url, $paramsKey);
+            $handlers = self::multiSet($url, $postParams, $paramsKey);
             $message = '';
             $i = 1;
             foreach ($handlers as $key => $ch) {
@@ -225,14 +231,14 @@ class Curl {
      * @param string $strDateTime Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
      * @return string Intervallo intercorso nel formato "secondi,millisecondi"
      */
-    public static function runMultiAsync(array $postParams, string $url, ?string $paramsKey = null, ?string $funcName = null) : void
+    public static function runMultiAsync(string $url, array $postParams, ?string $paramsKey = null, ?string $funcName = null) : void
     {
         try {
             if (count($postParams) === 0) {
                 throw new \Exception('Parametri curl non definiti');
             }
             $mh = curl_multi_init();
-            $handlers = self::multiSet($postParams, $url, $paramsKey);
+            $handlers = self::multiSet($url, $postParams, $paramsKey);
             foreach ($handlers as $ch) {
                 curl_multi_add_handle($mh, $ch);
             }

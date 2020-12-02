@@ -30,6 +30,22 @@ class Error
      * @param int $debug_level Livello di debug
      * @return void
      */
+    public static function debugLevel() : int
+    {
+        return defined('DEBUG_LEVEL') ? DEBUG_LEVEL : 1;
+    }
+    
+    /**
+     * Stampa il nome della funzione che ha generato l'errore.
+     *
+     * Il metodo printErrorInfo() viene chiamato nel caso una funzione abbia
+     * generato un errore. Restituisce una stringa con il nome della funzione e
+     * la data e l'ora.
+     *
+     * @param string $functionName Nome della funzione dove si è scatenato l'errore
+     * @param int $debug_level Livello di debug
+     * @return void
+     */
     public static function printErrorInfo(string $functionName, int $debug_level) : void
     {
         $date = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));

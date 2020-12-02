@@ -9,6 +9,8 @@ namespace vaniacarta74\Scarichi;
 
 use vaniacarta74\Scarichi\Error;
 
+require __DIR__ . '/../vendor/autoload.php';
+
 /**
  * Classe gestione errori.
  *
@@ -35,30 +37,33 @@ class Utility
     {
         try {
             $response = [];
-            $string = @file_get_contents($path);
-            $json = json_decode($string, true);
-
-            if ($keys !== null) {
-                $jsonArray = self::getSubArray($json, $keys);
-            } else {
-                $jsonArray = $json;
-            }
-            if ($deepKey !== null) {
-                if (is_array($jsonArray) && array_key_exists($deepKey, $jsonArray)) {
-                    if (is_array($jsonArray[$deepKey])) {
-                        throw new \Exception('Problemi con il file json. Parametro deepKey usato impropriamente');
+            if (self::checkPath($path)) {            
+                $string = @file_get_contents($path);
+                $json = json_decode($string, true);
+                if ($keys !== null) {
+                    $jsonArray = self::getSubArray($json, $keys);
+                } else {
+                    $jsonArray = $json;
+                }
+                if ($deepKey !== null) {
+                    if (is_array($jsonArray) && array_key_exists($deepKey, $jsonArray)) {
+                        if (is_array($jsonArray[$deepKey])) {
+                            throw new \Exception('Problemi con il file json. Parametro deepKey usato impropriamente');
+                        } else {
+                            $response[] = $jsonArray[$deepKey];
+                        }
                     } else {
-                        $response[] = $jsonArray[$deepKey];
+                        throw new \Exception('Problemi con il file json. Rivedere i parametri');
                     }
                 } else {
-                    throw new \Exception('Problemi con il file json. Rivedere i parametri');
+                    $response = $jsonArray;
                 }
             } else {
-                $response = $jsonArray;
+                throw new \Exception('Problemi con il file json. File inesistente');
             }
             return $response;
         } catch (\Throwable $e) {
-            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
             throw $e;
         }
     }
@@ -90,7 +95,7 @@ class Utility
             }
             return $subArray;
         } catch (\Throwable $e) {
-            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
             throw $e;
         }
     }
@@ -125,7 +130,7 @@ class Utility
             }
             return $interval;
         } catch (\Throwable $e) {
-            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
             throw $e;
         }
     }
@@ -151,7 +156,7 @@ class Utility
             }        
             return $result;
         } catch (\Throwable $e) {        
-            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
             throw $e;        
         }
     }
@@ -187,7 +192,94 @@ class Utility
             }
             return $isDate;
         } catch (\Throwable $e) {        
-            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
+            throw $e;        
+        }
+    }
+    
+    /**
+     * Stampa il tempo trascorso da una certa data.
+     *
+     * Il metodo benchmark() fornisce l'intervallo di tempo intercorso da una
+     * certa data. Viene utilizzato per calcolare il tempo di esecuzione della
+     * procedura.
+     *
+     * @param string $strDateTime Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
+     * @return string Intervallo intercorso nel formato "secondi,millisecondi"
+     */
+    public static function checkPath(string $path, ?string $mode = null) : bool
+    {
+        try {
+            if (preg_match('/^([\/][\w._-]+)*[\/][\w._-]+[\.](php|json|csv)$/', $path) && file_exists($path)) {
+                $isPath = true;
+                if (isset($mode)) {
+                    switch ($mode) {
+                        case 'r':
+                            if (!is_readable($path)) {
+                                // @codeCoverageIgnoreStart
+                                $isPath = false;
+                                // @codeCoverageIgnoreEnd
+                            }
+                            break;
+                        case 'w':
+                            if (!is_writable($path)) {
+                                // @codeCoverageIgnoreStart
+                                $isPath = false;
+                                // @codeCoverageIgnoreEnd
+                            }
+                            break;
+                        case 'rw':
+                            if (!is_readable($path) || !is_writable($path)) {
+                                // @codeCoverageIgnoreStart
+                                $isPath = false;
+                                // @codeCoverageIgnoreEnd
+                            }
+                            break;
+                        default :
+                            throw new \Exception('Parametro no definito: usare r o w.');
+                            break;
+                    }
+                }
+            } else {
+                $isPath = false;
+            }
+            return $isPath;
+        } catch (\Throwable $e) {        
+            Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
+            throw $e;        
+        }
+    }
+    
+    /**
+     * Stampa il tempo trascorso da una certa data.
+     *
+     * Il metodo benchmark() fornisce l'intervallo di tempo intercorso da una
+     * certa data. Viene utilizzato per calcolare il tempo di esecuzione della
+     * procedura.
+     *
+     * @param string $strDateTime Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
+     * @return string Intervallo intercorso nel formato "secondi,millisecondi"
+     */
+    public static function setDefault(?array $array = null, ?int $key = null, ?string $default = null, ?string $checkMethod = null, ?array $methodParams = null) : string
+    {
+        try {
+            $key = $key ?? 0;
+            $default = $default ?? '';
+            $checkMethod = $checkMethod ?? false;
+            $methodParams = $methodParams ?? [];
+            if (isset($array) && count($array) > 1) {
+                if ($key < count($array)) {
+                    $checkParams = array_merge(array($array[$key]),$methodParams);
+                    if ($checkMethod && self::callback($checkMethod, $checkParams)) {
+                        $default = $array[$key];
+                    }
+                } else {
+                    throw new \Exception('Chiave fuori range');
+                }
+            }
+            return $default;
+        } catch (\Throwable $e) {        
+            Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
             throw $e;        
         }
     }

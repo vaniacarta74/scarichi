@@ -109,7 +109,7 @@ class ToCsvTest extends TestCase
             return !is_null($value) && $value !== '';
         });        
 
-        $actual = Curl::run($params, URL);
+        $actual = Curl::run(URL, $params);
         
         $expecteds = explode('|', $response);
         
