@@ -260,24 +260,83 @@ class Utility
      * @param string $strDateTime Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
      * @return string Intervallo intercorso nel formato "secondi,millisecondi"
      */
-    public static function setDefault(?array $array = null, ?int $key = null, ?string $default = null, ?string $checkMethod = null, ?array $methodParams = null) : string
+    public static function checkUrl(string $url) : bool
+    {
+        try {
+            $regex = '/^(http[s]?:)[\/]{2}(localhost|([0-9][.]|[1-9][0-9][.]|[1][0-9][0-9][.]|[2][0-4][0-9][.]|[2][5][0-5][.]){3}([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5]){1})[\/]{1}([\w._-]*[\/])*([\w._-]+[.](json|html|php(\?{1}[\w._-]+[=]{1}[\w\/:.-]+(&{1}[\w._-]+[=]{1}[\w\/:.-]+)*)?))*$/';
+            if (preg_match($regex, $url)) {
+                $isUrl = true;
+            } else {
+                $isUrl = false;
+            }
+            return $isUrl;
+        // @codeCoverageIgnoreStart
+        } catch (\Throwable $e) {        
+            Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
+            throw $e;        
+        }
+        // @codeCoverageIgnoreEnd
+    }
+    
+    /**
+     * Stampa il tempo trascorso da una certa data.
+     *
+     * Il metodo benchmark() fornisce l'intervallo di tempo intercorso da una
+     * certa data. Viene utilizzato per calcolare il tempo di esecuzione della
+     * procedura.
+     *
+     * @param string $strDateTime Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
+     * @return string Intervallo intercorso nel formato "secondi,millisecondi"
+     */
+    public static function catchParam(?array $array = null, ?int $key = null, ?array $arrAssoc = null, ?string $keyAssoc = null, string $default) : string
     {
         try {
             $key = $key ?? 0;
-            $default = $default ?? '';
-            $checkMethod = $checkMethod ?? false;
-            $methodParams = $methodParams ?? [];
+            $keyAssoc = $keyAssoc ?? '';            
+            $arrAssoc = $arrAssoc ?? [];
             if (isset($array) && count($array) > 1) {
                 if ($key < count($array)) {
-                    $checkParams = array_merge(array($array[$key]),$methodParams);
-                    if ($checkMethod && self::callback($checkMethod, $checkParams)) {
-                        $default = $array[$key];
-                    }
+                    $toCheck = $array[$key];
                 } else {
                     throw new \Exception('Chiave fuori range');
                 }
+            } elseif (count($arrAssoc) > 0) {
+                if (array_key_exists($keyAssoc, $arrAssoc)) {
+                    $toCheck = $arrAssoc[$keyAssoc];
+                } else {
+                    throw new \Exception('Chiave inesistente');
+                }
+            } else {
+                $toCheck = $default;
             }
-            return $default;
+            return $toCheck;
+        } catch (\Throwable $e) {        
+            Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
+            throw $e;        
+        }
+    }
+    
+    /**
+     * Stampa il tempo trascorso da una certa data.
+     *
+     * Il metodo benchmark() fornisce l'intervallo di tempo intercorso da una
+     * certa data. Viene utilizzato per calcolare il tempo di esecuzione della
+     * procedura.
+     *
+     * @param string $strDateTime Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
+     * @return string Intervallo intercorso nel formato "secondi,millisecondi"
+     */
+    public static function checkParam(string $toCheck, string $checkMethod, ?array $methodParams = null) : string
+    {
+        try { 
+            $methodParams = $methodParams ?? [];
+            $checkParams = array_merge(array($toCheck), $methodParams);
+            if (self::callback($checkMethod, $checkParams)) {
+                $param = $toCheck;
+            } else {
+                throw new \Exception('Parametro non definito correttamente');
+            }
+            return $param;
         } catch (\Throwable $e) {        
             Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
             throw $e;        

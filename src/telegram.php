@@ -8,7 +8,8 @@ use vaniacarta74\Scarichi\Error;
 require __DIR__ . '/../vendor/autoload.php';
 
 try {
-    $botPath = Utility::setDefault($argv, 1, BOTPATH, 'Utility::checkPath', array('w'));
+    $rawPath = Utility::catchParam($argv, 1, $_REQUEST, 'path', BOTPATH);
+    $botPath = Utility::checkParam($rawPath, 'Utility::checkPath', array('w'));
     $jsonIn = Utility::getJsonArray($botPath);
     $bots = $jsonIn['bots'];    
     foreach ($bots as $bot) {

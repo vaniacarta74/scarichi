@@ -506,19 +506,136 @@ class UtilityTest extends TestCase
     /**
      * @coversNothing
      */
-    public function setDefaultProvider() : array
+    public function catchParamProvider() : array
     {
         $data = [
-            'standard' => [
+            'path standard' => [
                 'array' => [
                     'telegram.php',
                     '/var/www/html/telecontrollo/scarichi/telegram.json'
                 ],
                 'key' => 1,
+                'arrAssoc' => [
+                    'path' => '/var/www/html/telecontrollo/scarichi/github/src/telegram.php'
+                ],
+                'keyAssoc' => 'path',
+                'default' => BOTPATH,
+                'expected' => '/var/www/html/telecontrollo/scarichi/telegram.json'
+            ],
+            'path argv' => [
+                'array' => [
+                    'telegram.php',
+                    '/var/www/html/telecontrollo/scarichi/telegram.json'
+                ],
+                'key' => 1,
+                'arrAssoc' => null,
+                'keyAssoc' => null,
+                'default' => BOTPATH,
+                'expected' => '/var/www/html/telecontrollo/scarichi/telegram.json'
+            ],
+            'path request check' => [
+                'array' => null,
+                'key' => null,
+                'arrAssoc' => [
+                    'path' => '/var/www/html/telecontrollo/scarichi/github/src/telegram.php'
+                ],
+                'keyAssoc' => 'path',
+                'default' => BOTPATH,
+                'expected' => '/var/www/html/telecontrollo/scarichi/github/src/telegram.php'
+            ],
+            'generic default' => [
+                'array' => null,
+                'key' => null,
+                'arrAssoc' => null,
+                'keyAssoc' => null,
+                'default' => 'pippo',
+                'expected' => 'pippo'
+            ],
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::catchParam
+     * @dataProvider catchParamProvider
+     */
+    public function testCatchParamEquals(?array $array, ?int $key, ?array $arrAssoc, ?string $keyAssoc, string $default, string $expected) : void
+    {
+        $actual = Utility::catchParam($array, $key, $arrAssoc, $keyAssoc, $default);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::catchParam
+     */
+    public function testCatchParamRequestException() : void    {
+        
+        $array = null;
+        $key = null;
+        $arrAssoc = [
+            'path' => '/var/www/html/telecontrollo/scarichi/telegram.json'
+        ];
+        $keyAssoc = 'url';
+        $default = BOTPATH;
+        
+        $this->expectException(\Exception::class);
+        
+        Utility::catchParam($array, $key, $arrAssoc, $keyAssoc, $default);
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::catchParam
+     */
+    public function testCatchParamException() : void    {
+        
+        $array = [
+            'telegram.php',
+            '/var/www/html/telecontrollo/scarichi/telegram.json'
+        ];
+        $key = 2;
+        $arrAssoc = null;
+        $keyAssoc = null;
+        $default = BOTPATH;
+        
+        $this->expectException(\Exception::class);
+        
+        Utility::catchParam($array, $key, $arrAssoc, $keyAssoc, $default);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function checkParamProvider() : array
+    {
+        $data = [
+            'path default' => [
                 'default' => BOTPATH,
                 'method' => 'Utility::checkPath',
                 'params' => ['r'],
-                'expected' => '/var/www/html/telecontrollo/scarichi/telegram.json'
+                'expected' => '/var/www/html/telecontrollo/scarichi/github/src/config/../../../telegram.json'
+            ],            
+            'path param' => [
+                'default' => '/var/www/html/telecontrollo/scarichi/github/src/telegram.php',
+                'method' => 'Utility::checkPath',
+                'params' => ['r'],
+                'expected' => '/var/www/html/telecontrollo/scarichi/github/src/telegram.php'
+            ],
+            'url default' => [
+                'default' => BOTURL,
+                'method' => 'Utility::checkUrl',
+                'params' => null,
+                'expected' => 'http://localhost/scarichi/telegram.php'
+            ],
+            'url param' => [
+                'default' => 'http://localhost/scarichi/telegram.php?var=30030&datefrom=27/10/2020',
+                'method' => 'Utility::checkUrl',
+                'params' => null,
+                'expected' => 'http://localhost/scarichi/telegram.php?var=30030&datefrom=27/10/2020'
             ]
         ];
         
@@ -527,33 +644,114 @@ class UtilityTest extends TestCase
     
     /**
      * @group utility
-     * @covers \vaniacarta74\Scarichi\Utility::setDefault
-     * @dataProvider setDefaultProvider
+     * @covers \vaniacarta74\Scarichi\Utility::checkParam
+     * @dataProvider checkParamProvider
      */
-    public function testSetDefaultEquals(?array $array, ?int $key, ?string $default, ?string $checkMethod, ?array $methodParams, string $expected) : void
+    public function testCheckParamEquals(string $default, string $checkMethod, ?array $methodParams, string $expected) : void
     {
-        $actual = Utility::setDefault($array, $key, $default, $checkMethod, $methodParams);
+        $actual = Utility::checkParam($default, $checkMethod, $methodParams);
         
         $this->assertEquals($expected, $actual);
     }
     
     /**
      * @group utility
-     * @covers \vaniacarta74\Scarichi\Utility::setDefault
+     * @covers \vaniacarta74\Scarichi\Utility::checkParam
      */
-    public function testSetDefaultException() : void    {
+    public function testCheckParamPathException() : void    {
         
-        $array = [
-            'telegram.php',
-            '/var/www/html/telecontrollo/scarichi/telegram.json'
-        ];
-        $key = 2;
-        $default = BOTPATH;
-        $checkMethod = null;
+        $default = 'http://localhost/scarichi/telegram.php?var=30030&datefrom=27/10/2020';
+        $checkMethod = 'Utility::checkPath';
+        $methodParams = ['r'];
+                
+        $this->expectException(\Exception::class);
+        
+        Utility::checkParam($default, $checkMethod, $methodParams);
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::checkParam
+     */
+    public function testCheckParamUrlException() : void    {
+        
+        $default = '/var/www/html/telecontrollo/scarichi/github/src/telegram.php';
+        $checkMethod = 'Utility::checkUrl';
         $methodParams = null;
         
         $this->expectException(\Exception::class);
         
-        Utility::setDefault($array, $key, $default, $checkMethod, $methodParams);
+        Utility::checkParam($default, $checkMethod, $methodParams);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function checkUrlProvider() : array
+    {
+        $data = [
+            'directory' => [
+                'url' => 'http://localhost/sitpit/',
+                'expected' => true
+            ],
+            'local' => [
+                'url' => 'http://192.168.1.100/sitpit/',
+                'expected' => true
+            ],
+            'ssl' => [
+                'url' => 'https://192.168.1.100/sitpit/',
+                'expected' => true
+            ],
+            'more dir' => [
+                'url' => 'http://localhost/sitpit/telecontrollo/scarichi/',
+                'expected' => true
+            ],
+            'php' => [
+                'url' => 'http://localhost/sitpit/telecontrollo/scarichi/telegram.php',
+                'expected' => true
+            ],
+            'html' => [
+                'url' => 'http://localhost/scarichi/telegram.html',
+                'expected' => true
+            ],
+            'json' => [
+                'url' => 'http://localhost/scarichi/telegram.json',
+                'expected' => true
+            ],
+            'php 1 param' => [
+                'url' => 'http://localhost/sitpit/telecontrollo/scarichi/telegram.php?var=30030',
+                'expected' => true
+            ],
+            'php 2 param' => [
+                'url' => 'http://localhost/scarichi/telegram.php?var=30030&datefrom=01/01/2020',
+                'expected' => true
+            ],
+            'php more param' => [
+                'url' => 'http://localhost/scarichi/telegram.php?var=30030&datefrom=01/01/2020&dateto=21/01/2020',
+                'expected' => true
+            ],
+            'url with url' => [
+                'url' => 'http://localhost/scarichi/watchdog.php?url=http://localhost/scarichi/telegram.php',
+                'expected' => true
+            ],
+            'no dir no ext' => [
+                'url' => 'http://localhost/scarichi',
+                'expected' => false
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::checkUrl
+     * @dataProvider checkUrlProvider
+     */
+    public function testCheckUrlEquals(string $url, bool $expected) : void
+    {
+        $actual = Utility::checkUrl($url);
+        
+        $this->assertEquals($expected, $actual);
     }
 }

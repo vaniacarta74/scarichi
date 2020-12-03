@@ -2822,12 +2822,7 @@ function setPostParameters(array $parameters, array $filledValues) : array
 function goCurl(array $postParams, string $url, bool $async) : string
 {
     try {
-        $http = '(http[s]?:)[\/]{2}';
-        $ip = '([0-9][.]|[1-9][0-9][.]|[1][0-9][0-9][.]|[2][0-4][0-9][.]|[2][5][0-5][.]){3}([0-9]|[1-9][0-9]|[1][0-9][0-9]|[2][0-4][0-9]|[2][5][0-5]){1}';
-        $root = '((localhost)|' . $ip . ')';
-        $path = '([\/][\w._-]+)*[\/][\w._-]+[\.](php)';
-        $regex = $http . $root . $path;
-        if (!preg_match('/^' . $regex . '$/', $url)) {
+        if (!Utility::checkUrl($url)) {
             throw new \Exception('Url non valido');
         }
         $message = '';

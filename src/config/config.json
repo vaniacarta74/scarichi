@@ -16,7 +16,8 @@
         },
         "telegram": {
             "send": false,
-            "path": "/../../../telegram.json"
+            "path": "/../../../telegram.json",
+            "url": "http://localhost/scarichi/telegram.php"
         }
     },
     "modelli": {

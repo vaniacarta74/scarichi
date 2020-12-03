@@ -20,6 +20,7 @@ define('MAKESUBDIR', boolval(CONFIG['define']['csv']['subdirectory']));
 
 define('TELEGRAM', boolval(CONFIG['define']['telegram']['send']));
 define('BOTPATH', __DIR__ . CONFIG['define']['telegram']['path']);
+define('BOTURL', CONFIG['define']['telegram']['url']);
 
 define('DEBUG_LEVEL', intval(CONFIG['define']['log']['debug_level']));
 define('LOG_PATH', __DIR__ . CONFIG['define']['log']['log_path']);
