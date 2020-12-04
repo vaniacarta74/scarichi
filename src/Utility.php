@@ -304,7 +304,7 @@ class Utility
                 if (array_key_exists($keyAssoc, $arrAssoc)) {
                     $toCheck = $arrAssoc[$keyAssoc];
                 } else {
-                    throw new \Exception('Chiave inesistente');
+                    $toCheck = $default;
                 }
             } else {
                 $toCheck = $default;

@@ -1,0 +1,1 @@
+{"bots":[{"botName":"BotScarichi","token":"pippo","offset":0,"commands":["volume"],"chats":[1,2,3]},{"botName":"BotTest","token":"pluto","offset":0,"commands":["pluto"],"chats":[1,2,3]}]}

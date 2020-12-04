@@ -22,6 +22,9 @@ define('TELEGRAM', boolval(CONFIG['define']['telegram']['send']));
 define('BOTPATH', __DIR__ . CONFIG['define']['telegram']['path']);
 define('BOTURL', CONFIG['define']['telegram']['url']);
 
+define('NITER', intval(CONFIG['define']['watchdog']['iterations']));
+define('DELAY', intval(CONFIG['define']['watchdog']['delay']));
+
 define('DEBUG_LEVEL', intval(CONFIG['define']['log']['debug_level']));
 define('LOG_PATH', __DIR__ . CONFIG['define']['log']['log_path']);
 define('ERROR_LOG', CONFIG['define']['log']['error_log']);

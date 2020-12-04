@@ -551,6 +551,16 @@ class UtilityTest extends TestCase
                 'default' => 'pippo',
                 'expected' => 'pippo'
             ],
+            'error default' => [
+                'array' => null,
+                'key' => null,
+                'arrAssoc' => [
+                    'path' => '/var/www/html/telecontrollo/scarichi/github/src/telegram.php'
+                ],
+                'keyAssoc' => 'url',
+                'default' => 'pippo',
+                'expected' => 'pippo'
+            ]
         ];
         
         return $data;
@@ -566,25 +576,6 @@ class UtilityTest extends TestCase
         $actual = Utility::catchParam($array, $key, $arrAssoc, $keyAssoc, $default);
         
         $this->assertEquals($expected, $actual);
-    }
-    
-    /**
-     * @group utility
-     * @covers \vaniacarta74\Scarichi\Utility::catchParam
-     */
-    public function testCatchParamRequestException() : void    {
-        
-        $array = null;
-        $key = null;
-        $arrAssoc = [
-            'path' => '/var/www/html/telecontrollo/scarichi/telegram.json'
-        ];
-        $keyAssoc = 'url';
-        $default = BOTPATH;
-        
-        $this->expectException(\Exception::class);
-        
-        Utility::catchParam($array, $key, $arrAssoc, $keyAssoc, $default);
     }
     
     /**

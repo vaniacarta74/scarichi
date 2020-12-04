@@ -18,6 +18,10 @@
             "send": false,
             "path": "/../../../telegram.json",
             "url": "http://localhost/scarichi/telegram.php"
+        },
+        "watchdog": {
+            "iterations": 12,
+            "delay": 5000000
         }
     },
     "modelli": {
