@@ -591,7 +591,7 @@ class UtilityTest extends TestCase
         $key = 2;
         $arrAssoc = null;
         $keyAssoc = null;
-        $default = BOTPATH;
+        $default = null;
         
         $this->expectException(\Exception::class);
         

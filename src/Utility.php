@@ -288,26 +288,21 @@ class Utility
      * @param string $strDateTime Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
      * @return string Intervallo intercorso nel formato "secondi,millisecondi"
      */
-    public static function catchParam(?array $array = null, ?int $key = null, ?array $arrAssoc = null, ?string $keyAssoc = null, string $default) : string
+    public static function catchParam(?array $array = null, ?int $key = null, ?array $arrAssoc = null, ?string $keyAssoc = null, ?string $default) : string
     {
         try {
+            if (isset($default)) {
+                $toCheck = $default;
+            } else {
+                throw new \Exception('Parametro default necessario');
+            }
             $key = $key ?? 0;
             $keyAssoc = $keyAssoc ?? '';            
             $arrAssoc = $arrAssoc ?? [];
-            if (isset($array) && count($array) > 1) {
-                if ($key < count($array)) {
-                    $toCheck = $array[$key];
-                } else {
-                    throw new \Exception('Chiave fuori range');
-                }
-            } elseif (count($arrAssoc) > 0) {
-                if (array_key_exists($keyAssoc, $arrAssoc)) {
-                    $toCheck = $arrAssoc[$keyAssoc];
-                } else {
-                    $toCheck = $default;
-                }
-            } else {
-                $toCheck = $default;
+            if (isset($array) && count($array) > 1 && $key < count($array)) {
+                $toCheck = $array[$key];
+            } elseif (count($arrAssoc) > 0 && array_key_exists($keyAssoc, $arrAssoc)) {
+                $toCheck = $arrAssoc[$keyAssoc];
             }
             return $toCheck;
         } catch (\Throwable $e) {        
