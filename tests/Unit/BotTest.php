@@ -1364,6 +1364,7 @@ class BotTest extends TestCase
             'standard' => [
                 'args' => [
                     'botName' => 'BotScarichi',
+                    'userName' => 'ScarichiBot',
                     'token' => TOKEN,
                     'offset' => 0,
                     'commands' => [
@@ -1376,6 +1377,7 @@ class BotTest extends TestCase
                 ],    
                 'expecteds' => [
                     'botName' => 'BotScarichi',
+                    'userName' => 'ScarichiBot',
                     'token' => TOKEN,
                     'start' => 0,
                     'end' => 0,
@@ -1420,6 +1422,7 @@ class BotTest extends TestCase
         Reflections::invokeConstructor($this->bot, array($args));
         
         $actual['botName'] = Reflections::getProperty($this->bot, 'botName');
+        $actual['userName'] = Reflections::getProperty($this->bot, 'userName');
         $actual['token'] = Reflections::getProperty($this->bot, 'token');
         $actual['start'] = Reflections::getProperty($this->bot, 'start');
         $actual['end'] = Reflections::getProperty($this->bot, 'end');
@@ -1443,6 +1446,19 @@ class BotTest extends TestCase
             'botName' => [
                 'args' => [
                     'botName' => 12345,
+                    'userName' => 'ScarichiBot',
+                    'token' => 23456789,
+                    'offset' => 0,
+                    'commands' => [
+                        'volume'
+                    ],
+                    'chats' => []
+                ]
+            ],
+            'userName' => [
+                'args' => [
+                    'botName' => 'BotScarichi',
+                    'userName' => 123456,
                     'token' => 23456789,
                     'offset' => 0,
                     'commands' => [
@@ -1454,6 +1470,7 @@ class BotTest extends TestCase
             'token' => [
                 'args' => [
                     'botName' => 'BotScarichi',
+                    'userName' => 'ScarichiBot',
                     'token' => 23456789,
                     'offset' => 0,
                     'commands' => [
@@ -1465,6 +1482,7 @@ class BotTest extends TestCase
             'offset' => [
                 'args' => [
                     'botName' => 'BotScarichi',
+                    'userName' => 'ScarichiBot',
                     'token' => TOKEN,
                     'offset' => 'pippo',
                     'commands' => [
@@ -1476,6 +1494,7 @@ class BotTest extends TestCase
             'command' => [
                 'args' => [
                     'botName' => 'BotScarichi',
+                    'userName' => 'ScarichiBot',
                     'token' => TOKEN,
                     'offset' => 0,
                     'commands' => 'pippo',                    
@@ -1485,6 +1504,7 @@ class BotTest extends TestCase
             'chats' => [
                 'args' => [
                     'botName' => 'BotScarichi',
+                    'userName' => 'ScarichiBot',
                     'token' => TOKEN,
                     'offset' => 0,
                     'commands' => [
@@ -1518,6 +1538,7 @@ class BotTest extends TestCase
     {
         $expected = [
             'botName' => Reflections::getProperty($this->bot, 'botName'),
+            'userName' => Reflections::getProperty($this->bot, 'userName'),
             'token' => Reflections::getProperty($this->bot, 'token'), 
             'offset' => Reflections::getProperty($this->bot, 'end'),
             'commands' => Reflections::getProperty($this->bot, 'botCommands'),
@@ -2006,6 +2027,13 @@ class BotTest extends TestCase
             ],
             'volume no param' => [
                 'text' => '/volume',
+                'expected' => [
+                    'ok' => true,
+                    'params' => []
+                ]
+            ],
+            'volume username' => [
+                'text' => '/volume@ScarichiBot',
                 'expected' => [
                     'ok' => true,
                     'params' => []

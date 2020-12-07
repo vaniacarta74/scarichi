@@ -33,6 +33,7 @@ class BotManagerTest extends TestCase
             'bots' => [
                 [
                     'botName' => 'BotScarichi',
+                    'userName' => 'ScarichiBot',
                     'token' => 'pippo',
                     'offset' => 0,
                     'commands' => [
@@ -42,6 +43,7 @@ class BotManagerTest extends TestCase
                 ],
                 [
                     'botName' => 'BotTest',
+                    'userName' => 'TestBot',
                     'token' => 'pluto',
                     'offset' => 0,
                     'commands' => [
@@ -69,6 +71,7 @@ class BotManagerTest extends TestCase
             'bots' => [
                 [
                     'botName' => 'BotScarichi',
+                    'userName' => 'ScarichiBot',
                     'token' => TOKEN,
                     'offset' => 0,
                     'commands' => [
@@ -78,6 +81,7 @@ class BotManagerTest extends TestCase
                 ],
                 [
                     'botName' => 'BotPippo',
+                    'userName' => 'ScarichiBot',
                     'token' => TOKEN,
                     'offset' => 0,
                     'commands' => [
@@ -91,6 +95,7 @@ class BotManagerTest extends TestCase
             'bots' => [
                 [
                     'botName' => 'BotScarichi',
+                    'userName' => 'ScarichiBot',
                     'token' => TOKEN,
                     'offset' => 0,
                     'commands' => [
@@ -100,6 +105,7 @@ class BotManagerTest extends TestCase
                 ],
                 [
                     'botName' => 'BotPippo',
+                    'userName' => 'ScarichiBot',
                     'token' => TOKEN,
                     'offset' => 0,
                     'commands' => [
@@ -152,6 +158,7 @@ class BotManagerTest extends TestCase
             'bots' => [
                 [
                     'botName' => 'BotScarichi',
+                    'userName' => 'ScarichiBot',
                     'token' => 'pippo',
                     'offset' => 0,
                     'commands' => [
@@ -161,6 +168,7 @@ class BotManagerTest extends TestCase
                 ],
                 [
                     'botName' => 'BotTest',
+                    'userName' => 'TestBot',
                     'token' => 'pluto',
                     'offset' => 0,
                     'commands' => [

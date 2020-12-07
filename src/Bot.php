@@ -23,6 +23,7 @@ class Bot {
     private static $defaultChatId = CHATID;
     private static $allowed = ['message','channel_post'];
     private $botName;
+    private $userName;
     private $token;
     private $start;
     private $end;
@@ -40,6 +41,11 @@ class Bot {
                 $this->botName = $bot['botName'];
             } else {
                 throw new \Exception('BotName non presente o errato');
+            }
+            if (array_key_exists('userName', $bot) && is_string($bot['userName'])) {
+                $this->userName = $bot['userName'];
+            } else {
+                throw new \Exception('UserName non presente o errato');
             }
             if (array_key_exists('token', $bot) && is_string($bot['token'])) {
                 $this->token = $bot['token'];
@@ -260,9 +266,10 @@ class Bot {
     public function getProperties() : array
     {
         try {
-            if (isset($this->botName) && isset($this->token) && isset($this->end) && isset($this->botCommands) && isset($this->chats)) {
+            if (isset($this->botName) && isset($this->userName) && isset($this->token) && isset($this->end) && isset($this->botCommands) && isset($this->chats)) {
                 $properties = [
                     'botName' => $this->botName,
+                    'userName' => $this->userName,
                     'token' => $this->token,
                     'offset' => $this->end,
                     'commands' => $this->botCommands,
@@ -527,7 +534,8 @@ class Bot {
         try {
             if ($text !== '') {
                 $params = explode(' ', $text);
-                $botCommand = substr($params[0], 1);
+                $botComplete = substr($params[0], 1);
+                $botCommand = str_replace('@' . $this->userName, '', $botComplete);
                 if (in_array($botCommand, $this->botCommands)) {
                     $this->setMethods($botCommand);
                     $command = ['ok' => true,'params' => []];
