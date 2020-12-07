@@ -1013,6 +1013,7 @@ class BotTest extends TestCase
                     [
                         'update_id' => 1000,
                         'message' => [
+                            'message_id' => 2500,
                             'chat' => [
                                 'id' => 474912563
                             ],
@@ -1039,6 +1040,7 @@ class BotTest extends TestCase
                     [
                         'update_id' => 1000,
                         'message' => [
+                            'message_id' => 2500,
                             'chat' => [
                                 'id' => 474912563
                             ],
@@ -1061,8 +1063,9 @@ class BotTest extends TestCase
                 'autorized' => false,
                 'updates' => [
                     [
-                        'update_id' => 1000,
+                        'update_id' => 1000,                        
                         'message' => [
+                            'message_id' => 2500,
                             'chat' => [
                                 'id' => 9999
                             ],
@@ -1102,6 +1105,7 @@ class BotTest extends TestCase
                     [
                         'update_id' => 1003,
                         'message' => [
+                            'message_id' => 2500,
                             'chat' => [
                                 'id' => 474912563
                             ],
@@ -1129,6 +1133,7 @@ class BotTest extends TestCase
                     [
                         'update_id' => 1000,
                         'message' => [
+                            'message_id' => 2500,
                             'chat' => [
                                 'id' => 474912563
                             ],
@@ -1156,6 +1161,7 @@ class BotTest extends TestCase
                     [
                         'update_id' => 1000,
                         'message' => [
+                            'message_id' => 2500,
                             'chat' => [
                                 'id' => 9999
                             ],
@@ -1210,6 +1216,7 @@ class BotTest extends TestCase
                     [
                         'update_id' => 1000,
                         'message' => [
+                            'message_id' => 2500,
                             'chat' => [
                                 'id' => 474912563
                             ],
@@ -1236,6 +1243,7 @@ class BotTest extends TestCase
                     [
                         'update_id' => 1000,
                         'message' => [
+                            'message_id' => 2500,
                             'chat' => [
                                 'id' => 474912563
                             ],
@@ -1263,6 +1271,7 @@ class BotTest extends TestCase
                     [
                         'update_id' => 1000,
                         'message' => [
+                            'message_id' => 2500,
                             'chat' => [
                                 'id' => 474912563
                             ],
@@ -1576,6 +1585,69 @@ class BotTest extends TestCase
     }
     
     /**
+     * @coversNothing
+     */
+    public function reportNotAllowedProvider() : array
+    {
+        $data = [
+            'true' => [
+                'updates' => [
+                    'update_id' => 1000,
+                    'message' => [
+                        'message_id' => 2500,
+                        'chat' => [
+                            'id' => 6666
+                        ]
+                    ]
+                ],
+                'keys' => ['message','chat','id'],
+                'expected' => ''
+            ],
+            'false' => [
+                'updates' => [
+                    'update_id' => 1000,
+                    'inline_message' => [
+                        'message_id' => 2500,
+                        'chat' => [
+                            'id' => 6666
+                        ]
+                    ]
+                ],
+                'keys' => ['message','chat','id'],
+                'expected' => "<b>Notifica:</b> Struttura updates id <b>1000</b> non compatibile. Struttura message->chat->id non presente.<br/>"
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::reportNotAllowed
+     * @dataProvider reportNotAllowedProvider
+     */
+    public function testReportNotAllowedOutputEquals($update, $keys, $expected) : void
+    {
+        $this->expectOutputString($expected);
+        
+        Bot::reportNotAllowed($update, $keys);
+    }
+            
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::reportNotAllowed
+     */
+    public function testReportNotAllowedException() : void
+    {
+        $update = [];
+        $keys = ['message','chat','id'];
+        
+        $this->expectException(\Exception::class);
+        
+        Bot::reportNotAllowed($update, $keys);
+    }
+    
+    /**
      * @group bot
      * @covers \vaniacarta74\Scarichi\Bot::getChatId
      */
@@ -1786,6 +1858,7 @@ class BotTest extends TestCase
         $update = [
             'update_id' => 1002,
             'message' => [
+                'message_id' => 2500,
                 'chat' => [
                     'id' => 474912563
                 ]

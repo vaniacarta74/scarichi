@@ -21,6 +21,7 @@ class Bot {
     private static $url = 'https://api.telegram.org/bot';
     private static $defaultBot = TOKEN;   
     private static $defaultChatId = CHATID;
+    private static $allowed = ['message','channel_post'];
     private $botName;
     private $token;
     private $start;
@@ -94,7 +95,8 @@ class Bot {
         try {
             $url = self::$url . $token . '/getUpdates'; 
             $params = [
-                'offset' => $offset
+                'offset' => $offset,
+                //'allowed_updates' => self::$allowed
             ];
             $response = Curl::run($url, $params, true);
             if (!$response) {
@@ -283,7 +285,7 @@ class Bot {
             foreach ($this->updates as $update) {
                 if (array_key_exists('update_id', $update)) {                    
                     $chatId = $this->getChatId($update);
-                    if ($chatId > 0) {
+                    if ($chatId !== 0) {
                         if (in_array($chatId, $this->chats)) {
                             $autorized['yes'][] = $update['update_id'];
                         } else {
@@ -367,9 +369,28 @@ class Bot {
             Utility::getSubArray($update, $keys);
             return true;
         } catch (\Throwable $e) {
-            Error::noticeHandler(new \Exception("Struttura updates id <b>" . $update['update_id'] . "</b> non compatibile"), DEBUG_LEVEL, 'html');
-            file_put_contents(LOG_PATH . '/Telegram_' . $update['update_id'] . '.json' , json_encode($update));
+            self::reportNotAllowed($update, $keys);
             return false;
+        }
+    }
+    
+    public static function reportNotAllowed(array $update, array $keys) : void
+    {
+        try {
+            if (!array_key_exists('update_id', $update)) {
+                throw new \Exception("Update id non definito");
+            }
+            $updateId = $update['update_id'];
+            $strKeys = implode('->', $keys);
+            $allowed = array_flip(array_merge(['update_id'], self::$allowed));
+            $notAllowed = array_diff_key($update, $allowed);
+            if (count($notAllowed) > 0) {            
+                Error::noticeHandler(new \Exception("Struttura updates id <b>" . $updateId . "</b> non compatibile. Struttura " . $strKeys . " non presente."), DEBUG_LEVEL, 'html');
+                file_put_contents(LOG_PATH . '/Telegram_' . $updateId . '.json' , json_encode($update));
+            }
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
         }
     }
     
@@ -378,8 +399,10 @@ class Bot {
         try {
             if (count($update) > 0) {
                 $chatId = 0;
-                if (self::checkStruct($update, ['message','chat','id'])) {
-                    $chatId = $update['message']['chat']['id'];                                
+                foreach (self::$allowed as $allowed) {
+                    if (self::checkStruct($update, [$allowed,'chat','id'])) {
+                        $chatId = $update[$allowed]['chat']['id'];                                
+                    }
                 }
             } else {
                 throw new \Exception("Array update vuoto");
@@ -396,8 +419,11 @@ class Bot {
         try {
             if (count($update) > 0) {
                 $messageId = 0;
-                if (self::checkStruct($update, ['message','message_id'])) {
-                    $messageId = $update['message']['message_id'];                                
+                foreach (self::$allowed as $allowed) {
+                    if (self::checkStruct($update, [$allowed,'message_id'])) {
+                        $messageId = $update[$allowed]['message_id'];
+                        break;
+                    }
                 }
             } else {
                 throw new \Exception("Array update vuoto");
@@ -414,8 +440,11 @@ class Bot {
         try {
             if (count($update) > 0) {
                 $text = '';
-                if (self::checkStruct($update, ['message','text'])) {
-                    $text = $update['message']['text'];                                
+                foreach (self::$allowed as $allowed) {
+                    if (self::checkStruct($update, [$allowed,'text'])) {
+                        $text = $update[$allowed]['text'];
+                        break;
+                    }
                 }
             } else {
                 throw new \Exception("Array update vuoto");
@@ -432,8 +461,11 @@ class Bot {
         try { 
             if (count($update) > 0) {
                 $type = '';
-                if (self::checkStruct($update, ['message','entities',0,'type'])) {
-                    $type = $update['message']['entities'][0]['type'];                                
+                foreach (self::$allowed as $allowed) {
+                    if (self::checkStruct($update, [$allowed,'entities',0,'type'])) {
+                        $type = $update[$allowed]['entities'][0]['type'];
+                        break;
+                    }
                 }
             } else {
                 throw new \Exception("Array update vuoto");
@@ -476,7 +508,7 @@ class Bot {
                 if ($message !== '') {
                     $chatId = $this->getChatId($update);
                     $messageId = $this->getMessageId($update);
-                    if ($chatId > 0) {
+                    if ($chatId !== 0 && $messageId !== 0) {
                         $isOk = self::secureSend($message, $chatId, $messageId, $this->token);
                     }
                 }
