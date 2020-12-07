@@ -350,28 +350,167 @@ class BotTest extends TestCase
     
     /**
      * @group bot
+     * @coversNothing
+     */
+    public function replyMessageProvider() : array
+    {
+        $data = [
+            'chat_id' => [
+                'message' => 'Test metodo Bot::sendMesssage con chat_id',
+                'messageId' => '2500',
+                'chatId' => '474912563',
+                'token' => TOKEN,
+                'expected' => '{
+                    "ok": true,
+                    "result": {
+                        "message_id": *,
+                        "from": {
+                            "id": 1494758588,
+                            "is_bot": true,
+                            "first_name": "BotScarichi",
+                            "username": "ScarichiBot"
+                        },
+                        "chat": {
+                            "id": 474912563,
+                            "first_name": "Vania",
+                            "last_name": "Carta",
+                            "username": "vaniacarta",
+                            "type": "private"
+                        },
+                        "date": *,
+                        "text": "Test+metodo+Bot::sendMesssage+con+chat_id"
+                    }
+                }'
+            ],
+            'no chat_id' => [
+                'message' => 'Test metodo Bot::sendMesssage senza chat_id',
+                'messageId' => '2500',                
+                'chatId' => CHATID,
+                'token' => TOKEN,
+                'expected' => '{
+                    "ok": true,
+                    "result": {
+                        "message_id": *,
+                        "from": {
+                            "id": 1494758588,
+                            "is_bot": true,
+                            "first_name": "BotScarichi",
+                            "username": "ScarichiBot"
+                        },
+                        "chat": {
+                            "id": 474912563,
+                            "first_name": "Vania",
+                            "last_name": "Carta",
+                            "username": "vaniacarta",
+                            "type": "private"
+                        },
+                        "date": *,
+                        "text": "Test+metodo+Bot::sendMesssage+senza+chat_id"
+                    }
+                }'
+            ],
+            'chat_id error' => [
+                'message' => 'Test metodo Bot::sendMesssage con chat_id errato',
+                'messageId' => '2500',
+                'chatId' => 'pippo',
+                'token' => TOKEN,
+                'expected' => '{
+                    "ok": false,
+                    "error_code": 400,
+                    "description": "Bad+Request:+chat+not+found"
+                }'
+            ],
+            'message_id error' => [
+                'message' => 'Test metodo Bot::sendMesssage con chat_id errato',
+                'messageId' => '999999',
+                'chatId' => CHATID,
+                'token' => TOKEN,
+                'expected' => '{
+                    "ok": false,
+                    "error_code": 400,
+                    "description": "Bad+Request:+reply+message+not+found"
+                }'
+            ]           
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::replyMessage
+     * @dataProvider replyMessageProvider
+     */
+    public function testReplyMessageContainsString(string $message, string $messageId, string $chatId, string $token, string $notFormatted) : void
+    {
+        $noSpace = preg_replace('/[\s]/', '', $notFormatted);
+        $withSpace = preg_replace('/[+]/', ' ', $noSpace);
+        $expecteds = explode('*', $withSpace);
+        
+        $actual = Bot::replyMessage($message, $messageId, $chatId, $token);
+        
+        foreach ($expecteds as $expected) {
+            $this->assertStringContainsString($expected, $actual);            
+        }
+    }   
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::replyMessage
+     */
+    public function testReplyMessageException() : void
+    {
+        $message = '';
+        $messageId = '2500';
+        $chatId = CHATID;
+        $token = TOKEN; 
+        
+        $this->expectException(\Exception::class);
+        
+        Bot::replyMessage($message, $messageId, $chatId, $token);
+    }
+    
+    /**
+     * @group bot
      * @covers \vaniacarta74\Scarichi\Bot::secureSend
      */
     public function secureSendProvider() : array
     {
         $data = [
+            'message_id' => [
+                'message' => 'Test metodo Bot::secureSend con message_id',
+                'messageId' => '2500',
+                'chatId' => '474912563',
+                'token' => null,
+                'expected' => true
+            ],
             'chat_id' => [
                 'message' => 'Test metodo Bot::secureSend con chat_id',
+                'messageId' => null,
                 'chatId' => '474912563',
                 'token' => null,
                 'expected' => true
             ],
             'no chat_id' => [
                 'message' => 'Test metodo Bot::secureSend senza chat_id',
+                'messageId' => null,
                 'chatId' => null,
                 'token' => null,
                 'expected' => true
             ],
             'chat_id error' => [
                 'message' => 'Test metodo Bot::secureSend con chat_id inesistente',
+                'messageId' => null,
                 'chatId' => 'pippo',
                 'token' => null,
                 'expected' => false
+            ],
+            'message_id safe error' => [
+                'message' => 'Test metodo Bot::secureSend con message_id inesistente',
+                'messageId' => '9999999',
+                'chatId' => '474912563',
+                'token' => null,
+                'expected' => true
             ]           
         ];
         
@@ -383,9 +522,9 @@ class BotTest extends TestCase
      * @covers \vaniacarta74\Scarichi\Bot::secureSend
      * @dataProvider secureSendProvider
      */
-    public function testSecureSendEquals(string $message, ?string $chatId, ?string $token, bool $expected) : void
+    public function testSecureSendEquals(string $message, ?string $messageId, ?string $chatId, ?string $token, bool $expected) : void
     {
-        $actual = Bot::secureSend($message, $chatId, $token);
+        $actual = Bot::secureSend($message, $chatId, $messageId, $token);
         
         $this->assertEquals($expected, $actual); 
     }
@@ -397,12 +536,13 @@ class BotTest extends TestCase
     public function testSecureSendException() : void
     {
         $message = '';
+        $messageId = null;
         $chatId = CHATID;
         $token = TOKEN; 
         
         $this->expectException(\Exception::class);
         
-        Bot::secureSend($message, $chatId, $token);
+        Bot::secureSend($message, $chatId, $messageId, $token);
     }
     
     /**
@@ -1467,6 +1607,38 @@ class BotTest extends TestCase
         $this->expectException(\Exception::class);
         
         Reflections::invokeMethod($this->bot, 'getChatId', array($update));
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::getMessageId
+     */
+    public function testGetMessageIdEquals() : void
+    {
+        $update = [
+            'update_id' => 1002,
+            'message' => [
+                'message_id' => 2500
+            ]
+        ];
+        $expected = 2500;
+        
+        $actual = Reflections::invokeMethod($this->bot, 'getMessageId', array($update));
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::getMessageId
+     */
+    public function testGetMessageIdException() : void
+    {
+        $update = [];
+        
+        $this->expectException(\Exception::class);
+        
+        Reflections::invokeMethod($this->bot, 'getMessageId', array($update));
     }
     
     /**

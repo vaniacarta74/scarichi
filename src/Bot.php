@@ -180,19 +180,45 @@ class Bot {
             throw $e;
         }
     }
+    
+    public static function replyMessage(string $message, string $messageId, string $chatId, string $token) : string
+    {
+        try {
+            if ($message === '') {
+                throw new \Exception('Non è possibile inviare messaggi vuoti');
+            }
+            $url = self::$url . $token . '/sendMessage';            
+            $params = [
+                'chat_id' => $chatId,
+                'reply_to_message_id' => $messageId,
+                'text' => $message, 
+                'parse_mode' => 'HTML'
+            ];            
+            $response = Curl::run($url, $params, true);
+            
+            return $response;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
 
-    public static function secureSend(string $message, ?string $chatId = null, ?string $token = null) : bool
+    public static function secureSend(string $message, ?string $chatId = null, ?string $messageId = null, ?string $token = null) : bool
     {
         try {
             if ($message === '') {
                 throw new \Exception('Non è possibile inviare messaggi vuoti');
             }
             $n = 5;
-            $delay = 10000;
+            $delay = 500000;
             $tokenBot = $token ?? self::$defaultBot;
             $chat_id = $chatId ?? self::$defaultChatId;
             for ($i = 1; $i <= $n; $i++) {
-                $response = self::sendMessage($message, $chat_id, $tokenBot);
+                if (isset($messageId) && $i < 3) {
+                    $response = self::replyMessage($message, $messageId, $chat_id, $tokenBot);
+                } else {
+                    $response = self::sendMessage($message, $chat_id, $tokenBot);
+                }
                 $arrJson = json_decode($response, true);            
                 $isOk = $arrJson['ok'] ?? false;
                 if ($isOk) {
@@ -365,6 +391,24 @@ class Bot {
         }
     }
     
+    private function getMessageId(array $update) : int
+    {
+        try {
+            if (count($update) > 0) {
+                $messageId = 0;
+                if (self::checkStruct($update, ['message','message_id'])) {
+                    $messageId = $update['message']['message_id'];                                
+                }
+            } else {
+                throw new \Exception("Array update vuoto");
+            }
+            return $messageId;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
     private function getText(array $update) : string
     {
         try {
@@ -431,8 +475,9 @@ class Bot {
                 $isOk = false;
                 if ($message !== '') {
                     $chatId = $this->getChatId($update);
+                    $messageId = $this->getMessageId($update);
                     if ($chatId > 0) {
-                        $isOk = self::secureSend($message, $chatId, $this->token);
+                        $isOk = self::secureSend($message, $chatId, $messageId, $this->token);
                     }
                 }
             } else {
