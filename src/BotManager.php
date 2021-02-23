@@ -17,7 +17,8 @@ use vaniacarta74\Scarichi\Utility;
  *
  * @author Vania
  */
-class BotManager {
+class BotManager
+{
     
     /**
      * Stampa il nome della funzione che ha generato l'errore.

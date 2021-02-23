@@ -20,6 +20,12 @@ class ScarichiTest extends TestCase
         $single = '1) PID 0: Elaborazione dati Volume variabile 30030 dal 01/01/2019 al 02/01/2019 avvenuta con successo in | sec. File CSV full esportati.' . PHP_EOL;
         $double = $single . '2) PID 1: Elaborazione dati Volume variabile 30040 dal 01/01/2019 al 02/01/2019 avvenuta con successo in | sec. File CSV full esportati.' . PHP_EOL;
         
+        $now = new \DateTime();
+        $day = new \DateTime();
+        $interval = new \DateInterval('P1D');
+        $now->add($interval);
+        $day->sub($interval);
+        
         $data = [
             'standard' => [
                 'help' => null,
@@ -63,7 +69,7 @@ class ScarichiTest extends TestCase
                 'dateto' => '',
                 'nozero' => '',
                 'campo' => '',
-                'expected' => $header . PHP_EOL . '1) PID 0: Elaborazione dati Volume variabile 30030 dal 01/05/2020 al ' . date('d/m/Y') . ' avvenuta con successo in | sec. File CSV full esportati.' . PHP_EOL
+                'expected' => $header . PHP_EOL . '1) PID 0: Elaborazione dati Volume variabile 30030 dal 01/05/2020 al ' . $now->format('d/m/Y') . ' avvenuta con successo in | sec. File CSV full esportati.' . PHP_EOL
             ],
             'datefrom costant' => [
                 'help' => null,
@@ -129,7 +135,7 @@ class ScarichiTest extends TestCase
                 'dateto' => '',
                 'nozero' => '',
                 'campo' => '',
-                'expected' => $header . PHP_EOL . '1) PID 0: Elaborazione dati Volume variabile 30030 dal ' . date('d/m/Y', strtotime(date('Y') . '-' . date('m') . '-' . (date('d') - 1))) . ' al ' . date('d/m/Y') . ' avvenuta con successo in | sec. Nessun file CSV full esportato per mancanza di dati.' . PHP_EOL
+                'expected' => $header . PHP_EOL . '1) PID 0: Elaborazione dati Volume variabile 30030 dal ' . $day->format('d/m/Y') . ' al ' . $now->format('d/m/Y') . ' avvenuta con successo in | sec. Nessun file CSV full esportato per mancanza di dati.' . PHP_EOL
             ],
             'help' => [
                 'help' => '',

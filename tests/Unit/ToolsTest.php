@@ -16628,6 +16628,7 @@ class ToolsTest extends TestCase
         $now = new \DateTime();
         $day = new \DateTime();
         $interval = new \DateInterval('P1D');
+        $now->add($interval);
         $day->sub($interval);
         $all = selectAllQuery('SSCP_data', 'query_variabili_ALL');
 
@@ -17004,6 +17005,8 @@ class ToolsTest extends TestCase
         ];
         
         $now = new \DateTime();
+        $interval = new \DateInterval('P1D');
+        $now->add($interval);
 
         $data = [
             'default' => [

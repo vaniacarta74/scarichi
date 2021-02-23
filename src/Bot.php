@@ -16,7 +16,8 @@ use vaniacarta74\Scarichi\Utility;
  *
  * @author Vania
  */
-class Bot {
+class Bot
+{
     
     private static $url = 'https://api.telegram.org/bot';
     private static $defaultBot = TOKEN;   

@@ -2731,6 +2731,8 @@ function fillDateto(array $parameters, array $values, array $postVars) : array
         $rawValues = $values['dateto'];
         if ($rawValues[0] === $parameters['dateto']['default']) {
             $dateTimeTo = new \DateTime();
+            $interval = new \DateInterval('P1D');
+            $dateTimeTo->add($interval);
         } else {
             $dateTimeTo = new \DateTime($rawValues[0]);
         }

@@ -16,7 +16,8 @@ use vaniacarta74\Scarichi\Utility;
  *
  * @author Vania
  */
-class Curl {
+class Curl
+{
     
     /**
      * Stampa il tempo trascorso da una certa data.
