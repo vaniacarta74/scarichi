@@ -547,6 +547,296 @@ class BotTest extends TestCase
     
     /**
      * @group bot
+     * @coversNothing
+     */
+    public function checkAndSendProvider() : array
+    {
+        $data = [
+            'message_id' => [
+                'message' => 'Test metodo Bot::checkAndSend con message_id',
+                'nut' => null,
+                'limit' => null,
+                'messageId' => '2500',
+                'chatId' => '474912563',
+                'token' => null,
+                'expected' => true
+            ],
+            'chat_id' => [
+                'message' => 'Test metodo Bot::checkAndSend con chat_id',
+                'nut' => null,
+                'limit' => null,
+                'messageId' => null,
+                'chatId' => '474912563',
+                'token' => null,
+                'expected' => true
+            ],
+            'no chat_id' => [
+                'message' => 'Test metodo Bot::checkAndSend senza chat_id',
+                'nut' => null,
+                'limit' => null,
+                'messageId' => null,
+                'chatId' => null,
+                'token' => null,
+                'expected' => true
+            ],
+            'chat_id error' => [
+                'message' => 'Test metodo Bot::checkAndSend con chat_id inesistente',
+                'nut' => null,
+                'limit' => null,
+                'messageId' => null,
+                'chatId' => 'pippo',
+                'token' => null,
+                'expected' => false
+            ],
+            'message_id safe error' => [
+                'message' => 'Test metodo Bot::checkAndSend con message_id inesistente',
+                'nut' => null,
+                'limit' => null,
+                'messageId' => '9999999',
+                'chatId' => '474912563',
+                'token' => null,
+                'expected' => true
+            ],
+            'splitted too long' => [
+                'message' => 'Test metodo Bot::checkAndSend con split messaggio',
+                'nut' => '::',
+                'limit' => 30,
+                'messageId' => null,
+                'chatId' => null,
+                'token' => null,
+                'expected' => false
+            ],
+            'splitted right' => [
+                'message' => 'Test metodo Bot::checkAndSend con split messaggio',
+                'nut' => '::',
+                'limit' => 40,
+                'messageId' => null,
+                'chatId' => null,
+                'token' => null,
+                'expected' => true
+            ],
+            'no message' => [
+                'message' => '',
+                'nut' => '::',
+                'limit' => 30,
+                'messageId' => null,
+                'chatId' => null,
+                'token' => null,
+                'expected' => false
+            ]            
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::checkAndSend
+     * @dataProvider checkAndSendProvider
+     */
+    public function testCheckAndSendEquals(string $message, ?string $nut, ?int $msgLimit, ?string $messageId, ?string $chatId, ?string $token, bool $expected) : void
+    {
+        $actual = Bot::checkAndSend($message, $msgLimit, $nut, $chatId, $messageId, $token);
+        
+        $this->assertEquals($expected, $actual); 
+    }
+    
+    /**
+     * @group bot
+     * @coversNothing
+     */
+    public function breakAndSendProvider() : array
+    {
+        $data = [
+            'message_id' => [
+                'message' => 'Test metodo Bot::breakAndSend con message_id',
+                'nut' => ' ',
+                'limit' => MSGLIMIT,
+                'messageId' => '2500',
+                'chatId' => '474912563',
+                'token' => TOKEN,
+                'expected' => [
+                    0 => true
+                ]
+            ],
+            'chat_id' => [
+                'message' => 'Test metodo Bot::breakAndSend con chat_id',
+                'nut' => ' ',
+                'limit' => MSGLIMIT,
+                'messageId' => null,
+                'chatId' => '474912563',
+                'token' => TOKEN,
+                'expected' => [
+                    0 => true
+                ]
+            ],
+            'chat_id error' => [
+                'message' => 'Test metodo Bot::breakAndSend con chat_id inesistente',
+                'nut' => ' ',
+                'limit' => MSGLIMIT,
+                'messageId' => null,
+                'chatId' => 'pippo',
+                'token' => TOKEN,
+                'expected' => [
+                    0 => false
+                ]
+            ],
+            'message_id safe error' => [
+                'message' => 'Test metodo Bot::breakAndSend con message_id inesistente',
+                'nut' => ' ',
+                'limit' => MSGLIMIT,
+                'messageId' => '99999999999999999999999999',
+                'chatId' => '474912563',
+                'token' => TOKEN,
+                'expected' => [
+                    0 => true
+                ]
+            ],
+            'splitted mix' => [
+                'message' => 'Test metodo Bot::breakAndSend con split messaggio',
+                'nut' => '::',
+                'limit' => 30,
+                'messageId' => null,
+                'chatId' => CHATID,
+                'token' => TOKEN,
+                'expected' => [
+                    0 => true,
+                    1 => false
+                ]
+            ],
+            'splitted right' => [
+                'message' => 'Test metodo Bot::breakAndSend con split messaggio',
+                'nut' => '::',
+                'limit' => 40,
+                'messageId' => null,
+                'chatId' => CHATID,
+                'token' => TOKEN,
+                'expected' => [
+                    0 => true,
+                    1 => true
+                ]
+            ],
+            'too short' => [
+                'message' => 'Test metodo Bot::breakAndSend con split messaggio',
+                'nut' => ' ',
+                'limit' => 6,
+                'messageId' => null,
+                'chatId' => CHATID,
+                'token' => TOKEN,
+                'expected' => [
+                    0 => true,
+                    1 => true,
+                    2 => false,
+                    3 => true,
+                    4 => true,
+                    5 => false
+                ]
+            ],
+            'last null' => [
+                'message' => 'Test metodo Bot::br!eakAndSend con split messaggio!',
+                'nut' => '!',
+                'limit' => 30,
+                'messageId' => null,
+                'chatId' => CHATID,
+                'token' => TOKEN,
+                'expected' => [
+                    0 => true,
+                    1 => true,
+                    2 => true
+                ]
+            ],
+            'first too long' => [
+                'message' => 'Test metodo Bot::br!eakAndSend con split messaggio!',
+                'nut' => 'K',
+                'limit' => 30,
+                'messageId' => null,
+                'chatId' => CHATID,
+                'token' => TOKEN,
+                'expected' => [
+                    0 => false
+                ]
+            ]              
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::breakAndSend
+     * @dataProvider breakAndSendProvider
+     */
+    public function testBreakAndSendEquals(string $message, string $nut, int $msgLimit, ?string $messageId, string $chatId, string $token, array $expected) : void
+    {
+        $actual = Bot::breakAndSend($message, $msgLimit, $nut, $chatId, $messageId, $token);
+        
+        $this->assertEquals($expected, $actual); 
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::breakAndSend
+     */
+    public function testBreakAndSendException() : void
+    {
+        $message = '';
+        $msgLimit = MSGLIMIT;
+        $nut = ' ';
+        $messageId = null;
+        $chatId = CHATID;
+        $token = TOKEN; 
+        
+        $this->expectException(\Exception::class);
+        
+        Bot::breakAndSend($message, $msgLimit, $nut, $chatId, $messageId, $token);
+    }
+    
+    /**
+     * @group bot
+     * @coversNothing
+     */
+    public function checkIsOkProvider() : array
+    {
+        $data = [
+            'true' => [
+                'responses' => [
+                    0 => true,
+                    1 => true,
+                    2 => true
+                ],
+                'expected' => true
+            ],
+            'false' => [
+                'responses' => [
+                    0 => true,
+                    1 => false,
+                    2 => true
+                ],
+                'expected' => false
+            ],
+            'no response' => [
+                'responses' => [],
+                'expected' => false
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group bot
+     * @covers \vaniacarta74\Scarichi\Bot::checkIsOk
+     * @dataProvider checkIsOkProvider
+     */
+    public function testCheckIsOkEquals(array $responses, bool $expected) : void
+    {
+        $actual = Bot::checkIsOk($responses);
+        
+        $this->assertEquals($expected, $actual); 
+    }
+    
+    /**
+     * @group bot
      * @covers \vaniacarta74\Scarichi\Bot::arrayShift
      */
     public function testArrayShiftEquals() : void    

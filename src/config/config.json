@@ -15,6 +15,7 @@
             "subdirectory": false
         },
         "telegram": {
+            "limit": 1024,
             "send": false,
             "path": "/../../../telegram.json",
             "url": "http://localhost/scarichi/telegram.php"

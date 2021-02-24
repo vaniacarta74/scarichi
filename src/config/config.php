@@ -19,6 +19,7 @@ define('MAXRECORD', intval(CONFIG['define']['csv']['maxrecord']));
 define('MAKESUBDIR', boolval(CONFIG['define']['csv']['subdirectory']));
 
 define('TELEGRAM', boolval(CONFIG['define']['telegram']['send']));
+define('MSGLIMIT', intval(CONFIG['define']['telegram']['limit']));
 define('BOTPATH', __DIR__ . CONFIG['define']['telegram']['path']);
 define('BOTURL', CONFIG['define']['telegram']['url']);
 

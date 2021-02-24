@@ -203,16 +203,17 @@ class Curl
             if (count($postParams) === 0) {
                 throw new \Exception('Parametri curl non definiti');
             }
-            $handlers = self::multiSet($url, $postParams, $paramsKey);
-            $message = '';
+            $handlers = self::multiSet($url, $postParams, $paramsKey);            
             $i = 1;
+            $message = '';
             foreach ($handlers as $key => $ch) {
                 $report = self::exec($ch);
                 if ($funcName) {
-                    $message .= Utility::callback($funcName, array($report, $i, $key));
+                    echo Utility::callback($funcName, array($report, $i, $key));
                 } else {
-                    $message .= $report;
-                }                
+                    echo $report;
+                }
+                $message .= $report . PHP_EOL;
                 $i++;
             }
             return $message;
@@ -232,7 +233,8 @@ class Curl
      * @param string $strDateTime Data nel formato "YYYY-mm-dd HH:ii:ss.millisec"
      * @return string Intervallo intercorso nel formato "secondi,millisecondi"
      */
-    public static function runMultiAsync(string $url, array $postParams, ?string $paramsKey = null, ?string $funcName = null) : void
+    //public static function runMultiAsync(string $url, array $postParams, ?string $paramsKey = null, ?string $funcName = null) : void
+    public static function runMultiAsync(string $url, array $postParams, ?string $paramsKey = null, ?string $funcName = null) : string
     {
         try {
             if (count($postParams) === 0) {
@@ -244,6 +246,7 @@ class Curl
                 curl_multi_add_handle($mh, $ch);
             }
             $i = 1;
+            $message = '';
             do {
                 $status = curl_multi_exec($mh, $still_running);
                 if ($still_running) {
@@ -258,6 +261,7 @@ class Curl
                     } else {
                         echo $report;
                     }
+                    $message .= $report . PHP_EOL;
                     $i++;
                 }
             } while ($still_running && $status == CURLM_OK);
@@ -266,6 +270,7 @@ class Curl
                 curl_close($ch);
             }
             curl_multi_close($mh);
+            return $message;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;

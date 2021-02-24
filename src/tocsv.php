@@ -26,8 +26,7 @@ try {
     $printed = divideAndPrint($dati_ripuliti, $request['full'], $request['field']);
     
     $response = response($request, $printed);
-    $log = sendTelegram($response);
-    echo $log;
+    echo $response;
 } catch (\Throwable $e) {
     Error::errorHandler($e, DEBUG_LEVEL, 'html');
     exit();

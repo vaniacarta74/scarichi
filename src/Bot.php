@@ -22,6 +22,7 @@ class Bot
     private static $url = 'https://api.telegram.org/bot';
     private static $defaultBot = TOKEN;   
     private static $defaultChatId = CHATID;
+    private static $msgLimit = MSGLIMIT;
     private static $allowed = ['message','channel_post'];
     private $botName;
     private $userName;
@@ -211,7 +212,92 @@ class Bot
             throw $e;
         }
     }
-
+    
+    public static function checkAndSend(string $message, ?int $msgLimit = null, ?string $nut = null, ?string $chatId = null, ?string $messageId = null, ?string $token = null) : bool
+    {
+        try {            
+            $nutBot = $nut ?? ' ';
+            $limit = $msgLimit ?? self::$msgLimit;
+            $tokenBot = $token ?? self::$defaultBot;
+            $chat_id = $chatId ?? self::$defaultChatId;
+            if (strlen($message) === 0) {
+                $responses[] = false;
+            } elseif (strlen($message) > $limit) {
+                $responses = self::breakAndSend($message, $limit, $nutBot, $chat_id, $messageId, $tokenBot);
+            } else {
+                $responses[] = self::secureSend($message, $chatId, $messageId, $tokenBot);
+            }
+            $isOk = self::checkIsOk($responses);
+            return $isOk;
+        // @codeCoverageIgnoreStart
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+        // @codeCoverageIgnoreEnd
+    }
+    
+    public static function breakAndSend(string $message, int $limit, string $nut, string $chatId, ?string $messageId, ?string $token) : array
+    {
+        try { 
+            if ($message === '') {
+                throw new \Exception('Non è possibile spezzare messaggi vuoti');
+            }
+            $msgParts = explode($nut, $message);
+            $msgToSend = '';
+            $responses = [];
+            $i = 0;
+            foreach ($msgParts as $part) {
+                if (strlen($msgToSend) === 0 && $i === 0) {
+                    $msgToSend = $part;
+                } elseif ((strlen($msgToSend) === 0 && $i > 0) || strlen($msgToSend) > $limit) {
+                    $responses[] = false;
+                    $msgToSend = $part;
+                } elseif (strlen($msgToSend) === $limit || (strlen($msgToSend) < $limit && strlen($msgToSend . $nut . $part) > $limit)) {
+                    $responses[] = self::secureSend($msgToSend, $chatId, $messageId, $token);
+                    $msgToSend = $part;
+                } else {
+                    $msgToSend .= $nut . $part;
+                }
+                $i++;
+            }
+            if (strlen($msgToSend) > 0 && strlen($msgToSend) <= $limit) {
+                $responses[] = self::secureSend($msgToSend, $chatId, $messageId, $token);
+            } elseif (strlen($msgToSend) > $limit) {
+                $responses[] = false;
+            } else {
+                $responses[] = true;
+            }
+            return $responses;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    public static function checkIsOk(array $responses) : bool
+    {
+        try {
+            $isOk = true;
+            if (count($responses) > 0) {
+                foreach ($responses as $response) {
+                    if (!$response) {
+                        $isOk = false;
+                        break;
+                    }
+                }
+            } else {
+                $isOk = false;
+            }
+            return $isOk;
+        // @codeCoverageIgnoreStart
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+        // @codeCoverageIgnoreEnd
+    }
+    
     public static function secureSend(string $message, ?string $chatId = null, ?string $messageId = null, ?string $token = null) : bool
     {
         try {
@@ -517,7 +603,7 @@ class Bot
                     $chatId = $this->getChatId($update);
                     $messageId = $this->getMessageId($update);
                     if ($chatId !== 0 && $messageId !== 0) {
-                        $isOk = self::secureSend($message, $chatId, $messageId, $this->token);
+                        $isOk = self::checkAndSend($message, null, null, $chatId, $messageId, $this->token);
                     }
                 }
             } else {

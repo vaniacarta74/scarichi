@@ -2831,7 +2831,7 @@ function goCurl(array $postParams, string $url, bool $async) : string
         $n_param = count($postParams);
         if ($n_param > 0) {
             if ($async && $n_param > 1) {
-                Curl::runMultiAsync($url, $postParams, 'id', 'formatResponse');
+                $message = Curl::runMultiAsync($url, $postParams, 'id', 'formatResponse');
             } else {
                 $message = Curl::runMultiSync($url, $postParams, 'id', 'formatResponse');
             }
@@ -3196,20 +3196,24 @@ function addCostants(array $parametri, array $formule) : array
 }
 
 
-function sendTelegram(string $message, ?bool $force = false, ?string $chatId = null) : string
+function sendTelegram(string $message, ?string $nut = null, ?int $limit = null, ?bool $force = false, ?string $chatId = null) : string
 {
     try {
         if ($message !== '') {
             if ($force || TELEGRAM) {
-                $isOk = Bot::secureSend($message, $chatId);
+                $isOk = Bot::checkAndSend($message, $limit, $nut, $chatId);
                 if ($isOk) {
-                    $message .= ' Messaggio Telegram inviato con successo.';
+                    $response = 'Messaggio Telegram inviato con successo.' . PHP_EOL;
                 } else {
-                    $message .= ' Invio messaggio Telegram fallito.';
+                    $response = 'Invio messaggio Telegram fallito.' . PHP_EOL;
                 }
+            } else {
+                $response = 'Invio messaggio Telegram disabilitato.' . PHP_EOL;
             }
+        } else {
+            $response = 'Nessun messaggio da inviare.' . PHP_EOL;
         }
-        return $message;
+        return $response;
     //@codeCoverageIgnoreStart
     } catch (\Throwable $e) {        
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);

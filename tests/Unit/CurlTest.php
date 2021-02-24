@@ -329,6 +329,109 @@ class CurlTest extends TestCase
     public function runMultiSyncProvider() : array
     {
         $url = URL;
+        $single = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
+        $multi = $single . 'Elaborazione dati <b>Portata</b> variabile <b>30040</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
+        
+        $data = [
+            'no callback' => [
+                'post' => [
+                    [
+                        'id' => '0',
+                        'var' => '30030',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'url' => $url,
+                'key' => 'id',
+                'callback' => null,
+                'expected' => 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.'
+            ],
+            'no key' => [
+                'post' => [
+                    [
+                        'id' => '0',
+                        'var' => '30030',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'url' => $url,
+                'key' => null,
+                'callback' => 'formatResponse',
+                'expected' => 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL
+            ],
+            'single post' => [
+                'post' => [
+                    [
+                        'id' => '0',
+                        'var' => '30030',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'url' => $url,
+                'key' => 'id',
+                'callback' => 'formatResponse',
+                'expected' => $single
+            ],
+            'multi post' => [
+                'post' => [
+                    [
+                        'id' => '0',
+                        'var' => '30030',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ],
+                    [
+                        'id' => '1',
+                        'var' => '30040',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'url' => $url,
+                'key' => 'id',
+                'callback' => 'formatResponse',
+                'expected' => $multi
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group curl
+     * @covers \vaniacarta74\Scarichi\Curl::runMultiSync
+     * @dataProvider runMultiSyncProvider
+     */
+    public function testRunMultiSyncEquals(array $postParam, string $url, ?string $key, ?string $funcName, string $response) : void
+    {
+        $expecteds = explode('|', $response);
+        
+        $actual = curl::runMultiSync($url, $postParam, $key, $funcName);
+        
+        foreach ($expecteds as $expected) {
+            $this->assertStringContainsString($expected, $actual);
+        }
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function runMultiSyncEchoProvider() : array
+    {
+        $url = URL;
         $single = '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         $multi = $single . '2) PID 1: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         
@@ -413,13 +516,15 @@ class CurlTest extends TestCase
     /**
      * @group curl
      * @covers \vaniacarta74\Scarichi\Curl::runMultiSync
-     * @dataProvider runMultiSyncProvider
+     * @dataProvider runMultiSyncEchoProvider
      */
-    public function testRunMultiSyncEquals(array $postParam, string $url, ?string $key, ?string $funcName, string $response) : void
+    public function testRunMultiSyncEchoOutputString(array $postParam, string $url, ?string $key, ?string $funcName, string $response) : void
     {
         $expecteds = explode('|', $response);
         
-        $actual = curl::runMultiSync($url, $postParam, $key, $funcName);
+        curl::runMultiSync($url, $postParam, $key, $funcName);
+        
+        $actual = $this->getActualOutput();
         
         foreach ($expecteds as $expected) {
             $this->assertStringContainsString($expected, $actual);
@@ -446,6 +551,109 @@ class CurlTest extends TestCase
      * @coversNothing
      */
     public function runMultiAsyncProvider() : array
+    {
+        $url = URL;
+        $single = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
+        $multi = $single . 'Elaborazione dati <b>Portata</b> variabile <b>30040</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
+        
+        $data = [
+            'no callback' => [
+                'post' => [
+                    [
+                        'id' => '0',
+                        'var' => '30030',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'url' => $url,
+                'key' => 'id',
+                'callback' => null,
+                'expected' => 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.'
+            ],
+            'no key' => [
+                'post' => [
+                    [
+                        'id' => '0',
+                        'var' => '30030',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'url' => $url,
+                'key' => null,
+                'callback' => 'formatResponse',
+                'expected' => 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL
+            ],
+            'single post' => [
+                'post' => [
+                    [
+                        'id' => '0',
+                        'var' => '30030',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'url' => $url,
+                'key' => 'id',
+                'callback' => 'formatResponse',
+                'expected' => $single
+            ],
+            'multi post' => [
+                'post' => [
+                    [
+                        'id' => '0',
+                        'var' => '30030',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ],
+                    [
+                        'id' => '1',
+                        'var' => '30040',
+                        'datefrom' => '30/12/2019',
+                        'dateto' => '31/12/2019',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'url' => $url,
+                'key' => 'id',
+                'callback' => 'formatResponse',
+                'expected' => $multi
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group curl
+     * @covers \vaniacarta74\Scarichi\Curl::runMultiAsync
+     * @dataProvider runMultiAsyncProvider
+     */
+    public function testRunMultiAsyncEquals(array $postParam, string $url, ?string $key, ?string $funcName, string $response) : void
+    {
+        $expecteds = explode('|', $response);
+        
+        $actual = curl::runMultiAsync($url, $postParam, $key, $funcName);
+        
+        foreach ($expecteds as $expected) {
+            $this->assertStringContainsString($expected, $actual);
+        }
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function runMultiAsyncEchoProvider() : array
     {
         $url = URL;
         $single = '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
@@ -532,9 +740,9 @@ class CurlTest extends TestCase
     /**
      * @group curl
      * @covers \vaniacarta74\Scarichi\Curl::runMultiAsync
-     * @dataProvider runMultiAsyncProvider
+     * @dataProvider runMultiAsyncEchoProvider
      */
-    public function testRunMultiAsyncOutputString(array $postParam, string $url, ?string $key, ?string $funcName, string $response) : void
+    public function testRunMultiAsyncEchoOutputString(array $postParam, string $url, ?string $key, ?string $funcName, string $response) : void
     {
         $expecteds = explode('|', $response);
         

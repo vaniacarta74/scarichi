@@ -27,7 +27,8 @@ try {
     $filledValues = fillParameters($parameters, $values);
     $limitedValues = limitDates($filledValues, PERIOD, OFFSET);
     $postParams = setPostParameters($parameters, $limitedValues);
-    echo goCurl($postParams, URL, ASYNC);
+    $message = goCurl($postParams, URL, ASYNC);
+    echo sendTelegram($message, PHP_EOL);
 } catch (\Throwable $e) {
     Error::errorHandler($e, DEBUG_LEVEL, 'cli');
     exit();

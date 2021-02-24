@@ -17534,8 +17534,8 @@ class ToolsTest extends TestCase
     public function goCurlProvider() : array
     {
         $url = URL;
-        $single = '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
-        $multi = $single . '2) PID 1: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        $single = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
+        $multi = $single . 'Elaborazione dati <b>Portata</b> variabile <b>30040</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
         
         $data = [
             'no post values' => [
@@ -18564,33 +18564,59 @@ class ToolsTest extends TestCase
         $data = [            
             'no message' => [
                 'message' => '',
+                'nut' => null,
+                'limit' => null,
                 'forced' => true,
                 'chat_id' => null,
-                'expected' => ''
+                'expected' => 'Nessun messaggio da inviare.' . PHP_EOL
             ],
             'no force' => [
                 'message' => 'Test funzione sendTelegram()',
+                'nut' => null,
+                'limit' => null,
                 'forced' => null,
                 'chat_id' => null,
-                'expected' => 'Test funzione sendTelegram()'
+                'expected' => 'Invio messaggio Telegram disabilitato.' . PHP_EOL
             ],
             'force false' => [
                 'message' => 'Test funzione sendTelegram()',
+                'nut' => null,
+                'limit' => null,
                 'forced' => false,
                 'chat_id' => null,
-                'expected' => 'Test funzione sendTelegram()'
+                'expected' => 'Invio messaggio Telegram disabilitato.' . PHP_EOL
             ],
             'standard' => [
                 'message' => 'Test funzione sendTelegram(Standard)',
+                'nut' => null,
+                'limit' => null,
                 'forced' => true,
                 'chat_id' => null,
-                'expected' => 'Test funzione sendTelegram(Standard) Messaggio Telegram inviato con successo.'
+                'expected' => 'Messaggio Telegram inviato con successo.' . PHP_EOL
             ],
             'chat error' => [
                 'message' => 'Test funzione sendTelegram()',
+                'nut' => null,
+                'limit' => null,
                 'forced' => true,
                 'chat_id' => 'pippo',
-                'expected' => 'Test funzione sendTelegram() Invio messaggio Telegram fallito.'
+                'expected' => 'Invio messaggio Telegram fallito.' . PHP_EOL
+            ],
+            'nut default and limit' => [
+                'message' => 'Test funzione sendTelegram(Standard)',
+                'nut' => null,
+                'limit' => 25,
+                'forced' => true,
+                'chat_id' => null,
+                'expected' => 'Messaggio Telegram inviato con successo.' . PHP_EOL
+            ],
+            'limit too short' => [
+                'message' => 'Test funzione sendTelegram(Standard)',
+                'nut' => 'K',
+                'limit' => 25,
+                'forced' => true,
+                'chat_id' => null,
+                'expected' => 'Invio messaggio Telegram fallito.' . PHP_EOL
             ]
         ];
         
@@ -18602,9 +18628,9 @@ class ToolsTest extends TestCase
      * covers sendTelegram()
      * @dataProvider sendTelegramProvider
      */
-    public function testSendTelegramEquals(string $message, ?bool $force, ?string $chatId, string $expected) : void
+    public function testSendTelegramEquals(string $message, ?string $nut, ?int $limit, ?bool $force, ?string $chatId, string $expected) : void
     {
-        $actual = sendTelegram($message, $force, $chatId);
+        $actual = sendTelegram($message, $nut, $limit, $force, $chatId);
         
         $this->assertEquals($expected, $actual);
     }
