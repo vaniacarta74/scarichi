@@ -5,7 +5,7 @@
             "memory_limit": "2048M"
         },
         "log": {
-            "debug_level": 2,
+            "debug_level": 1,
             "log_path": "/../../log",
             "error_log": "error.log"
         },
@@ -27,7 +27,7 @@
                 }
             },
             "limit": 4096,
-            "send": false,
+            "send": true,
             "path": "/../../../telegram.json",
             "url": "http://localhost/scarichi/telegram.php"
         },
@@ -143,7 +143,7 @@
         "sintax": "php scarichi.php",
         "url": "http://localhost/scarichi/tocsv.php",
         "async": true,
-        "period": "99Y",
+        "period": "1M",
         "offset": "1D"
     },
     "global": {

@@ -27,9 +27,16 @@ try {
     $filledValues = fillParameters($parameters, $values);
     $limitedValues = limitDates($filledValues, PERIOD, OFFSET);
     $postParams = setPostParameters($parameters, $limitedValues);
+    
+    Curl::run('http://' . REMOTE_HOST . '/telecontrollo/bot/telegram_REST.php?token=sync&variabile=ALL&delay=168&tel=1');
+    
     $message = goCurl($postParams, URL, ASYNC);
     $telegram = setMessage($message);
     echo sendTelegram($telegram, PHP_EOL);
+    
+    Curl::run('http://' . REMOTE_HOST . '/telecontrollo/bot/telegram_REST.php?token=watchdog&tipologia=scarichi&host=1&move=0&variabile=ALL&metodo=array&tel=1');
+    Curl::run('http://' . REMOTE_HOST . '/telecontrollo/bot/telegram_REST.php?token=watchdog&tipologia=scarichi&host=2&variabile=ALL&metodo=array&tel=1');
+    
 } catch (\Throwable $e) {
     Error::errorHandler($e, DEBUG_LEVEL, 'cli');
     exit();
