@@ -24,7 +24,7 @@ class WatchdogTest extends TestCase
     public function watchdogCliProvider() : array
     {
         $dateTime = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
-        $when = $dateTime->format('d/m/y h');
+        $when = $dateTime->format('d/m/y H');
         
         $data = [
 //Attivare solo una tantum: troppo lungo            
@@ -81,7 +81,7 @@ class WatchdogTest extends TestCase
     public function watchdogUrlProvider() : array
     {
         $dateTime = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
-        $when = $dateTime->format('d/m/y h');
+        $when = $dateTime->format('d/m/y H');
         
         $data = [
             'standard' => [

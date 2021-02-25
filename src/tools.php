@@ -3276,3 +3276,40 @@ function limitDates(array $values, string $dateLimit, string $dateOffset) : arra
         throw $e;        
     }
 }
+
+
+function setMessage(string $message) : string
+{
+    try {
+        if ($message !== '') {
+            $header = CONFIG['define']['telegram']['scarichi']['header'];
+            $footer = CONFIG['define']['telegram']['scarichi']['footer'];
+
+            $title = '<b>' . $header['title'] . '</b>';
+
+            $dateStart = new \DateTime(START, new \DateTimeZone('Europe/Rome'));
+            $formStart = $dateStart->format('d/m/Y H:i:s');
+            $start = $header['start'] . ' <b>' . $formStart . '</b>';
+
+            $n_file = substr_count($message, 'File CSV');
+            $totals = $footer['report'] . ' <b>' . $n_file . '</b>';
+
+            $dateStop = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
+            $formStop = $dateStop->format('d/m/Y H:i:s');
+            $stop = $footer['stop'] . ' <b>' . $formStop . '</b>';
+
+            $time = $footer['time'] . ' <b>' . Utility::benchmark(START) . '</b>';
+
+            $telegram = $title . PHP_EOL . $start . PHP_EOL . PHP_EOL . $message . PHP_EOL . $stop . PHP_EOL . $time . PHP_EOL . $totals;
+        } else {
+            $telegram = '';
+        }        
+        return $telegram;
+    //@codeCoverageIgnoreStart
+    } catch (\Throwable $e) {        
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;        
+    }
+    //@codeCoverageIgnoreEnd
+}
+

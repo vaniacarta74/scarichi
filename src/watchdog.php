@@ -14,7 +14,7 @@ try {
     $url = Utility::checkParam($rawUrl, 'Utility::checkUrl');
     for ($i=1; $i <= $n; $i++) {
         $dateTime = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
-        $when = $dateTime->format('d/m/y h:i:s');
+        $when = $dateTime->format('d/m/y H:i:s');
         $result = Curl::run($url);
         echo 'PID ' . $i . ' ' . $when . '.' . PHP_EOL . htmlspecialchars(strip_tags($result)); 
         usleep($delay);

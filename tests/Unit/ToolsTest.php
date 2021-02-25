@@ -108,9 +108,6 @@ use function vaniacarta74\Scarichi\fillField as fillField;
 use function vaniacarta74\Scarichi\fillFull as fillFull;
 use function vaniacarta74\Scarichi\setPostParameters as setPostParameters;
 use function vaniacarta74\Scarichi\goCurl as goCurl;
-use function vaniacarta74\Scarichi\initCurl as initCurl;
-use function vaniacarta74\Scarichi\goMultiCurl as goMultiCurl;
-use function vaniacarta74\Scarichi\goSingleCurl as goSingleCurl;
 use function vaniacarta74\Scarichi\insertNoData as insertNoData;
 use function vaniacarta74\Scarichi\selectLastPrevData as selectLastPrevData;
 use function vaniacarta74\Scarichi\checkCurlResponse as checkCurlResponse;
@@ -127,6 +124,7 @@ use function vaniacarta74\Scarichi\loadDatiAcquisiti as loadDatiAcquisiti;
 use function vaniacarta74\Scarichi\addCostants as addCostants;
 use function vaniacarta74\Scarichi\sendTelegram as sendTelegram;
 use function vaniacarta74\Scarichi\formatResponse as formatResponse;
+use function vaniacarta74\Scarichi\setMessage as setMessage;
 
 class ToolsTest extends TestCase
 {
@@ -18790,5 +18788,71 @@ class ToolsTest extends TestCase
         $this->expectException(\Exception::class);
         
         limitDates($values, $limit, $offset);
-    }    
+    }
+
+    /**
+     * @coversNothing
+     */
+    public function setMessageProvider() : array
+    {
+        $title = '<b>Procedura calcolo movimentazioni dighe</b>';
+        $start = 'Elaborazione iniziata in data: <b>|</b>';
+        $singleNot = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.';
+        $singleOk = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.';
+        $messageOk = $singleOk  . PHP_EOL . $singleOk . PHP_EOL;
+        $messageNot = $singleNot  . PHP_EOL . $singleNot . PHP_EOL;
+        $messageMix = $singleOk  . PHP_EOL . $singleNot . PHP_EOL;
+        $stop = 'Elaborazione terminata in data: <b>|</b>';
+        $time = 'Tempo di elaborazione: <b>|</b>';
+        $totals = 'Numero totale file csv esportati: <b>%</b>';        
+        $telegram = $title . PHP_EOL . $start . PHP_EOL . PHP_EOL . '#' . PHP_EOL . $stop . PHP_EOL . $time . PHP_EOL . $totals;
+        
+        $data = [
+            'no message' => [
+                'message' => '',
+                'n_files' => 0,
+                'expected' => ''
+            ],
+            'one file' => [
+                'message' => $singleOk,
+                'n_files' => 1,
+                'expected' => str_replace('#', $singleOk, $telegram)
+            ],
+            'two files' => [
+                'message' => $messageOk,
+                'n_files' => 2,
+                'expected' => str_replace('#', $messageOk, $telegram)
+            ],
+            'tree files' => [
+                'message' => $messageOk . $singleOk . PHP_EOL,
+                'n_files' => 3,
+                'expected' => str_replace('#', $messageOk . $singleOk . PHP_EOL, $telegram)
+            ],
+            'four files' => [
+                'message' => $messageOk . $messageMix,
+                'n_files' => 3,
+                'expected' => str_replace('#', $messageOk . $messageMix, $telegram)
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers setMessage()
+     * @dataProvider setMessageProvider
+     */
+    public function testSetMessageStringContainsString(string $message, int $n_files, string $response) : void
+    {
+        $telegram = str_replace('%', $n_files, $response);
+        
+        $expecteds = explode('|', $telegram);
+        
+        $actual = setMessage($message);
+        
+        foreach ($expecteds as $expected) {
+            $this->assertStringContainsString($expected, $actual);
+        }
+    }
 }

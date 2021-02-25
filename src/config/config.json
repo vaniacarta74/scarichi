@@ -15,7 +15,18 @@
             "subdirectory": false
         },
         "telegram": {
-            "limit": 1024,
+            "scarichi": {
+                "header": {
+                    "title": "Procedura calcolo movimentazioni dighe",
+                    "start": "Elaborazione iniziata in data:"
+                },
+                "footer": {
+                    "stop": "Elaborazione terminata in data:",
+                    "time": "Tempo di elaborazione:",
+                    "report": "Numero totale file csv esportati:"
+                }
+            },
+            "limit": 4096,
             "send": false,
             "path": "/../../../telegram.json",
             "url": "http://localhost/scarichi/telegram.php"
