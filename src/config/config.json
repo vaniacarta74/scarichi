@@ -5,7 +5,7 @@
             "memory_limit": "2048M"
         },
         "log": {
-            "debug_level": 1,
+            "debug_level": 2,
             "log_path": "/../../log",
             "error_log": "error.log"
         },
@@ -26,8 +26,20 @@
                     "report": "Numero totale file csv esportati:"
                 }
             },
+            "admittedTags": [
+                "b",
+                "strong",
+                "i",
+                "u",
+                "ins",
+                "s",
+                "a",
+                "code",
+                "pre"
+            ],
+            "tagLimit": 100,
             "limit": 4096,
-            "send": true,
+            "send": false,
             "path": "/../../../telegram.json",
             "url": "http://localhost/scarichi/telegram.php"
         },
@@ -143,7 +155,7 @@
         "sintax": "php scarichi.php",
         "url": "http://localhost/scarichi/tocsv.php",
         "async": true,
-        "period": "1M",
+        "period": "99Y",
         "offset": "1D"
     },
     "global": {

@@ -337,4 +337,142 @@ class Utility
             throw $e;        
         }
     }
+    
+    public static function countTags(string $html, ?string $tag = null) : int
+    {
+        try {
+            $tagName = $tag ?? 'INNER';                
+            if (self::checkHtml($html)) {
+                $dom = new \DOMDocument;
+                $dom->loadHTML($html); 
+                if ($tagName === 'INNER') {                
+                    $htmlElements = $dom->getElementsByTagName('html');
+                    $bodyElements = $dom->getElementsByTagName('body');
+                    $paragraphElements = $dom->getElementsByTagName('p');
+                    $allElements = $dom->getElementsByTagName('*');
+                    $n_elements = $allElements->length - $htmlElements->length - $bodyElements->length - $paragraphElements->length;                
+                } else {
+                    $allElements = $dom->getElementsByTagName($tagName);            
+                    $n_elements = $allElements->length;
+                }
+            } else {
+                $n_elements = 0;
+            }
+            return $n_elements;
+        // @codeCoverageIgnoreStart
+        } catch (\Throwable $e) {        
+            Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
+            throw $e;        
+        }
+        // @codeCoverageIgnoreEnd
+    }
+    
+    public static function checkHtml(string $html) : bool
+    {
+        try {
+            $dom = new \DOMDocument;
+            try {
+                $dom->loadHTML($html);
+                return true;
+            } catch (\Throwable $e) {
+                return false;
+            }
+        // @codeCoverageIgnoreStart
+        } catch (\Throwable $e) {        
+            Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
+            throw $e;        
+        }
+        // @codeCoverageIgnoreEnd
+    }
+    
+    public static function purgeHtml(string $html, array $admittedTag) : string
+    {
+        try {            
+            $tags = self::getTags($html);
+            foreach ($tags as $key => $value) {
+                if (!in_array($key, $admittedTag) || $value !== 0) {
+                    if ($key !== 'a') {
+                        $html = str_replace('</' . $key . '>', '', str_replace('<' . $key . '>', '', $html));
+                    }
+                }
+            }
+            if (!self::checkHtml($html)) {
+                $html = htmlspecialchars(strip_tags($html));
+            }
+            if (array_key_exists('a', $tags) && $tags['a'] !== 0) {
+                $html = preg_replace('/<\/?a[^>]*>/', '', str_replace('</a>', '', $html));
+            }
+            return $html;
+        // @codeCoverageIgnoreStart
+        } catch (\Throwable $e) {        
+            Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
+            throw $e;        
+        }
+        // @codeCoverageIgnoreEnd
+    }
+    
+    public static function checkTags(string $html) : bool
+    {
+        try {
+            if ($html !== '') {
+                $groupped = self::getTags($html);
+                $isOk = self::areAllZero($groupped);
+            } else {
+                $isOk = true;
+            }
+            return $isOk;
+        // @codeCoverageIgnoreStart
+        } catch (\Throwable $e) {        
+            Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
+            throw $e;        
+        }
+        // @codeCoverageIgnoreEnd
+    }
+    
+    public static function getTags(string $html) : array
+    {
+        try {
+            $groupped = [];
+            if ($html !== '') {
+                preg_match_all('/<([\/]?[a-z0-9]*)/i', $html, $match); 
+                foreach ($match[1] as $tag) {
+                    $key = str_replace('/', '', $tag);
+                    if (!array_key_exists($key, $groupped) && ($key == $tag)) {
+                        $groupped[$key] = 1;
+                    } elseif (!array_key_exists($key, $groupped) && ($key != $tag)) {
+                        $groupped[$key] = -999999;
+                    } elseif (array_key_exists($key, $groupped) && ($key == $tag)) {
+                        $groupped[$key]++;
+                    } elseif (array_key_exists($key, $groupped) && ($key != $tag)) {
+                        $groupped[$key]--;
+                    }
+                }
+            }
+            return $groupped;
+        // @codeCoverageIgnoreStart
+        } catch (\Throwable $e) {        
+            Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
+            throw $e;        
+        }
+        // @codeCoverageIgnoreEnd
+    }
+    
+    public static function areAllZero(array $groupped) : bool
+    {
+        try {            
+            $isOk = true;
+            foreach ($groupped as $count) {
+                if ($count !== 0) {
+                    $isOk = false;
+                    break;
+                }
+            }
+            return $isOk;
+        // @codeCoverageIgnoreStart
+        } catch (\Throwable $e) {        
+            Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
+            throw $e;        
+        }
+        // @codeCoverageIgnoreEnd
+    }   
 }

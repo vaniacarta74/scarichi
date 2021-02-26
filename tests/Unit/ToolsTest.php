@@ -18563,6 +18563,7 @@ class ToolsTest extends TestCase
             'no message' => [
                 'message' => '',
                 'nut' => null,
+                'tagLimit' => null,
                 'limit' => null,
                 'forced' => true,
                 'chat_id' => null,
@@ -18571,6 +18572,7 @@ class ToolsTest extends TestCase
             'no force' => [
                 'message' => 'Test funzione sendTelegram()',
                 'nut' => null,
+                'tagLimit' => null,
                 'limit' => null,
                 'forced' => null,
                 'chat_id' => null,
@@ -18579,6 +18581,7 @@ class ToolsTest extends TestCase
             'force false' => [
                 'message' => 'Test funzione sendTelegram()',
                 'nut' => null,
+                'tagLimit' => null,
                 'limit' => null,
                 'forced' => false,
                 'chat_id' => null,
@@ -18587,6 +18590,7 @@ class ToolsTest extends TestCase
             'standard' => [
                 'message' => 'Test funzione sendTelegram(Standard)',
                 'nut' => null,
+                'tagLimit' => null,
                 'limit' => null,
                 'forced' => true,
                 'chat_id' => null,
@@ -18595,6 +18599,7 @@ class ToolsTest extends TestCase
             'chat error' => [
                 'message' => 'Test funzione sendTelegram()',
                 'nut' => null,
+                'tagLimit' => null,
                 'limit' => null,
                 'forced' => true,
                 'chat_id' => 'pippo',
@@ -18603,6 +18608,7 @@ class ToolsTest extends TestCase
             'nut default and limit' => [
                 'message' => 'Test funzione sendTelegram(Standard)',
                 'nut' => null,
+                'tagLimit' => null,
                 'limit' => 25,
                 'forced' => true,
                 'chat_id' => null,
@@ -18611,7 +18617,44 @@ class ToolsTest extends TestCase
             'limit too short' => [
                 'message' => 'Test funzione sendTelegram(Standard)',
                 'nut' => 'K',
+                'tagLimit' => null,
                 'limit' => 25,
+                'forced' => true,
+                'chat_id' => null,
+                'expected' => 'Invio messaggio Telegram fallito.' . PHP_EOL
+            ],
+            'too mach tags' => [
+                'message' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)',
+                'nut' => 'K',
+                'tagLimit' => 2,
+                'limit' => null,
+                'forced' => true,
+                'chat_id' => null,
+                'expected' => 'Invio messaggio Telegram fallito.' . PHP_EOL
+            ],
+            'right tags' => [
+                'message' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)',
+                'nut' => null,
+                'tagLimit' => 2,
+                'limit' => null,
+                'forced' => true,
+                'chat_id' => null,
+                'expected' => 'Messaggio Telegram inviato con successo.' . PHP_EOL
+            ],
+            'tags limit equal' => [
+                'message' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)',
+                'nut' => null,
+                'tagLimit' => 2,
+                'limit' => 30,
+                'forced' => true,
+                'chat_id' => null,
+                'expected' => 'Messaggio Telegram inviato con successo.' . PHP_EOL
+            ],
+            'tag limit ok but too long' => [
+                'message' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)',
+                'nut' => 'z',
+                'tagLimit' => 2,
+                'limit' => 30,
                 'forced' => true,
                 'chat_id' => null,
                 'expected' => 'Invio messaggio Telegram fallito.' . PHP_EOL
@@ -18626,9 +18669,9 @@ class ToolsTest extends TestCase
      * covers sendTelegram()
      * @dataProvider sendTelegramProvider
      */
-    public function testSendTelegramEquals(string $message, ?string $nut, ?int $limit, ?bool $force, ?string $chatId, string $expected) : void
+    public function testSendTelegramEquals(string $message, ?string $nut, ?int $tagLimit, ?int $limit, ?bool $force, ?string $chatId, string $expected) : void
     {
-        $actual = sendTelegram($message, $nut, $limit, $force, $chatId);
+        $actual = sendTelegram($message, $nut, $tagLimit, $limit, $force, $chatId);
         
         $this->assertEquals($expected, $actual);
     }

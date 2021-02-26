@@ -22,7 +22,9 @@ class Bot
     private static $url = 'https://api.telegram.org/bot';
     private static $defaultBot = TOKEN;   
     private static $defaultChatId = CHATID;
+    private static $tagLimit = TAGLIMIT;
     private static $msgLimit = MSGLIMIT;
+    private static $admittedTags = ADMITTEDTAGS;
     private static $allowed = ['message','channel_post'];
     private $botName;
     private $userName;
@@ -213,17 +215,18 @@ class Bot
         }
     }
     
-    public static function checkAndSend(string $message, ?int $msgLimit = null, ?string $nut = null, ?string $chatId = null, ?string $messageId = null, ?string $token = null) : bool
+    public static function checkAndSend(string $message, ?int $tagLimit = null, ?int $msgLimit = null, ?string $nut = null, ?string $chatId = null, ?string $messageId = null, ?string $token = null) : bool
     {
         try {            
             $nutBot = $nut ?? ' ';
+            $nMaxTag = $tagLimit ?? self::$tagLimit;
             $limit = $msgLimit ?? self::$msgLimit;
             $tokenBot = $token ?? self::$defaultBot;
             $chat_id = $chatId ?? self::$defaultChatId;
             if (strlen($message) === 0) {
                 $responses[] = false;
-            } elseif (strlen($message) > $limit) {
-                $responses = self::breakAndSend($message, $limit, $nutBot, $chat_id, $messageId, $tokenBot);
+            } elseif (strlen($message) > $limit || Utility::countTags($message) > $nMaxTag) {
+                $responses = self::breakAndSend($message, $nMaxTag, $limit, $nutBot, $chat_id, $messageId, $tokenBot);
             } else {
                 $responses[] = self::secureSend($message, $chatId, $messageId, $tokenBot);
             }
@@ -237,7 +240,7 @@ class Bot
         // @codeCoverageIgnoreEnd
     }
     
-    public static function breakAndSend(string $message, int $limit, string $nut, string $chatId, ?string $messageId, ?string $token) : array
+    public static function breakAndSend(string $message, int $tagLimit, int $limit, string $nut, string $chatId, ?string $messageId, ?string $token) : array
     {
         try { 
             if ($message === '') {
@@ -250,10 +253,10 @@ class Bot
             foreach ($msgParts as $part) {
                 if (strlen($msgToSend) === 0 && $i === 0) {
                     $msgToSend = $part;
-                } elseif ((strlen($msgToSend) === 0 && $i > 0) || strlen($msgToSend) > $limit) {
+                } elseif ((strlen($msgToSend) === 0 && $i > 0) || strlen($msgToSend) > $limit || Utility::countTags($msgToSend) > $tagLimit) {
                     $responses[] = false;
                     $msgToSend = $part;
-                } elseif (strlen($msgToSend) === $limit || (strlen($msgToSend) < $limit && strlen($msgToSend . $nut . $part) > $limit)) {
+                } elseif (strlen($msgToSend) === $limit || Utility::countTags($msgToSend) === $tagLimit || (strlen($msgToSend) < $limit && strlen($msgToSend . $nut . $part) > $limit) || (Utility::countTags($msgToSend) < $tagLimit && Utility::countTags($msgToSend . $nut . $part) > $tagLimit)) {
                     $responses[] = self::secureSend($msgToSend, $chatId, $messageId, $token);
                     $msgToSend = $part;
                 } else {
@@ -261,9 +264,9 @@ class Bot
                 }
                 $i++;
             }
-            if (strlen($msgToSend) > 0 && strlen($msgToSend) <= $limit) {
+            if (strlen($msgToSend) > 0 && strlen($msgToSend) <= $limit && Utility::countTags($msgToSend) <= $tagLimit) {
                 $responses[] = self::secureSend($msgToSend, $chatId, $messageId, $token);
-            } elseif (strlen($msgToSend) > $limit) {
+            } elseif (strlen($msgToSend) > $limit || Utility::countTags($msgToSend) > $tagLimit) {
                 $responses[] = false;
             } else {
                 $responses[] = true;
@@ -298,16 +301,18 @@ class Bot
         // @codeCoverageIgnoreEnd
     }
     
-    public static function secureSend(string $message, ?string $chatId = null, ?string $messageId = null, ?string $token = null) : bool
+    public static function secureSend(string $rawMessage, ?string $chatId = null, ?string $messageId = null, ?string $token = null, ?array $tags = null) : bool
     {
         try {
-            if ($message === '') {
+            if ($rawMessage === '') {
                 throw new \Exception('Non è possibile inviare messaggi vuoti');
             }
             $n = 5;
             $delay = 500000;
             $tokenBot = $token ?? self::$defaultBot;
             $chat_id = $chatId ?? self::$defaultChatId;
+            $admittedTags = $tags ?? self::$admittedTags;
+            $message = Utility::purgeHtml($rawMessage, $admittedTags);
             for ($i = 1; $i <= $n; $i++) {
                 if (isset($messageId) && $i < 3) {
                     $response = self::replyMessage($message, $messageId, $chat_id, $tokenBot);
@@ -603,7 +608,7 @@ class Bot
                     $chatId = $this->getChatId($update);
                     $messageId = $this->getMessageId($update);
                     if ($chatId !== 0 && $messageId !== 0) {
-                        $isOk = self::checkAndSend($message, null, null, $chatId, $messageId, $this->token);
+                        $isOk = self::checkAndSend($message, null, null, null, $chatId, $messageId, $this->token);
                     }
                 }
             } else {

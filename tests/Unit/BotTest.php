@@ -482,6 +482,7 @@ class BotTest extends TestCase
                 'messageId' => '2500',
                 'chatId' => '474912563',
                 'token' => null,
+                'tags' => null,
                 'expected' => true
             ],
             'chat_id' => [
@@ -489,6 +490,7 @@ class BotTest extends TestCase
                 'messageId' => null,
                 'chatId' => '474912563',
                 'token' => null,
+                'tags' => null,
                 'expected' => true
             ],
             'no chat_id' => [
@@ -496,6 +498,7 @@ class BotTest extends TestCase
                 'messageId' => null,
                 'chatId' => null,
                 'token' => null,
+                'tags' => null,
                 'expected' => true
             ],
             'chat_id error' => [
@@ -503,6 +506,7 @@ class BotTest extends TestCase
                 'messageId' => null,
                 'chatId' => 'pippo',
                 'token' => null,
+                'tags' => null,
                 'expected' => false
             ],
             'message_id safe error' => [
@@ -510,8 +514,57 @@ class BotTest extends TestCase
                 'messageId' => '9999999',
                 'chatId' => '474912563',
                 'token' => null,
+                'tags' => null,
                 'expected' => true
-            ]           
+            ],
+            'bad html' => [
+                'message' => '<b>Test metodo <b>Bot::secureSend con message_id inesistente',
+                'messageId' => null,
+                'chatId' => '474912563',
+                'token' => null,
+                'tags' => null,
+                'expected' => true
+            ],
+            'inverted html' => [
+                'message' => '<\b>Test metodo <b>Bot::secureSend con message_id inesistente',
+                'messageId' => null,
+                'chatId' => '474912563',
+                'token' => null,
+                'tags' => null,
+                'expected' => true
+            ],
+            'incomplete html' => [
+                'message' => '<b>Test metodo</b> <s>Bot::secureSend con message_id inesistente',
+                'messageId' => null,
+                'chatId' => '474912563',
+                'token' => null,
+                'tags' => null,
+                'expected' => true
+            ],
+            'not admitted tag' => [
+                'message' => '<b>Test metodo</b> <li>Bot::secureSend con message_id inesistente</li>',
+                'messageId' => null,
+                'chatId' => '474912563',
+                'token' => null,
+                'tags' => null,
+                'expected' => true
+            ],
+            'ancor tag' => [
+                'message' => '<b>Test</b> di <a href="http://www.pippo.com">funzione</a> sendTelegram(<b>Standard</b>)',
+                'messageId' => null,
+                'chatId' => '474912563',
+                'token' => null,
+                'tags' => null,
+                'expected' => true
+            ],
+            'bad ancor tag' => [
+                'message' => '<b>Test</b> di <a href="http://www.pippo.com">funzione sendTelegram(<b>Standard</b>)',
+                'messageId' => null,
+                'chatId' => '474912563',
+                'token' => null,
+                'tags' => null,
+                'expected' => true
+            ]             
         ];
         
         return $data;
@@ -522,9 +575,9 @@ class BotTest extends TestCase
      * @covers \vaniacarta74\Scarichi\Bot::secureSend
      * @dataProvider secureSendProvider
      */
-    public function testSecureSendEquals(string $message, ?string $messageId, ?string $chatId, ?string $token, bool $expected) : void
+    public function testSecureSendEquals(string $message, ?string $messageId, ?string $chatId, ?string $token, ?array $tags, bool $expected) : void
     {
-        $actual = Bot::secureSend($message, $chatId, $messageId, $token);
+        $actual = Bot::secureSend($message, $chatId, $messageId, $token, $tags);
         
         $this->assertEquals($expected, $actual); 
     }
@@ -538,11 +591,12 @@ class BotTest extends TestCase
         $message = '';
         $messageId = null;
         $chatId = CHATID;
-        $token = TOKEN; 
+        $token = TOKEN;
+        $tags = null;
         
         $this->expectException(\Exception::class);
         
-        Bot::secureSend($message, $chatId, $messageId, $token);
+        Bot::secureSend($message, $chatId, $messageId, $token, $tags);
     }
     
     /**
@@ -555,6 +609,7 @@ class BotTest extends TestCase
             'message_id' => [
                 'message' => 'Test metodo Bot::checkAndSend con message_id',
                 'nut' => null,
+                'tagLimit' => null,
                 'limit' => null,
                 'messageId' => '2500',
                 'chatId' => '474912563',
@@ -564,6 +619,7 @@ class BotTest extends TestCase
             'chat_id' => [
                 'message' => 'Test metodo Bot::checkAndSend con chat_id',
                 'nut' => null,
+                'tagLimit' => null,
                 'limit' => null,
                 'messageId' => null,
                 'chatId' => '474912563',
@@ -573,6 +629,7 @@ class BotTest extends TestCase
             'no chat_id' => [
                 'message' => 'Test metodo Bot::checkAndSend senza chat_id',
                 'nut' => null,
+                'tagLimit' => null,
                 'limit' => null,
                 'messageId' => null,
                 'chatId' => null,
@@ -582,6 +639,7 @@ class BotTest extends TestCase
             'chat_id error' => [
                 'message' => 'Test metodo Bot::checkAndSend con chat_id inesistente',
                 'nut' => null,
+                'tagLimit' => null,
                 'limit' => null,
                 'messageId' => null,
                 'chatId' => 'pippo',
@@ -591,6 +649,7 @@ class BotTest extends TestCase
             'message_id safe error' => [
                 'message' => 'Test metodo Bot::checkAndSend con message_id inesistente',
                 'nut' => null,
+                'tagLimit' => null,
                 'limit' => null,
                 'messageId' => '9999999',
                 'chatId' => '474912563',
@@ -600,6 +659,7 @@ class BotTest extends TestCase
             'splitted too long' => [
                 'message' => 'Test metodo Bot::checkAndSend con split messaggio',
                 'nut' => '::',
+                'tagLimit' => null,
                 'limit' => 30,
                 'messageId' => null,
                 'chatId' => null,
@@ -609,6 +669,7 @@ class BotTest extends TestCase
             'splitted right' => [
                 'message' => 'Test metodo Bot::checkAndSend con split messaggio',
                 'nut' => '::',
+                'tagLimit' => null,
                 'limit' => 40,
                 'messageId' => null,
                 'chatId' => null,
@@ -618,12 +679,53 @@ class BotTest extends TestCase
             'no message' => [
                 'message' => '',
                 'nut' => '::',
+                'tagLimit' => null,
                 'limit' => 30,
                 'messageId' => null,
                 'chatId' => null,
                 'token' => null,
                 'expected' => false
-            ]            
+            ],
+            'too mach tags' => [
+                'message' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)',
+                'nut' => 'K',
+                'tagLimit' => 2,
+                'limit' => null,
+                'messageId' => null,
+                'chatId' => null,
+                'token' => null,
+                'expected' => false
+            ],
+            'right tags' => [
+                'message' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)',
+                'nut' => null,
+                'tagLimit' => 2,
+                'limit' => null,
+                'messageId' => null,
+                'chatId' => null,
+                'token' => null,
+                'expected' => true
+            ],
+            'tags limit equal' => [
+                'message' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)',
+                'nut' => null,
+                'tagLimit' => 2,
+                'limit' => 30,
+                'messageId' => null,
+                'chatId' => null,
+                'token' => null,
+                'expected' => true
+            ],
+            'tag limit ok but too long' => [
+                'message' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)',
+                'nut' => 'z',
+                'tagLimit' => 2,
+                'limit' => 30,
+                'messageId' => null,
+                'chatId' => null,
+                'token' => null,
+                'expected' => false
+            ]
         ];
         
         return $data;
@@ -634,9 +736,9 @@ class BotTest extends TestCase
      * @covers \vaniacarta74\Scarichi\Bot::checkAndSend
      * @dataProvider checkAndSendProvider
      */
-    public function testCheckAndSendEquals(string $message, ?string $nut, ?int $msgLimit, ?string $messageId, ?string $chatId, ?string $token, bool $expected) : void
+    public function testCheckAndSendEquals(string $message, ?string $nut, ?int $tagLimit, ?int $msgLimit, ?string $messageId, ?string $chatId, ?string $token, bool $expected) : void
     {
-        $actual = Bot::checkAndSend($message, $msgLimit, $nut, $chatId, $messageId, $token);
+        $actual = Bot::checkAndSend($message, $tagLimit, $msgLimit, $nut, $chatId, $messageId, $token);
         
         $this->assertEquals($expected, $actual); 
     }
@@ -651,6 +753,7 @@ class BotTest extends TestCase
             'message_id' => [
                 'message' => 'Test metodo Bot::breakAndSend con message_id',
                 'nut' => ' ',
+                'tagLimit' => TAGLIMIT,
                 'limit' => MSGLIMIT,
                 'messageId' => '2500',
                 'chatId' => '474912563',
@@ -662,6 +765,7 @@ class BotTest extends TestCase
             'chat_id' => [
                 'message' => 'Test metodo Bot::breakAndSend con chat_id',
                 'nut' => ' ',
+                'tagLimit' => TAGLIMIT,
                 'limit' => MSGLIMIT,
                 'messageId' => null,
                 'chatId' => '474912563',
@@ -673,6 +777,7 @@ class BotTest extends TestCase
             'chat_id error' => [
                 'message' => 'Test metodo Bot::breakAndSend con chat_id inesistente',
                 'nut' => ' ',
+                'tagLimit' => TAGLIMIT,
                 'limit' => MSGLIMIT,
                 'messageId' => null,
                 'chatId' => 'pippo',
@@ -684,6 +789,7 @@ class BotTest extends TestCase
             'message_id safe error' => [
                 'message' => 'Test metodo Bot::breakAndSend con message_id inesistente',
                 'nut' => ' ',
+                'tagLimit' => TAGLIMIT,
                 'limit' => MSGLIMIT,
                 'messageId' => '99999999999999999999999999',
                 'chatId' => '474912563',
@@ -695,6 +801,7 @@ class BotTest extends TestCase
             'splitted mix' => [
                 'message' => 'Test metodo Bot::breakAndSend con split messaggio',
                 'nut' => '::',
+                'tagLimit' => TAGLIMIT,
                 'limit' => 30,
                 'messageId' => null,
                 'chatId' => CHATID,
@@ -707,6 +814,7 @@ class BotTest extends TestCase
             'splitted right' => [
                 'message' => 'Test metodo Bot::breakAndSend con split messaggio',
                 'nut' => '::',
+                'tagLimit' => TAGLIMIT,
                 'limit' => 40,
                 'messageId' => null,
                 'chatId' => CHATID,
@@ -719,6 +827,7 @@ class BotTest extends TestCase
             'too short' => [
                 'message' => 'Test metodo Bot::breakAndSend con split messaggio',
                 'nut' => ' ',
+                'tagLimit' => TAGLIMIT,
                 'limit' => 6,
                 'messageId' => null,
                 'chatId' => CHATID,
@@ -735,6 +844,7 @@ class BotTest extends TestCase
             'last null' => [
                 'message' => 'Test metodo Bot::br!eakAndSend con split messaggio!',
                 'nut' => '!',
+                'tagLimit' => TAGLIMIT,
                 'limit' => 30,
                 'messageId' => null,
                 'chatId' => CHATID,
@@ -748,6 +858,7 @@ class BotTest extends TestCase
             'first too long' => [
                 'message' => 'Test metodo Bot::br!eakAndSend con split messaggio!',
                 'nut' => 'K',
+                'tagLimit' => TAGLIMIT,
                 'limit' => 30,
                 'messageId' => null,
                 'chatId' => CHATID,
@@ -755,7 +866,71 @@ class BotTest extends TestCase
                 'expected' => [
                     0 => false
                 ]
-            ]              
+            ],
+            'too mach tags' => [
+                'message' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)',
+                'nut' => 'K',
+                'tagLimit' => 2,
+                'limit' => MSGLIMIT,
+                'messageId' => null,
+                'chatId' => CHATID,
+                'token' => TOKEN,
+                'expected' => [
+                    0 => false
+                ]
+            ],
+            'right tags' => [
+                'message' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)',
+                'nut' => ' ',
+                'tagLimit' => 2,
+                'limit' => MSGLIMIT,
+                'messageId' => null,
+                'chatId' => CHATID,
+                'token' => TOKEN,
+                'expected' => [
+                    0 => true,
+                    1 => true
+                ]
+            ],
+            'tags limit equal' => [
+                'message' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)',
+                'nut' => ' ',
+                'tagLimit' => 2,
+                'limit' => 30,
+                'messageId' => null,
+                'chatId' => CHATID,
+                'token' => TOKEN,
+                'expected' => [
+                    0 => true,
+                    1 => true
+                ]
+            ],
+            'bad html and too long' => [
+                'message' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)',
+                'nut' => 'z',
+                'tagLimit' => 2,
+                'limit' => 30,
+                'messageId' => null,
+                'chatId' => CHATID,
+                'token' => TOKEN,
+                'expected' => [
+                    0 => true,
+                    1 => false
+                ]
+            ],
+            'bad html' => [
+                'message' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)',
+                'nut' => 'z',
+                'tagLimit' => 2,
+                'limit' => 50,
+                'messageId' => null,
+                'chatId' => CHATID,
+                'token' => TOKEN,
+                'expected' => [
+                    0 => true,
+                    1 => true
+                ]
+            ]               
         ];
         
         return $data;
@@ -766,9 +941,9 @@ class BotTest extends TestCase
      * @covers \vaniacarta74\Scarichi\Bot::breakAndSend
      * @dataProvider breakAndSendProvider
      */
-    public function testBreakAndSendEquals(string $message, string $nut, int $msgLimit, ?string $messageId, string $chatId, string $token, array $expected) : void
+    public function testBreakAndSendEquals(string $message, string $nut, int $tagLimit, int $msgLimit, ?string $messageId, string $chatId, string $token, array $expected) : void
     {
-        $actual = Bot::breakAndSend($message, $msgLimit, $nut, $chatId, $messageId, $token);
+        $actual = Bot::breakAndSend($message, $tagLimit, $msgLimit, $nut, $chatId, $messageId, $token);
         
         $this->assertEquals($expected, $actual); 
     }
@@ -780,6 +955,7 @@ class BotTest extends TestCase
     public function testBreakAndSendException() : void
     {
         $message = '';
+        $tagLimit = TAGLIMIT;
         $msgLimit = MSGLIMIT;
         $nut = ' ';
         $messageId = null;
@@ -788,7 +964,7 @@ class BotTest extends TestCase
         
         $this->expectException(\Exception::class);
         
-        Bot::breakAndSend($message, $msgLimit, $nut, $chatId, $messageId, $token);
+        Bot::breakAndSend($message, $tagLimit, $msgLimit, $nut, $chatId, $messageId, $token);
     }
     
     /**

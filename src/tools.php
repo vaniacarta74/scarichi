@@ -3196,12 +3196,12 @@ function addCostants(array $parametri, array $formule) : array
 }
 
 
-function sendTelegram(string $message, ?string $nut = null, ?int $limit = null, ?bool $force = false, ?string $chatId = null) : string
+function sendTelegram(string $message, ?string $nut = null, ?int $tagLimit = null, ?int $limit = null, ?bool $force = false, ?string $chatId = null) : string
 {
     try {
         if ($message !== '') {
             if ($force || TELEGRAM) {
-                $isOk = Bot::checkAndSend($message, $limit, $nut, $chatId);
+                $isOk = Bot::checkAndSend($message, $tagLimit, $limit, $nut, $chatId);
                 if ($isOk) {
                     $response = 'Messaggio Telegram inviato con successo.' . PHP_EOL;
                 } else {

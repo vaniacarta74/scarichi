@@ -745,4 +745,394 @@ class UtilityTest extends TestCase
         
         $this->assertEquals($expected, $actual);
     }
+    
+    /**
+     * @coversNothing
+     */
+    public function countTagsProvider() : array
+    {
+        $data = [
+            'standard' => [
+                'html' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)',
+                'tag' => null,
+                'expected' => 3
+            ],
+            'standard explicit' => [
+                'html' => '<html><body><p><b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)</p></body></html>',
+                'tag' => null,
+                'expected' => 3
+            ],
+            'standard mixed' => [
+                'html' => '<b>Test</b> di <i>funzione</i> sendTelegram(<b>Standard</b>)',
+                'tag' => null,
+                'expected' => 3
+            ],
+            'defined tag' => [
+                'html' => '<b>Test</b> di <i>funzione</i> sendTelegram(<b>Standard</b>)',
+                'tag' => 'b',
+                'expected' => 2
+            ],
+            'all tags' => [
+                'html' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)',
+                'tag' => '*',
+                'expected' => 5
+            ],
+            'all tags explicit' => [
+                'html' => '<html><body><b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)</body></html>',
+                'tag' => '*',
+                'expected' => 5
+            ],            
+            'all tags crnl' => [
+                'html' => '<b>Test</b> di <b>funzione</b>' . PHP_EOL  . 'sendTelegram(<b>Standard</b>)',
+                'tag' => '*',
+                'expected' => 5
+            ],
+            'void html' => [
+                'html' => '',
+                'tag' => null,
+                'expected' => 0
+            ],
+            'no tag close' => [
+                'html' => '<b>Test</b> di <b>fun',
+                'tag' => null,
+                'expected' => 2
+            ],
+            'no tag open' => [
+                'html' => 'ione</b> sendTelegram(<b>Standard</b>)',
+                'tag' => null,
+                'expected' => 0
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::countTags
+     * @dataProvider countTagsProvider
+     */
+    public function testCountTagsEquals(string $html, ?string $tag = null, int $expected) : void
+    {
+        $actual = Utility::countTags($html, $tag);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function checkTagsProvider() : array
+    {
+        $data = [
+            'standard' => [
+                'html' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)',
+                'expected' => true
+            ],
+            'standard explicit' => [
+                'html' => '<html><body><p><b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)</p></body></html>',
+                'expected' => true
+            ],
+            'standard mixed' => [
+                'html' => '<b>Test</b> di <i>funzione</i> sendTelegram(<b>Standard</b>)',
+                'expected' => true
+            ],            
+            'all tags crnl' => [
+                'html' => '<b>Test</b> di <b>funzione</b>' . PHP_EOL  . 'sendTelegram(<b>Standard</b>)',
+                'expected' => true
+            ],
+            'void html' => [
+                'html' => '',
+                'expected' => true
+            ],
+            'no tag close' => [
+                'html' => '<b>Test</b> di <b>fun',
+                'expected' => false
+            ],
+            'no tag open' => [
+                'html' => 'ione</b> sendTelegram(<b>Standard</b>)',
+                'expected' => false
+            ],
+            'inverted' => [
+                'html' => '</b>Test<b> di </i>funzione<i> sendTelegram(</b>Standard<b>)',
+                'expected' => false
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::checkTags
+     * @dataProvider checkTagsProvider
+     */
+    public function testCheckTagsEquals(string $html, bool $expected) : void
+    {
+        $actual = Utility::checkTags($html);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function areAllZeroProvider() : array
+    {
+        $data = [
+            'standard' => [
+                'tags' => [
+                    'b' => 0,
+                    'strong' => 0,
+                    'i' => 0,
+                    'html' => 0,
+                    'body' => 0,
+                    'p' => 0,
+                    'u' => 0,
+                    'ins' => 0,
+                    's' => 0,
+                    'a' => 0,
+                    'code' => 0,
+                    'pre' => 0
+                ],
+                'expected' => true
+            ],
+            'failed' => [
+                'tags' => [
+                    'b' => 1,
+                    'strong' => 0,
+                    'i' => 0,
+                    'html' => 0,
+                    'body' => 0,
+                    'p' => 0,
+                    'u' => 0,
+                    'ins' => 0,
+                    's' => 0,
+                    'a' => 0,
+                    'code' => 0,
+                    'pre' => 0
+                ],
+                'expected' => false
+            ],
+            'inverted' => [
+                'tags' => [
+                    'b' => -999999,
+                    'strong' => 0,
+                    'i' => 0,
+                    'html' => 0,
+                    'body' => 0,
+                    'p' => 0,
+                    'u' => 0,
+                    'ins' => 0,
+                    's' => 0,
+                    'a' => 0,
+                    'code' => 0,
+                    'pre' => 0
+                ],
+                'expected' => false
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::areAllZero
+     * @dataProvider areAllZeroProvider
+     */
+    public function testAreAllZeroEquals(array $tags, bool $expected) : void
+    {
+        $actual = Utility::areAllZero($tags);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function getTagsProvider() : array
+    {
+        $data = [
+            'standard' => [
+                'html' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)',
+                'expected' => [
+                    'b' => 0
+                ]
+            ],
+            'standard explicit' => [
+                'html' => '<html><body><p><b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)</p></body></html>',
+                'expected' => [
+                    'html' => 0,
+                    'body' => 0,
+                    'p' => 0,
+                    'b' => 0
+                ]
+            ],
+            'standard mixed' => [
+                'html' => '<b>Test</b> di <i>funzione</i> sendTelegram(<b>Standard</b>)',
+                'expected' => [
+                    'b' => 0,
+                    'i' => 0
+                ]
+            ],            
+            'all tags crnl' => [
+                'html' => '<b>Test</b> di <b>funzione</b>' . PHP_EOL  . 'sendTelegram(<b>Standard</b>)',
+                'expected' => [
+                    'b' => 0
+                ]
+            ],
+            'void html' => [
+                'html' => '',
+                'expected' => []
+            ],
+            'no tag close' => [
+                'html' => '<b>Test</b> di <b>fun',
+                'expected' => [
+                    'b' => 1
+                ]
+            ],
+            'no tag open' => [
+                'html' => 'ione</b> sendTelegram(<b>Standard</b>)',
+                'expected' => [
+                    'b' => -999999
+                ]
+            ],
+            'inverted' => [
+                'html' => '</b>Test<b> di </i>funzione<i> sendTelegram(</b>Standard<b>)',
+                'expected' => [
+                    'b' => -999998,
+                    'i' => -999998
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::getTags
+     * @dataProvider getTagsProvider
+     */
+    public function testGetTagsEquals(string $html, array $expected) : void
+    {
+        $actual = Utility::getTags($html);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function purgeHtmlProvider() : array
+    {
+        $data = [
+            'standard' => [
+                'html' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)',
+                'admittedTags' => ADMITTEDTAGS,
+                'expected' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)'
+            ],
+            'standard explicit' => [
+                'html' => '<html><body><p><b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)</p></body></html>',
+                'admittedTags' => ADMITTEDTAGS,
+                'expected' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)'
+            ],
+            'standard mixed' => [
+                'html' => '<b>Test</b> di <i>funzione</i> sendTelegram(<b>Standard</b>)',
+                'admittedTags' => ADMITTEDTAGS,
+                'expected' => '<b>Test</b> di <i>funzione</i> sendTelegram(<b>Standard</b>)'
+            ],            
+            'all tags crnl' => [
+                'html' => '<b>Test</b> di <b>funzione</b>' . PHP_EOL  . 'sendTelegram(<b>Standard</b>)',
+                'admittedTags' => ADMITTEDTAGS,
+                'expected' => '<b>Test</b> di <b>funzione</b>' . PHP_EOL  . 'sendTelegram(<b>Standard</b>)'
+            ],
+            'void html' => [
+                'html' => '',
+                'admittedTags' => ADMITTEDTAGS,
+                'expected' => ''
+            ],
+            'no tag close' => [
+                'html' => '<b>Test</b> di <b>fun',
+                'admittedTags' => ADMITTEDTAGS,
+                'expected' => 'Test di fun'
+            ],
+            'no tag open' => [
+                'html' => 'ione</b> sendTelegram(<b>Standard</b>)',
+                'admittedTags' => ADMITTEDTAGS,
+                'expected' => 'ione sendTelegram(Standard)'
+            ],
+            'inverted' => [
+                'html' => '</b>Test<b> di </i>funzione<i> sendTelegram(</b>Standard<b>)',
+                'admittedTags' => ADMITTEDTAGS,
+                'expected' => 'Test di funzione sendTelegram(Standard)'
+            ],
+            'mixed' => [
+                'html' => '<b>Test</b> di </i>funzione<i> sendTelegram(<b>Standard</b>)',
+                'admittedTags' => ADMITTEDTAGS,
+                'expected' => '<b>Test</b> di funzione sendTelegram(<b>Standard</b>)'
+            ],
+            'link stripped' => [
+                'html' => '<b>Test</b> di <a href="http://www.pippo.com"funzione<i> sendTelegram(<b>Standard</b>)',
+                'admittedTags' => ADMITTEDTAGS,
+                'expected' => 'Test di '
+            ],
+            'link purged' => [
+                'html' => '<b>Test</b> di <a href="http://www.pippo.com">funzione<i> sendTelegram(<b>Standard</b>)',
+                'admittedTags' => ADMITTEDTAGS,
+                'expected' => '<b>Test</b> di funzione sendTelegram(<b>Standard</b>)'
+            ],
+            'link double' => [
+                'html' => '<b>Test</b> di <a href="http://www.pippo.com">funzione<a> sendTelegram(<b>Standard</b>)',
+                'admittedTags' => ADMITTEDTAGS,
+                'expected' => '<b>Test</b> di funzione sendTelegram(<b>Standard</b>)'
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::purgeHtml
+     * @dataProvider purgeHtmlProvider
+     */
+    public function testPurgeHtmlEquals(string $html, array $admittedTags, string $expected) : void
+    {
+        $actual = Utility::purgeHtml($html, $admittedTags);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function checkHtmlProvider() : array
+    {
+        $data = [
+            'standard' => [
+                'html' => '<b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)',
+                'expected' => true
+            ],
+            'error' => [
+                'html' => '</b>Test</b> di <b>funzione</b> sendTelegram(<b>Standard</b>)',
+                'expected' => false
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::checkHtml
+     * @dataProvider checkHtmlProvider
+     */
+    public function testCheckHtmlEquals(string $html, bool $expected) : void
+    {
+        $actual = Utility::checkHtml($html);
+        
+        $this->assertEquals($expected, $actual);
+    }
 }
