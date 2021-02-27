@@ -1068,6 +1068,11 @@ class UtilityTest extends TestCase
                 'admittedTags' => ADMITTEDTAGS,
                 'expected' => 'Test di funzione sendTelegram(Standard)'
             ],
+            'wrong html' => [
+                'html' => '<\b>Test metodo <b>Bot::secureSend con message_id inesistente',
+                'admittedTags' => ADMITTEDTAGS,
+                'expected' => 'Test metodo Bot::secureSend con message_id inesistente'
+            ],
             'mixed' => [
                 'html' => '<b>Test</b> di </i>funzione<i> sendTelegram(<b>Standard</b>)',
                 'admittedTags' => ADMITTEDTAGS,
@@ -1076,7 +1081,7 @@ class UtilityTest extends TestCase
             'link stripped' => [
                 'html' => '<b>Test</b> di <a href="http://www.pippo.com"funzione<i> sendTelegram(<b>Standard</b>)',
                 'admittedTags' => ADMITTEDTAGS,
-                'expected' => 'Test di '
+                'expected' => '<b>Test</b> di  sendTelegram(<b>Standard</b>)'
             ],
             'link purged' => [
                 'html' => '<b>Test</b> di <a href="http://www.pippo.com">funzione<i> sendTelegram(<b>Standard</b>)',
@@ -1087,6 +1092,16 @@ class UtilityTest extends TestCase
                 'html' => '<b>Test</b> di <a href="http://www.pippo.com">funzione<a> sendTelegram(<b>Standard</b>)',
                 'admittedTags' => ADMITTEDTAGS,
                 'expected' => '<b>Test</b> di funzione sendTelegram(<b>Standard</b>)'
+            ],
+            'link break 1' => [
+                'html' => '<b>Test</b> di <a href="http://www.pippo.com">funzione',
+                'admittedTags' => ADMITTEDTAGS,
+                'expected' => '<b>Test</b> di funzione'
+            ],
+            'link break 2' => [
+                'html' => 'href="http://www.pippo.com">funzione</a> sendTelegram(<b>Standard</b>)',
+                'admittedTags' => ADMITTEDTAGS,
+                'expected' => 'href="http://www.pippo.com">funzione sendTelegram(<b>Standard</b>)'
             ]
         ];
         

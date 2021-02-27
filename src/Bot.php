@@ -304,34 +304,37 @@ class Bot
     public static function secureSend(string $rawMessage, ?string $chatId = null, ?string $messageId = null, ?string $token = null, ?array $tags = null) : bool
     {
         try {
-            if ($rawMessage === '') {
-                throw new \Exception('Non è possibile inviare messaggi vuoti');
-            }
-            $n = 5;
-            $delay = 500000;
-            $tokenBot = $token ?? self::$defaultBot;
-            $chat_id = $chatId ?? self::$defaultChatId;
-            $admittedTags = $tags ?? self::$admittedTags;
-            $message = Utility::purgeHtml($rawMessage, $admittedTags);
-            for ($i = 1; $i <= $n; $i++) {
-                if (isset($messageId) && $i < 3) {
-                    $response = self::replyMessage($message, $messageId, $chat_id, $tokenBot);
-                } else {
-                    $response = self::sendMessage($message, $chat_id, $tokenBot);
+            if ($rawMessage !== '') {                
+                $n = 5;
+                $delay = 500000;
+                $tokenBot = $token ?? self::$defaultBot;
+                $chat_id = $chatId ?? self::$defaultChatId;
+                $admittedTags = $tags ?? self::$admittedTags;
+                $message = Utility::purgeHtml($rawMessage, $admittedTags);
+                for ($i = 1; $i <= $n; $i++) {
+                    if (isset($messageId) && $i < 3) {
+                        $response = self::replyMessage($message, $messageId, $chat_id, $tokenBot);
+                    } else {
+                        $response = self::sendMessage($message, $chat_id, $tokenBot);
+                    }
+                    $arrJson = json_decode($response, true);            
+                    $isOk = $arrJson['ok'] ?? false;
+                    if ($isOk) {
+                        break;
+                    } else {
+                        usleep($delay);
+                    }
                 }
-                $arrJson = json_decode($response, true);            
-                $isOk = $arrJson['ok'] ?? false;
-                if ($isOk) {
-                    break;
-                } else {
-                    usleep($delay);
-                }
+            } else {
+                $isOk = false;
             }
             return $isOk;
+        // @codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
+        // @codeCoverageIgnoreStart
     }
     
     private function updateOffset() : void

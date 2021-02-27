@@ -525,7 +525,7 @@ class BotTest extends TestCase
                 'tags' => null,
                 'expected' => true
             ],
-            'inverted html' => [
+            'wrong html' => [
                 'message' => '<\b>Test metodo <b>Bot::secureSend con message_id inesistente',
                 'messageId' => null,
                 'chatId' => '474912563',
@@ -564,7 +564,23 @@ class BotTest extends TestCase
                 'token' => null,
                 'tags' => null,
                 'expected' => true
-            ]             
+            ],
+            'break ancor tag' => [
+                'message' => 'href="http://www.pippo.com">funzione sendTelegram(<b>Standard</b>)',
+                'messageId' => null,
+                'chatId' => '474912563',
+                'token' => null,
+                'tags' => null,
+                'expected' => true
+            ],
+            'void' => [
+                'message' => '',
+                'messageId' => null,
+                'chatId' => '474912563',
+                'token' => null,
+                'tags' => null,
+                'expected' => false
+            ]
         ];
         
         return $data;
@@ -581,24 +597,7 @@ class BotTest extends TestCase
         
         $this->assertEquals($expected, $actual); 
     }
-    
-    /**
-     * @group bot
-     * @covers \vaniacarta74\Scarichi\Bot::secureSend
-     */
-    public function testSecureSendException() : void
-    {
-        $message = '';
-        $messageId = null;
-        $chatId = CHATID;
-        $token = TOKEN;
-        $tags = null;
         
-        $this->expectException(\Exception::class);
-        
-        Bot::secureSend($message, $chatId, $messageId, $token, $tags);
-    }
-    
     /**
      * @group bot
      * @coversNothing

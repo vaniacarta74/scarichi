@@ -389,19 +389,41 @@ class Utility
     {
         try {            
             $tags = self::getTags($html);
+//            foreach ($tags as $key => $value) {
+//                if (!in_array($key, $admittedTag) || $value !== 0) {
+//                    if ($key !== 'a') {
+//                        $html = str_replace('</' . $key . '>', '', str_replace('<' . $key . '>', '', $html));
+//                    }
+//                }
+//            }
+            
+//            echo '<pre>';
+//            var_dump($tags);
+//            echo '</pre>';
+            
             foreach ($tags as $key => $value) {
                 if (!in_array($key, $admittedTag) || $value !== 0) {
                     if ($key !== 'a') {
                         $html = str_replace('</' . $key . '>', '', str_replace('<' . $key . '>', '', $html));
+                    } else {
+                        $html = preg_replace('/<\/?a[^>]*>/', '', str_replace('</a>', '', $html));
                     }
+                    //echo PHP_EOL . $html . PHP_EOL;
                 }
             }
+            
             if (!self::checkHtml($html)) {
-                $html = htmlspecialchars(strip_tags($html));
+                $html = strip_tags($html);
             }
-            if (array_key_exists('a', $tags) && $tags['a'] !== 0) {
-                $html = preg_replace('/<\/?a[^>]*>/', '', str_replace('</a>', '', $html));
-            }
+            
+//            if (array_key_exists('a', $tags) && $tags['a'] !== 0) {
+//                $html = preg_replace('/<\/?a[^>]*>/', '', str_replace('</a>', '', $html));
+//            }
+            
+//            if (!self::checkHtml($html)) {
+//                $html = htmlspecialchars(strip_tags($html));
+//            }
+            
             return $html;
         // @codeCoverageIgnoreStart
         } catch (\Throwable $e) {        
