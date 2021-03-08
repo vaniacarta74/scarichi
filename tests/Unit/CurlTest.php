@@ -30,7 +30,7 @@ class CurlTest extends TestCase
             'field' => 'portata',
             'full' => '0'
         ];
-        $url = 'http://localhost/scarichi/tocsv.php';
+        $url = 'http://' . LOCALHOST . '/scarichi/tocsv.php';
         
         $actual = Curl::set($url, $params);
         
@@ -45,7 +45,7 @@ class CurlTest extends TestCase
      */
     public function testSetGetIsResource()
     {
-        $url = 'http://localhost/scarichi/tocsv.php';
+        $url = 'http://' . LOCALHOST . '/scarichi/tocsv.php';
         
         $actual = Curl::set($url);
         
@@ -61,7 +61,7 @@ class CurlTest extends TestCase
     public function testSetException() : void
     {
         $params = [];
-        $url = 'http://localhost/scarichi/tocsv.php';
+        $url = 'http://' . LOCALHOST . '/scarichi/tocsv.php';
         
         $this->expectException(\Exception::class);
         
@@ -81,7 +81,7 @@ class CurlTest extends TestCase
             'field' => 'portata',
             'full' => '0'
         ];
-        $url = 'http://localhost/scarichi/tojson.php';
+        $url = 'http://' . LOCALHOST . '/scarichi/tojson.php';
         
         $actual = Curl::setJson($url, $params);
         
@@ -97,7 +97,7 @@ class CurlTest extends TestCase
     public function testSetJsonException() : void
     {
         $params = [];
-        $url = 'http://localhost/scarichi/tojson.php';
+        $url = 'http://' . LOCALHOST . '/scarichi/tojson.php';
         
         $this->expectException(\Exception::class);
         
@@ -147,7 +147,7 @@ class CurlTest extends TestCase
             'field' => 'portata',
             'full' => '0'
         ];
-        $url = 'http://localhost/scarichi/tocsv.php';
+        $url = 'http://' . LOCALHOST . '/scarichi/tocsv.php';
         $json = false;
         $response = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.';
         $expecteds = explode('|', $response);
@@ -165,7 +165,7 @@ class CurlTest extends TestCase
      */
     public function testRunGetContainsString() : void
     {
-        $url = 'http://localhost/scarichi/tocsv.php?var=30030&datefrom=30/12/2019&dateto=31/12/2019&field=portata&full=0';
+        $url = 'http://' . LOCALHOST . '/scarichi/tocsv.php?var=30030&datefrom=30/12/2019&dateto=31/12/2019&field=portata&full=0';
         $response = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.';
         $expecteds = explode('|', $response);
         
@@ -189,7 +189,7 @@ class CurlTest extends TestCase
             'field' => 'portata',
             'full' => '0'
         ];
-        $url = 'http://localhost/scarichi/tojson.php';
+        $url = 'http://' . LOCALHOST . '/scarichi/tojson.php';
         $json = true;
         $expected = __DIR__ . '/../providers/curlRunTest.json';
         
@@ -205,7 +205,7 @@ class CurlTest extends TestCase
     public function testRunException() : void
     {
         $params = [];
-        $url = 'http://localhost/scarichi/tocsv.php';
+        $url = 'http://' . LOCALHOST . '/scarichi/tocsv.php';
         
         $this->expectException(\Exception::class);
         

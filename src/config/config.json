@@ -41,7 +41,7 @@
             "limit": 4096,
             "send": false,
             "path": "/../../../telegram.json",
-            "url": "http://localhost/scarichi/telegram.php"
+            "url": "http://localhost:80/scarichi/telegram.php"
         },
         "watchdog": {
             "iterations": 12,
@@ -153,7 +153,7 @@
     },
     "command": { 
         "sintax": "php scarichi.php",
-        "url": "http://localhost/scarichi/tocsv.php",
+        "url": "http://localhost:80/scarichi/tocsv.php",
         "async": true,
         "period": "99Y",
         "offset": "1D"

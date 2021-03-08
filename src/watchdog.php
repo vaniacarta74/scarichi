@@ -8,7 +8,8 @@ use vaniacarta74\Scarichi\Utility;
 require __DIR__ . '/../vendor/autoload.php';
 
 try {
-    $n = Utility::catchParam($argv, 1, $_REQUEST, 'n', NITER);
+    $request = $argv ?? null;
+    $n = Utility::catchParam($request, 1, $_REQUEST, 'n', NITER);
     $delay = Utility::catchParam($argv, 2, $_REQUEST, 'delay', DELAY);
     $rawUrl = Utility::catchParam($argv, 3, $_REQUEST, 'url', BOTURL);
     $url = Utility::checkParam($rawUrl, 'Utility::checkUrl');

@@ -43,7 +43,7 @@ class ToPbiTest extends TestCase
      */
     public function testToPbiJsonStringEqualsJsonFile(?string $var, ?string $dateFrom, ?string $dateTo, string $provider) : void
     {
-        $url = 'http://localhost/scarichi/topbi.php';
+        $url = 'http://' . LOCALHOST . '/scarichi/topbi.php';
         
         $paramsRaw = [
             'var' => $var,
@@ -68,7 +68,7 @@ class ToPbiTest extends TestCase
      */
     public function testToPbiException() : void
     {
-        $url = 'http://localhost/scarichi/topbi.php';
+        $url = 'http://' . LOCALHOST . '/scarichi/topbi.php';
         
         $params = [
             'var' => '40000',

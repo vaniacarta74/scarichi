@@ -34,5 +34,7 @@ define('ERROR_LOG', CONFIG['define']['log']['error_log']);
 
 define('TIMEOUT', intval(CONFIG['define']['system']['timeout']));
 
+define('LOCALHOST', 'localhost:80');
+
 ini_set('memory_limit', CONFIG['define']['system']['memory_limit']);
 ini_set('max_execution_time', TIMEOUT);

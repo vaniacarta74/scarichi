@@ -89,7 +89,7 @@ class ToJsonTest extends TestCase
      */
     public function testToJsonJsonStringEqualsJsonFile(?string $var, ?string $dateFrom, ?string $dateTo, ?string $full, ?string $field, string $provider) : void
     {
-        $url = 'http://localhost/scarichi/tojson.php';
+        $url = 'http://' . LOCALHOST . '/scarichi/tojson.php';
         
         $paramsRaw = [
             'var' => $var,
@@ -116,7 +116,7 @@ class ToJsonTest extends TestCase
      */
     public function testToJsonException() : void
     {
-        $url = 'http://localhost/scarichi/tojson.php';
+        $url = 'http://' . LOCALHOST . '/scarichi/tojson.php';
         
         $params = [
             'var' => '30030',

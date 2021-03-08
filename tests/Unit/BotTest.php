@@ -164,7 +164,7 @@ class BotTest extends TestCase
             ]
         ];
         
-        Reflections::setStaticProperty(get_class($this->bot), 'url', 'http://localhost/tests/providers/');
+        Reflections::setStaticProperty(get_class($this->bot), 'url', 'http://' . LOCALHOST . '/tests/providers/');
         
         $actual = Bot::secureUpdate($offset, $token);
         
@@ -428,7 +428,7 @@ class BotTest extends TestCase
                 'expected' => '{
                     "ok": false,
                     "error_code": 400,
-                    "description": "Bad+Request:+reply+message+not+found"
+                    "description": "Bad+Request:+replied+message+not+found"
                 }'
             ]           
         ];

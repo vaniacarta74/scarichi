@@ -53,7 +53,7 @@ class WatchdogTest extends TestCase
                 'path' => '/var/www/html/telecontrollo/scarichi/github/src/watchdog.php',
                 'n' => 1,
                 'delay' => 1000,
-                'url' => 'http://localhost/scarichi/telegram.php',
+                'url' => 'http://' . LOCALHOST . '/scarichi/telegram.php',
                 'expected' => 'PID 1 ' . $when
             ]
         ];
@@ -85,11 +85,11 @@ class WatchdogTest extends TestCase
         
         $data = [
             'standard' => [
-                'url' => 'http://localhost/scarichi/watchdog.php?n=1&delay=1000000',
+                'url' => 'http://' . LOCALHOST . '/scarichi/watchdog.php?n=1&delay=1000000',
                 'expected' => 'PID 1 ' . $when
             ],
             'json' => [
-                'url' => 'http://localhost/scarichi/watchdog.php?n=1&delay=1000000&url=http://localhost/scarichi/telegram.php',
+                'url' => 'http://' . LOCALHOST . '/scarichi/watchdog.php?n=1&delay=1000000&url=http://' . LOCALHOST . '/scarichi/telegram.php',
                 'expected' => 'PID 1 ' . $when
             ]
         ];

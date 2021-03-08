@@ -620,13 +620,13 @@ class UtilityTest extends TestCase
                 'default' => BOTURL,
                 'method' => 'Utility::checkUrl',
                 'params' => null,
-                'expected' => 'http://localhost/scarichi/telegram.php'
+                'expected' => 'http://' . LOCALHOST . '/scarichi/telegram.php'
             ],
             'url param' => [
-                'default' => 'http://localhost/scarichi/telegram.php?var=30030&datefrom=27/10/2020',
+                'default' => 'http://' . LOCALHOST . '/scarichi/telegram.php?var=30030&datefrom=27/10/2020',
                 'method' => 'Utility::checkUrl',
                 'params' => null,
-                'expected' => 'http://localhost/scarichi/telegram.php?var=30030&datefrom=27/10/2020'
+                'expected' => 'http://' . LOCALHOST . '/scarichi/telegram.php?var=30030&datefrom=27/10/2020'
             ]
         ];
         
@@ -651,7 +651,7 @@ class UtilityTest extends TestCase
      */
     public function testCheckParamPathException() : void    {
         
-        $default = 'http://localhost/scarichi/telegram.php?var=30030&datefrom=27/10/2020';
+        $default = 'http://' . LOCALHOST . '/scarichi/telegram.php?var=30030&datefrom=27/10/2020';
         $checkMethod = 'Utility::checkPath';
         $methodParams = ['r'];
                 
@@ -682,7 +682,7 @@ class UtilityTest extends TestCase
     {
         $data = [
             'directory' => [
-                'url' => 'http://localhost/sitpit/',
+                'url' => 'http://' . LOCALHOST . '/sitpit/',
                 'expected' => true
             ],
             'local' => [
@@ -694,39 +694,39 @@ class UtilityTest extends TestCase
                 'expected' => true
             ],
             'more dir' => [
-                'url' => 'http://localhost/sitpit/telecontrollo/scarichi/',
+                'url' => 'http://' . LOCALHOST . '/sitpit/telecontrollo/scarichi/',
                 'expected' => true
             ],
             'php' => [
-                'url' => 'http://localhost/sitpit/telecontrollo/scarichi/telegram.php',
+                'url' => 'http://' . LOCALHOST . '/sitpit/telecontrollo/scarichi/telegram.php',
                 'expected' => true
             ],
             'html' => [
-                'url' => 'http://localhost/scarichi/telegram.html',
+                'url' => 'http://' . LOCALHOST . '/scarichi/telegram.html',
                 'expected' => true
             ],
             'json' => [
-                'url' => 'http://localhost/scarichi/telegram.json',
+                'url' => 'http://' . LOCALHOST . '/scarichi/telegram.json',
                 'expected' => true
             ],
             'php 1 param' => [
-                'url' => 'http://localhost/sitpit/telecontrollo/scarichi/telegram.php?var=30030',
+                'url' => 'http://' . LOCALHOST . '/sitpit/telecontrollo/scarichi/telegram.php?var=30030',
                 'expected' => true
             ],
             'php 2 param' => [
-                'url' => 'http://localhost/scarichi/telegram.php?var=30030&datefrom=01/01/2020',
+                'url' => 'http://' . LOCALHOST . '/scarichi/telegram.php?var=30030&datefrom=01/01/2020',
                 'expected' => true
             ],
             'php more param' => [
-                'url' => 'http://localhost/scarichi/telegram.php?var=30030&datefrom=01/01/2020&dateto=21/01/2020',
+                'url' => 'http://' . LOCALHOST . '/scarichi/telegram.php?var=30030&datefrom=01/01/2020&dateto=21/01/2020',
                 'expected' => true
             ],
             'url with url' => [
-                'url' => 'http://localhost/scarichi/watchdog.php?url=http://localhost/scarichi/telegram.php',
+                'url' => 'http://' . LOCALHOST . '/scarichi/watchdog.php?url=http://' . LOCALHOST . '/scarichi/telegram.php',
                 'expected' => true
             ],
             'no dir no ext' => [
-                'url' => 'http://localhost/scarichi',
+                'url' => 'http://' . LOCALHOST . '/scarichi',
                 'expected' => false
             ]
         ];

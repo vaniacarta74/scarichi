@@ -60,11 +60,11 @@ class TelegramTest extends TestCase
     {
         $data = [
             'standard' => [
-                'url' => 'http://localhost/scarichi/telegram.php',
+                'url' => 'http://' . LOCALHOST . '/scarichi/telegram.php',
                 'expected' => '<b>BotScarichi</b> is ok: <b>true</b>.<br/>' . PHP_EOL . 'Registrazione offset avvenuta con successo.<br/>' . PHP_EOL . 'Tempo di elaborazione: <b>'
             ],
             'json' => [
-                'url' => 'http://localhost/scarichi/telegram.php?path=/var/www/html/telecontrollo/scarichi/telegram.json',
+                'url' => 'http://' . LOCALHOST . '/scarichi/telegram.php?path=/var/www/html/telecontrollo/scarichi/telegram.json',
                 'expected' => '<b>BotScarichi</b> is ok: <b>true</b>.<br/>' . PHP_EOL . 'Registrazione offset avvenuta con successo.<br/>' . PHP_EOL . 'Tempo di elaborazione: <b>'
             ]
         ];

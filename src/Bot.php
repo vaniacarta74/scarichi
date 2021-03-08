@@ -851,7 +851,7 @@ class Bot
     public static function runnerVolume(string $variabile, string $datefrom, string $dateto) : array
     {
         try {
-            $url = 'http://localhost/scarichi/tojson.php';
+            $url = 'http://' . LOCALHOST . '/scarichi/tojson.php';
             $params = [
                 'var' => $variabile,
                 'datefrom' => $datefrom,
