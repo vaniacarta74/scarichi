@@ -1,6 +1,7 @@
 {
     "define": {
         "system": {
+            "localhost": "localhost",
             "timeout": 7200,
             "memory_limit": "2048M"
         },
@@ -41,7 +42,7 @@
             "limit": 4096,
             "send": false,
             "path": "/../../../telegram.json",
-            "url": "http://localhost:80/scarichi/telegram.php"
+            "url": "scarichi/telegram.php"
         },
         "watchdog": {
             "iterations": 12,
@@ -153,7 +154,7 @@
     },
     "command": { 
         "sintax": "php scarichi.php",
-        "url": "http://localhost:80/scarichi/tocsv.php",
+        "url": "scarichi/tocsv.php",
         "async": true,
         "period": "99Y",
         "offset": "1D"
