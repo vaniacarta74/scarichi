@@ -3365,7 +3365,17 @@ class BotTest extends TestCase
                     'tipo_dato' => '1'
                 ],
                 'expected' => '1.030,153'
-            ]            
+            ],
+            'float' => [
+                'record' => [
+                    'variabile' => '30030',
+                    'valore' => 1030.153,
+                    'data_e_ora' => '01/01/2017 00:00:00',                
+                    'tipo_dato' => '1'
+                ],
+                'expected' => '1.030,153'
+            ]  
+            
         ];
         
         return $data;

@@ -936,7 +936,12 @@ class Bot
     {
         try {
             if (array_key_exists('valore', $record)) {
-                $valore = $record['valore'];
+                $rawValore = $record['valore'];
+                if (is_double($rawValore) || is_float($rawValore)) {
+                    $valore = number_format($rawValore, 3, ',', '');
+                } else {
+                    $valore = $rawValore;
+                }
                 $arrValore = explode(',', $valore);                
                 $intera = intval($arrValore[0]);
                 $intForm = number_format($arrValore[0], 0, ',', '.');                
