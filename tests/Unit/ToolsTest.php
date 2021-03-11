@@ -107,6 +107,7 @@ use function vaniacarta74\Scarichi\fillDateto as fillDateto;
 use function vaniacarta74\Scarichi\fillField as fillField;
 use function vaniacarta74\Scarichi\fillFull as fillFull;
 use function vaniacarta74\Scarichi\setPostParameters as setPostParameters;
+use function vaniacarta74\Scarichi\buildSetParams as buildSetParams;
 use function vaniacarta74\Scarichi\goCurl as goCurl;
 use function vaniacarta74\Scarichi\insertNoData as insertNoData;
 use function vaniacarta74\Scarichi\selectLastPrevData as selectLastPrevData;
@@ -17529,6 +17530,266 @@ class ToolsTest extends TestCase
     /**
      * @coversNothing
      */
+    public function buildSetParamsProvider() : array
+    {
+        $data = [
+            'only url' => [
+                'url' => URL,
+                'method' => null,
+                'postParams' => null,
+                'key' => null,
+                'isJson' => null,
+                'expected' => [
+                    [
+                        'url' => URL,
+                        'method' => 'GET',
+                        'params' => [],
+                        'key' => null,
+                        'isJson' => null
+                    ]
+                ]
+            ],
+            'no filled values' => [
+                'url' => URL,
+                'method' => 'GET',
+                'postParams' => [],
+                'key' => null,
+                'isJson' => null,
+                'expected' => [
+                    [
+                        'url' => URL,
+                        'method' => 'GET',
+                        'params' => [],
+                        'key' => null,
+                        'isJson' => null
+                    ]
+                ]
+            ],
+            'single' => [
+                'url' => URL,
+                'method' => 'POST',
+                'postParams' => [
+                    [
+                        'id' => '0',
+                        'var' => '30030',
+                        'datefrom' => '30/12/2020',
+                        'dateto' => '31/12/2020',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'key' => null,
+                'isJson' => null,
+                'expected' => [
+                    [
+                        'url' => URL,
+                        'method' => 'POST',
+                        'params' => [
+                            'id' => '0',
+                            'var' => '30030',
+                            'datefrom' => '30/12/2020',
+                            'dateto' => '31/12/2020',
+                            'field' => 'portata',
+                            'full' => '0'
+                        ],
+                        'key' => null,
+                        'isJson' => null
+                    ]
+                ]
+            ],
+            'single var multi dates' => [
+                'url' => URL,
+                'method' => 'POST',
+                'postParams' => [
+                    [
+                        'id' => '0',
+                        'var' => '30030',
+                        'datefrom' => '01/01/2020',
+                        'dateto' => '01/06/2020',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ],
+                    [
+                        'id' => '1',
+                        'var' => '30030',
+                        'datefrom' => '31/05/2020',
+                        'dateto' => '31/12/2020',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'key' => null,
+                'isJson' => null,
+                'expected' => [
+                    [
+                        'url' => URL,
+                        'method' => 'POST',
+                        'params' => [
+                            'id' => '0',
+                            'var' => '30030',
+                            'datefrom' => '01/01/2020',
+                            'dateto' => '01/06/2020',
+                            'field' => 'portata',
+                            'full' => '0'
+                        ],
+                        'key' => null,
+                        'isJson' => null
+                    ],
+                    [
+                        'url' => URL,
+                        'method' => 'POST',
+                        'params' => [
+                            'id' => '1',
+                            'var' => '30030',
+                            'datefrom' => '31/05/2020',
+                            'dateto' => '31/12/2020',
+                            'field' => 'portata',
+                            'full' => '0'
+                        ],
+                        'key' => null,
+                        'isJson' => null
+                    ]
+                ]
+            ],
+            'single get' => [
+                'url' => URL,
+                'method' => 'GET',
+                'postParams' => [
+                    [
+                        'id' => '0',
+                        'var' => '30030',
+                        'datefrom' => '30/12/2020',
+                        'dateto' => '31/12/2020',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'key' => 'id',
+                'isJson' => true,
+                'expected' => [
+                    [
+                        'url' => URL . '?id=0&var=30030&datefrom=30%2F12%2F2020&dateto=31%2F12%2F2020&field=portata&full=0',
+                        'method' => 'GET',
+                        'params' => [],
+                        'key' => '0',
+                        'isJson' => true
+                    ]
+                ]
+            ],
+            'key progressive' => [
+                'url' => URL,
+                'method' => 'POST',
+                'postParams' => [
+                    [
+                        'id' => '0',
+                        'var' => '30030',
+                        'datefrom' => '30/12/2020',
+                        'dateto' => '31/12/2020',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'key' => 'n°*',
+                'isJson' => null,
+                'expected' => [
+                    [
+                        'url' => URL,
+                        'method' => 'POST',
+                        'params' => [
+                            'id' => '0',
+                            'var' => '30030',
+                            'datefrom' => '30/12/2020',
+                            'dateto' => '31/12/2020',
+                            'field' => 'portata',
+                            'full' => '0'
+                        ],
+                        'key' => 'n°0',
+                        'isJson' => null
+                    ]
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers buildSetParams()
+     * @dataProvider buildSetParamsProvider
+     */
+    public function testBuildSetParamsEquals(string $url, ?string $method, ?array $postParams, ?string $key, ?bool $isJson, array $expected) : void
+    {
+        $actual = buildSetParams($url, $method, $postParams, $key, $isJson);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function buildSetParamsExceptionProvider() : array
+    {
+        $data = [
+            'wrong url' => [
+                'url' => 'URL',
+                'method' => 'POST',
+                'postParams' => [
+                    [
+                        'id' => '0',
+                        'var' => '30030',
+                        'datefrom' => '30/12/2020',
+                        'dateto' => '31/12/2020',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'key' => null,
+                'isJson' => null,
+            ],
+            'wrong method' => [
+                'url' => URL,
+                'method' => 'PIPPO',
+                'postParams' => [
+                    [
+                        'id' => '0',
+                        'var' => '30030',
+                        'datefrom' => '01/01/2020',
+                        'dateto' => '01/06/2020',
+                        'field' => 'portata',
+                        'full' => '0'
+                    ]
+                ],
+                'key' => null,
+                'isJson' => null
+            ],
+            'wrong post' => [
+                'url' => URL,
+                'method' => 'POST',
+                'postParams' => [],
+                'key' => null,
+                'isJson' => null
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers buildSetParams()
+     * @dataProvider buildSetParamsExceptionProvider
+     */
+    public function testBuildSetParamsException(string $url, string $method, array $postParams, ?string $key, ?bool $isJson) : void
+    {
+        $this->expectException(\Exception::class);
+        
+        buildSetParams($url, $method, $postParams, $key, $isJson);
+    }
+    
+    /**
+     * @coversNothing
+     */
     public function goCurlProvider() : array
     {
         $url = URL;
@@ -17537,84 +17798,115 @@ class ToolsTest extends TestCase
         
         $data = [
             'no post values' => [
-                'post' => [],
-                'url' => $url,
+                'setParams' => [],
                 'async' => false,
                 'expected' => ''
             ],
             'single' => [
-                'post' => [
+                'setParams' => [
                     [
-                        'id' => '0',
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
+                        'url' => $url,
+                        'method' => 'POST',
+                        'params' => [
+                            'id' => '0',
+                            'var' => '30030',
+                            'datefrom' => '30/12/2019',
+                            'dateto' => '31/12/2019',
+                            'field' => 'portata',
+                            'full' => '0'
+                        ],
+                        'isJson' => null,
+                        'key' => null
                     ]
                 ],
-                'url' => $url,
                 'async' => false,
                 'expected' => $single
             ],
             'multi' => [
-                'post' => [
+                'setParams' => [
                     [
-                        'id' => '0',
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
+                        'url' => $url,
+                        'method' => 'POST',
+                        'params' => [
+                            'id' => '0',
+                            'var' => '30030',
+                            'datefrom' => '30/12/2019',
+                            'dateto' => '31/12/2019',
+                            'field' => 'portata',
+                            'full' => '0'
+                        ],
+                        'isJson' => null,
+                        'key' => null
                     ],
                     [
-                        'id' => '1',
-                        'var' => '30040',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
+                        'url' => $url,
+                        'method' => 'POST',
+                        'params' => [
+                            'id' => '1',
+                            'var' => '30040',
+                            'datefrom' => '30/12/2019',
+                            'dateto' => '31/12/2019',
+                            'field' => 'portata',
+                            'full' => '0'
+                        ],
+                        'isJson' => null,
+                        'key' => null
                     ]
                 ],
-                'url' => $url,
                 'async' => false,
                 'expected' => $multi
             ],
             'single async' => [
-                'post' => [
+                'setParams' => [
                     [
-                        'id' => '0',
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
+                        'url' => $url,
+                        'method' => 'POST',
+                        'params' => [
+                            'id' => '0',
+                            'var' => '30030',
+                            'datefrom' => '30/12/2019',
+                            'dateto' => '31/12/2019',
+                            'field' => 'portata',
+                            'full' => '0'
+                        ],
+                        'isJson' => null,
+                        'key' => null
                     ]
                 ],
-                'url' => $url,
                 'async' => true,
                 'expected' => $single
             ],
             'multi async' => [
-                'post' => [
+                'setParams' => [
                     [
-                        'id' => '0',
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
+                        'url' => $url,
+                        'method' => 'POST',
+                        'params' => [
+                            'id' => '0',
+                            'var' => '30030',
+                            'datefrom' => '30/12/2019',
+                            'dateto' => '31/12/2019',
+                            'field' => 'portata',
+                            'full' => '0'
+                        ],
+                        'isJson' => null,
+                        'key' => null
                     ],
                     [
-                        'id' => '1',
-                        'var' => '30040',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
+                        'url' => $url,
+                        'method' => 'POST',
+                        'params' => [
+                            'id' => '1',
+                            'var' => '30040',
+                            'datefrom' => '30/12/2019',
+                            'dateto' => '31/12/2019',
+                            'field' => 'portata',
+                            'full' => '0'
+                        ],
+                        'isJson' => null,
+                        'key' => null
                     ]
                 ],
-                'url' => $url,
                 'async' => true,
                 'expected' => ''
             ]
@@ -17628,32 +17920,17 @@ class ToolsTest extends TestCase
      * covers goCurl()
      * @dataProvider goCurlProvider
      */
-    public function testGoCurlStringContainsString(array $postParam, string $url, bool $async, string $response) : void
+    public function testGoCurlStringContainsString(array $setParams, bool $async, string $response) : void
     {
         $expecteds = explode('|', $response);
         
-        $actual = goCurl($postParam, $url, $async);
+        $actual = goCurl($setParams, $async);
         
         foreach ($expecteds as $expected) {
             $this->assertStringContainsString($expected, $actual);
         }
     }
-    
-    /**
-     * @group test
-     * covers goCurl()
-     */
-    public function testGoCurlDataException() : void
-    {
-        $postParam = [];
-        $url = 'pippo';
-        $async = false;
-        
-        $this->expectException(\Exception::class);
-        
-        goCurl($postParam, $url, $async);
-    }   
-    
+            
     /**
      * @coversNothing
      */

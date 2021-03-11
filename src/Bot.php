@@ -108,7 +108,7 @@ class Bot
                 'offset' => $offset,
                 //'allowed_updates' => self::$allowed
             ];
-            $response = Curl::run($url, $params, true);
+            $response = Curl::run($url, 'POST', $params, true);
             if (!$response) {
                 throw new \Exception('Server Telegram non raggiungibile');
             }
@@ -184,7 +184,7 @@ class Bot
                 'text' => $message, 
                 'parse_mode' => 'HTML'
             ];            
-            $response = Curl::run($url, $params, true);
+            $response = Curl::run($url, 'POST', $params, true);
             
             return $response;
         } catch (\Throwable $e) {
@@ -206,7 +206,7 @@ class Bot
                 'text' => $message, 
                 'parse_mode' => 'HTML'
             ];            
-            $response = Curl::run($url, $params, true);
+            $response = Curl::run($url, 'POST', $params, true);
             
             return $response;
         } catch (\Throwable $e) {
@@ -858,7 +858,7 @@ class Bot
                 'dateto' => $dateto,
                 'field' => 'cumulato'
             ];
-            $json = Curl::run($url, $params, true);            
+            $json = Curl::run($url, 'POST', $params, true);            
             $arrJson = json_decode($json, true);
             
             return $arrJson;

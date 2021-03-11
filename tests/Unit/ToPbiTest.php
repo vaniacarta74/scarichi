@@ -57,7 +57,7 @@ class ToPbiTest extends TestCase
 
         $expected = __DIR__ . '/../providers/' . $provider;
 
-        $actual = Curl::run($url, $params);
+        $actual = Curl::run($url, 'POST', $params);
         
         $this->assertJsonStringEqualsJsonFile($expected, $actual);
     }
@@ -78,7 +78,7 @@ class ToPbiTest extends TestCase
         
         $expected = __DIR__ . '/../providers/toPbiException.json';
 
-        $actual = Curl::run($url, $params);
+        $actual = Curl::run($url, 'POST', $params);
         
         $this->assertJsonStringEqualsJsonFile($expected, $actual);       
     }

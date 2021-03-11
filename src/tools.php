@@ -2821,26 +2821,78 @@ function setPostParameters(array $parameters, array $filledValues) : array
 }
 
 
-function goCurl(array $postParams, string $url, bool $async) : string
+function buildSetParams(string $url, ?string $rawMethod = null, ?array $rawParams = null, ?string $key = null, ?bool $json = null) : array
 {
-    try {
-        if (!Utility::checkUrl($url)) {
-            throw new \Exception('Url non valido');
+    try {        
+        $i = 0;
+        $setParams = [];
+        $method = $rawMethod ?? 'GET';
+        $postParams = $rawParams ?? [];
+        $isJson = $json ?? false;
+        if (!Utility::checkUrl($url) || !in_array($method, array('GET','POST','PUT','PATCH','DELETE'))) {
+            throw new \Exception('Url non valido o metodo non ammesso');
         }
-        $message = '';
-        $n_param = count($postParams);
-        if ($n_param > 0) {
-            if ($async && $n_param > 1) {
-                $message = Curl::runMultiAsync($url, $postParams, 'id', 'formatResponse');
-            } else {
-                $message = Curl::runMultiSync($url, $postParams, 'id', 'formatResponse');
+        if (count($postParams) === 0 && $method === 'POST') {
+            throw new \Exception('Parametri metodo POST assenti');
+        } elseif (count($postParams) === 0 && $method !== 'POST') {
+            $setParams = [
+                [
+                    'url' => $url,
+                    'method' => $method,
+                    'params' => [],
+                    'isJson' => null,
+                    'key' => null
+                ]
+            ];
+        } else {
+            foreach ($postParams as $idCall => $params) {            
+                $callParams = [];
+                if ($method === 'POST') {
+                    $callParams['url'] = $url;  
+                    $callParams['params'] = $params;
+                } else {
+                    $callParams['url'] = $url . '?' . http_build_query($params);
+                    $callParams['params'] = [];
+                }
+                $callParams['method'] = $method;
+                $callParams['isJson'] = $isJson;
+                if (isset($key) && array_key_exists($key, $params)) {
+                    $callParams['key'] = $params[$key];
+                } elseif (isset($key) && !array_key_exists($key, $params)) {
+                    $callParams['key'] = str_replace('*', $idCall, $key);
+                } else {
+                    $callParams['key'] = null;
+                }            
+                $setParams[] = $callParams;
             }
         }
-        return $message;
+        return $setParams;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
     }
+}
+
+
+function goCurl(array $setParams, bool $async) : string
+{
+    try {
+        $message = '';
+        $n_param = count($setParams);
+        if ($n_param > 0) {
+            if ($async && $n_param > 1) {
+                $message = Curl::runMultiAsync($setParams, 'formatResponse');
+            } else {
+                $message = Curl::runMultiSync($setParams, 'formatResponse');
+            }
+        }
+        return $message;
+    // @codeCoverageIgnoreStart
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+    // @codeCoverageIgnoreEnd
 }
 
 

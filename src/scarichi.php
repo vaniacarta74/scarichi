@@ -13,7 +13,7 @@ namespace vaniacarta74\Scarichi;
 require __DIR__ . '/../vendor/autoload.php';
 
 //$argc = 9;
-//$argv = ['scarichi.php', '-V', '30030,30040', '-f', '2Y6M15D', '-t', '01/02/2018', '-c', '-n'];
+//$argv = ['scarichi.php', '-V', '30030', '-f', '01/01/2019', '-t', '02/01/2019', '-c', '-n'];
 
 try {
     $composer = COMPOSER;
@@ -30,7 +30,8 @@ try {
     
     Curl::run('http://' . REMOTE_HOST . '/telecontrollo/bot/telegram_REST.php?token=sync&variabile=ALL&delay=168&tel=1');
     
-    $message = goCurl($postParams, URL, ASYNC);
+    $setParams = buildSetParams(URL, 'GET', $postParams, 'id');
+    $message = goCurl($setParams, ASYNC);
     $telegram = setMessage($message);
     echo sendTelegram($telegram, PHP_EOL);
     

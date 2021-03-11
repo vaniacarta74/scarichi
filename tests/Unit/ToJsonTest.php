@@ -105,7 +105,7 @@ class ToJsonTest extends TestCase
 
         $expected = __DIR__ . '/../providers/' . $provider;
 
-        $actual = Curl::run($url, $params);
+        $actual = Curl::run($url, 'POST', $params);
         
         $this->assertJsonStringEqualsJsonFile($expected, $actual);             
     }
@@ -128,7 +128,7 @@ class ToJsonTest extends TestCase
         
         $expected = __DIR__ . '/../providers/toJsonException.json';
                 
-        $actual = Curl::run($url, $params);
+        $actual = Curl::run($url, 'POST', $params);
         
         $this->assertJsonStringEqualsJsonFile($expected, $actual);        
     }
