@@ -484,7 +484,7 @@ class CurlTest extends TestCase
      */
     public function multiSetProvider() : array
     {
-        $url = URL;
+        $url = TOCSVURL;
         
         $data = [
             'post no json no key' => [
@@ -713,7 +713,7 @@ class CurlTest extends TestCase
      */
     public function runMultiSyncProvider() : array
     {
-        $url = URL;
+        $url = TOCSVURL;
         $single = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
         $multi = $single . 'Elaborazione dati <b>Portata</b> variabile <b>30040</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
         
@@ -1007,7 +1007,7 @@ class CurlTest extends TestCase
      */
     public function runMultiSyncEchoProvider() : array
     {
-        $url = URL;
+        $url = TOCSVURL;
         $single = '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         $multi = $single . '2) PID 1: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         
@@ -1317,7 +1317,7 @@ class CurlTest extends TestCase
      */
     public function runMultiAsyncProvider() : array
     {
-        $url = URL;
+        $url = TOCSVURL;
         $single = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
         $multi = $single . 'Elaborazione dati <b>Portata</b> variabile <b>30040</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
         
@@ -1611,7 +1611,7 @@ class CurlTest extends TestCase
      */
     public function runMultiAsyncEchoProvider() : array
     {
-        $url = URL;
+        $url = TOCSVURL;
         $single = '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         $multi = $single . '2) PID 1: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         
@@ -2124,7 +2124,7 @@ class CurlTest extends TestCase
      */
     public function multiSet2Provider() : array
     {
-        $url = URL;
+        $url = TOCSVURL;
         
         $data = [
             'no key' => [
@@ -2207,7 +2207,7 @@ class CurlTest extends TestCase
                 'full' => '0'
             ]
         ];
-        $url = URL;
+        $url = TOCSVURL;
         $key = 'pippo';
         
         $this->expectException(\Exception::class);
@@ -2222,7 +2222,7 @@ class CurlTest extends TestCase
     public function testMultiSet2DataException() : void
     {
         $postParam = [];
-        $url = URL;
+        $url = TOCSVURL;
         $key = 'var';
         
         $this->expectException(\Exception::class);
@@ -2235,7 +2235,7 @@ class CurlTest extends TestCase
      */
     public function runMultiSync2Provider() : array
     {
-        $url = URL;
+        $url = TOCSVURL;
         $single = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
         $multi = $single . 'Elaborazione dati <b>Portata</b> variabile <b>30040</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
         
@@ -2338,7 +2338,7 @@ class CurlTest extends TestCase
      */
     public function runMultiSync2EchoProvider() : array
     {
-        $url = URL;
+        $url = TOCSVURL;
         $single = '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         $multi = $single . '2) PID 1: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         
@@ -2445,7 +2445,7 @@ class CurlTest extends TestCase
     public function testRunMultiSync2DataException() : void
     {
         $postParam = [];
-        $url = URL;
+        $url = TOCSVURL;
         $key = 'id';
         $funcName = 'formatResponse';
         
@@ -2459,7 +2459,7 @@ class CurlTest extends TestCase
      */
     public function runMultiAsync2Provider() : array
     {
-        $url = URL;
+        $url = TOCSVURL;
         $single = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
         $multi = $single . 'Elaborazione dati <b>Portata</b> variabile <b>30040</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
         
@@ -2562,7 +2562,7 @@ class CurlTest extends TestCase
      */
     public function runMultiAsync2EchoProvider() : array
     {
-        $url = URL;
+        $url = TOCSVURL;
         $single = '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         $multi = $single . '2) PID 1: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
         
@@ -2669,7 +2669,7 @@ class CurlTest extends TestCase
     public function testRunMultiAsync2DataException() : void
     {
         $postParam = [];
-        $url = URL;
+        $url = TOCSVURL;
         $key = 'id';
         $funcName = 'formatResponse';
         

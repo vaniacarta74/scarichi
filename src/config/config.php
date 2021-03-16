@@ -13,14 +13,19 @@ define('LOCALHOST', CONFIG['define']['system']['localhost']);
 
 define('PERIOD', CONFIG['command']['period']);
 define('OFFSET', CONFIG['command']['offset']);
-define('ASYNC', boolval(CONFIG['command']['async']));
-define('URL', 'http://' . LOCALHOST . '/' . CONFIG['command']['url']);
+
+define('SERVICES', CONFIG['define']['services']);
+define('ASYNC', boolval(SERVICES['tocsv']['isAsync']));
+define('TOCSVURL', 'http://' . LOCALHOST . '/' . SERVICES['tocsv']['path']);
+define('TELRESTURL', 'http://' . REMOTE_HOST . '/' . SERVICES['telegram_REST']['path']);
 
 define('NODATA', intval(CONFIG['define']['csv']['nodata']));
 define('MAXRECORD', intval(CONFIG['define']['csv']['maxrecord']));
 define('MAKESUBDIR', boolval(CONFIG['define']['csv']['subdirectory']));
 
 define('TELEGRAM', boolval(CONFIG['define']['telegram']['send']));
+define('TELSCARICHI', CONFIG['define']['telegram']['scarichi']);
+define('GLOBALMSG', boolval(CONFIG['define']['telegram']['global']));
 define('ADMITTEDTAGS', CONFIG['define']['telegram']['admittedTags']);
 define('TAGLIMIT', intval(CONFIG['define']['telegram']['tagLimit']));
 define('MSGLIMIT', intval(CONFIG['define']['telegram']['limit']));

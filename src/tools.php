@@ -927,7 +927,7 @@ function printToCSV(array $dati, string $fileName) : void
 }
 
 
-function divideAndPrint(array $data, bool $full, string $field, ?int $limit = null) : bool
+function divideAndPrint(array $data, bool $full, string $field, ?int $limit = null) : int
 {
     $limit = $limit ?? MAXRECORD;
     $filtered = !$full;
@@ -936,24 +936,24 @@ function divideAndPrint(array $data, bool $full, string $field, ?int $limit = nu
         if ($limit <= 0) {
             throw new \Exception('Impostare un numero massimo di record da esportare almeno uguale ad 1');
         }
-        if (count($data) === 0) {
-            $printed = false;
-        } else {
-            $i = 0;
+        $printed = 0;
+        if (count($data) > 0) {
+            $i = 0;            
             $printableData = [];
             foreach ($data as $record) {
                 if ($i === $limit) {
                     printPart($printableData, $i, $filtered, $field);
                     $i = 0;
                     $printableData = [];
+                    $printed++;
                 }
                 $printableData[$i] = $record;
                 $i++;
             }
             if ($i > 0) {
                 printPart($printableData, $i, $filtered, $field);
+                $printed++;
             }
-            $printed = true;
         }
         return $printed;
     } catch (\Throwable $e) {
@@ -1018,7 +1018,7 @@ function filter(array $dati, bool $full, int $filterVal) : array
 }
 
 
-function response(array $request, bool $printed) : string
+function response(array $request, int $printed, string $start) : string
 {
     try {
         $keys = array_flip(['var', 'datefrom', 'dateto', 'full', 'field']);
@@ -1029,10 +1029,10 @@ function response(array $request, bool $printed) : string
         
         $type = $request['full'] ? 'full' : 'senza zeri';
         
-        $html = 'Elaborazione dati <b>' . ucfirst($request['field']) . '</b> variabile <b>' . $request['var'] . '</b> dal <b>' . $request['datefrom']->format('d/m/Y') . '</b> al <b>' . $request['dateto']->format('d/m/Y') . '</b> avvenuta con successo in <b>' . Utility::benchmark(START) . '</b>.';
+        $html = 'Elaborazione dati <b>' . ucfirst($request['field']) . '</b> variabile <b>' . $request['var'] . '</b> dal <b>' . $request['datefrom']->format('d/m/Y') . '</b> al <b>' . $request['dateto']->format('d/m/Y') . '</b> avvenuta con successo in <b>' . Utility::benchmark($start) . '</b>.';
         
-        if ($printed) {
-            $html .= ' File CSV <b>' . $type . '</b> esportati.';
+        if ($printed > 0) {
+            $html .= ' File CSV <b>' . $type . '</b> esportati: <b>' . $printed . '</b>';
         } else {
             $html .= ' Nessun file CSV <b>' . $type . '</b> esportato per mancanza di dati.';
         }
@@ -1042,6 +1042,38 @@ function response(array $request, bool $printed) : string
         throw $e;
     }
 }
+
+
+function csvResponse(array $request, int $printed, string $start) : array
+{
+    try {
+        $header = CONFIG['define']['services']['tocsv']['header'];
+        $footer = CONFIG['define']['services']['tocsv']['footer'];
+        
+        $response['ok'] = true; 
+        foreach ($request as $key => $value) {
+            if (is_a($value, 'DateTime')) {
+                $response['response']['params'][$key] = $value->format('d/m/Y H:i:s');
+            } else {
+                $response['response']['params'][$key] = $value;
+            }
+        }
+        $response['response']['header'][0] = $header['title'];
+        $response['response']['header'][1] = $header['start'] . ' ' . Utility::microToLatinTime($start);
+        
+        $response['response']['body'][0] = response($request, $printed, $start);      
+        
+        $response['response']['footer'][0] = $footer['stop'] . ' ' . Utility::getLatinTime();
+        $response['response']['footer'][1] = $footer['time'] . ' ' . Utility::benchmark($start);
+        $response['response']['footer'][2] = $footer['report'] . ' ' . $printed;
+
+        return $response;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
 
 function calcolaPortata(array $coefficienti, array $parametri, array $campi) : float
 {
@@ -2874,19 +2906,20 @@ function buildSetParams(string $url, ?string $rawMethod = null, ?array $rawParam
 }
 
 
-function goCurl(array $setParams, bool $async) : string
+function goCurl(array $setParams, bool $async, ?string $callback = null) : array
 {
     try {
-        $message = '';
+        $responses = [];
+        $printFunction = $callback ?? null;
         $n_param = count($setParams);
         if ($n_param > 0) {
             if ($async && $n_param > 1) {
-                $message = Curl::runMultiAsync($setParams, 'formatResponse');
+                $responses = Curl::runMultiAsync($setParams, $printFunction);
             } else {
-                $message = Curl::runMultiSync($setParams, 'formatResponse');
+                $responses = Curl::runMultiSync($setParams, $printFunction);
             }
         }
-        return $message;
+        return $responses;
     // @codeCoverageIgnoreStart
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -2896,19 +2929,20 @@ function goCurl(array $setParams, bool $async) : string
 }
 
 
-function checkCurlResponse(string $response, int $debug_level) : string
+function checkCurlResponse(string $report, int $debug_level) : string
 {
     try {
         if ($debug_level > 2) {
             throw new \Exception('Livello di debug non definito');
         }
-        if ($response === '') {
+        $response = json_decode($report, true);
+        if (!$response['ok']) {
             $message = 'Elaborazone fallita.';
             if ($debug_level === 1) {
                 $message .= ' Verificare il log degli errori (' . realpath(LOG_PATH) . '/' . ERROR_LOG . ').';
             }
         } else {
-            $message = htmlspecialchars(strip_tags($response));
+            $message = htmlspecialchars(strip_tags($response['response']));
         }
         return $message;
     } catch (\Throwable $e) {
@@ -3330,10 +3364,10 @@ function limitDates(array $values, string $dateLimit, string $dateOffset) : arra
 }
 
 
-function setMessage(string $message) : string
+function setMessage(array $responses) : string
 {
     try {
-        if ($message !== '') {
+        if (count($responses) > 0) {
             $header = CONFIG['define']['telegram']['scarichi']['header'];
             $footer = CONFIG['define']['telegram']['scarichi']['footer'];
 
@@ -3342,8 +3376,16 @@ function setMessage(string $message) : string
             $dateStart = new \DateTime(START, new \DateTimeZone('Europe/Rome'));
             $formStart = $dateStart->format('d/m/Y H:i:s');
             $start = $header['start'] . ' <b>' . $formStart . '</b>';
-
-            $n_file = substr_count($message, 'File CSV');
+            
+            $n_file = 0;
+            $message = '';
+            foreach ($responses as $json) {
+                $response = json_decode($json, true);
+                if ($response['ok']) {
+                    $message .= $response['response'] . PHP_EOL;
+                    $n_file++;
+                }
+            }
             $totals = $footer['report'] . ' <b>' . $n_file . '</b>';
 
             $dateStop = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
@@ -3365,3 +3407,32 @@ function setMessage(string $message) : string
     //@codeCoverageIgnoreEnd
 }
 
+function sendMessages(array $messages) : string
+{
+    try {
+        $globalMessage = '';
+        if (GLOBALMSG) {
+            $globalMessage .= '<b>' . TELSCARICHI['header']['title']['global'] . '</b>' . PHP_EOL;
+            $globalMessage .= TELSCARICHI['header']['start'] . ' <b>' . Utility::microToLatinTime(START) . '</b>' . PHP_EOL;
+            $globalMessage .= PHP_EOL;
+            $globalMessage .= $messages['sync'] . PHP_EOL;
+            $globalMessage .= PHP_EOL;
+            $globalMessage .= $messages['iscsv'] . PHP_EOL;
+            $globalMessage .= PHP_EOL;
+            $globalMessage .= str_replace('dati', 'dati host 1', $messages['watch1']) . PHP_EOL;
+            $globalMessage .= PHP_EOL;
+            $globalMessage .= str_replace('dati', 'dati host 2', $messages['watch2']) . PHP_EOL;
+            $globalMessage .= PHP_EOL;            
+            $globalMessage .= TELSCARICHI['footer']['stop'] . ' <b>' . Utility::getLatinTime() . '</b>' . PHP_EOL;
+            $globalMessage .= TELSCARICHI['footer']['time'] . ' <b>' . Utility::benchmark(START) . '</b>' . PHP_EOL;
+        } else {
+            $globalMessage = $messages['iscsv'];
+        }
+        return sendTelegram($globalMessage, PHP_EOL);        
+    //@codeCoverageIgnoreStart
+    } catch (\Throwable $e) {        
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;        
+    }
+    //@codeCoverageIgnoreEnd
+}

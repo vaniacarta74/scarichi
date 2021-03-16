@@ -13,12 +13,13 @@ namespace vaniacarta74\Scarichi;
 require __DIR__ . '/../vendor/autoload.php';
 
 //$argc = 9;
-//$argv = ['scarichi.php', '-V', '30030', '-f', '01/01/2019', '-t', '02/01/2019', '-c', '-n'];
+//$argv = ['scarichi.php', '-V', '30030,30040', '-f', '01/01/2019', '-t', '02/01/2019', '-c', '-n'];
 
 try {
     $composer = COMPOSER;
     $help = CONFIG;
     $parameters = $help['parameters'];
+    $sendMode = !GLOBALMSG && TELEGRAM;
     
     $type = shuntTypes($parameters, $argv);
     echo getMessage($composer, $help, $type);
@@ -26,18 +27,21 @@ try {
     
     $filledValues = fillParameters($parameters, $values);
     $limitedValues = limitDates($filledValues, PERIOD, OFFSET);
-    $postParams = setPostParameters($parameters, $limitedValues);
+    $csvParams = setPostParameters($parameters, $limitedValues);
     
-    Curl::run('http://' . REMOTE_HOST . '/telecontrollo/bot/telegram_REST.php?token=sync&variabile=ALL&delay=168&tel=1');
+    $syncService = New ServiceManager('telegram_REST', 'sync', [['tel' => $sendMode]]);
+    $messages['sync'] = $syncService->getMessage();
     
-    $setParams = buildSetParams(URL, 'GET', $postParams, 'id');
-    $message = goCurl($setParams, ASYNC);
-    $telegram = setMessage($message);
-    echo sendTelegram($telegram, PHP_EOL);
+    $csvService = New ServiceManager('tocsv', null, $csvParams);
+    $messages['iscsv'] = $csvService->getMessage(); 
     
-    Curl::run('http://' . REMOTE_HOST . '/telecontrollo/bot/telegram_REST.php?token=watchdog&tipologia=scarichi&host=1&move=0&variabile=ALL&metodo=array&tel=1');
-    Curl::run('http://' . REMOTE_HOST . '/telecontrollo/bot/telegram_REST.php?token=watchdog&tipologia=scarichi&host=2&variabile=ALL&metodo=array&tel=1');
+    $watchService1 = New ServiceManager('telegram_REST', 'watchdog', [['tel' => $sendMode]]);
+    $messages['watch1'] = $watchService1->getMessage();
     
+    $watchService2 = New ServiceManager('telegram_REST', 'watchdog', [['host' => 2,'move' => 1,'tel' => $sendMode]]);
+    $messages['watch2'] = $watchService2->getMessage();
+    
+    echo sendMessages($messages);
 } catch (\Throwable $e) {
     Error::errorHandler($e, DEBUG_LEVEL, 'cli');
     exit();

@@ -17534,14 +17534,14 @@ class ToolsTest extends TestCase
     {
         $data = [
             'only url' => [
-                'url' => URL,
+                'url' => TOCSVURL,
                 'method' => null,
                 'postParams' => null,
                 'key' => null,
                 'isJson' => null,
                 'expected' => [
                     [
-                        'url' => URL,
+                        'url' => TOCSVURL,
                         'method' => 'GET',
                         'params' => [],
                         'key' => null,
@@ -17550,14 +17550,14 @@ class ToolsTest extends TestCase
                 ]
             ],
             'no filled values' => [
-                'url' => URL,
+                'url' => TOCSVURL,
                 'method' => 'GET',
                 'postParams' => [],
                 'key' => null,
                 'isJson' => null,
                 'expected' => [
                     [
-                        'url' => URL,
+                        'url' => TOCSVURL,
                         'method' => 'GET',
                         'params' => [],
                         'key' => null,
@@ -17566,7 +17566,7 @@ class ToolsTest extends TestCase
                 ]
             ],
             'single' => [
-                'url' => URL,
+                'url' => TOCSVURL,
                 'method' => 'POST',
                 'postParams' => [
                     [
@@ -17582,7 +17582,7 @@ class ToolsTest extends TestCase
                 'isJson' => null,
                 'expected' => [
                     [
-                        'url' => URL,
+                        'url' => TOCSVURL,
                         'method' => 'POST',
                         'params' => [
                             'id' => '0',
@@ -17598,7 +17598,7 @@ class ToolsTest extends TestCase
                 ]
             ],
             'single var multi dates' => [
-                'url' => URL,
+                'url' => TOCSVURL,
                 'method' => 'POST',
                 'postParams' => [
                     [
@@ -17622,7 +17622,7 @@ class ToolsTest extends TestCase
                 'isJson' => null,
                 'expected' => [
                     [
-                        'url' => URL,
+                        'url' => TOCSVURL,
                         'method' => 'POST',
                         'params' => [
                             'id' => '0',
@@ -17636,7 +17636,7 @@ class ToolsTest extends TestCase
                         'isJson' => null
                     ],
                     [
-                        'url' => URL,
+                        'url' => TOCSVURL,
                         'method' => 'POST',
                         'params' => [
                             'id' => '1',
@@ -17652,7 +17652,7 @@ class ToolsTest extends TestCase
                 ]
             ],
             'single get' => [
-                'url' => URL,
+                'url' => TOCSVURL,
                 'method' => 'GET',
                 'postParams' => [
                     [
@@ -17668,7 +17668,7 @@ class ToolsTest extends TestCase
                 'isJson' => true,
                 'expected' => [
                     [
-                        'url' => URL . '?id=0&var=30030&datefrom=30%2F12%2F2020&dateto=31%2F12%2F2020&field=portata&full=0',
+                        'url' => TOCSVURL . '?id=0&var=30030&datefrom=30%2F12%2F2020&dateto=31%2F12%2F2020&field=portata&full=0',
                         'method' => 'GET',
                         'params' => [],
                         'key' => '0',
@@ -17677,7 +17677,7 @@ class ToolsTest extends TestCase
                 ]
             ],
             'key progressive' => [
-                'url' => URL,
+                'url' => TOCSVURL,
                 'method' => 'POST',
                 'postParams' => [
                     [
@@ -17693,7 +17693,7 @@ class ToolsTest extends TestCase
                 'isJson' => null,
                 'expected' => [
                     [
-                        'url' => URL,
+                        'url' => TOCSVURL,
                         'method' => 'POST',
                         'params' => [
                             'id' => '0',
@@ -17732,7 +17732,7 @@ class ToolsTest extends TestCase
     {
         $data = [
             'wrong url' => [
-                'url' => 'URL',
+                'url' => 'TOCSVURL',
                 'method' => 'POST',
                 'postParams' => [
                     [
@@ -17748,7 +17748,7 @@ class ToolsTest extends TestCase
                 'isJson' => null,
             ],
             'wrong method' => [
-                'url' => URL,
+                'url' => TOCSVURL,
                 'method' => 'PIPPO',
                 'postParams' => [
                     [
@@ -17764,7 +17764,7 @@ class ToolsTest extends TestCase
                 'isJson' => null
             ],
             'wrong post' => [
-                'url' => URL,
+                'url' => TOCSVURL,
                 'method' => 'POST',
                 'postParams' => [],
                 'key' => null,
@@ -17792,7 +17792,7 @@ class ToolsTest extends TestCase
      */
     public function goCurlProvider() : array
     {
-        $url = URL;
+        $url = TOCSVURL;
         $single = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
         $multi = $single . 'Elaborazione dati <b>Portata</b> variabile <b>30040</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
         

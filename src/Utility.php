@@ -101,6 +101,55 @@ class Utility
     }
     
     /**
+     * @return string
+     * @throws \Throwable
+     */
+    public static function getMicroTime() : string
+    {
+        try {
+            $now = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
+            $microTime = $now->format('Y-m-d H:i:s.u');
+            return $microTime;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
+            throw $e;
+        }
+    }
+    
+    /**
+     * @return string
+     * @throws \Throwable
+     */
+    public static function getLatinTime() : string
+    {
+        try {
+            $now = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
+            $microTime = $now->format('d/m/Y H:i:s');
+            return $microTime;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
+            throw $e;
+        }
+    }
+    
+    /**
+     * @param string $microTime
+     * @return string
+     * @throws \Throwable
+     */
+    public static function microToLatinTime(string $microTime) : string
+    {
+        try {
+            $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s.u', $microTime, new \DateTimeZone('Europe/Rome'));
+            $latinTime = $dateTime->format('d/m/Y H:i:s');
+            return $latinTime;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
+            throw $e;
+        }
+    }
+    
+    /**
      * Stampa il tempo trascorso da una certa data.
      *
      * Il metodo benchmark() fornisce l'intervallo di tempo intercorso da una

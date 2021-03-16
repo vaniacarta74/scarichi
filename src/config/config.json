@@ -9,22 +9,113 @@
             "debug_level": 2,
             "log_path": "/../../log",
             "error_log": "error.log"
-        },
+        },        
         "csv": {
             "nodata": -9999,        
             "maxrecord": 10000,        
             "subdirectory": false
         },
-        "telegram": {
-            "scarichi": {
+        "services": {
+            "tocsv": {
+                "host": "localhost",
+                "path": "scarichi/tocsv.php",
+                "params": {
+                    "tocsv": []
+                },                
+                "method": "GET",
+                "key": "id",
+                "isJson": false,
+                "isAsync": true,
+                "withBody": true,
                 "header": {
-                    "title": "Procedura calcolo movimentazioni dighe",
+                    "title": "Procedura esportazione CSV dati movimentazioni dighe",
                     "start": "Elaborazione iniziata in data:"
                 },
                 "footer": {
                     "stop": "Elaborazione terminata in data:",
                     "time": "Tempo di elaborazione:",
                     "report": "Numero totale file csv esportati:"
+                }
+            },
+            "telegram_REST": {
+                "host": "remotehost",
+                "path": "telecontrollo/bot/telegram_REST.php",
+                "params": {
+                    "sync": {
+                        "token": {
+                            "default": "sync"
+                        },
+                        "variabile": {
+                            "default": "ALL"
+                        },
+                        "delay": {
+                            "default": 168
+                        },
+                        "tel": {
+                            "default": 1
+                        }
+                    },
+                    "watchdog": {
+                        "token": {
+                            "default": "watchdog"
+                        },
+                        "tipologia": {
+                            "default": "scarichi"
+                        },
+                        "host": {
+                            "default": 1
+                        },
+                        "move": {
+                            "default": 0
+                        },
+                        "variabile": {
+                            "default": "ALL"
+                        },
+                        "metodo": {
+                            "default": "array"
+                        },
+                        "tel": {
+                            "default": 1
+                        }
+                    }
+                },
+                "method": "GET",
+                "key": "token",
+                "isJson": false,
+                "isAsync": false,
+                "withBody": false,
+                "header": {},
+                "footer": {}
+            }
+        },
+        "telegram": {
+            "scarichi": {
+                "header": {
+                    "title": {
+                        "global": "CALCOLO VOLUMI E PORTATE MOVIMENTAZIONI DIGHE",
+                        "sync": "Procedura sincronizzazione banche dati",
+                        "tocsv": "Procedura calcolo ed esportazione dati",
+                        "watchdog": "Procedura caricamento dati"
+                    },
+                    "start": "Elaborazione iniziata in data:"
+                },
+                "footer": {
+                    "stop": "Elaborazione terminata in data:",
+                    "time": "Tempo di elaborazione:",
+                    "report": {
+                        "sync": {
+                            "in": "TOTALI:",
+                            "out": "Totali:"
+                        },
+                        "tocsv": {
+                            "in": "Numero totale file csv",
+                            "out": "Totali:"
+                        },
+                        "watchdog": {
+                            "in": "TOTALI:",
+                            "out": "Totali:"
+                        }
+                    }
                 }
             },
             "admittedTags": [
@@ -40,7 +131,8 @@
             ],
             "tagLimit": 100,
             "limit": 4096,
-            "send": false,
+            "send": true,
+            "global": true, 
             "path": "/../../../telegram.json",
             "url": "scarichi/telegram.php"
         },
@@ -48,6 +140,11 @@
             "iterations": 12,
             "delay": 5000000
         }
+    },
+    "command": { 
+        "sintax": "php scarichi.php",
+        "period": "99Y",
+        "offset": "1D"
     },
     "modelli": {
         "1": {
@@ -151,14 +248,7 @@
                 ]
             }
         }
-    },
-    "command": { 
-        "sintax": "php scarichi.php",
-        "url": "scarichi/tocsv.php",
-        "async": true,
-        "period": "99Y",
-        "offset": "1D"
-    },
+    },    
     "global": {
         "section_types": [
             "short",

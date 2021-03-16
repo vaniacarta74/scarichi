@@ -3,7 +3,13 @@ namespace vaniacarta74\Scarichi;
 
 require __DIR__ . '/../vendor/autoload.php';
 
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Methods: POST, GET");
+
 try {
+    $start = Utility::getMicroTime();
+    
     $request = checkRequest($_REQUEST, true);
     
     $scarichi = loadScarichi($request);
@@ -23,11 +29,14 @@ try {
     $dati_filtrati = filter($dati_formattati, $request['full'], 0);
     $dati_ripuliti = filter($dati_filtrati, false, NODATA);
 
-    $printed = divideAndPrint($dati_ripuliti, $request['full'], $request['field']);
+    $printed = divideAndPrint($dati_ripuliti, $request['full'], $request['field']);    
     
-    $response = response($request, $printed);
-    echo $response;
+    $response = csvResponse($request, $printed, $start);
+    http_response_code(200);
+    echo json_encode($response);
 } catch (\Throwable $e) {
-    Error::errorHandler($e, DEBUG_LEVEL, 'html');
+    http_response_code(400);
+    Error::errorHandler($e, 1, 'cli');
+    Error::noticeHandler($e, 2, 'json');
     exit();
 }

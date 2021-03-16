@@ -166,7 +166,7 @@ class Curl
      * @throws \Throwable
      * @throws \Exception
      */
-    public static function runMultiSync(array $setParams, ?string $funcName = null) : string
+    public static function runMultiSync(array $setParams, ?string $funcName = null) : array
     {
         try {
             if (count($setParams) === 0) {
@@ -174,18 +174,16 @@ class Curl
             }
             $handlers = self::multiSet($setParams);            
             $i = 1;
-            $message = '';
+            $responses = [];;
             foreach ($handlers as $key => $ch) {
                 $report = self::exec($ch);
-                if ($funcName) {
+                if (isset($funcName)) {
                     echo Utility::callback($funcName, array($report, $i, $key));
-                } else {
-                    echo $report;
                 }
-                $message .= $report . PHP_EOL;
+                $responses[] = $report;
                 $i++;
             }
-            return $message;
+            return $responses;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
@@ -200,7 +198,7 @@ class Curl
      * @throws \Throwable
      * @throws \Exception
      */
-    public static function runMultiAsync(array $setParams, ?string $funcName = null) : string
+    public static function runMultiAsync(array $setParams, ?string $funcName = null) : array
     {
         try {
             if (count($setParams) === 0) {
@@ -212,7 +210,7 @@ class Curl
                 curl_multi_add_handle($mh, $ch);
             }
             $i = 1;
-            $message = '';
+            $responses = [];
             do {
                 $status = curl_multi_exec($mh, $still_running);
                 if ($still_running) {
@@ -222,12 +220,10 @@ class Curl
                     $ch = $info['handle'];
                     $key = array_search($ch, $handlers);
                     $report = curl_multi_getcontent($ch);
-                    if ($funcName) {
+                    if (isset($funcName)) {
                         echo Utility::callback($funcName, array($report, $i, $key));
-                    } else {
-                        echo $report;
                     }
-                    $message .= $report . PHP_EOL;
+                    $responses[] = $report;
                     $i++;
                 }
             } while ($still_running && $status == CURLM_OK);
@@ -236,7 +232,7 @@ class Curl
                 curl_close($ch);
             }
             curl_multi_close($mh);
-            return $message;
+            return $responses;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
