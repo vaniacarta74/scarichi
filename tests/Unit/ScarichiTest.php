@@ -17,8 +17,8 @@ class ScarichiTest extends TestCase
         $description = $composer['description'];
         $header = setHeader($composer). PHP_EOL . '|';
         $headerNoStart = setHeader($composer);
-        $single = '1) PID 0: Elaborazione dati Volume variabile 30030 dal 01/01/2019 al 02/01/2019 avvenuta con successo in | sec. File CSV full esportati.' . PHP_EOL;
-        $double = $single . '2) PID 1: Elaborazione dati Volume variabile 30040 dal 01/01/2019 al 02/01/2019 avvenuta con successo in | sec. File CSV full esportati.' . PHP_EOL;
+        $single = '1) PID 0: Elaborazione dati Volume variabile 30030 dal 01/01/2019 al 02/01/2019 avvenuta con successo in | sec. File CSV full esportati: |' . PHP_EOL;
+        $double = $single . '2) PID 1: Elaborazione dati Volume variabile 30040 dal 01/01/2019 al 02/01/2019 avvenuta con successo in | sec. File CSV full esportati: |' . PHP_EOL;
         
         $now = new \DateTime();
         $day = new \DateTime();
@@ -69,7 +69,7 @@ class ScarichiTest extends TestCase
                 'dateto' => '',
                 'nozero' => '',
                 'campo' => '',
-                'expected' => $header . PHP_EOL . '1) PID 0: Elaborazione dati Volume variabile 30030 dal 01/05/2020 al ' . $now->format('d/m/Y') . ' avvenuta con successo in | sec. File CSV full esportati.' . PHP_EOL
+                'expected' => $header . PHP_EOL . '1) PID 0: Elaborazione dati Volume variabile 30030 dal 01/05/2020 al ' . $now->format('d/m/Y') . ' avvenuta con successo in | sec. File CSV full esportati: |' . PHP_EOL
             ],
             'datefrom costant' => [
                 'help' => null,
@@ -80,7 +80,7 @@ class ScarichiTest extends TestCase
                 'dateto' => '03/01/2019',
                 'nozero' => '',
                 'campo' => '',
-                'expected' => $header . PHP_EOL . '1) PID 0: Elaborazione dati Volume variabile 30030 dal 01/01/2019 al 03/01/2019 avvenuta con successo in | sec. File CSV full esportati.' . PHP_EOL
+                'expected' => $header . PHP_EOL . '1) PID 0: Elaborazione dati Volume variabile 30030 dal 01/01/2019 al 03/01/2019 avvenuta con successo in | sec. File CSV full esportati: |' . PHP_EOL
             ],
             'only dateto' => [
                 'help' => null,
@@ -91,7 +91,7 @@ class ScarichiTest extends TestCase
                 'dateto' => '02/05/2019',
                 'nozero' => '',
                 'campo' => '',
-                'expected' => $header . PHP_EOL . '1) PID 0: Elaborazione dati Volume variabile 30030 dal 01/05/2019 al 02/05/2019 avvenuta con successo in | sec. File CSV full esportati.' . PHP_EOL
+                'expected' => $header . PHP_EOL . '1) PID 0: Elaborazione dati Volume variabile 30030 dal 01/05/2019 al 02/05/2019 avvenuta con successo in | sec. File CSV full esportati: |' . PHP_EOL
             ],
             'field other' => [
                 'help' => null,
@@ -102,7 +102,7 @@ class ScarichiTest extends TestCase
                 'dateto' => '02/01/2019',
                 'nozero' => '',
                 'campo' => 'L',
-                'expected' => $header . PHP_EOL . '1) PID 0: Elaborazione dati Livello variabile 30030 dal 01/01/2019 al 02/01/2019 avvenuta con successo in | sec. File CSV full esportati.' . PHP_EOL
+                'expected' => $header . PHP_EOL . '1) PID 0: Elaborazione dati Livello variabile 30030 dal 01/01/2019 al 02/01/2019 avvenuta con successo in | sec. File CSV full esportati: |' . PHP_EOL
             ],
             'full 0' => [
                 'help' => null,

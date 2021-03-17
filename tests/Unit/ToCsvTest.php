@@ -12,6 +12,7 @@ class ToCsvTest extends TestCase
      */
     public function toCsvProvider() : array
     {
+                
         $data = [
             'standard' => [
                 'var' => '30030',
@@ -19,7 +20,30 @@ class ToCsvTest extends TestCase
                 'dateto' => '02/01/2017',
                 'full' => '1',
                 'field' => 'volume',
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
+                'expected' => '{
+                    "ok":true,
+                    "response":{
+                        "params":{
+                            "var":"30030",
+                            "datefrom":"01\/01\/2017 00:00:00",
+                            "dateto":"02\/01\/2017 00:00:00",
+                            "full":true,
+                            "field":"volume"
+                        },
+                        "header":[
+                            "Procedura esportazione CSV dati movimentazioni dighe",
+                            "Elaborazione iniziata in data: |"
+                        ],
+                        "body":[
+                            "Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2017<\/b> al <b>02\/01\/2017<\/b> avvenuta con successo in <b>| sec<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"
+                        ],
+                        "footer":[
+                            "Elaborazione terminata in data: |",
+                            "Tempo di elaborazione: | sec",
+                            "Numero totale file csv esportati: |"
+                        ]
+                    }
+                }'
             ],
             'no full and field' => [
                 'var' => '30030',
@@ -27,7 +51,30 @@ class ToCsvTest extends TestCase
                 'dateto' => '02/01/2017',
                 'full' => null,
                 'field' => null,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
+                'expected' => '{
+                    "ok":true,
+                    "response":{
+                        "params":{
+                            "var":"30030",
+                            "datefrom":"01\/01\/2017 00:00:00",
+                            "dateto":"02\/01\/2017 00:00:00",
+                            "full":true,
+                            "field":"volume"
+                        },
+                        "header":[
+                            "Procedura esportazione CSV dati movimentazioni dighe",
+                            "Elaborazione iniziata in data: |"
+                        ],
+                        "body":[
+                            "Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2017<\/b> al <b>02\/01\/2017<\/b> avvenuta con successo in <b>| sec<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"
+                        ],
+                        "footer":[
+                            "Elaborazione terminata in data: |",
+                            "Tempo di elaborazione: | sec",
+                            "Numero totale file csv esportati: |"
+                        ]
+                    }
+                }'
             ],
             'only datefrom' => [
                 'var' => '30030',
@@ -35,7 +82,30 @@ class ToCsvTest extends TestCase
                 'dateto' => null,
                 'full' => null,
                 'field' => null,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/05/2020</b> al <b>' . date('d/m/Y') . '</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
+                'expected' => '{
+                    "ok":true,
+                    "response":{
+                        "params":{
+                            "var":"30030",
+                            "datefrom":"01\/05\/2020 00:00:00",
+                            "dateto":"' . date('d') . '\/' . date('m') . '\/' . date('Y') . ' 00:00:00",
+                            "full":true,
+                            "field":"volume"
+                        },
+                        "header":[
+                            "Procedura esportazione CSV dati movimentazioni dighe",
+                            "Elaborazione iniziata in data: |"
+                        ],
+                        "body":[
+                            "Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/05\/2020<\/b> al <b>' . date('d') . '\/' . date('m') . '\/' . date('Y') . '<\/b> avvenuta con successo in <b>| sec<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"
+                        ],
+                        "footer":[
+                            "Elaborazione terminata in data: |",
+                            "Tempo di elaborazione: | sec",
+                            "Numero totale file csv esportati: |"
+                        ]
+                    }
+                }'
             ],
             'only dateto' => [
                 'var' => '30030',
@@ -43,7 +113,30 @@ class ToCsvTest extends TestCase
                 'dateto' => '01/01/2017',
                 'full' => null,
                 'field' => null,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>31/12/2016</b> al <b>01/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
+                'expected' => '{
+                    "ok":true,
+                    "response":{
+                        "params":{
+                            "var":"30030",
+                            "datefrom":"31\/12\/2016 00:00:00",
+                            "dateto":"01\/01\/2017 00:00:00",
+                            "full":true,
+                            "field":"volume"
+                        },
+                        "header":[
+                            "Procedura esportazione CSV dati movimentazioni dighe",
+                            "Elaborazione iniziata in data: |"
+                        ],
+                        "body":[
+                            "Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>31\/12\/2016<\/b> al <b>01\/01\/2017<\/b> avvenuta con successo in <b>| sec<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"
+                        ],
+                        "footer":[
+                            "Elaborazione terminata in data: |",
+                            "Tempo di elaborazione: | sec",
+                            "Numero totale file csv esportati: |"
+                        ]
+                    }
+                }'
             ],
             'variable' => [
                 'variable' => '30030',
@@ -51,7 +144,30 @@ class ToCsvTest extends TestCase
                 'dateto' => '02/01/2017',
                 'full' => null,
                 'field' => null,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
+                'expected' => '{
+                    "ok":true,
+                    "response":{
+                        "params":{
+                            "var":"30030",
+                            "datefrom":"01\/01\/2017 00:00:00",
+                            "dateto":"02\/01\/2017 00:00:00",
+                            "full":true,
+                            "field":"volume"
+                        },
+                        "header":[
+                            "Procedura esportazione CSV dati movimentazioni dighe",
+                            "Elaborazione iniziata in data: |"
+                        ],
+                        "body":[
+                            "Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2017<\/b> al <b>02\/01\/2017<\/b> avvenuta con successo in <b>| sec<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"
+                        ],
+                        "footer":[
+                            "Elaborazione terminata in data: |",
+                            "Tempo di elaborazione: | sec",
+                            "Numero totale file csv esportati: |"
+                        ]
+                    }
+                }'
             ],
             'variabile' => [
                 'variabile' => '30030',
@@ -59,7 +175,30 @@ class ToCsvTest extends TestCase
                 'dateto' => '02/01/2017',
                 'full' => null,
                 'field' => null,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
+                'expected' => '{
+                    "ok":true,
+                    "response":{
+                        "params":{
+                            "var":"30030",
+                            "datefrom":"01\/01\/2017 00:00:00",
+                            "dateto":"02\/01\/2017 00:00:00",
+                            "full":true,
+                            "field":"volume"
+                        },
+                        "header":[
+                            "Procedura esportazione CSV dati movimentazioni dighe",
+                            "Elaborazione iniziata in data: |"
+                        ],
+                        "body":[
+                            "Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2017<\/b> al <b>02\/01\/2017<\/b> avvenuta con successo in <b>| sec<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"
+                        ],
+                        "footer":[
+                            "Elaborazione terminata in data: |",
+                            "Tempo di elaborazione: | sec",
+                            "Numero totale file csv esportati: |"
+                        ]
+                    }
+                }'
             ],
             'field other' => [
                 'var' => '30030',
@@ -67,7 +206,30 @@ class ToCsvTest extends TestCase
                 'dateto' => '02/01/2017',
                 'full' => null,
                 'field' => 'livello',
-                'expected' => 'Elaborazione dati <b>Livello</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
+                'expected' => '{
+                    "ok":true,
+                    "response":{
+                        "params":{
+                            "var":"30030",
+                            "datefrom":"01\/01\/2017 00:00:00",
+                            "dateto":"02\/01\/2017 00:00:00",
+                            "full":true,
+                            "field":"livello"
+                        },
+                        "header":[
+                            "Procedura esportazione CSV dati movimentazioni dighe",
+                            "Elaborazione iniziata in data: |"
+                        ],
+                        "body":[
+                            "Elaborazione dati <b>Livello<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2017<\/b> al <b>02\/01\/2017<\/b> avvenuta con successo in <b>| sec<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"
+                        ],
+                        "footer":[
+                            "Elaborazione terminata in data: |",
+                            "Tempo di elaborazione: | sec",
+                            "Numero totale file csv esportati: |"
+                        ]
+                    }
+                }'
             ],
             'full 0' => [
                 'var' => '30030',
@@ -75,7 +237,30 @@ class ToCsvTest extends TestCase
                 'dateto' => '02/01/2017',
                 'full' => '0',
                 'field' => null,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.'
+                'expected' => '{
+                    "ok":true,
+                    "response":{
+                        "params":{
+                            "var":"30030",
+                            "datefrom":"01\/01\/2017 00:00:00",
+                            "dateto":"02\/01\/2017 00:00:00",
+                            "full":false,
+                            "field":"volume"
+                        },
+                        "header":[
+                            "Procedura esportazione CSV dati movimentazioni dighe",
+                            "Elaborazione iniziata in data: |"
+                        ],
+                        "body":[
+                            "Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2017<\/b> al <b>02\/01\/2017<\/b> avvenuta con successo in <b>| sec<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati."
+                        ],
+                        "footer":[
+                            "Elaborazione terminata in data: |",
+                            "Tempo di elaborazione: | sec",
+                            "Numero totale file csv esportati: |"
+                        ]
+                    }
+                }'
             ],
             'full 1' => [
                 'var' => '30030',
@@ -83,7 +268,30 @@ class ToCsvTest extends TestCase
                 'dateto' => '02/01/2017',
                 'full' => '1',
                 'field' => null,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
+                'expected' => '{
+                    "ok":true,
+                    "response":{
+                        "params":{
+                            "var":"30030",
+                            "datefrom":"01\/01\/2017 00:00:00",
+                            "dateto":"02\/01\/2017 00:00:00",
+                            "full":true,
+                            "field":"volume"
+                        },
+                        "header":[
+                            "Procedura esportazione CSV dati movimentazioni dighe",
+                            "Elaborazione iniziata in data: |"
+                        ],
+                        "body":[
+                            "Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2017<\/b> al <b>02\/01\/2017<\/b> avvenuta con successo in <b>| sec<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"
+                        ],
+                        "footer":[
+                            "Elaborazione terminata in data: |",
+                            "Tempo di elaborazione: | sec",
+                            "Numero totale file csv esportati: |"
+                        ]
+                    }
+                }'
             ]
         ];
         
@@ -95,7 +303,7 @@ class ToCsvTest extends TestCase
      * covers tocsv.php
      * @dataProvider toCsvProvider
      */
-    public function testToCsvEquals(?string $var, ?string $dateFrom, ?string $dateTo, ?string $full, ?string $field, ?string $response) : void
+    public function testToCsvEquals(?string $var, ?string $dateFrom, ?string $dateTo, ?string $full, ?string $field, ?string $rawResponse) : void
     {
         $paramsRaw = [
             'var' => $var,
@@ -110,6 +318,8 @@ class ToCsvTest extends TestCase
         });        
 
         $actual = Curl::run(TOCSVURL, 'POST', $params);
+        
+        $response = str_replace(array(PHP_EOL, '  '), '', $rawResponse);
         
         $expecteds = explode('|', $response);
         

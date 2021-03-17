@@ -131,7 +131,7 @@
             ],
             "tagLimit": 100,
             "limit": 4096,
-            "send": true,
+            "send": false,
             "global": true, 
             "path": "/../../../telegram.json",
             "url": "scarichi/telegram.php"

@@ -179,7 +179,7 @@ class CurlTest extends TestCase
         ];
         $url = 'http://' . LOCALHOST . '/scarichi/tocsv.php';
         $json = false;
-        $response = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.';
+        $response = 'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>|<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.';
         $expecteds = explode('|', $response);
         
         $actual = Curl::run($url, 'POST', $params, $json);
@@ -196,7 +196,7 @@ class CurlTest extends TestCase
     public function testRunGetContainsString() : void
     {
         $url = 'http://' . LOCALHOST . '/scarichi/tocsv.php?var=30030&datefrom=30/12/2019&dateto=31/12/2019&field=portata&full=0';
-        $response = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.';
+        $response = 'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>|<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.';
         $expecteds = explode('|', $response);
         
         $actual = Curl::run($url);
@@ -456,7 +456,7 @@ class CurlTest extends TestCase
      */
     public function testExecContainsString($ch) : void
     {
-        $response = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.';
+        $response = 'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>|<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.';
         $expecteds = explode('|', $response);
         
         $actual = Curl::exec($ch);
@@ -714,8 +714,9 @@ class CurlTest extends TestCase
     public function runMultiSyncProvider() : array
     {
         $url = TOCSVURL;
-        $single = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
-        $multi = $single . 'Elaborazione dati <b>Portata</b> variabile <b>30040</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
+        $single = 'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>| sec<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.';
+        $single2 = 'Elaborazione dati <b>Portata<\/b> variabile <b>30040<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>| sec<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.';
+        $multi = [$single, $single2];
         
         $data = [
             'no callback' => [
@@ -736,7 +737,9 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.'
+                'expected' => [
+                    'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>|<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.'
+                ]
             ],
             'no key' => [
                 'setParams' => [
@@ -755,8 +758,10 @@ class CurlTest extends TestCase
                         'key' => null
                     ]
                 ],
-                'callback' => 'formatResponse',
-                'expected' => 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL
+                'callback' => 'ServiceManager::formatResponse',
+                'expected' => [
+                    'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>| sec<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.'
+                ]
             ],
             'single post' => [
                 'setParams' => [
@@ -775,8 +780,10 @@ class CurlTest extends TestCase
                         'key' => 'id'
                     ]
                 ],
-                'callback' => 'formatResponse',
-                'expected' => $single
+                'callback' => 'ServiceManager::formatResponse',
+                'expected' => [
+                    $single
+                ]
             ],
             'multi post' => [
                 'setParams' => [
@@ -809,7 +816,7 @@ class CurlTest extends TestCase
                         'key' => 'id'
                     ]
                 ],
-                'callback' => 'formatResponse',
+                'callback' => 'ServiceManager::formatResponse',
                 'expected' => $multi
             ],
             'post with key diff' => [
@@ -828,8 +835,10 @@ class CurlTest extends TestCase
                         'key' => 'pippo'
                     ]
                 ],
-                'callback' => 'formatResponse',
-                'expected' => $single
+                'callback' => 'ServiceManager::formatResponse',
+                'expected' => [
+                    $single
+                ]
             ],
             'post multi' => [
                 'setParams' => [
@@ -893,7 +902,10 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => $single . '{"ok":true,"response":{"method":"POST","params":{"var":"30040","datefrom":"30\/12\/2019","dateto":"31\/12\/2019","field":"portata","full":"0"}}}'
+                'expected' => [
+                    $single,
+                    '{"ok":true,"response":{"method":"POST","params":{"var":"30040","datefrom":"30\/12\/2019","dateto":"31\/12\/2019","field":"portata","full":"0"}}}'
+                ]
             ],
             'multi method' => [
                 'setParams' => [
@@ -919,7 +931,10 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => '{"ok":true,"response":{"method":"GET","params":{"var":"30030","datefrom":"01\/01\/2020"}}}' . PHP_EOL . '{"ok":true,"response":{"method":"POST","params":{"var":"30040","datefrom":"30\/12\/2019","dateto":"31\/12\/2019","field":"portata","full":"0"}}}'
+                'expected' => [
+                    '{"ok":true,"response":{"method":"GET","params":{"var":"30030","datefrom":"01\/01\/2020"}}}',
+                    '{"ok":true,"response":{"method":"POST","params":{"var":"30040","datefrom":"30\/12\/2019","dateto":"31\/12\/2019","field":"portata","full":"0"}}}'
+                ]
             ],
             'multi get' => [
                 'setParams' => [
@@ -939,7 +954,10 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => '{"ok":true,"response":{"method":"GET","params":{"var":"30030","datefrom":"01\/01\/2020"}}}' . PHP_EOL . '{"ok":true,"response":{"method":"GET","params":{"var":"30040","datefrom":"01\/01\/2020"}}}'
+                'expected' => [
+                    '{"ok":true,"response":{"method":"GET","params":{"var":"30030","datefrom":"01\/01\/2020"}}}',
+                    '{"ok":true,"response":{"method":"GET","params":{"var":"30040","datefrom":"01\/01\/2020"}}}'
+                ]
             ],
             'multi put patch' => [
                 'setParams' => [
@@ -959,7 +977,10 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => '{"ok":true,"response":{"method":"PUT","params":{"var":"30030","datefrom":"01\/01\/2020"}}}' . PHP_EOL . '{"ok":true,"response":{"method":"PATCH","params":{"var":"30040","datefrom":"01\/01\/2020"}}}'
+                'expected' => [
+                    '{"ok":true,"response":{"method":"PUT","params":{"var":"30030","datefrom":"01\/01\/2020"}}}',
+                    '{"ok":true,"response":{"method":"PATCH","params":{"var":"30040","datefrom":"01\/01\/2020"}}}'
+                ]
             ],
             'multi delete' => [
                 'setParams' => [
@@ -979,7 +1000,10 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => '{"ok":true,"response":{"method":"DELETE","params":{"id":"999998"}}}' . PHP_EOL . '{"ok":true,"response":{"method":"DELETE","params":{"id":"999999"}}}'
+                'expected' => [
+                    '{"ok":true,"response":{"method":"DELETE","params":{"id":"999998"}}}',
+                    '{"ok":true,"response":{"method":"DELETE","params":{"id":"999999"}}}'
+                ]
             ]            
         ];
         
@@ -991,14 +1015,15 @@ class CurlTest extends TestCase
      * @covers \vaniacarta74\Scarichi\Curl::runMultiSync
      * @dataProvider runMultiSyncProvider
      */
-    public function testRunMultiSyncEquals(array $setParams, ?string $funcName, string $response) : void
+    public function testRunMultiSyncEquals(array $setParams, ?string $funcName, array $responses) : void
     {
-        $expecteds = explode('|', $response);
+        $actuals = curl::runMultiSync($setParams, $funcName);
         
-        $actual = curl::runMultiSync($setParams, $funcName);
-        
-        foreach ($expecteds as $expected) {
-            $this->assertStringContainsString($expected, $actual);
+        foreach ($responses as $key => $response) {    
+            $expecteds = explode('|', $response);       
+            foreach ($expecteds as $expected) {
+                $this->assertStringContainsString($expected, $actuals[$key]);
+            }
         }
     }
     
@@ -1030,7 +1055,7 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.'
+                'expected' => ''
             ],
             'no key' => [
                 'setParams' => [
@@ -1049,7 +1074,7 @@ class CurlTest extends TestCase
                         'key' => null
                     ]
                 ],
-                'callback' => 'formatResponse',
+                'callback' => 'ServiceManager::formatResponse',
                 'expected' => '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
             ],
             'single post' => [
@@ -1069,7 +1094,7 @@ class CurlTest extends TestCase
                         'key' => '0'
                     ]
                 ],
-                'callback' => 'formatResponse',
+                'callback' => 'ServiceManager::formatResponse',
                 'expected' => $single
             ],
             'multi post' => [
@@ -1103,7 +1128,7 @@ class CurlTest extends TestCase
                         'key' => '1'
                     ]
                 ],
-                'callback' => 'formatResponse',
+                'callback' => 'ServiceManager::formatResponse',
                 'expected' => $multi
             ],
             'post with key diff' => [
@@ -1122,7 +1147,7 @@ class CurlTest extends TestCase
                         'key' => 'pippo'
                     ]
                 ],
-                'callback' => 'formatResponse',
+                'callback' => 'ServiceManager::formatResponse',
                 'expected' => '1) PID pippo: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
             ],
             'post multi' => [
@@ -1154,7 +1179,7 @@ class CurlTest extends TestCase
                         'key' => 'pippo'
                     ]
                 ],
-                'callback' => 'formatResponse',
+                'callback' => 'ServiceManager::formatResponse',
                 'expected' => '1) PID 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL . '2) PID pippo: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
             ],
             'post multi mixed' => [
@@ -1187,7 +1212,7 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.{"ok":true,"response":{"method":"POST","params":{"var":"30040","datefrom":"30\/12\/2019","dateto":"31\/12\/2019","field":"portata","full":"0"}}}'
+                'expected' => ''
             ],
             'multi method' => [
                 'setParams' => [
@@ -1213,7 +1238,7 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => '{"ok":true,"response":{"method":"GET","params":{"var":"30030","datefrom":"01\/01\/2020"}}}{"ok":true,"response":{"method":"POST","params":{"var":"30040","datefrom":"30\/12\/2019","dateto":"31\/12\/2019","field":"portata","full":"0"}}}'
+                'expected' => ''
             ],
             'multi get' => [
                 'setParams' => [
@@ -1233,7 +1258,7 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => '{"ok":true,"response":{"method":"GET","params":{"var":"30030","datefrom":"01\/01\/2020"}}}{"ok":true,"response":{"method":"GET","params":{"var":"30040","datefrom":"01\/01\/2020"}}}'
+                'expected' => ''
             ],
             'multi put patch' => [
                 'setParams' => [
@@ -1253,7 +1278,7 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => '{"ok":true,"response":{"method":"PUT","params":{"var":"30030","datefrom":"01\/01\/2020"}}}{"ok":true,"response":{"method":"PATCH","params":{"var":"30040","datefrom":"01\/01\/2020"}}}'
+                'expected' => ''
             ],
             'multi delete' => [
                 'setParams' => [
@@ -1273,7 +1298,7 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => '{"ok":true,"response":{"method":"DELETE","params":{"id":"999998"}}}{"ok":true,"response":{"method":"DELETE","params":{"id":"999999"}}}'
+                'expected' => ''
             ]
         ];
         
@@ -1305,7 +1330,7 @@ class CurlTest extends TestCase
     public function testRunMultiSyncDataException() : void
     {
         $setParams = [];
-        $funcName = 'formatResponse';
+        $funcName = 'ServiceManager::formatResponse';
         
         $this->expectException(\Exception::class);
         
@@ -1318,8 +1343,9 @@ class CurlTest extends TestCase
     public function runMultiAsyncProvider() : array
     {
         $url = TOCSVURL;
-        $single = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
-        $multi = $single . 'Elaborazione dati <b>Portata</b> variabile <b>30040</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
+        $single = 'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>| sec<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.';
+        $single2 = 'Elaborazione dati <b>Portata<\/b> variabile <b>30040<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>| sec<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.';
+        $multi = [$single, $single2];
         
         $data = [
             'no callback' => [
@@ -1340,7 +1366,9 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.'
+                'expected' => [
+                    'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>|<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.'
+                ]
             ],
             'no key' => [
                 'setParams' => [
@@ -1359,8 +1387,10 @@ class CurlTest extends TestCase
                         'key' => null
                     ]
                 ],
-                'callback' => 'formatResponse',
-                'expected' => 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL
+                'callback' => 'ServiceManager::formatResponse',
+                'expected' => [
+                    'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>| sec<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.'
+                ]
             ],
             'single post' => [
                 'setParams' => [
@@ -1379,8 +1409,10 @@ class CurlTest extends TestCase
                         'key' => 'id'
                     ]
                 ],
-                'callback' => 'formatResponse',
-                'expected' => $single
+                'callback' => 'ServiceManager::formatResponse',
+                'expected' => [
+                    $single
+                ]
             ],
             'multi post' => [
                 'setParams' => [
@@ -1413,7 +1445,7 @@ class CurlTest extends TestCase
                         'key' => '1'
                     ]
                 ],
-                'callback' => 'formatResponse',
+                'callback' => 'ServiceManager::formatResponse',
                 'expected' => $multi
             ],
             'post with key diff' => [
@@ -1432,8 +1464,10 @@ class CurlTest extends TestCase
                         'key' => 'pippo'
                     ]
                 ],
-                'callback' => 'formatResponse',
-                'expected' => $single
+                'callback' => 'ServiceManager::formatResponse',
+                'expected' => [
+                    $single
+                ]
             ],
             'post multi' => [
                 'setParams' => [
@@ -1497,7 +1531,10 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => $single . '|{"ok":true,"response":{"method":"POST","params":{"var":"30040","datefrom":"30\/12\/2019","dateto":"31\/12\/2019","field":"portata","full":"0"}}}' . PHP_EOL
+                'expected' => [
+                    $single, 
+                    '{"ok":true,"response":{"method":"POST","params":{"var":"30040","datefrom":"30\/12\/2019","dateto":"31\/12\/2019","field":"portata","full":"0"}}}'
+                ]
             ],
             'multi method' => [
                 'setParams' => [
@@ -1523,7 +1560,10 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => '{"ok":true,"response":{"method":"GET","params":{"var":"30030","datefrom":"01\/01\/2020"}}}' . PHP_EOL . '|{"ok":true,"response":{"method":"POST","params":{"var":"30040","datefrom":"30\/12\/2019","dateto":"31\/12\/2019","field":"portata","full":"0"}}}' . PHP_EOL
+                'expected' => [
+                    '{"ok":true,"response":{"method":"GET","params":{"var":"30030","datefrom":"01\/01\/2020"}}}',
+                    '{"ok":true,"response":{"method":"POST","params":{"var":"30040","datefrom":"30\/12\/2019","dateto":"31\/12\/2019","field":"portata","full":"0"}}}'
+                ]
             ],
             'multi get' => [
                 'setParams' => [
@@ -1543,7 +1583,10 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => '{"ok":true,"response":{"method":"GET","params":{"var":"30030","datefrom":"01\/01\/2020"}}}' . PHP_EOL . '|{"ok":true,"response":{"method":"GET","params":{"var":"30040","datefrom":"01\/01\/2020"}}}' . PHP_EOL
+                'expected' => [
+                    '{"ok":true,"response":{"method":"GET","params":{"var":"30030","datefrom":"01\/01\/2020"}}}',
+                    '{"ok":true,"response":{"method":"GET","params":{"var":"30040","datefrom":"01\/01\/2020"}}}'
+                ]
             ],
             'multi put patch' => [
                 'setParams' => [
@@ -1563,7 +1606,10 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => '{"ok":true,"response":{"method":"PUT","params":{"var":"30030","datefrom":"01\/01\/2020"}}}' . PHP_EOL . '|{"ok":true,"response":{"method":"PATCH","params":{"var":"30040","datefrom":"01\/01\/2020"}}}' . PHP_EOL
+                'expected' => [
+                    '{"ok":true,"response":{"method":"PUT","params":{"var":"30030","datefrom":"01\/01\/2020"}}}',
+                    '{"ok":true,"response":{"method":"PATCH","params":{"var":"30040","datefrom":"01\/01\/2020"}}}'
+                ]
             ],
             'multi delete' => [
                 'setParams' => [
@@ -1583,7 +1629,10 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => '{"ok":true,"response":{"method":"DELETE","params":{"id":"999998"}}}' . PHP_EOL . '|{"ok":true,"response":{"method":"DELETE","params":{"id":"999999"}}}' . PHP_EOL
+                'expected' => [
+                    '{"ok":true,"response":{"method":"DELETE","params":{"id":"999998"}}}',
+                    '{"ok":true,"response":{"method":"DELETE","params":{"id":"999999"}}}'
+                ]
             ] 
         ];
         
@@ -1595,14 +1644,16 @@ class CurlTest extends TestCase
      * @covers \vaniacarta74\Scarichi\Curl::runMultiAsync
      * @dataProvider runMultiAsyncProvider
      */
-    public function testRunMultiAsyncEquals(array $setParams, ?string $funcName, string $response) : void
+    public function testRunMultiAsyncEquals(array $setParams, ?string $funcName, array $responses) : void
     {
-        $expecteds = explode('|', $response);
+        $actuals = curl::runMultiAsync($setParams, $funcName);        
+        $actual = implode('', $actuals);
         
-        $actual = curl::runMultiAsync($setParams, $funcName);
-        
-        foreach ($expecteds as $expected) {
-            $this->assertStringContainsString($expected, $actual);
+        foreach ($responses as $response) {    
+            $expecteds = explode('|', $response);    
+            foreach ($expecteds as $expected) {
+                $this->assertStringContainsString($expected, $actual);
+            }
         }
     }
     
@@ -1634,7 +1685,7 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.'
+                'expected' => ''
             ],
             'no key' => [
                 'setParams' => [
@@ -1653,7 +1704,7 @@ class CurlTest extends TestCase
                         'key' => null
                     ]
                 ],
-                'callback' => 'formatResponse',
+                'callback' => 'ServiceManager::formatResponse',
                 'expected' => '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
             ],
             'single post' => [
@@ -1673,7 +1724,7 @@ class CurlTest extends TestCase
                         'key' => '0'
                     ]
                 ],
-                'callback' => 'formatResponse',
+                'callback' => 'ServiceManager::formatResponse',
                 'expected' => $single
             ],
             'multi post' => [
@@ -1707,7 +1758,7 @@ class CurlTest extends TestCase
                         'key' => '1'
                     ]
                 ],
-                'callback' => 'formatResponse',
+                'callback' => 'ServiceManager::formatResponse',
                 'expected' => $multi
             ],
             'post with key diff' => [
@@ -1726,7 +1777,7 @@ class CurlTest extends TestCase
                         'key' => 'pippo'
                     ]
                 ],
-                'callback' => 'formatResponse',
+                'callback' => 'ServiceManager::formatResponse',
                 'expected' => '1) PID pippo: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
             ],
             'post multi' => [
@@ -1758,7 +1809,7 @@ class CurlTest extends TestCase
                         'key' => 'pippo'
                     ]
                 ],
-                'callback' => 'formatResponse',
+                'callback' => 'ServiceManager::formatResponse',
                 'expected' => '1) PID 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL . '2) PID pippo: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
             ],
             'post multi mixed' => [
@@ -1791,7 +1842,7 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.|{"ok":true,"response":{"method":"POST","params":{"var":"30040","datefrom":"30\/12\/2019","dateto":"31\/12\/2019","field":"portata","full":"0"}}}'
+                'expected' => ''
             ],
             'multi method' => [
                 'setParams' => [
@@ -1817,7 +1868,7 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => '{"ok":true,"response":{"method":"GET","params":{"var":"30030","datefrom":"01\/01\/2020"}}}|{"ok":true,"response":{"method":"POST","params":{"var":"30040","datefrom":"30\/12\/2019","dateto":"31\/12\/2019","field":"portata","full":"0"}}}'
+                'expected' => ''
             ],
             'multi get' => [
                 'setParams' => [
@@ -1837,7 +1888,7 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => '{"ok":true,"response":{"method":"GET","params":{"var":"30030","datefrom":"01\/01\/2020"}}}|{"ok":true,"response":{"method":"GET","params":{"var":"30040","datefrom":"01\/01\/2020"}}}'
+                'expected' => ''
             ],
             'multi put patch' => [
                 'setParams' => [
@@ -1857,7 +1908,7 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => '{"ok":true,"response":{"method":"PUT","params":{"var":"30030","datefrom":"01\/01\/2020"}}}|{"ok":true,"response":{"method":"PATCH","params":{"var":"30040","datefrom":"01\/01\/2020"}}}'
+                'expected' => ''
             ],
             'multi delete' => [
                 'setParams' => [
@@ -1877,7 +1928,7 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => null,
-                'expected' => '{"ok":true,"response":{"method":"DELETE","params":{"id":"999998"}}}|{"ok":true,"response":{"method":"DELETE","params":{"id":"999999"}}}'
+                'expected' => ''
             ] 
         ];
         
@@ -1909,772 +1960,10 @@ class CurlTest extends TestCase
     public function testRunMultiAsyncDataException() : void
     {
         $setParams = [];
-        $funcName = 'formatResponse';
+        $funcName = 'ServiceManager::formatResponse';
         
         $this->expectException(\Exception::class);
         
         curl::runMultiAsync($setParams, $funcName);
-    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    /**
-     * @group curl
-     * @covers \vaniacarta74\Scarichi\Curl::set2     
-     */
-    public function testSet2PostIsResource()
-    {
-        $params = [
-            'var' => '30030',
-            'datefrom' => '30/12/2019',
-            'dateto' => '31/12/2019',
-            'field' => 'portata',
-            'full' => '0'
-        ];
-        $url = 'http://' . LOCALHOST . '/scarichi/tocsv.php';
-        
-        $actual = Curl::set2($url, $params);
-        
-        $this->assertIsResource($actual);
-        
-        return $actual;
-    }
-    
-    /**
-     * @group curl
-     * @covers \vaniacarta74\Scarichi\Curl::set2     
-     */
-    public function testSet2GetIsResource()
-    {
-        $url = 'http://' . LOCALHOST . '/scarichi/tocsv.php';
-        
-        $actual = Curl::set2($url);
-        
-        $this->assertIsResource($actual);
-        
-        return $actual;
-    }
-    
-    /**
-     * @group curl
-     * @covers \vaniacarta74\Scarichi\Curl::set2
-     */
-    public function testSet2Exception() : void
-    {
-        $params = [];
-        $url = 'http://' . LOCALHOST . '/scarichi/tocsv.php';
-        
-        $this->expectException(\Exception::class);
-        
-        Curl::set2($url, $params);
-    }
-    
-    /**
-     * @group curl
-     * @covers \vaniacarta74\Scarichi\Curl::setJson     
-     */
-    public function testSetJsonIsResource()
-    {
-        $params = [
-            'var' => '30030',
-            'datefrom' => '30/12/2019',
-            'dateto' => '31/12/2019',
-            'field' => 'portata',
-            'full' => '0'
-        ];
-        $url = 'http://' . LOCALHOST . '/scarichi/tojson.php';
-        
-        $actual = Curl::setJson($url, $params);
-        
-        $this->assertIsResource($actual);
-        
-        return $actual;
-    }
-    
-    /**
-     * @group curl
-     * @covers \vaniacarta74\Scarichi\Curl::setJson
-     */
-    public function testSetJsonException() : void
-    {
-        $params = [];
-        $url = 'http://' . LOCALHOST . '/scarichi/tojson.php';
-        
-        $this->expectException(\Exception::class);
-        
-        Curl::setJson($url, $params);
-    }
-    
-    /**
-     * @group curl
-     * @covers \vaniacarta74\Scarichi\Curl::exec2
-     * @depends testSet2PostIsResource
-     */
-    public function testExec2ContainsString($ch) : void
-    {
-        $response = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.';
-        $expecteds = explode('|', $response);
-        
-        $actual = Curl::exec2($ch);
-        
-        foreach ($expecteds as $expected) {
-            $this->assertStringContainsString($expected, $actual);
-        }
-    }
-    
-    /**
-     * @group curl
-     * @covers \vaniacarta74\Scarichi\Curl::exec2
-     */
-    public function testExec2Exception() : void
-    {
-        $ch = null;
-        
-        $this->expectException(\Exception::class);
-        
-        Curl::exec2($ch);
-    }
-    
-    /**
-     * @group curl
-     * @covers \vaniacarta74\Scarichi\Curl::run2
-     */
-    public function testRun2ContainsString() : void
-    {
-        $params = [
-            'var' => '30030',
-            'datefrom' => '30/12/2019',
-            'dateto' => '31/12/2019',
-            'field' => 'portata',
-            'full' => '0'
-        ];
-        $url = 'http://' . LOCALHOST . '/scarichi/tocsv.php';
-        $json = false;
-        $response = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.';
-        $expecteds = explode('|', $response);
-        
-        $actual = Curl::run2($url, $params, $json);
-        
-        foreach ($expecteds as $expected) {
-            $this->assertStringContainsString($expected, $actual);
-        }
-    }
-    
-    /**
-     * @group curl
-     * @covers \vaniacarta74\Scarichi\Curl::run2
-     */
-    public function testRun2GetContainsString() : void
-    {
-        $url = 'http://' . LOCALHOST . '/scarichi/tocsv.php?var=30030&datefrom=30/12/2019&dateto=31/12/2019&field=portata&full=0';
-        $response = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.';
-        $expecteds = explode('|', $response);
-        
-        $actual = Curl::run2($url);
-        
-        foreach ($expecteds as $expected) {
-            $this->assertStringContainsString($expected, $actual);
-        }
-    }
-    
-    /**
-     * @group curl
-     * @covers \vaniacarta74\Scarichi\Curl::run2
-     */
-    public function testRun2JsonStringEqualsJsonFile() : void
-    {
-        $params = [
-            'var' => '30030',
-            'datefrom' => '23/04/2020',
-            'dateto' => '24/04/2020',
-            'field' => 'portata',
-            'full' => '0'
-        ];
-        $url = 'http://' . LOCALHOST . '/scarichi/tojson.php';
-        $json = true;
-        $expected = __DIR__ . '/../providers/curlRunTest.json';
-        
-        $actual = Curl::run2($url, $params, $json);
-        
-        $this->assertJsonStringEqualsJsonFile($expected, $actual);
-    }
-    
-    /**
-     * @group curl
-     * @covers \vaniacarta74\Scarichi\Curl::run2
-     */
-    public function testRun2Exception() : void
-    {
-        $params = [];
-        $url = 'http://' . LOCALHOST . '/scarichi/tocsv.php';
-        
-        $this->expectException(\Exception::class);
-        
-        Curl::run2($url, $params);
-    }
-    
-    /**
-     * @coversNothing
-     */
-    public function multiSet2Provider() : array
-    {
-        $url = TOCSVURL;
-        
-        $data = [
-            'no key' => [
-                'post' => [
-                    [
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'key' => null
-            ],
-            'single' => [
-                'post' => [
-                    [
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'key' => 'var'
-            ],
-            'multi' => [
-                'post' => [
-                    [
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ],
-                    [
-                        'var' => '30040',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'key' => 'var'
-            ]
-        ];
-        
-        return $data;
-    }
-    
-    /**
-     * @group curl
-     * @covers \vaniacarta74\Scarichi\Curl::multiSet2
-     * @dataProvider multiSet2Provider
-     */
-    public function testMultiSet2IsResource(array $postParam, string $url, ?string $key) : void
-    {
-        $actuals = Curl::multiSet2($url, $postParam, $key);
-        
-        foreach ($actuals as $actual) {
-            $this->assertIsResource($actual);
-        }
-    }
-    
-    /**
-     * @group curl
-     * @covers \vaniacarta74\Scarichi\Curl::multiSet2
-     */
-    public function testMultiSet2KeyException() : void
-    {
-        $postParam = [
-            [
-                'var' => '30030',
-                'datefrom' => '30/12/2019',
-                'dateto' => '31/12/2019',
-                'field' => 'portata',
-                'full' => '0'
-            ]
-        ];
-        $url = TOCSVURL;
-        $key = 'pippo';
-        
-        $this->expectException(\Exception::class);
-        
-        Curl::multiSet2($url, $postParam, $key);
-    }
-    
-    /**
-     * @group curl
-     * @covers \vaniacarta74\Scarichi\Curl::multiSet2
-     */
-    public function testMultiSet2DataException() : void
-    {
-        $postParam = [];
-        $url = TOCSVURL;
-        $key = 'var';
-        
-        $this->expectException(\Exception::class);
-        
-        Curl::multiSet2($url, $postParam, $key);
-    }
-
-    /**
-     * @coversNothing
-     */
-    public function runMultiSync2Provider() : array
-    {
-        $url = TOCSVURL;
-        $single = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
-        $multi = $single . 'Elaborazione dati <b>Portata</b> variabile <b>30040</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
-        
-        $data = [
-            'no callback' => [
-                'post' => [
-                    [
-                        'id' => '0',
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'key' => 'id',
-                'callback' => null,
-                'expected' => 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.'
-            ],
-            'no key' => [
-                'post' => [
-                    [
-                        'id' => '0',
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'key' => null,
-                'callback' => 'formatResponse',
-                'expected' => 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL
-            ],
-            'single post' => [
-                'post' => [
-                    [
-                        'id' => '0',
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'key' => 'id',
-                'callback' => 'formatResponse',
-                'expected' => $single
-            ],
-            'multi post' => [
-                'post' => [
-                    [
-                        'id' => '0',
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ],
-                    [
-                        'id' => '1',
-                        'var' => '30040',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'key' => 'id',
-                'callback' => 'formatResponse',
-                'expected' => $multi
-            ]
-        ];
-        
-        return $data;
-    }
-    
-    /**
-     * @group curl
-     * @covers \vaniacarta74\Scarichi\Curl::runMultiSync2
-     * @dataProvider runMultiSync2Provider
-     */
-    public function testRunMultiSync2Equals(array $postParam, string $url, ?string $key, ?string $funcName, string $response) : void
-    {
-        $expecteds = explode('|', $response);
-        
-        $actual = curl::runMultiSync2($url, $postParam, $key, $funcName);
-        
-        foreach ($expecteds as $expected) {
-            $this->assertStringContainsString($expected, $actual);
-        }
-    }
-    
-    /**
-     * @coversNothing
-     */
-    public function runMultiSync2EchoProvider() : array
-    {
-        $url = TOCSVURL;
-        $single = '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
-        $multi = $single . '2) PID 1: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
-        
-        $data = [
-            'no callback' => [
-                'post' => [
-                    [
-                        'id' => '0',
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'key' => 'id',
-                'callback' => null,
-                'expected' => 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.'
-            ],
-            'no key' => [
-                'post' => [
-                    [
-                        'id' => '0',
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'key' => null,
-                'callback' => 'formatResponse',
-                'expected' => '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
-            ],
-            'single post' => [
-                'post' => [
-                    [
-                        'id' => '0',
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'key' => 'id',
-                'callback' => 'formatResponse',
-                'expected' => $single
-            ],
-            'multi post' => [
-                'post' => [
-                    [
-                        'id' => '0',
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ],
-                    [
-                        'id' => '1',
-                        'var' => '30040',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'key' => 'id',
-                'callback' => 'formatResponse',
-                'expected' => $multi
-            ]
-        ];
-        
-        return $data;
-    }
-    
-    /**
-     * @group curl
-     * @covers \vaniacarta74\Scarichi\Curl::runMultiSync2
-     * @dataProvider runMultiSync2EchoProvider
-     */
-    public function testRunMultiSync2EchoOutputString(array $postParam, string $url, ?string $key, ?string $funcName, string $response) : void
-    {
-        $expecteds = explode('|', $response);
-        
-        curl::runMultiSync2($url, $postParam, $key, $funcName);
-        
-        $actual = $this->getActualOutput();
-        
-        foreach ($expecteds as $expected) {
-            $this->assertStringContainsString($expected, $actual);
-        }
-    }
-    
-    /**
-     * @group curl
-     * @covers \vaniacarta74\Scarichi\Curl::runMultiSync2
-     */
-    public function testRunMultiSync2DataException() : void
-    {
-        $postParam = [];
-        $url = TOCSVURL;
-        $key = 'id';
-        $funcName = 'formatResponse';
-        
-        $this->expectException(\Exception::class);
-        
-        curl::runMultiSync2($url, $postParam, $key, $funcName);
-    }
-    
-    /**
-     * @coversNothing
-     */
-    public function runMultiAsync2Provider() : array
-    {
-        $url = TOCSVURL;
-        $single = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
-        $multi = $single . 'Elaborazione dati <b>Portata</b> variabile <b>30040</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
-        
-        $data = [
-            'no callback' => [
-                'post' => [
-                    [
-                        'id' => '0',
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'key' => 'id',
-                'callback' => null,
-                'expected' => 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.'
-            ],
-            'no key' => [
-                'post' => [
-                    [
-                        'id' => '0',
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'key' => null,
-                'callback' => 'formatResponse',
-                'expected' => 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL
-            ],
-            'single post' => [
-                'post' => [
-                    [
-                        'id' => '0',
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'key' => 'id',
-                'callback' => 'formatResponse',
-                'expected' => $single
-            ],
-            'multi post' => [
-                'post' => [
-                    [
-                        'id' => '0',
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ],
-                    [
-                        'id' => '1',
-                        'var' => '30040',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'key' => 'id',
-                'callback' => 'formatResponse',
-                'expected' => $multi
-            ]
-        ];
-        
-        return $data;
-    }
-    
-    /**
-     * @group curl
-     * @covers \vaniacarta74\Scarichi\Curl::runMultiAsync2
-     * @dataProvider runMultiAsync2Provider
-     */
-    public function testRunMultiAsync2Equals(array $postParam, string $url, ?string $key, ?string $funcName, string $response) : void
-    {
-        $expecteds = explode('|', $response);
-        
-        $actual = curl::runMultiAsync2($url, $postParam, $key, $funcName);
-        
-        foreach ($expecteds as $expected) {
-            $this->assertStringContainsString($expected, $actual);
-        }
-    }
-    
-    /**
-     * @coversNothing
-     */
-    public function runMultiAsync2EchoProvider() : array
-    {
-        $url = TOCSVURL;
-        $single = '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
-        $multi = $single . '2) PID 1: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
-        
-        $data = [
-            'no callback' => [
-                'post' => [
-                    [
-                        'id' => '0',
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'key' => 'id',
-                'callback' => null,
-                'expected' => 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>|</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.'
-            ],
-            'no key' => [
-                'post' => [
-                    [
-                        'id' => '0',
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'key' => null,
-                'callback' => 'formatResponse',
-                'expected' => '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
-            ],
-            'single post' => [
-                'post' => [
-                    [
-                        'id' => '0',
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'key' => 'id',
-                'callback' => 'formatResponse',
-                'expected' => $single
-            ],
-            'multi post' => [
-                'post' => [
-                    [
-                        'id' => '0',
-                        'var' => '30030',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ],
-                    [
-                        'id' => '1',
-                        'var' => '30040',
-                        'datefrom' => '30/12/2019',
-                        'dateto' => '31/12/2019',
-                        'field' => 'portata',
-                        'full' => '0'
-                    ]
-                ],
-                'url' => $url,
-                'key' => 'id',
-                'callback' => 'formatResponse',
-                'expected' => $multi
-            ]
-        ];
-        
-        return $data;
-    }
-    
-    /**
-     * @group curl
-     * @covers \vaniacarta74\Scarichi\Curl::runMultiAsync2
-     * @dataProvider runMultiAsync2EchoProvider
-     */
-    public function testRunMultiAsync2EchoOutputString(array $postParam, string $url, ?string $key, ?string $funcName, string $response) : void
-    {
-        $expecteds = explode('|', $response);
-        
-        curl::runMultiAsync2($url, $postParam, $key, $funcName);
-        
-        $actual = $this->getActualOutput();
-        
-        foreach ($expecteds as $expected) {
-            $this->assertStringContainsString($expected, $actual);
-        }
-    }
-    
-    /**
-     * @group curl
-     * @covers \vaniacarta74\Scarichi\Curl::runMultiAsync2
-     */
-    public function testRunMultiAsync2DataException() : void
-    {
-        $postParam = [];
-        $url = TOCSVURL;
-        $key = 'id';
-        $funcName = 'formatResponse';
-        
-        $this->expectException(\Exception::class);
-        
-        curl::runMultiAsync2($url, $postParam, $funcName);
     }
 }

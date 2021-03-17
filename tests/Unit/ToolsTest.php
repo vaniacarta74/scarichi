@@ -3,6 +3,7 @@ namespace vaniacarta74\Scarichi\tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use vaniacarta74\Scarichi\tests\classes\CsvFileIterator;
+use vaniacarta74\Scarichi\Utility;
 
 use function vaniacarta74\Scarichi\checkFilter as checkFilter;
 use function vaniacarta74\Scarichi\checkVariable as checkVariable;
@@ -135,6 +136,8 @@ class ToolsTest extends TestCase
      */
     public function responseProvider() : array
     {
+        $start = Utility::getMicroTime();
+        
         $data = [
             'standard' => [
                 'request' => [
@@ -144,8 +147,9 @@ class ToolsTest extends TestCase
                     'full' => '1',
                     'field' => 'volume'
                 ],
-                'printed' => true,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
+                'printed' => 1,
+                'start' => $start,
+                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati: <b>1</b>'
             ],
             'full no print' => [
                 'request' => [
@@ -155,7 +159,8 @@ class ToolsTest extends TestCase
                     'full' => '1',
                     'field' => 'volume'
                 ],
-                'printed' => false,
+                'printed' => 0,
+                'start' => $start,
                 'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>full</b> esportato per mancanza di dati.'
             ],
             'only datefrom full print' => [
@@ -166,8 +171,9 @@ class ToolsTest extends TestCase
                     'full' => '1',
                     'field' => 'volume'
                 ],
-                'printed' => true,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/05/2020</b> al <b>' . date('d/m/Y') . '</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
+                'printed' => 1,
+                'start' => $start,
+                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/05/2020</b> al <b>' . date('d/m/Y') . '</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati: <b>1</b>'
             ],
             'field other full print' => [
                 'request' => [
@@ -177,8 +183,9 @@ class ToolsTest extends TestCase
                     'full' => '1',
                     'field' => 'livello'
                 ],
-                'printed' => true,
-                'expected' => 'Elaborazione dati <b>Livello</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.'
+                'printed' => 1,
+                'start' => $start,
+                'expected' => 'Elaborazione dati <b>Livello</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati: <b>1</b>'
             ],
             'field other no 0 no print' => [
                 'request' => [
@@ -188,7 +195,8 @@ class ToolsTest extends TestCase
                     'full' => '0',
                     'field' => 'livello'
                 ],
-                'printed' => false,
+                'printed' => 0,
+                'start' => $start,
                 'expected' => 'Elaborazione dati <b>Livello</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.'
             ]
         ];
@@ -6752,17 +6760,18 @@ class ToolsTest extends TestCase
      * @group depends
      * covers divideAndPrint()
      */
-    public function testDivideAndPrintFalse() : void
+    public function testDivideAndPrintNoDataEquals() : void
     {
         $full = true;
         $field = 'delta';
         $limit = 100;
+        $expected = 0;
         
         $dati = [];
         
         $actual = divideAndPrint($dati, $full, $field, $limit);
         
-        $this->assertFalse($actual);
+        $this->assertEquals($expected, $actual);
     }
 
     /**
@@ -6770,15 +6779,16 @@ class ToolsTest extends TestCase
      * covers divideAndPrint()
      * @depends testFilterEquals
      */
-    public function testDivideAndPrintTrue(array $dati) : void
+    public function testDivideAndPrintEquals(array $dati) : void
     {
         $full = true;
         $field = 'delta';
         $limit = 100;
+        $expected = 1;
         
         $actual = divideAndPrint($dati, $full, $field, $limit);
         
-        $this->assertTrue($actual);
+        $this->assertEquals($expected, $actual);
     }
 
     
@@ -6838,11 +6848,11 @@ class ToolsTest extends TestCase
      * covers response()
      * @dataProvider responseProvider
      */
-    public function testResponseEquals(array $request, bool $printed, string $response) : void
+    public function testResponseEquals(array $request, int $printed, string $start, string $response) : void
     {
         $expecteds = explode('|', $response);
         
-        $actual = response($request, $printed);
+        $actual = response($request, $printed, $start);
         
         foreach ($expecteds as $expected) {
             $this->assertStringContainsString($expected, $actual);
@@ -6855,7 +6865,8 @@ class ToolsTest extends TestCase
      */
     public function testResponseException() : void
     {
-        $printed = true;
+        $printed = 1;
+        $start = Utility::getMicroTime();
         
         $request = [
             'var' => '30030',
@@ -6866,7 +6877,7 @@ class ToolsTest extends TestCase
         
         $this->expectException(\Exception::class);
         
-        response($request, $printed);
+        response($request, $printed, $start);
     }
     
     /**
@@ -6875,7 +6886,8 @@ class ToolsTest extends TestCase
      */
     public function testResponseException1() : void
     {
-        $printed = true;
+        $printed = 1;
+        $start = Utility::getMicroTime();
         
         $request = [
             'var' => '30030',
@@ -6888,7 +6900,7 @@ class ToolsTest extends TestCase
         
         $this->expectException(\Exception::class);
         
-        response($request, $printed);
+        response($request, $printed, $start);
     }
         
     /**
@@ -17920,7 +17932,7 @@ class ToolsTest extends TestCase
      * covers goCurl()
      * @dataProvider goCurlProvider
      */
-    public function testGoCurlStringContainsString(array $setParams, bool $async, string $response) : void
+    public function GoCurlStringContainsString(array $setParams, bool $async, string $response) : void
     {
         $expecteds = explode('|', $response);
         
@@ -17962,7 +17974,7 @@ class ToolsTest extends TestCase
      * covers checkCurlResponse()
      * @dataProvider checkCurlResponseProvider
      */
-    public function testCheckCurlResponseEquals(string $response, int $debug_level, string $expected) : void
+    public function CheckCurlResponseEquals(string $response, int $debug_level, string $expected) : void
     {
         $actual = checkCurlResponse($response, $debug_level);
         
@@ -17973,7 +17985,7 @@ class ToolsTest extends TestCase
      * @group test
      * covers checkCurlResponse()
      */
-    public function testCheckCurlResponseException() : void
+    public function CheckCurlResponseException() : void
     {
         $response = 'pippo';
         $debug_level = 3;
@@ -18987,7 +18999,7 @@ class ToolsTest extends TestCase
      * covers formatResponse()
      * @dataProvider formatResponseProvider
      */
-    public function testFormatResponseEquals(string $response, int $i, string $key, string $expected) : void
+    public function FormatResponseEquals(string $response, int $i, string $key, string $expected) : void
     {
         $actual = formatResponse($response, $i, $key);
         
@@ -19163,7 +19175,7 @@ class ToolsTest extends TestCase
      * covers setMessage()
      * @dataProvider setMessageProvider
      */
-    public function testSetMessageStringContainsString(string $message, int $n_files, string $response) : void
+    public function SetMessageStringContainsString(string $message, int $n_files, string $response) : void
     {
         $telegram = str_replace('%', $n_files, $response);
         

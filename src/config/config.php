@@ -26,6 +26,7 @@ define('MAKESUBDIR', boolval(CONFIG['define']['csv']['subdirectory']));
 define('TELEGRAM', boolval(CONFIG['define']['telegram']['send']));
 define('TELSCARICHI', CONFIG['define']['telegram']['scarichi']);
 define('GLOBALMSG', boolval(CONFIG['define']['telegram']['global']));
+define('MODE', boolval(!GLOBALMSG && TELEGRAM));
 define('ADMITTEDTAGS', CONFIG['define']['telegram']['admittedTags']);
 define('TAGLIMIT', intval(CONFIG['define']['telegram']['tagLimit']));
 define('MSGLIMIT', intval(CONFIG['define']['telegram']['limit']));

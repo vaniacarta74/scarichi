@@ -3410,29 +3410,60 @@ function setMessage(array $responses) : string
 function sendMessages(array $messages) : string
 {
     try {
-        $globalMessage = '';
-        if (GLOBALMSG) {
-            $globalMessage .= '<b>' . TELSCARICHI['header']['title']['global'] . '</b>' . PHP_EOL;
-            $globalMessage .= TELSCARICHI['header']['start'] . ' <b>' . Utility::microToLatinTime(START) . '</b>' . PHP_EOL;
-            $globalMessage .= PHP_EOL;
-            $globalMessage .= $messages['sync'] . PHP_EOL;
-            $globalMessage .= PHP_EOL;
-            $globalMessage .= $messages['iscsv'] . PHP_EOL;
-            $globalMessage .= PHP_EOL;
-            $globalMessage .= str_replace('dati', 'dati host 1', $messages['watch1']) . PHP_EOL;
-            $globalMessage .= PHP_EOL;
-            $globalMessage .= str_replace('dati', 'dati host 2', $messages['watch2']) . PHP_EOL;
-            $globalMessage .= PHP_EOL;            
-            $globalMessage .= TELSCARICHI['footer']['stop'] . ' <b>' . Utility::getLatinTime() . '</b>' . PHP_EOL;
-            $globalMessage .= TELSCARICHI['footer']['time'] . ' <b>' . Utility::benchmark(START) . '</b>' . PHP_EOL;
+        if (count($messages) > 0) {
+            $globalMessage = '';
+            if (GLOBALMSG) {
+                $globalMessage .= '<b>' . TELSCARICHI['header']['title']['global'] . '</b>' . PHP_EOL;
+                $globalMessage .= TELSCARICHI['header']['start'] . ' <b>' . Utility::microToLatinTime(START) . '</b>' . PHP_EOL;
+                $globalMessage .= PHP_EOL;
+                $globalMessage .= $messages['sync'] . PHP_EOL;
+                $globalMessage .= PHP_EOL;
+                $globalMessage .= $messages['iscsv'] . PHP_EOL;
+                $globalMessage .= PHP_EOL;
+                $globalMessage .= str_replace('dati', 'dati host 1', $messages['watch1']) . PHP_EOL;
+                $globalMessage .= PHP_EOL;
+                $globalMessage .= str_replace('dati', 'dati host 2', $messages['watch2']) . PHP_EOL;
+                $globalMessage .= PHP_EOL;            
+                $globalMessage .= TELSCARICHI['footer']['stop'] . ' <b>' . Utility::getLatinTime() . '</b>' . PHP_EOL;
+                $globalMessage .= TELSCARICHI['footer']['time'] . ' <b>' . Utility::benchmark(START) . '</b>' . PHP_EOL;
+            } else {
+                $globalMessage = $messages['iscsv'];
+            }
+            $response = sendTelegram($globalMessage, PHP_EOL); 
         } else {
-            $globalMessage = $messages['iscsv'];
+            $response = '';
         }
-        return sendTelegram($globalMessage, PHP_EOL);        
+        return $response;
     //@codeCoverageIgnoreStart
     } catch (\Throwable $e) {        
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;        
     }
     //@codeCoverageIgnoreEnd
+}
+
+
+function callServices(string $type, bool $sendMode, ?array $csvParams) : array
+{
+    try {
+        $messages = [];
+        if ($type === 'ok' || $type === 'default') {            
+
+            $syncService = New ServiceManager('telegram_REST', 'sync', [['tel' => $sendMode]]);
+            $messages['sync'] = $syncService->getMessage();
+
+            $csvService = New ServiceManager('tocsv', null, $csvParams);
+            $messages['iscsv'] = $csvService->getMessage(); 
+
+            $watchService1 = New ServiceManager('telegram_REST', 'watchdog', [['tel' => $sendMode]]);
+            $messages['watch1'] = $watchService1->getMessage();
+
+            $watchService2 = New ServiceManager('telegram_REST', 'watchdog', [['host' => 2,'move' => 1,'tel' => $sendMode]]);
+            $messages['watch2'] = $watchService2->getMessage();
+        }
+        return $messages;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
 }

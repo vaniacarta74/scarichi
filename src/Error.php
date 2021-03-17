@@ -132,7 +132,7 @@ class Error
     public static function appendToFile(string $message) : void
     {
         file_put_contents(self::$logFile, $message, FILE_APPEND);
-        chmod(self::$logFile, 0777);
+        //chmod(self::$logFile, 0777);
     }
     
     /**

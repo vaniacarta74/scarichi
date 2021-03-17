@@ -13,13 +13,13 @@ namespace vaniacarta74\Scarichi;
 require __DIR__ . '/../vendor/autoload.php';
 
 //$argc = 9;
-//$argv = ['scarichi.php', '-V', '30030,30040', '-f', '01/01/2019', '-t', '02/01/2019', '-c', '-n'];
+//$argv = ['scarichi.php', '-V', '30030', '-f', '01/01/2019', '-t', '02/01/2019', '-c', '-n', 'FALSE'];
+//$argv = ['scarichi.php', '-v'];
 
 try {
     $composer = COMPOSER;
     $help = CONFIG;
-    $parameters = $help['parameters'];
-    $sendMode = !GLOBALMSG && TELEGRAM;
+    $parameters = $help['parameters'];    
     
     $type = shuntTypes($parameters, $argv);
     echo getMessage($composer, $help, $type);
@@ -27,20 +27,9 @@ try {
     
     $filledValues = fillParameters($parameters, $values);
     $limitedValues = limitDates($filledValues, PERIOD, OFFSET);
-    $csvParams = setPostParameters($parameters, $limitedValues);
+    $params = setPostParameters($parameters, $limitedValues);
     
-    $syncService = New ServiceManager('telegram_REST', 'sync', [['tel' => $sendMode]]);
-    $messages['sync'] = $syncService->getMessage();
-    
-    $csvService = New ServiceManager('tocsv', null, $csvParams);
-    $messages['iscsv'] = $csvService->getMessage(); 
-    
-    $watchService1 = New ServiceManager('telegram_REST', 'watchdog', [['tel' => $sendMode]]);
-    $messages['watch1'] = $watchService1->getMessage();
-    
-    $watchService2 = New ServiceManager('telegram_REST', 'watchdog', [['host' => 2,'move' => 1,'tel' => $sendMode]]);
-    $messages['watch2'] = $watchService2->getMessage();
-    
+    $messages = callServices($type, MODE, $params);    
     echo sendMessages($messages);
 } catch (\Throwable $e) {
     Error::errorHandler($e, DEBUG_LEVEL, 'cli');
