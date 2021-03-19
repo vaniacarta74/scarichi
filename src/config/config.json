@@ -20,12 +20,38 @@
                 "host": "localhost",
                 "path": "scarichi/tocsv.php",
                 "params": {
-                    "tocsv": []
+                    "tocsv": {
+                        "id": {
+                            "tosend": false,
+                            "default": null
+                        },
+                        "var": {
+                            "tosend": true,
+                            "default": null
+                        },
+                        "datefrom": {
+                            "tosend": true,
+                            "default": null
+                        },
+                        "dateto": {
+                            "tosend": true,
+                            "default": null
+                        },
+                        "full": {
+                            "tosend": true,
+                            "default": 1
+                        },
+                        "field": {
+                            "tosend": true,
+                            "default": "volume"
+                        }
+                    }
                 },                
                 "method": "GET",
                 "key": "id",
                 "isJson": false,
                 "isAsync": true,
+                "printf": "formatResponse",
                 "withBody": true,
                 "header": {
                     "title": "Procedura esportazione CSV dati movimentazioni dighe",
@@ -43,38 +69,49 @@
                 "params": {
                     "sync": {
                         "token": {
+                            "tosend": true,
                             "default": "sync"
                         },
                         "variabile": {
+                            "tosend": true,
                             "default": "ALL"
                         },
                         "delay": {
+                            "tosend": true,
                             "default": 168
                         },
                         "tel": {
+                            "tosend": true,
                             "default": 1
                         }
                     },
                     "watchdog": {
                         "token": {
+                            "tosend": true,
                             "default": "watchdog"
                         },
                         "tipologia": {
+                            "tosend": true,
                             "default": "scarichi"
                         },
                         "host": {
+                            "tosend": true,
                             "default": 1
                         },
                         "move": {
+                            "tosend": true,
                             "default": 0
                         },
                         "variabile": {
+                            "tosend": true,
                             "default": "ALL"
                         },
                         "metodo": {
+                            "tosend": true,
                             "default": "array"
                         },
                         "tel": {
+                            "tosend": true,
                             "default": 1
                         }
                     }
@@ -83,7 +120,8 @@
                 "key": "token",
                 "isJson": false,
                 "isAsync": false,
-                "withBody": false,
+                "printf": "formatResponse",
+                "withBody": false,                
                 "header": {},
                 "footer": {}
             }

@@ -9,7 +9,6 @@ namespace vaniacarta74\Scarichi\tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use vaniacarta74\Scarichi\Utility;
-use function vaniacarta74\Scarichi\formulaPortataSfioro as formulaPortataSfioro;
 
 /**
  * Description of UtilityTest
@@ -1149,5 +1148,67 @@ class UtilityTest extends TestCase
         $actual = Utility::checkHtml($html);
         
         $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::getMicroTime
+     */
+    public function testGetMicroTimeEquals() : void
+    {
+        $actual = Utility::getMicroTime();
+        
+        $this->assertRegExp('/^[0-9]{4}[-][0-9]{2}[-][0-9]{2}[\s][0-9]{2}[:][0-9]{2}[:][0-9]{2}[\.][0-9]{6}$/', $actual);
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::getLatinTime
+     */
+    public function testGetLatinTimeEquals() : void
+    {
+        $actual = Utility::getLatinTime();
+        
+        $this->assertRegExp('/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}[\s][0-9]{2}[:][0-9]{2}[:][0-9]{2}$/', $actual);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function microToLatinTimeProvider() : array
+    {
+        $data = [
+            'standard' => [
+                'microTime' => '2020-01-01 08:59:59.012345',
+                'expected' => '01/01/2020 08:59:59'
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::microToLatinTime
+     * @dataProvider microToLatinTimeProvider
+     */
+    public function testMicroToLatinTimeEquals(string $microTime, string $expected) : void
+    {
+        $actual = Utility::microToLatinTime($microTime);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @group utility
+     * @covers \vaniacarta74\Scarichi\Utility::microToLatinTime
+     */
+    public function testMicroToLatinTimeException() : void    {
+        
+        $microTime = '01/01/2020';
+        
+        $this->expectException(\Exception::class);
+        
+        Utility::microToLatinTime($microTime);
     }
 }

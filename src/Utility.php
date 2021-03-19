@@ -110,10 +110,12 @@ class Utility
             $now = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
             $microTime = $now->format('Y-m-d H:i:s.u');
             return $microTime;
+        // @codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
             throw $e;
         }
+        // @codeCoverageIgnoreEnd
     }
     
     /**
@@ -124,12 +126,14 @@ class Utility
     {
         try {
             $now = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
-            $microTime = $now->format('d/m/Y H:i:s');
-            return $microTime;
+            $latinTime = $now->format('d/m/Y H:i:s');
+            return $latinTime;
+        // @codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, Error::debugLevel());
             throw $e;
         }
+        // @codeCoverageIgnoreEnd
     }
     
     /**
@@ -140,6 +144,9 @@ class Utility
     public static function microToLatinTime(string $microTime) : string
     {
         try {
+            if (!preg_match('/^[0-9]{4}[-][0-9]{2}[-][0-9]{2}[\s][0-9]{2}[:][0-9]{2}[:][0-9]{2}[\.][0-9]{6}$/', $microTime)) {
+                throw new \Exception('Formato microtime errato. Utilizzare: Y-m-d H:i:s.u');
+            }
             $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s.u', $microTime, new \DateTimeZone('Europe/Rome'));
             $latinTime = $dateTime->format('d/m/Y H:i:s');
             return $latinTime;
