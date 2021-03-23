@@ -174,7 +174,7 @@ class Curl
             }
             $handlers = self::multiSet($setParams);            
             $i = 1;
-            $responses = [];;
+            $responses = [];
             foreach ($handlers as $key => $ch) {
                 $report = self::exec($ch);
                 if (isset($funcName)) {

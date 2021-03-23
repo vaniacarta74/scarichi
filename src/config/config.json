@@ -76,6 +76,14 @@
                             "tosend": true,
                             "default": "ALL"
                         },
+                        "db": {
+                            "tosend": true,
+                            "default": 1
+                        },
+                        "tipodato": {
+                            "tosend": true,
+                            "default": 1
+                        },
                         "delay": {
                             "tosend": true,
                             "default": 168

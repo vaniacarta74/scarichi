@@ -19,10 +19,9 @@ use vaniacarta74\Scarichi\Utility;
  * @author Vania
  */
 class ServiceManager extends Accessor
-{
-    private static $globalSend = GLOBALMSG;
-    private static $config = SERVICES;
+{    
     private static $telegram = TELSCARICHI;
+    private $globalSend;
     private $serConfig;
     private $service;    
     private $token;
@@ -32,7 +31,7 @@ class ServiceManager extends Accessor
     private $key;
     private $isJson;
     private $isAsync;
-    private $printfunction;
+    private $printFunction;
     private $withBody;
     private $params;
     private $responses;
@@ -41,25 +40,35 @@ class ServiceManager extends Accessor
         
     /**
      * @param string $service
+     * @param string|null $token
      * @param array $params
-     * @throws \Exception
+     * @param array $config
+     * @throws \Throwable
      */
     public function __construct(string $service, ?string $token = null, ?array $params = null, ?array $config = null)
     {
-        $this->setStart();
-        $this->checkService($service, $config);        
-        $this->setToken($token);
-        $this->setUrl();
-        $this->setSerParams();
-        $this->setMethod();
-        $this->setKey();
-        $this->setIsJson();
-        $this->setIsAsync();
-        $this->setPrintFunction();
-        $this->setWithBody();
-        $this->setParams($params);
-        $this->callService();
-        $this->setMessage();
+        try {        
+            $this->setStart();
+            $this->checkService($service, $config);
+            $this->setGlobalSend();        
+            $this->setToken($token);
+            $this->setUrl();
+            $this->setSerParams();
+            $this->setMethod();
+            $this->setKey();
+            $this->setIsJson();
+            $this->setIsAsync();
+            $this->setPrintFunction();
+            $this->setWithBody();
+            $this->setParams($params);
+            $this->callService();
+            $this->setMessage();
+        //@codeCoverageIgnoreStart
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+        //@codeCoverageIgnoreEnd
     }
     
     /**
@@ -70,18 +79,48 @@ class ServiceManager extends Accessor
     {
         try {        
             $this->start = Utility::getMicroTime();
+        //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
-    }  
+        //@codeCoverageIgnoreEnd
+    }
     
+    /**
+     * @return void
+     * @throws \Throwable
+     */
+    private function setGlobalSend() : void
+    {
+        try {
+            if (isset($this->serConfig)&& array_key_exists('globalSend', $this->serConfig)) {
+                $globalSend = $this->serConfig['globalSend'];
+            } else {
+                $globalSend = GLOBALMSG;
+            }
+            $this->globalSend = $globalSend;
+        //@codeCoverageIgnoreStart
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+        //@codeCoverageIgnoreEnd
+    }
+    
+    /**
+     * @param string $rawService
+     * @param array $rawConfig
+     * @return void
+     * @throws \Throwable
+     * @throws \Exception
+     */
     private function checkService(string $rawService, ?array $rawConfig = null) : void
     {
         try {
             $service = filter_var($rawService, FILTER_SANITIZE_URL);
             if (!filter_var($service, FILTER_VALIDATE_URL)) {
-                $config = $rawConfig ?? self::$config;
+                $config = $rawConfig ?? SERVICES;
                 if (!array_key_exists($service, $config)) {
                     throw new \Exception('Configurazione servizio inesitente');
                 }
@@ -90,7 +129,7 @@ class ServiceManager extends Accessor
                 $serConfig = null;
             } 
             $this->service = $service;
-            $this->serConfig = $serConfig;            
+            $this->serConfig = $serConfig;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
@@ -98,7 +137,7 @@ class ServiceManager extends Accessor
     }
     
     /**
-     * @return string
+     * @return void
      * @throws \Throwable
      * @throws \Exception
      */
@@ -116,13 +155,13 @@ class ServiceManager extends Accessor
                     $url = 'http://' . REMOTE_HOST . '/' . $this->serConfig['path'];
                 } else {
                     $url = 'http://' . $host . '/' . $this->serConfig['path'];
-                }
+                } 
                 if (!filter_var($url, FILTER_VALIDATE_URL)) {
                     throw new \Exception('Url non valido');
                 }
             } else {
                 $url = $this->service;
-            }
+            }            
             $this->url = $url;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -131,25 +170,31 @@ class ServiceManager extends Accessor
     }
     
     /**
-     * @param string|null $token
+     * @param string|null $rawToken
      * @return void
      * @throws \Throwable
+     * @throws \Exception
      */
     private function setToken(?string $rawToken = null) : void
     {
         try {
-            if (isset($this->serConfig)) {
-                if (isset($rawToken)) {
+            if (isset($rawToken)) {
+                if (isset($this->serConfig)) {
                     if (array_key_exists('params', $this->serConfig) && array_key_exists($rawToken, $this->serConfig['params'])) {
                         $token = $rawToken;
                     } else {
                         throw new \Exception('Configurazione o token non valido');
-                    }                
+                    }
                 } else {
-                    $token = $this->service;
+                    $token = $rawToken;
                 }
             } else {
-                $token = null;
+                if (isset($this->serConfig)) {
+                    $token = $this->service;
+                } else {
+                    $urlParts = explode('?', $this->service); 
+                    $token = $urlParts[0];
+                }
             }
             $this->token = $token;
         } catch (\Throwable $e) {
@@ -158,6 +203,11 @@ class ServiceManager extends Accessor
         }
     }
     
+    /**
+     * @return void
+     * @throws \Throwable
+     * @throws \Exception
+     */
     private function setSerParams() : void
     {
         try {
@@ -177,6 +227,11 @@ class ServiceManager extends Accessor
         }
     }
     
+    /**
+     * @return void
+     * @throws \Throwable
+     * @throws \Exception
+     */
     private function setMethod() : void
     {
         try {
@@ -199,6 +254,11 @@ class ServiceManager extends Accessor
         }
     }
     
+    /**
+     * @return void
+     * @throws \Throwable
+     * @throws \Exception
+     */
     private function setKey() : void
     {
         try {
@@ -218,6 +278,11 @@ class ServiceManager extends Accessor
         }
     }
     
+    /**
+     * @return void
+     * @throws \Throwable
+     * @throws \Exception
+     */
     private function setIsJson() : void
     {
         try {
@@ -228,7 +293,7 @@ class ServiceManager extends Accessor
                     throw new \Exception('Configurazione isJson non valida');
                 }
             } else {
-                $isJson = null;
+                $isJson = false;
             }
             $this->isJson = $isJson;
         } catch (\Throwable $e) {
@@ -237,6 +302,11 @@ class ServiceManager extends Accessor
         }
     }
     
+    /**
+     * @return void
+     * @throws \Throwable
+     * @throws \Exception
+     */
     private function setIsAsync() : void
     {
         try {
@@ -256,13 +326,18 @@ class ServiceManager extends Accessor
         }
     }
     
+    /**
+     * @return void
+     * @throws \Throwable
+     * @throws \Exception
+     */
     private function setPrintFunction() : void
     {
         try {
             if (isset($this->serConfig)) {
                 if (array_key_exists('printf', $this->serConfig)) {
                     $function = $this->serConfig['printf'];
-                    if (is_callable('self::' . $function)) {
+                    if (isset($function) && is_callable('self::' . $function)) {
                         $className = str_replace(__NAMESPACE__ . '\\', '', get_class());
                         $printf = $className . '::' . $function;
                     } else {
@@ -274,13 +349,18 @@ class ServiceManager extends Accessor
             } else {
                 $printf = null;
             }
-            $this->printfunction = $printf;
+            $this->printFunction = $printf;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
     }
     
+    /**
+     * @return void
+     * @throws \Throwable
+     * @throws \Exception
+     */
     private function setWithBody() : void
     {
         try {
@@ -320,15 +400,16 @@ class ServiceManager extends Accessor
             } else {
                 $filled = $params;
             }
-            return $filled;            
+            return $filled;
+        //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
+        //@codeCoverageIgnoreEnd
     }
     
     /**
-     * @param array $serviceParams
      * @return array
      * @throws \Throwable
      */
@@ -339,35 +420,40 @@ class ServiceManager extends Accessor
             foreach ($this->serParams as $key => $default) {
                 $defParams[$key] = $default['default'];
             }
-            return $defParams;            
+            return $defParams;
+        //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
+        //@codeCoverageIgnoreEnd
     }
     
     /**
      * @param array $multiQueryParams
-     * @param array $defaultParams
      * @return array
      * @throws \Throwable
      */
     private function purgeParams(array $multiQueryParams) : array
     {
         try {
-            $purged = [];
+            $multiPurged = [];
             foreach ($multiQueryParams as $idCall => $queryParams) {
+                $purged = []; 
                 foreach ($queryParams as $key => $value) {
                     if (array_key_exists($key, $this->serParams)) {
-                        $purged[$idCall][$key] = $value;
+                        $purged[$key] = $value;
                     }                    
                 }
+                $multiPurged[$idCall] = $purged;
             }
-            return $purged;            
+            return $multiPurged;
+        //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
+        //@codeCoverageIgnoreEnd
     }
     
     /**
@@ -379,18 +465,21 @@ class ServiceManager extends Accessor
     private function fillParams(array $multiPurgedParams, array $defaultParams) : array
     {
         try {
+            $filled = [];
             foreach ($multiPurgedParams as $idCall => $purgedParams) {
                 $filled[$idCall] = $purgedParams + $defaultParams;
             }
-            return $filled;            
+            return $filled;
+        //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
+        //@codeCoverageIgnoreEnd
     }
     
     /**
-     * @param array $postParams
+     * @param array $params
      * @return void
      * @throws \Throwable
      * @throws \Exception
@@ -423,9 +512,15 @@ class ServiceManager extends Accessor
         }
     }
     
+    /**
+     * @param array $postParams
+     * @return array
+     * @throws \Throwable
+     */
     private function setCallParams(array $postParams) : array
     {
         try {
+            $prevKey = '';
             $setParams = [];
             foreach ($postParams as $idCall => $params) {            
                 $callParams = [];
@@ -443,56 +538,77 @@ class ServiceManager extends Accessor
                 }
                 $callParams['method'] = $this->method;
                 $callParams['isJson'] = $this->isJson;
-                $callParams['key'] = $this->setCallKey($idCall, $params);
+                $callParams['key'] = $this->setCallKey($idCall, $params, $prevKey);                
+                $prevKey = $callParams['key'];
                 $setParams[] = $callParams;
-            }           
-            return $setParams;
-        } catch (\Throwable $e) {
-            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-            throw $e;
-        }
-    }
-    
-    private function setQueryParams(array $params) : array
-    {
-        try {
-            $queryParams = [];
-            foreach ($params as $key => $value) {
-                if (array_key_exists($key, $this->serParams) && $this->serParams[$key]['tosend']) {
-                    $queryParams[$key] = $value;
-                }
             }
-            return $queryParams;            
+            return $setParams;
+        //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
+        //@codeCoverageIgnoreEnd
     }
     
     /**
-     * @param string|null $rawKey
-     * @param int $i
      * @param array $params
+     * @return array
+     * @throws \Throwable
+     */
+    private function setQueryParams(array $params) : array
+    {
+        try {            
+            if (count($this->serParams) > 0) {
+                $queryParams = [];
+                foreach ($params as $key => $value) {
+                    if (array_key_exists($key, $this->serParams) && $this->serParams[$key]['tosend']) {
+                        $queryParams[$key] = $value;
+                    }
+                }
+            } else {
+                $queryParams = $params;
+            }
+            return $queryParams;
+        //@codeCoverageIgnoreStart
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+        //@codeCoverageIgnoreEnd
+    }
+    
+    /**
+     * @param string $i
+     * @param array $params
+     * @param string $prevKey
      * @return string|null
      * @throws \Throwable
      */
-    private function setCallKey(string $i, array $params) : ?string
+    private function setCallKey(string $i, array $params, string $prevKey) : ?string
     {
         try {
             if (isset($this->key)) {
                 if (array_key_exists($this->key, $params)) {
-                    $key = $params[$this->key];
+                    $currentKey = $params[$this->key];                                        
                 } else {
-                    $key = str_replace('*', $i, $this->key);                    
-                }                
+                    $currentKey = str_replace('*', $i, $this->key);                    
+                }
+                if ($currentKey !== $prevKey) {
+                    $key = $currentKey;
+                } else {
+                    $key = $currentKey . $i;
+                }
             } else {
                 $key = null;
             }            
             return $key;
+        //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
+        //@codeCoverageIgnoreEnd
     }
 
     /**
@@ -506,9 +622,9 @@ class ServiceManager extends Accessor
             $n_param = count($this->params);
             if ($n_param > 0) {
                 if ($this->isAsync && $n_param > 1) {
-                    $responses = Curl::runMultiAsync($this->params, $this->printfunction);
+                    $responses = Curl::runMultiAsync($this->params, $this->printFunction);
                 } else {
-                    $responses = Curl::runMultiSync($this->params, $this->printfunction);
+                    $responses = Curl::runMultiSync($this->params, $this->printFunction);
                 }
             }
             $this->responses = $responses;
@@ -523,31 +639,28 @@ class ServiceManager extends Accessor
     /**
      * @param string $report
      * @param int $debug_level
-     * @return string
+     * @return array
      * @throws \Throwable
      * @throws \Exception
      */
     protected static function checkServiceResponse(string $report, int $debug_level) : array
     {
         try {
-            if ($debug_level > 2) {
-                throw new \Exception('Livello di debug non definito');
-            }
             $response = json_decode($report, true);
             if (!$response['ok']) {
                 $message = 'Elaborazione fallita.';
-                if ($debug_level === 1) {
-                    $message .= ' Verificare il log degli errori (' . realpath(LOG_PATH) . '/' . ERROR_LOG . ').';
-                }
+                $message .= ($debug_level === 1) ? ' Verificare il log degli errori (' . realpath(LOG_PATH) . '/' . ERROR_LOG . ').' : '';
                 $checked[] = $message;
             } else {
                 $checked = $response['response']['body'];
             }
             return $checked;
+        //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
+        //@codeCoverageIgnoreEnd
     }
     
     /**
@@ -595,8 +708,7 @@ class ServiceManager extends Accessor
             } else {
                 $telegramHeader['title'] = '<b>' . $this->token . '</b>';
             }
-            $telegramHeader['start'] = $header['start'] . ' <b>' . Utility::microToLatinTime($this->start) . '</b>';
-                    
+            $telegramHeader['start'] = $header['start'] . ' <b>' . Utility::microToLatinTime($this->start) . '</b>';                    
             return $telegramHeader;
         //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {        
@@ -644,29 +756,68 @@ class ServiceManager extends Accessor
             if (array_key_exists($this->token, $repConf)) {
                 $repTitle = $repConf[$this->token]['in'];
                 $totals = [];
-                $repString = 'n.d.';
                 foreach ($responses as $json) {
                     $response = json_decode($json, true);
                     if ($response['ok']) {                        
                         $resFooter = str_replace(' ', '', str_replace($repTitle, '', $response['response']['footer'][2]));
-                        $reports = explode('|', $resFooter);
-                        foreach ($reports as $report) {
-                            $vars = explode(':', $report);
-                            $var = ucfirst($vars[0]);
-                            if (isset($totals[$var])) {
-                                $totals[$var] += intval($vars[1]);
-                            } else {
-                                $totals[$var] = intval($vars[1]);
-                            }
-                        }         
+                        $this->setTotals($totals, $resFooter);
                     }
                 }
-                if (count($totals) > 0) {
-                    $repString = str_replace('=', ': ' , str_replace('&', ' | ', http_build_query($totals)));
-                }
+                $repString = $this->formatTotals($totals);
             } else {
                 $repString = '';
             }
+            return $repString;
+        //@codeCoverageIgnoreStart
+        } catch (\Throwable $e) {        
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;        
+        }
+        //@codeCoverageIgnoreEnd
+    }
+    
+    /**
+     * @param array $totals
+     * @param string $resFooter
+     * @return void
+     * @throws \Throwable
+     */
+    private function setTotals(array &$totals, string $resFooter) : void
+    {
+        try {            
+            $reports = explode('|', $resFooter);
+            foreach ($reports as $report) {
+                $vars = explode(':', $report);
+                $var = ucfirst($vars[0]);
+                if (isset($totals[$var])) {
+                    $totals[$var] += intval(str_replace('.', '', $vars[1]));
+                } else {
+                    $totals[$var] = intval(str_replace('.', '', $vars[1]));
+                }
+            }                        
+        //@codeCoverageIgnoreStart
+        } catch (\Throwable $e) {        
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;        
+        }
+        //@codeCoverageIgnoreEnd
+    }
+    
+    /**
+     * @param array $totals
+     * @return string
+     * @throws \Throwable
+     */
+    private function formatTotals(array $totals) : string
+    {
+        try {
+            $repString = 'n.d.';
+            if (count($totals) > 0) {
+                foreach ($totals as $key => $value) {
+                   $formatted[$key] = number_format($value, 0, ',', '.');
+                }
+                $repString = str_replace('=', ': ' , str_replace('&', ' | ', http_build_query($formatted)));
+            }            
             return $repString;
         //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {        
@@ -684,15 +835,13 @@ class ServiceManager extends Accessor
     {
         try {
             $responses = $this->responses ?? [];
+            $telegram = '';
             if (count($responses) > 0) {
                 $header = $this->setHeader(); 
                 $body = $this->setBody($responses);
                 $repString = $this->setReport($responses);
                 $footer = $this->setFooter($repString);
-
                 $telegram = $header['title'] . PHP_EOL . $header['start'] . PHP_EOL . $body . $footer['stop'] . PHP_EOL . $footer['time'] . PHP_EOL . $footer['totals'];
-            } else {
-                $telegram = '';
             }        
             $this->message = $telegram;
         //@codeCoverageIgnoreStart
@@ -704,26 +853,50 @@ class ServiceManager extends Accessor
     }
     
     /**
-     * @return void
+     * @param array $responses
+     * @return string
      * @throws \Throwable
      */
     private function setBody(array $responses) : string
     {
         try {
-            if (self::$globalSend || !$this->withBody) {
+            if ($this->globalSend || !$this->withBody) {
                 $body = '';
             } else {
                 $message = '';
                 foreach ($responses as $json) {
                     $response = json_decode($json, true);
                     if ($response['ok']) {
-                        $message .= $response['response']['body'][0] . PHP_EOL;                        
+                        $this->setBodyMsg($message, $response['response']['body']);
                     }
                 }
                 $body = PHP_EOL . $message . PHP_EOL;
-            }
-            
+            }            
             return $body;
+        //@codeCoverageIgnoreStart
+        } catch (\Throwable $e) {        
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;        
+        }
+        //@codeCoverageIgnoreEnd
+    }
+    
+    /**
+     * @param string $message
+     * @param array $bodies
+     * @return void
+     * @throws \Throwable
+     */
+    private function setBodyMsg(string &$message, array $bodies) : void
+    {
+        try {
+            foreach ($bodies as $key => $body) {
+                if (is_numeric($key)) {
+                    $message .= $body . PHP_EOL;
+                } else {
+                    $message .= '<b>' . $key . ':</b> ' . $body . PHP_EOL;
+                }
+            }
         //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {        
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
