@@ -26,11 +26,12 @@ try {
     $values = setParameters($parameters, $argv, $type);
     
     $filledValues = fillParameters($parameters, $values);
-    $limitedValues = limitDates($filledValues, PERIOD, OFFSET);
+    $limitedValues = limitDates($filledValues);
     $params = setPostParameters($parameters, $limitedValues);
     
-    $messages = callServices($type, MODE, $params);    
-    echo sendMessages($messages);
+    $messages = callServices($type, $params);    
+    $telegram = buildTelegram($messages);
+    echo sendTelegram($telegram, PHP_EOL);
 } catch (\Throwable $e) {
     Error::errorHandler($e, DEBUG_LEVEL, 'cli');
     exit();

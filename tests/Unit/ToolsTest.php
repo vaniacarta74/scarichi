@@ -109,10 +109,8 @@ use function vaniacarta74\Scarichi\fillField as fillField;
 use function vaniacarta74\Scarichi\fillFull as fillFull;
 use function vaniacarta74\Scarichi\setPostParameters as setPostParameters;
 use function vaniacarta74\Scarichi\buildSetParams as buildSetParams;
-use function vaniacarta74\Scarichi\goCurl as goCurl;
 use function vaniacarta74\Scarichi\insertNoData as insertNoData;
 use function vaniacarta74\Scarichi\selectLastPrevData as selectLastPrevData;
-use function vaniacarta74\Scarichi\checkCurlResponse as checkCurlResponse;
 use function vaniacarta74\Scarichi\addCampiDati as addCampiDati;
 use function vaniacarta74\Scarichi\addCampiCalcoli as addCampiCalcoli;
 use function vaniacarta74\Scarichi\addCampiFormule as addCampiFormule;
@@ -125,8 +123,9 @@ use function vaniacarta74\Scarichi\loadFormule as loadFormule;
 use function vaniacarta74\Scarichi\loadDatiAcquisiti as loadDatiAcquisiti;
 use function vaniacarta74\Scarichi\addCostants as addCostants;
 use function vaniacarta74\Scarichi\sendTelegram as sendTelegram;
-use function vaniacarta74\Scarichi\formatResponse as formatResponse;
-use function vaniacarta74\Scarichi\setMessage as setMessage;
+use function vaniacarta74\Scarichi\buildTelegram as buildTelegram;
+use function vaniacarta74\Scarichi\callServices as callServices;
+use function vaniacarta74\Scarichi\csvResponse as csvResponse;
 
 class ToolsTest extends TestCase
 {
@@ -17802,202 +17801,6 @@ class ToolsTest extends TestCase
     /**
      * @coversNothing
      */
-    public function goCurlProvider() : array
-    {
-        $url = TOCSVURL;
-        $single = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
-        $multi = $single . 'Elaborazione dati <b>Portata</b> variabile <b>30040</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.' . PHP_EOL;
-        
-        $data = [
-            'no post values' => [
-                'setParams' => [],
-                'async' => false,
-                'expected' => ''
-            ],
-            'single' => [
-                'setParams' => [
-                    [
-                        'url' => $url,
-                        'method' => 'POST',
-                        'params' => [
-                            'id' => '0',
-                            'var' => '30030',
-                            'datefrom' => '30/12/2019',
-                            'dateto' => '31/12/2019',
-                            'field' => 'portata',
-                            'full' => '0'
-                        ],
-                        'isJson' => null,
-                        'key' => null
-                    ]
-                ],
-                'async' => false,
-                'expected' => $single
-            ],
-            'multi' => [
-                'setParams' => [
-                    [
-                        'url' => $url,
-                        'method' => 'POST',
-                        'params' => [
-                            'id' => '0',
-                            'var' => '30030',
-                            'datefrom' => '30/12/2019',
-                            'dateto' => '31/12/2019',
-                            'field' => 'portata',
-                            'full' => '0'
-                        ],
-                        'isJson' => null,
-                        'key' => null
-                    ],
-                    [
-                        'url' => $url,
-                        'method' => 'POST',
-                        'params' => [
-                            'id' => '1',
-                            'var' => '30040',
-                            'datefrom' => '30/12/2019',
-                            'dateto' => '31/12/2019',
-                            'field' => 'portata',
-                            'full' => '0'
-                        ],
-                        'isJson' => null,
-                        'key' => null
-                    ]
-                ],
-                'async' => false,
-                'expected' => $multi
-            ],
-            'single async' => [
-                'setParams' => [
-                    [
-                        'url' => $url,
-                        'method' => 'POST',
-                        'params' => [
-                            'id' => '0',
-                            'var' => '30030',
-                            'datefrom' => '30/12/2019',
-                            'dateto' => '31/12/2019',
-                            'field' => 'portata',
-                            'full' => '0'
-                        ],
-                        'isJson' => null,
-                        'key' => null
-                    ]
-                ],
-                'async' => true,
-                'expected' => $single
-            ],
-            'multi async' => [
-                'setParams' => [
-                    [
-                        'url' => $url,
-                        'method' => 'POST',
-                        'params' => [
-                            'id' => '0',
-                            'var' => '30030',
-                            'datefrom' => '30/12/2019',
-                            'dateto' => '31/12/2019',
-                            'field' => 'portata',
-                            'full' => '0'
-                        ],
-                        'isJson' => null,
-                        'key' => null
-                    ],
-                    [
-                        'url' => $url,
-                        'method' => 'POST',
-                        'params' => [
-                            'id' => '1',
-                            'var' => '30040',
-                            'datefrom' => '30/12/2019',
-                            'dateto' => '31/12/2019',
-                            'field' => 'portata',
-                            'full' => '0'
-                        ],
-                        'isJson' => null,
-                        'key' => null
-                    ]
-                ],
-                'async' => true,
-                'expected' => ''
-            ]
-        ];
-        
-        return $data;
-    }
-    
-    /**
-     * @group test
-     * covers goCurl()
-     * @dataProvider goCurlProvider
-     */
-    public function GoCurlStringContainsString(array $setParams, bool $async, string $response) : void
-    {
-        $expecteds = explode('|', $response);
-        
-        $actual = goCurl($setParams, $async);
-        
-        foreach ($expecteds as $expected) {
-            $this->assertStringContainsString($expected, $actual);
-        }
-    }
-            
-    /**
-     * @coversNothing
-     */
-    public function checkCurlResponseProvider() : array
-    {
-        $data = [
-            'no response level 1' => [
-                'response' => '',
-                'debug' => 1,
-                'expected' => 'Elaborazone fallita. Verificare il log degli errori (' . realpath(LOG_PATH) . '/' . ERROR_LOG . ').'
-            ],
-            'no response level 2' => [
-                'response' => '',
-                'debug' => 2,
-                'expected' => 'Elaborazone fallita.'
-            ],
-            'response' => [
-                'response' => '<b>pippo<b/>',
-                'debug' => 1,
-                'expected' => 'pippo'
-            ]
-        ];
-        
-        return $data;
-    }
-    
-    /**
-     * @group test
-     * covers checkCurlResponse()
-     * @dataProvider checkCurlResponseProvider
-     */
-    public function CheckCurlResponseEquals(string $response, int $debug_level, string $expected) : void
-    {
-        $actual = checkCurlResponse($response, $debug_level);
-        
-        $this->assertEquals($expected, $actual);
-    }
-    
-    /**
-     * @group test
-     * covers checkCurlResponse()
-     */
-    public function CheckCurlResponseException() : void
-    {
-        $response = 'pippo';
-        $debug_level = 3;
-        
-        $this->expectException(\Exception::class);
-        
-        checkCurlResponse($response, $debug_level);
-    }
-    
-    /**
-     * @coversNothing
-     */
     public function selectLastPrevDataProvider() : array
     {
         $data = [
@@ -18968,47 +18771,6 @@ class ToolsTest extends TestCase
     /**
      * @coversNothing
      */
-    public function formatResponseProvider() : array
-    {
-        $data = [
-            'no response level 1' => [
-                'response' => '',
-                'i' => 1,
-                'key' => 'Topolino',
-                'expected' => '1) PID Topolino: Elaborazone fallita.'
-            ],
-            'no response level 2' => [
-                'response' => '',
-                'i' => 1,
-                'key' => 'Topolino',
-                'expected' => '1) PID Topolino: Elaborazone fallita.'
-            ],
-            'response' => [
-                'response' => '<b>Pippo<b/>',
-                'i' => 1,
-                'key' => 'L\'amico di Topolino',
-                'expected' => '1) PID L\'amico di Topolino: Pippo' . PHP_EOL
-            ]
-        ];
-        
-        return $data;
-    }
-    
-    /**
-     * @group test
-     * covers formatResponse()
-     * @dataProvider formatResponseProvider
-     */
-    public function FormatResponseEquals(string $response, int $i, string $key, string $expected) : void
-    {
-        $actual = formatResponse($response, $i, $key);
-        
-        $this->assertStringContainsString($expected, $actual);
-    }
-    
-    /**
-     * @coversNothing
-     */
     public function limitDatesProvider() : array
     {
         $data = [
@@ -19125,45 +18887,38 @@ class ToolsTest extends TestCase
     /**
      * @coversNothing
      */
-    public function setMessageProvider() : array
+    public function buildTelegramProvider() : array
     {
-        $title = '<b>Procedura calcolo movimentazioni dighe</b>';
-        $start = 'Elaborazione iniziata in data: <b>|</b>';
-        $singleNot = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.';
-        $singleOk = 'Elaborazione dati <b>Portata</b> variabile <b>30030</b> dal <b>30/12/2019</b> al <b>31/12/2019</b> avvenuta con successo in <b>| sec</b>. File CSV <b>full</b> esportati.';
-        $messageOk = $singleOk  . PHP_EOL . $singleOk . PHP_EOL;
-        $messageNot = $singleNot  . PHP_EOL . $singleNot . PHP_EOL;
-        $messageMix = $singleOk  . PHP_EOL . $singleNot . PHP_EOL;
+        $title = '<b>CALCOLO VOLUMI E PORTATE MOVIMENTAZIONI DIGHE</b>';
+        $start = 'Elaborazione iniziata in data: <b>|</b>';        
         $stop = 'Elaborazione terminata in data: <b>|</b>';
-        $time = 'Tempo di elaborazione: <b>|</b>';
-        $totals = 'Numero totale file csv esportati: <b>%</b>';        
-        $telegram = $title . PHP_EOL . $start . PHP_EOL . PHP_EOL . '#' . PHP_EOL . $stop . PHP_EOL . $time . PHP_EOL . $totals;
+        $time = 'Tempo di elaborazione: <b>|</b>';        
         
         $data = [
             'no message' => [
-                'message' => '',
-                'n_files' => 0,
+                'messages' => [],
+                'global' => true,
                 'expected' => ''
             ],
-            'one file' => [
-                'message' => $singleOk,
-                'n_files' => 1,
-                'expected' => str_replace('#', $singleOk, $telegram)
+            'global' => [
+                'messages' => [
+                    'sync' => 'Messaggio sync',
+                    'tocsv' => 'Messaggio tocsv',
+                    'watch1' => 'Messaggio watchdog dati',
+                    'watch2' => 'Messaggio watchdog dati'
+                ],
+                'global' => true,
+                'expected' => $title . PHP_EOL . $start . PHP_EOL . PHP_EOL . 'Messaggio sync' . PHP_EOL . PHP_EOL . 'Messaggio tocsv' . PHP_EOL . PHP_EOL . 'Messaggio watchdog dati host 1' . PHP_EOL . PHP_EOL . 'Messaggio watchdog dati host 2' . PHP_EOL . PHP_EOL . $stop . PHP_EOL . $time 
             ],
-            'two files' => [
-                'message' => $messageOk,
-                'n_files' => 2,
-                'expected' => str_replace('#', $messageOk, $telegram)
-            ],
-            'tree files' => [
-                'message' => $messageOk . $singleOk . PHP_EOL,
-                'n_files' => 3,
-                'expected' => str_replace('#', $messageOk . $singleOk . PHP_EOL, $telegram)
-            ],
-            'four files' => [
-                'message' => $messageOk . $messageMix,
-                'n_files' => 3,
-                'expected' => str_replace('#', $messageOk . $messageMix, $telegram)
+            'tocsv' => [
+                'messages' => [
+                    'sync' => 'Messaggio sync',
+                    'tocsv' => 'Messaggio tocsv',
+                    'watch1' => 'Messaggio watchdog dati',
+                    'watch2' => 'Messaggio watchdog dati'
+                ],
+                'global' => false,
+                'expected' => 'Messaggio tocsv'
             ]
         ];
         
@@ -19172,19 +18927,158 @@ class ToolsTest extends TestCase
     
     /**
      * @group test
-     * covers setMessage()
-     * @dataProvider setMessageProvider
+     * covers buildTelegram()
+     * @dataProvider buildTelegramProvider
      */
-    public function SetMessageStringContainsString(string $message, int $n_files, string $response) : void
+    public function testBuildTelegramStringContainsString(array $messages, ?bool $global, string $response) : void
     {
-        $telegram = str_replace('%', $n_files, $response);
+        $expecteds = explode('|', $response);
         
-        $expecteds = explode('|', $telegram);
-        
-        $actual = setMessage($message);
+        $actual = buildTelegram($messages, $global);
         
         foreach ($expecteds as $expected) {
             $this->assertStringContainsString($expected, $actual);
+        }
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function callServicesProvider() : array
+    {
+        $data = [
+            'standard' => [
+                'type' => 'ok',
+                'csvParams' => [
+                    [
+                        'var' => '30030',
+                        'datefrom' => '01/01/2019',
+                        'dateto' => '02/01/2019',
+                        'full' => '1',
+                        'field' => 'volume'
+                    ]
+                ],
+                'mode' => false,
+                'expected' => [
+                    'sync' => '<b>Procedura sincronizzazione banche dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Records: 12.306 | Insert: 54 | Update: 0 | Presenti: 12.245 | Scartati: 7 | Cancellati: 0',
+                    'tocsv' => '<b>Procedura calcolo ed esportazione dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Esportati: ',
+                    'watch1' => '<b>Procedura caricamento dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Records: 0 | Insert: 0 | Update: 0 | Presenti: 0 | Scartati: 0 | Cancellati: 0',
+                    'watch2' => '<b>Procedura caricamento dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Records: 0 | Insert: 0 | Update: 0 | Presenti: 0 | Scartati: 0 | Cancellati: 0'
+                ]
+            ]            
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers callServices()
+     * @dataProvider callServicesProvider
+     */
+    public function testCallServicesStringContainsString(string $type, ?array $csvParams, ?bool $mode, array $responses) : void
+    {
+        $actual = callServices($type, $csvParams, $mode);
+        
+        foreach ($responses as $key => $response) {
+            $expecteds = explode('|', $response);
+            foreach ($expecteds as $expected) {
+                $this->assertStringContainsString($expected, $actual[$key]);
+            }
+        }        
+    }
+    
+    /**
+     * @group test
+     * covers callServices()
+     */
+    public function testCallServicesEquals() : void
+    {
+        $expected = [];
+        
+        $actual = callServices('help', null, null);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function csvResponseProvider() : array
+    {
+        $data = [
+            'standard' => [
+                'request' => [
+                    'var' => '30030',
+                    'datefrom' => \DateTime::createFromFormat('d/m/Y H:i:s', '01/01/2019 00:00:00'),
+                    'dateto' => \DateTime::createFromFormat('d/m/Y H:i:s', '02/01/2019 00:00:00'),
+                    'full' => 1,
+                    'field' => 'volume'
+                ],
+                'printed' => 3,
+                'start' => '2021-03-24 08:58:54.123456',
+                'expected' => [
+                    'ok' => true,
+                    'response' => [
+                        'params' => [
+                            'var' => '30030',
+                            'datefrom' => '01/01/2019 00:00:00',
+                            'dateto' => '02/01/2019 00:00:00',
+                            'full' => 1,
+                            'field' => 'volume'
+                        ],
+                        'header' => [
+                            'Procedura esportazione CSV dati movimentazioni dighe',
+                            'Elaborazione iniziata in data: 24/03/2021 08:58:54'
+                        ],
+                        'body' => [
+                            'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2019</b> al <b>02/01/2019</b> avvenuta con successo in <b>|sec</b>. File CSV <b>full</b> esportati: <b>3</b>'
+                        ],
+                        'footer' => [
+                            'Elaborazione terminata in data: |',
+                            'Tempo di elaborazione: |sec',
+                            'Numero totale file csv esportati: 3'
+                        ]                        
+                    ]
+                ]
+            ]            
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers csvResponse()
+     * @dataProvider csvResponseProvider
+     */
+    public function testCsvResponseStringContainsString(array $request, int $printed, string $start, array $responses) : void
+    {
+        $actual = csvResponse($request, $printed, $start);
+        
+        $this->assertEquals($responses['ok'], $actual['ok']);
+        $this->assertEquals($responses['response']['params'], $actual['response']['params']);
+        
+        $actualHeader = implode('', $actual['response']['header']);
+        foreach ($responses['response']['header'] as $key => $response) {
+            $expecteds = explode('|', $response);
+            foreach ($expecteds as $expected) {
+                $this->assertStringContainsString($expected, $actualHeader);
+            }
+        }         
+        $actualBody = implode('', $actual['response']['body']);
+        foreach ($responses['response']['body'] as $key => $response) {
+            $expecteds = explode('|', $response);
+            foreach ($expecteds as $expected) {
+                $this->assertStringContainsString($expected, $actualBody);
+            }
+        }        
+        $actualFooter = implode('', $actual['response']['footer']);
+        foreach ($responses['response']['footer'] as $key => $response) {
+            $expecteds = explode('|', $response);
+            foreach ($expecteds as $expected) {
+                $this->assertStringContainsString($expected, $actualFooter);
+            }
         }
     }
 }

@@ -94,7 +94,7 @@ class ServiceManager extends Accessor
     private function setGlobalSend() : void
     {
         try {
-            if (isset($this->serConfig)&& array_key_exists('globalSend', $this->serConfig)) {
+            if (isset($this->serConfig) && array_key_exists('globalSend', $this->serConfig)) {
                 $globalSend = $this->serConfig['globalSend'];
             } else {
                 $globalSend = GLOBALMSG;
@@ -155,13 +155,13 @@ class ServiceManager extends Accessor
                     $url = 'http://' . REMOTE_HOST . '/' . $this->serConfig['path'];
                 } else {
                     $url = 'http://' . $host . '/' . $this->serConfig['path'];
-                } 
-                if (!filter_var($url, FILTER_VALIDATE_URL)) {
-                    throw new \Exception('Url non valido');
-                }
+                }                
             } else {
                 $url = $this->service;
-            }            
+            }
+            if (!filter_var($url, FILTER_VALIDATE_URL)) {
+                throw new \Exception('Url non valido');
+            }
             $this->url = $url;
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -337,7 +337,7 @@ class ServiceManager extends Accessor
             if (isset($this->serConfig)) {
                 if (array_key_exists('printf', $this->serConfig)) {
                     $function = $this->serConfig['printf'];
-                    if (isset($function) && is_callable('self::' . $function)) {
+                    if (isset($function) && method_exists($this, $function)) {
                         $className = str_replace(__NAMESPACE__ . '\\', '', get_class());
                         $printf = $className . '::' . $function;
                     } else {
@@ -434,9 +434,10 @@ class ServiceManager extends Accessor
      * @return array
      * @throws \Throwable
      */
-    private function purgeParams(array $multiQueryParams) : array
+    private function purgeParams(?array $params = null) : array
     {
         try {
+            $multiQueryParams = $params ?? [];
             $multiPurged = [];
             foreach ($multiQueryParams as $idCall => $queryParams) {
                 $purged = []; 
@@ -462,9 +463,11 @@ class ServiceManager extends Accessor
      * @return array
      * @throws \Throwable
      */
-    private function fillParams(array $multiPurgedParams, array $defaultParams) : array
+    private function fillParams(?array $purged = null, ?array $default = null) : array
     {
         try {
+            $multiPurgedParams = $purged ?? [];
+            $defaultParams = $default ?? [];
             $filled = [];
             foreach ($multiPurgedParams as $idCall => $purgedParams) {
                 $filled[$idCall] = $purgedParams + $defaultParams;
@@ -513,29 +516,21 @@ class ServiceManager extends Accessor
     }
     
     /**
-     * @param array $postParams
+     * @param array $rawParams
      * @return array
      * @throws \Throwable
      */
-    private function setCallParams(array $postParams) : array
+    private function setCallParams(?array $rawParams = null) : array
     {
         try {
+            $postParams = $rawParams ?? [];
             $prevKey = '';
             $setParams = [];
             foreach ($postParams as $idCall => $params) {            
-                $callParams = [];
                 $queryParams = $this->setQueryParams($params);
-                if ($this->method === 'POST') {
-                    $callParams['url'] = $this->url;  
-                    $callParams['params'] = $queryParams;
-                } else {
-                    $query = '';
-                    if (isset($queryParams) && is_array($queryParams) && count($queryParams) > 0) {
-                        $query = '?' . http_build_query($queryParams);
-                    }
-                    $callParams['url'] = $this->url . $query;
-                    $callParams['params'] = [];
-                }
+                $urlAndParams = $this->setUrlAndParams($queryParams);
+                $callParams['url'] = $urlAndParams['url']; 
+                $callParams['params'] = $urlAndParams['params'];                
                 $callParams['method'] = $this->method;
                 $callParams['isJson'] = $this->isJson;
                 $callParams['key'] = $this->setCallKey($idCall, $params, $prevKey);                
@@ -549,6 +544,35 @@ class ServiceManager extends Accessor
             throw $e;
         }
         //@codeCoverageIgnoreEnd
+    }
+    
+    /**
+     * @param array $queryParams
+     * @return array
+     * @throws \Throwable
+     * @throws \Exception
+     */
+    private function setUrlAndParams(array $queryParams) : array
+    {
+        try {
+            $urlAndParams['url'] = $this->url;
+            $urlAndParams['params'] = [];
+            if (count($queryParams) > 0) {
+                if ($this->method === 'POST') {
+                    $urlAndParams['params'] = $queryParams;
+                } else {
+                    $urlAndParams['url'] .= '?' . http_build_query($queryParams);;
+                }
+            } else {
+                if ($this->method === 'POST') {
+                    throw new \Exception('Nessun parametro con metodo POST');
+                }
+            }            
+            return $urlAndParams;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
     }
     
     /**
@@ -787,12 +811,14 @@ class ServiceManager extends Accessor
         try {            
             $reports = explode('|', $resFooter);
             foreach ($reports as $report) {
-                $vars = explode(':', $report);
-                $var = ucfirst($vars[0]);
-                if (isset($totals[$var])) {
-                    $totals[$var] += intval(str_replace('.', '', $vars[1]));
-                } else {
-                    $totals[$var] = intval(str_replace('.', '', $vars[1]));
+                $vars = explode(':', $report);                
+                if (count($vars) > 1) {
+                    $var = ucfirst($vars[0]);
+                    if (isset($totals[$var])) {
+                        $totals[$var] += intval(str_replace('.', '', $vars[1]));
+                    } else {
+                        $totals[$var] = intval(str_replace('.', '', $vars[1]));
+                    }
                 }
             }                        
         //@codeCoverageIgnoreStart
@@ -835,9 +861,9 @@ class ServiceManager extends Accessor
     {
         try {
             $responses = $this->responses ?? [];
-            $telegram = '';
+            $telegram = '';            
             if (count($responses) > 0) {
-                $header = $this->setHeader(); 
+                $header = $this->setHeader();                
                 $body = $this->setBody($responses);
                 $repString = $this->setReport($responses);
                 $footer = $this->setFooter($repString);

@@ -46,6 +46,20 @@ class Reflections
      * @group reflections
      * @coversNothing
      */
+    public static function invokeStaticMethod(object &$object, string $methodName, ?array $args = [])
+    {
+        $class = new \ReflectionClass($object);
+        
+        $method = $class->getMethod($methodName);
+        $method->setAccessible(true);
+        
+        return $method->invokeArgs(null, $args);
+    }
+    
+    /**
+     * @group reflections
+     * @coversNothing
+     */
     public static function getProperty(object &$object, string $propertyName)
     {
         $class = new \ReflectionClass($object);

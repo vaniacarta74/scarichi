@@ -1068,10 +1068,12 @@ function csvResponse(array $request, int $printed, string $start) : array
         $response['response']['footer'][2] = $footer['report'] . ' ' . $printed;
 
         return $response;
+    //@codeCoverageIgnoreStart
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
     }
+    //@codeCoverageIgnoreEnd
 }
 
 
@@ -2906,52 +2908,6 @@ function buildSetParams(string $url, ?string $rawMethod = null, ?array $rawParam
 }
 
 
-function goCurl(array $setParams, bool $async, ?string $callback = null) : array
-{
-    try {
-        $responses = [];
-        $printFunction = $callback ?? null;
-        $n_param = count($setParams);
-        if ($n_param > 0) {
-            if ($async && $n_param > 1) {
-                $responses = Curl::runMultiAsync($setParams, $printFunction);
-            } else {
-                $responses = Curl::runMultiSync($setParams, $printFunction);
-            }
-        }
-        return $responses;
-    // @codeCoverageIgnoreStart
-    } catch (\Throwable $e) {
-        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-        throw $e;
-    }
-    // @codeCoverageIgnoreEnd
-}
-
-
-function checkCurlResponse(string $report, int $debug_level) : string
-{
-    try {
-        if ($debug_level > 2) {
-            throw new \Exception('Livello di debug non definito');
-        }
-        $response = json_decode($report, true);
-        if (!$response['ok']) {
-            $message = 'Elaborazone fallita.';
-            if ($debug_level === 1) {
-                $message .= ' Verificare il log degli errori (' . realpath(LOG_PATH) . '/' . ERROR_LOG . ').';
-            }
-        } else {
-            $message = htmlspecialchars(strip_tags($response['response']));
-        }
-        return $message;
-    } catch (\Throwable $e) {
-        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-        throw $e;
-    }
-}
-
-
 function selectLastPrevData(string $db, array $parametri, array $dati, string $categoria) : array
 {
     try {
@@ -3251,16 +3207,7 @@ function changeMode(string $path, string $url, int $mode) : bool
     
 function addCostants(array $parametri, array $formule) : array
 {
-    try {
-//        if (count($parametri) > 0) {
-//            array_walk($parametri[0], function ($value) {
-//                if (!is_a($value, 'DateTime') && $value == NODATA) {
-//                    throw new \Exception('Presenti NoData per le date selezionate');
-//                }
-//            });
-//        } else {
-//            throw new \Exception('Non ci sono dati per le date selezionate');
-//        }
+    try {        
         if (count($parametri) === 0) {
             throw new \Exception('Non ci sono dati per le date selezionate');
         }
@@ -3309,24 +3256,11 @@ function sendTelegram(string $message, ?string $nut = null, ?int $tagLimit = nul
 }
 
 
-function formatResponse(string $report, int $i, string $key) : string
+function limitDates(array $values, ?string $limit = null, ?string $offset = null) : array
 {
     try {
-        $response = checkCurlResponse($report, DEBUG_LEVEL);
-        $message = $i . ') PID ' . $key . ': ' . $response . PHP_EOL;
-        return $message;
-    //@codeCoverageIgnoreStart
-    } catch (\Throwable $e) {        
-        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-        throw $e;        
-    }
-    //@codeCoverageIgnoreEnd
-}
-
-
-function limitDates(array $values, string $dateLimit, string $dateOffset) : array
-{
-    try {
+        $dateLimit = $limit ?? PERIOD;
+        $dateOffset = $offset ?? OFFSET;
         $limited = [];
         if (count($values) > 0) {
             if (!array_key_exists('datefrom', $values) || !array_key_exists('datefrom', $values)) {
@@ -3363,62 +3297,24 @@ function limitDates(array $values, string $dateLimit, string $dateOffset) : arra
     }
 }
 
-
-function setMessage(array $responses) : string
+/**
+ * @param array $messages
+ * @return string
+ * @throws \Throwable
+ */
+function buildTelegram(array $messages, ?bool $sendGlobal = null) : string
 {
     try {
-        if (count($responses) > 0) {
-            $header = CONFIG['define']['telegram']['scarichi']['header'];
-            $footer = CONFIG['define']['telegram']['scarichi']['footer'];
-
-            $title = '<b>' . $header['title'] . '</b>';
-
-            $dateStart = new \DateTime(START, new \DateTimeZone('Europe/Rome'));
-            $formStart = $dateStart->format('d/m/Y H:i:s');
-            $start = $header['start'] . ' <b>' . $formStart . '</b>';
-            
-            $n_file = 0;
-            $message = '';
-            foreach ($responses as $json) {
-                $response = json_decode($json, true);
-                if ($response['ok']) {
-                    $message .= $response['response'] . PHP_EOL;
-                    $n_file++;
-                }
-            }
-            $totals = $footer['report'] . ' <b>' . $n_file . '</b>';
-
-            $dateStop = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
-            $formStop = $dateStop->format('d/m/Y H:i:s');
-            $stop = $footer['stop'] . ' <b>' . $formStop . '</b>';
-
-            $time = $footer['time'] . ' <b>' . Utility::benchmark(START) . '</b>';
-
-            $telegram = $title . PHP_EOL . $start . PHP_EOL . PHP_EOL . $message . PHP_EOL . $stop . PHP_EOL . $time . PHP_EOL . $totals;
-        } else {
-            $telegram = '';
-        }        
-        return $telegram;
-    //@codeCoverageIgnoreStart
-    } catch (\Throwable $e) {        
-        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-        throw $e;        
-    }
-    //@codeCoverageIgnoreEnd
-}
-
-function sendMessages(array $messages) : string
-{
-    try {
-        if (count($messages) > 0) {
-            $globalMessage = '';
-            if (GLOBALMSG) {
+        $isGlobal = $sendGlobal ?? GLOBALMSG;
+        $globalMessage = '';
+        if (count($messages) > 0) {            
+            if ($isGlobal) {
                 $globalMessage .= '<b>' . TELSCARICHI['header']['title']['global'] . '</b>' . PHP_EOL;
                 $globalMessage .= TELSCARICHI['header']['start'] . ' <b>' . Utility::microToLatinTime(START) . '</b>' . PHP_EOL;
                 $globalMessage .= PHP_EOL;
                 $globalMessage .= $messages['sync'] . PHP_EOL;
                 $globalMessage .= PHP_EOL;
-                $globalMessage .= $messages['iscsv'] . PHP_EOL;
+                $globalMessage .= $messages['tocsv'] . PHP_EOL;
                 $globalMessage .= PHP_EOL;
                 $globalMessage .= str_replace('dati', 'dati host 1', $messages['watch1']) . PHP_EOL;
                 $globalMessage .= PHP_EOL;
@@ -3427,13 +3323,10 @@ function sendMessages(array $messages) : string
                 $globalMessage .= TELSCARICHI['footer']['stop'] . ' <b>' . Utility::getLatinTime() . '</b>' . PHP_EOL;
                 $globalMessage .= TELSCARICHI['footer']['time'] . ' <b>' . Utility::benchmark(START) . '</b>' . PHP_EOL;
             } else {
-                $globalMessage = $messages['iscsv'];
-            }
-            $response = sendTelegram($globalMessage, PHP_EOL); 
-        } else {
-            $response = '';
+                $globalMessage = $messages['tocsv'];
+            }            
         }
-        return $response;
+        return $globalMessage;
     //@codeCoverageIgnoreStart
     } catch (\Throwable $e) {        
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -3442,10 +3335,17 @@ function sendMessages(array $messages) : string
     //@codeCoverageIgnoreEnd
 }
 
-
-function callServices(string $type, bool $sendMode, ?array $csvParams) : array
+/**
+ * @param string $type
+ * @param bool $sendMode
+ * @param array $csvParams
+ * @return array
+ * @throws \Throwable
+ */
+function callServices(string $type, ?array $csvParams, ?bool $mode = null) : array
 {
     try {
+        $sendMode = $mode ?? MODE;
         $messages = [];
         if ($type === 'ok' || $type === 'default') {            
 
@@ -3453,7 +3353,7 @@ function callServices(string $type, bool $sendMode, ?array $csvParams) : array
             $messages['sync'] = $syncService->getMessage();
 
             $csvService = New ServiceManager('tocsv', null, $csvParams);
-            $messages['iscsv'] = $csvService->getMessage(); 
+            $messages['tocsv'] = $csvService->getMessage(); 
 
             $watchService1 = New ServiceManager('telegram_REST', 'watchdog', [['tel' => $sendMode]]);
             $messages['watch1'] = $watchService1->getMessage();
@@ -3462,8 +3362,10 @@ function callServices(string $type, bool $sendMode, ?array $csvParams) : array
             $messages['watch2'] = $watchService2->getMessage();
         }
         return $messages;
+    //@codeCoverageIgnoreStart
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
     }
+    //@codeCoverageIgnoreEnd
 }
