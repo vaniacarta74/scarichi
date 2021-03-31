@@ -18659,7 +18659,7 @@ class ToolsTest extends TestCase
                 'limit' => null,
                 'forced' => true,
                 'chat_id' => null,
-                'expected' => 'Nessun messaggio da inviare.' . PHP_EOL
+                'expected' => ''
             ],
             'no force' => [
                 'message' => 'Test funzione sendTelegram()',

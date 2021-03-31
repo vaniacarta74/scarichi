@@ -10,7 +10,6 @@ namespace vaniacarta74\Scarichi\tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use vaniacarta74\Scarichi\ServiceManager;
-use vaniacarta74\Scarichi\Utility;
 use vaniacarta74\Scarichi\tests\classes\Reflections;
 
 /**
@@ -56,7 +55,7 @@ class ServiceManagerTest  extends TestCase
                 'expected1' => [
                     'globalSend' => GLOBALMSG,
                     'serConfig' => [
-                        'host' => 'localhost',
+                        'host' => 'LOCALHOST',
                         'path' => 'scarichi/tocsv.php',
                         'params' => [
                             'tocsv' => [
@@ -104,7 +103,7 @@ class ServiceManagerTest  extends TestCase
                     ],
                     'service' => 'tocsv',
                     'token' => 'tocsv',
-                    'url' => 'http://localhost/scarichi/tocsv.php',
+                    'url' => TOCSVURL,
                     'serParams' => [
                         'id' => [
                             'tosend' => false,
@@ -139,7 +138,7 @@ class ServiceManagerTest  extends TestCase
                     'withBody' => true,                    
                     'params' => [
                         [
-                            'url' => 'http://localhost/scarichi/tocsv.php?full=1&field=volume',
+                            'url' => TOCSVURL . '?full=1&field=volume',
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => null,
@@ -179,7 +178,7 @@ class ServiceManagerTest  extends TestCase
                 'expected1' => [
                     'globalSend' => GLOBALMSG,
                     'serConfig' => [
-                        'host' => 'localhost',
+                        'host' => 'LOCALHOST',
                         'path' => 'scarichi/tocsv.php',
                         'params' => [
                             'tocsv' => [
@@ -227,7 +226,7 @@ class ServiceManagerTest  extends TestCase
                     ],
                     'service' => 'tocsv',
                     'token' => 'tocsv',
-                    'url' => 'http://localhost/scarichi/tocsv.php',
+                    'url' => TOCSVURL,
                     'serParams' => [
                         'id' => [
                             'tosend' => false,
@@ -262,7 +261,7 @@ class ServiceManagerTest  extends TestCase
                     'withBody' => true,
                     'params' => [
                         [
-                            'url' => 'http://localhost/scarichi/tocsv.php?var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
+                            'url' => TOCSVURL . '?var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
@@ -303,7 +302,7 @@ class ServiceManagerTest  extends TestCase
                 'expected1' => [
                     'globalSend' => GLOBALMSG,
                     'serConfig' => [
-                        'host' => 'localhost',
+                        'host' => 'LOCALHOST',
                         'path' => 'scarichi/tocsv.php',
                         'params' => [
                             'tocsv' => [
@@ -351,7 +350,7 @@ class ServiceManagerTest  extends TestCase
                     ],
                     'service' => 'tocsv',
                     'token' => 'tocsv',
-                    'url' => 'http://localhost/scarichi/tocsv.php',
+                    'url' => TOCSVURL,
                     'serParams' => [
                         'id' => [
                             'tosend' => false,
@@ -386,7 +385,7 @@ class ServiceManagerTest  extends TestCase
                     'withBody' => true,
                     'params' => [
                         [
-                            'url' => 'http://localhost/scarichi/tocsv.php?var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
+                            'url' => TOCSVURL . '?var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
@@ -435,7 +434,7 @@ class ServiceManagerTest  extends TestCase
                 'expected1' => [
                     'globalSend' => GLOBALMSG,
                     'serConfig' => [
-                        'host' => 'localhost',
+                        'host' => 'LOCALHOST',
                         'path' => 'scarichi/tocsv.php',
                         'params' => [
                             'tocsv' => [
@@ -483,7 +482,7 @@ class ServiceManagerTest  extends TestCase
                     ],
                     'service' => 'tocsv',
                     'token' => 'tocsv',
-                    'url' => 'http://localhost/scarichi/tocsv.php',
+                    'url' => TOCSVURL,
                     'serParams' => [
                         'id' => [
                             'tosend' => false,
@@ -518,14 +517,14 @@ class ServiceManagerTest  extends TestCase
                     'withBody' => true,
                     'params' => [
                         [
-                            'url' => 'http://localhost/scarichi/tocsv.php?var=30040&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
+                            'url' => TOCSVURL . '?var=30040&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
                             'key' => '0'
                         ],
                         [
-                            'url' => 'http://localhost/scarichi/tocsv.php?var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
+                            'url' => TOCSVURL . '?var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
@@ -560,7 +559,7 @@ class ServiceManagerTest  extends TestCase
                 'expected1' => [
                     'globalSend' => GLOBALMSG,
                     'serConfig' => [
-                        'host' => 'localhost',
+                        'host' => 'LOCALHOST',
                         'path' => 'scarichi/tocsv.php',
                         'params' => [
                             'tocsv' => [
@@ -608,7 +607,7 @@ class ServiceManagerTest  extends TestCase
                     ],
                     'service' => 'tocsv',
                     'token' => 'tocsv',
-                    'url' => 'http://localhost/scarichi/tocsv.php',
+                    'url' => TOCSVURL,
                     'serParams' => [
                         'id' => [
                             'tosend' => false,
@@ -643,7 +642,7 @@ class ServiceManagerTest  extends TestCase
                     'withBody' => true,                    
                     'params' => [
                         [
-                            'url' => 'http://localhost/scarichi/tocsv.php?full=1&field=volume',
+                            'url' => TOCSVURL . '?full=1&field=volume',
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => null,
@@ -667,7 +666,7 @@ class ServiceManagerTest  extends TestCase
             ],            
             'url service' => [
                 'args' => [
-                    'service' => 'http://localhost/scarichi/tocsv.php?var=30030&datefrom=01/01/2019&dateto=02/01/2019&full=1&field=volume',
+                    'service' => TOCSVURL . '?var=30030&datefrom=01/01/2019&dateto=02/01/2019&full=1&field=volume',
                     'token' => null,
                     'postParams' => null,
                     'config' => null
@@ -675,9 +674,9 @@ class ServiceManagerTest  extends TestCase
                 'expected1' => [
                     'globalSend' => GLOBALMSG,
                     'serConfig' => null,
-                    'service' => 'http://localhost/scarichi/tocsv.php?var=30030&datefrom=01/01/2019&dateto=02/01/2019&full=1&field=volume',
-                    'token' => 'http://localhost/scarichi/tocsv.php',
-                    'url' => 'http://localhost/scarichi/tocsv.php?var=30030&datefrom=01/01/2019&dateto=02/01/2019&full=1&field=volume',
+                    'service' => TOCSVURL . '?var=30030&datefrom=01/01/2019&dateto=02/01/2019&full=1&field=volume',
+                    'token' => TOCSVURL,
+                    'url' => TOCSVURL . '?var=30030&datefrom=01/01/2019&dateto=02/01/2019&full=1&field=volume',
                     'serParams' => [],
                     'method' => 'GET',
                     'key' => null,
@@ -687,7 +686,7 @@ class ServiceManagerTest  extends TestCase
                     'withBody' => false,
                     'params' => [
                         [
-                            'url' => 'http://localhost/scarichi/tocsv.php?var=30030&datefrom=01/01/2019&dateto=02/01/2019&full=1&field=volume',
+                            'url' => TOCSVURL . '?var=30030&datefrom=01/01/2019&dateto=02/01/2019&full=1&field=volume',
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
@@ -701,7 +700,7 @@ class ServiceManagerTest  extends TestCase
                     ]
                 ],
                 'expected3' => [
-                    'message' => '<b>http://localhost/scarichi/tocsv.php</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL,
+                    'message' => '<b>http://' . LOCALHOST . '/scarichi/tocsv.php</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL,
                 ],
                 'expected4' => [
                     'echos' => []
@@ -709,7 +708,7 @@ class ServiceManagerTest  extends TestCase
             ],
             'url service with token' => [
                 'args' => [
-                    'service' => 'http://localhost/scarichi/tocsv.php?var=30030&datefrom=01/01/2019&dateto=02/01/2019&full=1&field=volume',
+                    'service' => TOCSVURL . '?var=30030&datefrom=01/01/2019&dateto=02/01/2019&full=1&field=volume',
                     'token' => 'Esportazione volumi su csv',
                     'postParams' => null,
                     'config' => null
@@ -717,9 +716,9 @@ class ServiceManagerTest  extends TestCase
                 'expected1' => [
                     'globalSend' => GLOBALMSG,
                     'serConfig' => null,
-                    'service' => 'http://localhost/scarichi/tocsv.php?var=30030&datefrom=01/01/2019&dateto=02/01/2019&full=1&field=volume',
+                    'service' => TOCSVURL . '?var=30030&datefrom=01/01/2019&dateto=02/01/2019&full=1&field=volume',
                     'token' => 'Esportazione volumi su csv',
-                    'url' => 'http://localhost/scarichi/tocsv.php?var=30030&datefrom=01/01/2019&dateto=02/01/2019&full=1&field=volume',
+                    'url' => TOCSVURL . '?var=30030&datefrom=01/01/2019&dateto=02/01/2019&full=1&field=volume',
                     'serParams' => [],
                     'method' => 'GET',
                     'key' => null,
@@ -729,7 +728,7 @@ class ServiceManagerTest  extends TestCase
                     'withBody' => false,
                     'params' => [
                         [
-                            'url' => 'http://localhost/scarichi/tocsv.php?var=30030&datefrom=01/01/2019&dateto=02/01/2019&full=1&field=volume',
+                            'url' => TOCSVURL . '?var=30030&datefrom=01/01/2019&dateto=02/01/2019&full=1&field=volume',
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
@@ -751,7 +750,7 @@ class ServiceManagerTest  extends TestCase
             ],
             'url token params' => [
                 'args' => [
-                    'service' => 'http://localhost/scarichi/tocsv.php',
+                    'service' => TOCSVURL,
                     'token' => 'Esportazione volumi su csv',
                     'postParams' => [
                         [
@@ -767,9 +766,9 @@ class ServiceManagerTest  extends TestCase
                 'expected1' => [
                     'globalSend' => GLOBALMSG,
                     'serConfig' => null,
-                    'service' => 'http://localhost/scarichi/tocsv.php',
+                    'service' => TOCSVURL,
                     'token' => 'Esportazione volumi su csv',
-                    'url' => 'http://localhost/scarichi/tocsv.php',
+                    'url' => TOCSVURL,
                     'serParams' => [],
                     'method' => 'GET',
                     'key' => null,
@@ -779,7 +778,7 @@ class ServiceManagerTest  extends TestCase
                     'withBody' => false,
                     'params' => [
                         [
-                            'url' => 'http://localhost/scarichi/tocsv.php?var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
+                            'url' => TOCSVURL . '?var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
@@ -811,7 +810,7 @@ class ServiceManagerTest  extends TestCase
                     ],
                     'config' => [
                         'test' => [
-                            'host' => 'localhost',
+                            'host' => 'LOCALHOST',
                             'path' => 'scarichi/tocsv.php',
                             'params' => [
                                 'test' => [
@@ -843,7 +842,7 @@ class ServiceManagerTest  extends TestCase
                 'expected1' => [
                     'globalSend' => GLOBALMSG,
                     'serConfig' => [
-                        'host' => 'localhost',
+                        'host' => 'LOCALHOST',
                         'path' => 'scarichi/tocsv.php',
                         'params' => [
                             'test' => [
@@ -872,7 +871,7 @@ class ServiceManagerTest  extends TestCase
                     ],
                     'service' => 'test',
                     'token' => 'test',
-                    'url' => 'http://localhost/scarichi/tocsv.php',
+                    'url' => TOCSVURL,
                     'serParams' => [
                         'var' => [
                             'tosend' => true,
@@ -895,7 +894,7 @@ class ServiceManagerTest  extends TestCase
                     'withBody' => false,
                     'params' => [
                         [
-                            'url' => 'http://localhost/scarichi/tocsv.php',
+                            'url' => TOCSVURL,
                             'method' => 'POST',
                             'params' => [
                                 'var' => '30030',
@@ -931,7 +930,7 @@ class ServiceManagerTest  extends TestCase
                     ],
                     'config' => [
                         'test' => [
-                            'host' => 'localhost',
+                            'host' => 'LOCALHOST',
                             'path' => 'scarichi/tocsv.php',
                             'params' => [
                                 'withToken' => [
@@ -968,7 +967,7 @@ class ServiceManagerTest  extends TestCase
                 'expected1' => [
                     'globalSend' => false,
                     'serConfig' => [
-                        'host' => 'localhost',
+                        'host' => 'LOCALHOST',
                         'path' => 'scarichi/tocsv.php',
                         'params' => [
                             'withToken' => [
@@ -1002,7 +1001,7 @@ class ServiceManagerTest  extends TestCase
                     ],
                     'service' => 'test',
                     'token' => 'withToken',
-                    'url' => 'http://localhost/scarichi/tocsv.php',
+                    'url' => TOCSVURL,
                     'serParams' => [
                         'token' => [
                             'tosend' => true,
@@ -1029,7 +1028,7 @@ class ServiceManagerTest  extends TestCase
                     'withBody' => true,
                     'params' => [
                         [
-                            'url' => 'http://localhost/scarichi/tocsv.php?token=withToken&var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019',
+                            'url' => TOCSVURL . '?token=withToken&var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019',
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
@@ -1064,7 +1063,7 @@ class ServiceManagerTest  extends TestCase
                     ],
                     'config' => [
                         'test' => [
-                            'host' => 'localhost',
+                            'host' => 'LOCALHOST',
                             'path' => 'scarichi/tocsv.php',
                             'params' => [
                                 'withToken' => [
@@ -1101,7 +1100,7 @@ class ServiceManagerTest  extends TestCase
                 'expected1' => [
                     'globalSend' => false,
                     'serConfig' => [
-                        'host' => 'localhost',
+                        'host' => 'LOCALHOST',
                         'path' => 'scarichi/tocsv.php',
                         'params' => [
                             'withToken' => [
@@ -1135,7 +1134,7 @@ class ServiceManagerTest  extends TestCase
                     ],
                     'service' => 'test',
                     'token' => 'withToken',
-                    'url' => 'http://localhost/scarichi/tocsv.php',
+                    'url' => TOCSVURL,
                     'serParams' => [
                         'token' => [
                             'tosend' => true,
@@ -1162,14 +1161,14 @@ class ServiceManagerTest  extends TestCase
                     'withBody' => true,
                     'params' => [
                         [
-                            'url' => 'http://localhost/scarichi/tocsv.php?token=withToken&var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019',                            
+                            'url' => TOCSVURL . '?token=withToken&var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019',                            
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
                             'key' => 'token0'
                         ],
                         [
-                            'url' => 'http://localhost/scarichi/tocsv.php?var=30040&token=withToken&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019',
+                            'url' => TOCSVURL . '?var=30040&token=withToken&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019',
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
@@ -1208,7 +1207,7 @@ class ServiceManagerTest  extends TestCase
                     ],
                     'config' => [
                         'test' => [
-                            'host' => 'localhost',
+                            'host' => 'LOCALHOST',
                             'path' => 'scarichi/tocsv.php',
                             'params' => [
                                 'withToken' => [
@@ -1245,7 +1244,7 @@ class ServiceManagerTest  extends TestCase
                 'expected1' => [
                     'globalSend' => false,
                     'serConfig' => [
-                        'host' => 'localhost',
+                        'host' => 'LOCALHOST',
                         'path' => 'scarichi/tocsv.php',
                         'params' => [
                             'withToken' => [
@@ -1279,7 +1278,7 @@ class ServiceManagerTest  extends TestCase
                     ],
                     'service' => 'test',
                     'token' => 'withToken',
-                    'url' => 'http://localhost/scarichi/tocsv.php',
+                    'url' => TOCSVURL,
                     'serParams' => [
                         'token' => [
                             'tosend' => true,
@@ -1306,14 +1305,14 @@ class ServiceManagerTest  extends TestCase
                     'withBody' => true,
                     'params' => [
                         [
-                            'url' => 'http://localhost/scarichi/tocsv.php?token=withToken&var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019',                            
+                            'url' => TOCSVURL . '?token=withToken&var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019',                            
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
                             'key' => 'withToken'
                         ],
                         [
-                            'url' => 'http://localhost/scarichi/tocsv.php?var=30040&token=withToken&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019',
+                            'url' => TOCSVURL . '?var=30040&token=withToken&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019',
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
@@ -1352,7 +1351,7 @@ class ServiceManagerTest  extends TestCase
                     ],
                     'config' => [
                         'test' => [
-                            'host' => 'localhost',
+                            'host' => 'LOCALHOST',
                             'path' => 'scarichi/tocsv.php',
                             'params' => [
                                 'test' => [
@@ -1385,7 +1384,7 @@ class ServiceManagerTest  extends TestCase
                 'expected1' => [
                     'globalSend' => false,
                     'serConfig' => [
-                        'host' => 'localhost',
+                        'host' => 'LOCALHOST',
                         'path' => 'scarichi/tocsv.php',
                         'params' => [
                             'test' => [
@@ -1415,7 +1414,7 @@ class ServiceManagerTest  extends TestCase
                     ],
                     'service' => 'test',
                     'token' => 'test',
-                    'url' => 'http://localhost/scarichi/tocsv.php',
+                    'url' => TOCSVURL,
                     'serParams' => [
                         'var' => [
                             'tosend' => true,
@@ -1438,14 +1437,14 @@ class ServiceManagerTest  extends TestCase
                     'withBody' => true,
                     'params' => [
                         [
-                            'url' => 'http://localhost/scarichi/tocsv.php?var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019',                            
+                            'url' => TOCSVURL . '?var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019',                            
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
                             'key' => 'pippo'
                         ],
                         [
-                            'url' => 'http://localhost/scarichi/tocsv.php?var=30040&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019',
+                            'url' => TOCSVURL . '?var=30040&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019',
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
@@ -1485,7 +1484,7 @@ class ServiceManagerTest  extends TestCase
                 'expected1' => [
                     'globalSend' => GLOBALMSG,
                     'serConfig' => [
-                        'host' => 'remotehost',
+                        'host' => 'REMOTE_HOST',
                         'path' => 'telecontrollo/bot/telegram_REST.php',
                         'params' => [
                             'sync' => [
@@ -1556,7 +1555,7 @@ class ServiceManagerTest  extends TestCase
                     ],
                     'service' => 'telegram_REST',
                     'token' => 'sync',
-                    'url' => 'http://192.168.1.100/telecontrollo/bot/telegram_REST.php',
+                    'url' => TELRESTURL,
                     'serParams' => [
                         'token' => [
                             'tosend' => true,
@@ -1591,7 +1590,7 @@ class ServiceManagerTest  extends TestCase
                     'withBody' => false,
                     'params' => [
                         [
-                            'url' => 'http://192.168.1.100/telecontrollo/bot/telegram_REST.php?token=sync&variabile=ALL&tel=0&db=1&tipodato=1&delay=168',
+                            'url' => TELRESTURL . '?token=sync&variabile=ALL&tel=0&db=1&tipodato=1&delay=168',
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
@@ -1631,7 +1630,7 @@ class ServiceManagerTest  extends TestCase
                 'expected1' => [
                     'globalSend' => GLOBALMSG,
                     'serConfig' => [
-                        'host' => 'remotehost',
+                        'host' => 'REMOTE_HOST',
                         'path' => 'telecontrollo/bot/telegram_REST.php',
                         'params' => [
                             'sync' => [
@@ -1702,7 +1701,7 @@ class ServiceManagerTest  extends TestCase
                     ],
                     'service' => 'telegram_REST',
                     'token' => 'sync',
-                    'url' => 'http://192.168.1.100/telecontrollo/bot/telegram_REST.php',
+                    'url' => TELRESTURL,
                     'serParams' => [
                         'token' => [
                             'tosend' => true,
@@ -1737,7 +1736,7 @@ class ServiceManagerTest  extends TestCase
                     'withBody' => false,
                     'params' => [
                         [
-                            'url' => 'http://192.168.1.100/telecontrollo/bot/telegram_REST.php?token=sync&variabile=30030&tel=0&db=1&tipodato=1&delay=168',
+                            'url' => TELRESTURL . '?token=sync&variabile=30030&tel=0&db=1&tipodato=1&delay=168',
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
@@ -1781,7 +1780,7 @@ class ServiceManagerTest  extends TestCase
                 'expected1' => [
                     'globalSend' => GLOBALMSG,
                     'serConfig' => [
-                        'host' => 'remotehost',
+                        'host' => 'REMOTE_HOST',
                         'path' => 'telecontrollo/bot/telegram_REST.php',
                         'params' => [
                             'sync' => [
@@ -1852,7 +1851,7 @@ class ServiceManagerTest  extends TestCase
                     ],
                     'service' => 'telegram_REST',
                     'token' => 'sync',
-                    'url' => 'http://192.168.1.100/telecontrollo/bot/telegram_REST.php',
+                    'url' => TELRESTURL,
                     'serParams' => [
                         'token' => [
                             'tosend' => true,
@@ -1887,14 +1886,14 @@ class ServiceManagerTest  extends TestCase
                     'withBody' => false,
                     'params' => [
                         [
-                            'url' => 'http://192.168.1.100/telecontrollo/bot/telegram_REST.php?token=sync&variabile=30030&tel=0&db=1&tipodato=1&delay=168',
+                            'url' => TELRESTURL . '?token=sync&variabile=30030&tel=0&db=1&tipodato=1&delay=168',
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
                             'key' => 'sync'
                         ],
                         [
-                            'url' => 'http://192.168.1.100/telecontrollo/bot/telegram_REST.php?token=sync&variabile=30040&tel=0&db=1&tipodato=1&delay=168',
+                            'url' => TELRESTURL . '?token=sync&variabile=30040&tel=0&db=1&tipodato=1&delay=168',
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
@@ -1939,7 +1938,7 @@ class ServiceManagerTest  extends TestCase
                     ],
                     'config' => [
                         'telegram_REST' => [
-                            'host' => '192.168.1.100',
+                            'host' => 'REMOTE_HOST',
                             'path' => 'telecontrollo/bot/telegram_REST.php',
                             'params' => [
                                 'sync' => [
@@ -1984,7 +1983,7 @@ class ServiceManagerTest  extends TestCase
                 'expected1' => [
                     'globalSend' => false,
                     'serConfig' => [
-                        'host' => '192.168.1.100',
+                        'host' => 'REMOTE_HOST',
                         'path' => 'telecontrollo/bot/telegram_REST.php',
                         'params' => [
                             'sync' => [
@@ -2026,7 +2025,7 @@ class ServiceManagerTest  extends TestCase
                     ],
                     'service' => 'telegram_REST',
                     'token' => 'sync',
-                    'url' => 'http://192.168.1.100/telecontrollo/bot/telegram_REST.php',
+                    'url' => TELRESTURL,
                     'serParams' => [
                         'token' => [
                             'tosend' => true,
@@ -2061,14 +2060,14 @@ class ServiceManagerTest  extends TestCase
                     'withBody' => true,
                     'params' => [
                         [
-                            'url' => 'http://192.168.1.100/telecontrollo/bot/telegram_REST.php?token=sync&variabile=30030&tel=0&db=1&tipodato=1&delay=168',
+                            'url' => TELRESTURL . '?token=sync&variabile=30030&tel=0&db=1&tipodato=1&delay=168',
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
                             'key' => 'sync'
                         ],
                         [
-                            'url' => 'http://192.168.1.100/telecontrollo/bot/telegram_REST.php?token=sync&variabile=30040&tel=0&db=1&tipodato=1&delay=168',
+                            'url' => TELRESTURL . '?token=sync&variabile=30040&tel=0&db=1&tipodato=1&delay=168',
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
@@ -2182,7 +2181,7 @@ class ServiceManagerTest  extends TestCase
                     'params' => null,
                     'config' => [
                         'telegram_REST' => [
-                            'host' => '192.168.1.100',
+                            'host' => 'REMOTE_HOST',
                             'path' => 'telecontrollo/bot/telegram_REST.php',
                             'params' => [
                                 'tocsv' => []
@@ -2224,7 +2223,7 @@ class ServiceManagerTest  extends TestCase
                     'params' => null,
                     'config' => [
                         'tocsv' => [
-                            'host' => '192.168.1.100',
+                            'host' => 'REMOTE_HOST',
                             'path' => 'telecontrollo/bot/telegram_REST.php',                            
                             'method' => 'GET',
                             'key' => null,
@@ -2243,7 +2242,7 @@ class ServiceManagerTest  extends TestCase
                     'params' => null,
                     'config' => [
                         'tocsv' => [
-                            'host' => '192.168.1.100',
+                            'host' => 'REMOTE_HOST',
                             'path' => 'telecontrollo/bot/telegram_REST.php',
                             'params' => [
                                 'pippo' => []
@@ -2265,7 +2264,7 @@ class ServiceManagerTest  extends TestCase
                     'params' => null,
                     'config' => [
                         'tocsv' => [
-                            'host' => '192.168.1.100',
+                            'host' => 'REMOTE_HOST',
                             'path' => 'telecontrollo/bot/telegram_REST.php',
                             'params' => [
                                 'tocsv' => []
@@ -2286,7 +2285,7 @@ class ServiceManagerTest  extends TestCase
                     'params' => null,
                     'config' => [
                         'tocsv' => [
-                            'host' => '192.168.1.100',
+                            'host' => 'REMOTE_HOST',
                             'path' => 'telecontrollo/bot/telegram_REST.php',
                             'params' => [
                                 'tocsv' => []
@@ -2308,7 +2307,7 @@ class ServiceManagerTest  extends TestCase
                     'params' => null,
                     'config' => [
                         'tocsv' => [
-                            'host' => '192.168.1.100',
+                            'host' => 'REMOTE_HOST',
                             'path' => 'telecontrollo/bot/telegram_REST.php',
                             'params' => [
                                 'tocsv' => []
@@ -2329,7 +2328,7 @@ class ServiceManagerTest  extends TestCase
                     'params' => null,
                     'config' => [
                         'tocsv' => [
-                            'host' => '192.168.1.100',
+                            'host' => 'REMOTE_HOST',
                             'path' => 'telecontrollo/bot/telegram_REST.php',
                             'params' => [
                                 'tocsv' => []
@@ -2350,7 +2349,7 @@ class ServiceManagerTest  extends TestCase
                     'params' => null,
                     'config' => [
                         'tocsv' => [
-                            'host' => '192.168.1.100',
+                            'host' => 'REMOTE_HOST',
                             'path' => 'telecontrollo/bot/telegram_REST.php',
                             'params' => [
                                 'tocsv' => []
@@ -2371,7 +2370,7 @@ class ServiceManagerTest  extends TestCase
                     'params' => null,
                     'config' => [
                         'tocsv' => [
-                            'host' => '192.168.1.100',
+                            'host' => 'REMOTE_HOST',
                             'path' => 'telecontrollo/bot/telegram_REST.php',
                             'params' => [
                                 'tocsv' => []
@@ -2392,7 +2391,7 @@ class ServiceManagerTest  extends TestCase
                     'params' => null,
                     'config' => [
                         'tocsv' => [
-                            'host' => '192.168.1.100',
+                            'host' => 'REMOTE_HOST',
                             'path' => 'telecontrollo/bot/telegram_REST.php',
                             'params' => [
                                 'tocsv' => []
@@ -2413,7 +2412,7 @@ class ServiceManagerTest  extends TestCase
                     'params' => [],
                     'config' => [
                         'tocsv' => [
-                            'host' => '192.168.1.100',
+                            'host' => 'REMOTE_HOST',
                             'path' => 'telecontrollo/bot/telegram_REST.php',
                             'params' => [
                                 'tocsv' => []
@@ -2560,7 +2559,7 @@ class ServiceManagerTest  extends TestCase
             'single' => [
                 'params' => [
                     [
-                        'url' => 'http://localhost/scarichi/tocsv.php?var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
+                        'url' => TOCSVURL . '?var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
                         'method' => 'GET',
                         'params' => [],
                         'isJson' => false,
@@ -2576,14 +2575,14 @@ class ServiceManagerTest  extends TestCase
             'multi' => [
                 'params' => [
                     [
-                        'url' => 'http://localhost/scarichi/tocsv.php?var=30040&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
+                        'url' => TOCSVURL . '?var=30040&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
                         'method' => 'GET',
                         'params' => [],
                         'isJson' => false,
                         'key' => '0'
                     ],
                     [
-                        'url' => 'http://localhost/scarichi/tocsv.php?var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
+                        'url' => TOCSVURL . '?var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
                         'method' => 'GET',
                         'params' => [],
                         'isJson' => false,
@@ -2727,7 +2726,7 @@ class ServiceManagerTest  extends TestCase
                 'expected' => [
                     'service' => 'tocsv',
                     'serConfig' => [
-                        'host' => 'localhost',
+                        'host' => 'LOCALHOST',
                         'path' => 'scarichi/tocsv.php',
                         'params' => [
                             'tocsv' => [
@@ -2850,18 +2849,18 @@ class ServiceManagerTest  extends TestCase
             'localhost' => [
                 'service' => 'pippo',
                 'serConfig' => [
-                    'host' => 'localhost',
+                    'host' => 'LOCALHOST',
                     'path' => 'scarichi/tocsv.php'           
                 ],                
-                'expected' => 'http://localhost/scarichi/tocsv.php'
+                'expected' => TOCSVURL
             ],
             'remote' => [
                 'service' => 'pippo',
                 'serConfig' => [
-                    'host' => 'remotehost',
+                    'host' => 'REMOTE_HOST',
                     'path' => 'scarichi/tocsv.php'           
                 ],                
-                'expected' => 'http://192.168.1.100/scarichi/tocsv.php'
+                'expected' => 'http://' . REMOTE_HOST . '/scarichi/tocsv.php'
             ],
             'custom' => [
                 'service' => 'pippo',
@@ -2978,7 +2977,7 @@ class ServiceManagerTest  extends TestCase
                 ],
                 'service' => 'tocsv',
                 'serConfig' => [
-                    'host' => 'localhost',
+                    'host' => 'LOCALHOST',
                     'path' => 'scarichi/tocsv.php',
                     'params' => [
                         'tocsv' => [
@@ -3032,7 +3031,7 @@ class ServiceManagerTest  extends TestCase
                 ],
                 'service' => 'tocsv',
                 'serConfig' => [
-                    'host' => 'localhost',
+                    'host' => 'LOCALHOST',
                     'path' => 'scarichi/tocsv.php',
                     'params' => [
                         'pippo' => [
@@ -3114,7 +3113,7 @@ class ServiceManagerTest  extends TestCase
                 ],
                 'service' => 'tocsv',
                 'serConfig' => [
-                    'host' => 'localhost',
+                    'host' => 'LOCALHOST',
                     'path' => 'scarichi/tocsv.php',
                     'params' => [
                         'tocsv' => [
@@ -3195,7 +3194,7 @@ class ServiceManagerTest  extends TestCase
             'standard' => [
                 'token' => 'tocsv',
                 'serConfig' => [
-                    'host' => 'localhost',
+                    'host' => 'LOCALHOST',
                     'path' => 'scarichi/tocsv.php',
                     'params' => [
                         'tocsv' => [
@@ -3299,7 +3298,7 @@ class ServiceManagerTest  extends TestCase
             'token not match' => [
                 'token' => 'pippo',
                 'serConfig' => [
-                    'host' => 'localhost',
+                    'host' => 'LOCALHOST',
                     'path' => 'scarichi/tocsv.php',
                     'params' => [
                         'tocsv' => [
@@ -3378,7 +3377,7 @@ class ServiceManagerTest  extends TestCase
             ],
             'standard' => [
                 'serConfig' => [
-                    'host' => 'localhost',
+                    'host' => 'LOCALHOST',
                     'path' => 'scarichi/tocsv.php',
                     'params' => [
                         'tocsv' => [
@@ -3455,7 +3454,7 @@ class ServiceManagerTest  extends TestCase
         $data = [
             'method no HTTP' => [
                 'serConfig' => [
-                    'host' => 'localhost',
+                    'host' => 'LOCALHOST',
                     'path' => 'scarichi/tocsv.php',
                     'params' => [
                         'tocsv' => [
@@ -3504,7 +3503,7 @@ class ServiceManagerTest  extends TestCase
             ],
             'method no in config' => [
                 'serConfig' => [
-                    'host' => 'localhost',
+                    'host' => 'LOCALHOST',
                     'path' => 'scarichi/tocsv.php',
                     'params' => [
                         'tocsv' => [
@@ -3581,7 +3580,7 @@ class ServiceManagerTest  extends TestCase
             ],
             'standard' => [
                 'serConfig' => [
-                    'host' => 'localhost',
+                    'host' => 'LOCALHOST',
                     'path' => 'scarichi/tocsv.php',
                     'params' => [
                         'tocsv' => [
@@ -3658,7 +3657,7 @@ class ServiceManagerTest  extends TestCase
         $data = [            
             'key no in config' => [
                 'serConfig' => [
-                    'host' => 'localhost',
+                    'host' => 'LOCALHOST',
                     'path' => 'scarichi/tocsv.php',
                     'params' => [
                         'tocsv' => [
@@ -3735,7 +3734,7 @@ class ServiceManagerTest  extends TestCase
             ],
             'standard' => [
                 'serConfig' => [
-                    'host' => 'localhost',
+                    'host' => 'LOCALHOST',
                     'path' => 'scarichi/tocsv.php',
                     'params' => [
                         'tocsv' => [
@@ -3812,7 +3811,7 @@ class ServiceManagerTest  extends TestCase
         $data = [            
             'isJson no in config' => [
                 'serConfig' => [
-                    'host' => 'localhost',
+                    'host' => 'LOCALHOST',
                     'path' => 'scarichi/tocsv.php',
                     'params' => [
                         'tocsv' => [
@@ -3889,7 +3888,7 @@ class ServiceManagerTest  extends TestCase
             ],
             'standard' => [
                 'serConfig' => [
-                    'host' => 'localhost',
+                    'host' => 'LOCALHOST',
                     'path' => 'scarichi/tocsv.php',
                     'params' => [
                         'tocsv' => [
@@ -3966,7 +3965,7 @@ class ServiceManagerTest  extends TestCase
         $data = [            
             'isAsync no in config' => [
                 'serConfig' => [
-                    'host' => 'localhost',
+                    'host' => 'LOCALHOST',
                     'path' => 'scarichi/tocsv.php',
                     'params' => [
                         'tocsv' => [
@@ -4055,7 +4054,7 @@ class ServiceManagerTest  extends TestCase
             ],
             'standard' => [
                 'serConfig' => [
-                    'host' => 'localhost',
+                    'host' => 'LOCALHOST',
                     'path' => 'scarichi/tocsv.php',
                     'params' => [
                         'tocsv' => [
@@ -4132,7 +4131,7 @@ class ServiceManagerTest  extends TestCase
         $data = [            
             'printf no in config' => [
                 'serConfig' => [
-                    'host' => 'localhost',
+                    'host' => 'LOCALHOST',
                     'path' => 'scarichi/tocsv.php',
                     'params' => [
                         'tocsv' => [
@@ -4209,7 +4208,7 @@ class ServiceManagerTest  extends TestCase
             ],
             'standard' => [
                 'serConfig' => [
-                    'host' => 'localhost',
+                    'host' => 'LOCALHOST',
                     'path' => 'scarichi/tocsv.php',
                     'params' => [
                         'tocsv' => [
@@ -4286,7 +4285,7 @@ class ServiceManagerTest  extends TestCase
         $data = [            
             'no in config' => [
                 'serConfig' => [
-                    'host' => 'localhost',
+                    'host' => 'LOCALHOST',
                     'path' => 'scarichi/tocsv.php',
                     'params' => [
                         'tocsv' => [
@@ -4790,7 +4789,7 @@ class ServiceManagerTest  extends TestCase
                         ]
                     ]
                 ],
-                'url' => 'http://localhost/scarichi/tocsv.php',
+                'url' => TOCSVURL,
                 'method' => 'POST',
                 'serParams' => [
                     'id' => [
@@ -4822,7 +4821,7 @@ class ServiceManagerTest  extends TestCase
                 'key' => 'var',
                 'expected' => [
                     [
-                        'url' => 'http://localhost/scarichi/tocsv.php',
+                        'url' => TOCSVURL,
                         'method' => 'POST',
                         'params' => [
                             'var' => '30030',
@@ -4847,7 +4846,7 @@ class ServiceManagerTest  extends TestCase
                         ]
                     ]
                 ],
-                'url' => 'http://localhost/scarichi/tocsv.php',
+                'url' => TOCSVURL,
                 'method' => 'GET',
                 'serParams' => [
                     'id' => [
@@ -4879,7 +4878,7 @@ class ServiceManagerTest  extends TestCase
                 'key' => 'var',
                 'expected' => [
                     [
-                        'url' => 'http://localhost/scarichi/tocsv.php?var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
+                        'url' => TOCSVURL . '?var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
                         'method' => 'GET',
                         'params' => [],
                         'isJson' => false,
@@ -4891,14 +4890,14 @@ class ServiceManagerTest  extends TestCase
                 'args' => [
                     'params' => null
                 ],
-                'url' => 'http://localhost/scarichi/tocsv.php',
+                'url' => TOCSVURL,
                 'method' => 'GET',
                 'serParams' => [],
                 'isJson' => false,
                 'key' => 'var',
                 'expected' => [
                     [
-                        'url' => 'http://localhost/scarichi/tocsv.php',
+                        'url' => TOCSVURL,
                         'method' => 'GET',
                         'params' => [],
                         'isJson' => null,
@@ -4912,7 +4911,7 @@ class ServiceManagerTest  extends TestCase
                         []
                     ]
                 ],
-                'url' => 'http://localhost/scarichi/tocsv.php',
+                'url' => TOCSVURL,
                 'method' => 'GET',
                 'serParams' => [
                     'id' => [
@@ -4944,7 +4943,7 @@ class ServiceManagerTest  extends TestCase
                 'key' => 'var',
                 'expected' => [
                     [
-                        'url' => 'http://localhost/scarichi/tocsv.php?full=1&field=volume',
+                        'url' => TOCSVURL . '?full=1&field=volume',
                         'method' => 'GET',
                         'params' => [],
                         'isJson' => null,
@@ -4987,7 +4986,7 @@ class ServiceManagerTest  extends TestCase
                 'args' => [
                     'params' => null
                 ],
-                'url' => 'http://localhost/scarichi/tocsv.php',
+                'url' => TOCSVURL,
                 'method' => 'POST',
                 'serParams' => [],
                 'isJson' => false,
@@ -5035,7 +5034,7 @@ class ServiceManagerTest  extends TestCase
                         ]
                     ]
                 ],
-                'url' => 'http://localhost/scarichi/tocsv.php',
+                'url' => TOCSVURL,
                 'method' => 'POST',
                 'serParams' => [
                     'id' => [
@@ -5067,7 +5066,7 @@ class ServiceManagerTest  extends TestCase
                 'key' => 'id',
                 'expected' => [
                     [
-                        'url' => 'http://localhost/scarichi/tocsv.php',
+                        'url' => TOCSVURL,
                         'method' => 'POST',
                         'params' => [
                             'var' => '30030',
@@ -5094,7 +5093,7 @@ class ServiceManagerTest  extends TestCase
                         ]
                     ]
                 ],
-                'url' => 'http://localhost/scarichi/tocsv.php',
+                'url' => TOCSVURL,
                 'method' => 'GET',
                 'serParams' => [
                     'id' => [
@@ -5126,7 +5125,7 @@ class ServiceManagerTest  extends TestCase
                 'key' => 'id',
                 'expected' => [
                     [
-                        'url' => 'http://localhost/scarichi/tocsv.php?var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
+                        'url' => TOCSVURL . '?var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
                         'method' => 'GET',
                         'params' => [],
                         'isJson' => false,
@@ -5303,10 +5302,10 @@ class ServiceManagerTest  extends TestCase
                         'field' => 'volume'
                     ]
                 ],
-                'url' => 'http://localhost/scarichi/tocsv.php',
+                'url' => TOCSVURL,
                 'method' => 'POST',
                 'expected' => [
-                    'url' => 'http://localhost/scarichi/tocsv.php', 
+                    'url' => TOCSVURL, 
                     'params' => [
                         'var' => '30030',
                         'datefrom' => '01/01/2019',
@@ -5326,10 +5325,10 @@ class ServiceManagerTest  extends TestCase
                         'field' => 'volume'
                     ]
                 ],
-                'url' => 'http://localhost/scarichi/tocsv.php',
+                'url' => TOCSVURL,
                 'method' => 'GET',
                 'expected' => [
-                    'url' => 'http://localhost/scarichi/tocsv.php?var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
+                    'url' => TOCSVURL . '?var=30030&datefrom=01%2F01%2F2019&dateto=02%2F01%2F2019&full=1&field=volume',
                     'params' => []
                 ]
             ],
@@ -5337,10 +5336,10 @@ class ServiceManagerTest  extends TestCase
                 'args' => [
                     'queryParams' => []
                 ],
-                'url' => 'http://localhost/scarichi/tocsv.php',
+                'url' => TOCSVURL,
                 'method' => 'GET',
                 'expected' => [
-                    'url' => 'http://localhost/scarichi/tocsv.php',
+                    'url' => TOCSVURL,
                     'params' => []
                 ]
             ]
@@ -5374,7 +5373,7 @@ class ServiceManagerTest  extends TestCase
                 'args' => [
                     'queryParams' => []
                 ],
-                'url' => 'http://localhost/scarichi/tocsv.php',
+                'url' => TOCSVURL,
                 'method' => 'POST'
             ]
         ];

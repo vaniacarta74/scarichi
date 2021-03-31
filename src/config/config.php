@@ -9,15 +9,13 @@ define('START', $now->format('Y-m-d H:i:s.u'));
 define('COMPOSER', Utility::getJsonArray(__DIR__ . '/../../composer.json'));
 define('CONFIG', Utility::getJsonArray(__DIR__ . '/config.json'));
 
-define('LOCALHOST', CONFIG['define']['system']['localhost']);
-
 define('PERIOD', CONFIG['command']['period']);
 define('OFFSET', CONFIG['command']['offset']);
 
 define('SERVICES', CONFIG['define']['services']);
 define('ASYNC', boolval(SERVICES['tocsv']['isAsync']));
-define('TOCSVURL', 'http://' . LOCALHOST . '/' . SERVICES['tocsv']['path']);
-define('TELRESTURL', 'http://' . REMOTE_HOST . '/' . SERVICES['telegram_REST']['path']);
+define('TOCSVURL', 'http://' . constant(SERVICES['tocsv']['host']) . '/' . SERVICES['tocsv']['path']);
+define('TELRESTURL', 'http://' . constant(SERVICES['telegram_REST']['host']) . '/' . SERVICES['telegram_REST']['path']);
 
 define('NODATA', intval(CONFIG['define']['csv']['nodata']));
 define('MAXRECORD', intval(CONFIG['define']['csv']['maxrecord']));

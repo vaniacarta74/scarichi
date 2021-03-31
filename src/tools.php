@@ -3244,7 +3244,7 @@ function sendTelegram(string $message, ?string $nut = null, ?int $tagLimit = nul
                 $response = 'Invio messaggio Telegram disabilitato.' . PHP_EOL;
             }
         } else {
-            $response = 'Nessun messaggio da inviare.' . PHP_EOL;
+            $response = '';
         }
         return $response;
     //@codeCoverageIgnoreStart

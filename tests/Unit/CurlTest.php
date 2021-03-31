@@ -80,10 +80,10 @@ class CurlTest extends TestCase
                 'url' => 'http://' . LOCALHOST . '/tests/providers/curlTest.php?json=0',
                 'method' => 'POST',
                 'params' => [
-                    "var" => 10230,
-                    "type" => 2,
-                    "date" => "01/01/2021",
-                    "val" => 3.5
+                    'var' => '10230',
+                    'type' => '2',
+                    'date' => '01/01/2021',
+                    'val' => '3,5'
                 ],
                 'json' => null,
                 'expected' => '{

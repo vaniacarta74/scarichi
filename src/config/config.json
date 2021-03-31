@@ -1,12 +1,11 @@
 {
     "define": {
         "system": {
-            "localhost": "localhost",
             "timeout": 7200,
             "memory_limit": "2048M"
         },
         "log": {
-            "debug_level": 1,
+            "debug_level": 2,
             "log_path": "/../../log",
             "error_log": "error.log"
         },        
@@ -17,7 +16,7 @@
         },
         "services": {
             "tocsv": {
-                "host": "localhost",
+                "host": "LOCALHOST",
                 "path": "scarichi/tocsv.php",
                 "params": {
                     "tocsv": {
@@ -64,7 +63,7 @@
                 }
             },
             "telegram_REST": {
-                "host": "remotehost",
+                "host": "REMOTE_HOST",
                 "path": "telecontrollo/bot/telegram_REST.php",
                 "params": {
                     "sync": {
@@ -177,8 +176,8 @@
             ],
             "tagLimit": 100,
             "limit": 4096,
-            "send": true,
-            "global": false, 
+            "send": false,
+            "global": true, 
             "path": "/../../../telegram.json",
             "url": "scarichi/telegram.php"
         },
@@ -189,7 +188,7 @@
     },
     "command": { 
         "sintax": "php scarichi.php",
-        "period": "1M",
+        "period": "99Y",
         "offset": "1D"
     },
     "modelli": {

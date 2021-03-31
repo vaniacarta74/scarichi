@@ -84,7 +84,7 @@ class Curl
                             curl_setopt($ch, CURLINFO_HEADER_OUT, true);
                             curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
                         } else {
-                            $posts = $params;                          
+                            $posts = $params;
                             curl_setopt($ch, CURLOPT_HEADER, false);
                         }
                         curl_setopt($ch, CURLOPT_POST, true);

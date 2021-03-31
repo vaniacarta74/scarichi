@@ -149,13 +149,11 @@ class ServiceManager extends Accessor
                     throw new \Exception('Configurazione non valida');
                 }
                 $host = $this->serConfig['host'];
-                if ($host === 'localhost') {
-                    $url = 'http://' . LOCALHOST . '/' . $this->serConfig['path'];
-                } elseif ($host === 'remotehost') {
-                    $url = 'http://' . REMOTE_HOST . '/' . $this->serConfig['path'];
+                if (defined($host)) {
+                    $url = 'http://' . constant($host) . '/' . $this->serConfig['path'];
                 } else {
                     $url = 'http://' . $host . '/' . $this->serConfig['path'];
-                }                
+                }  
             } else {
                 $url = $this->service;
             }

@@ -319,7 +319,7 @@ class ToCsvTest extends TestCase
 
         $actual = Curl::run(TOCSVURL, 'POST', $params);
         
-        $response = str_replace(array(PHP_EOL, '  '), '', $rawResponse);
+        $response = json_encode(json_decode($rawResponse, true));
         
         $expecteds = explode('|', $response);
         
