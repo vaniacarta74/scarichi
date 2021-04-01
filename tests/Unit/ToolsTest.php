@@ -160,7 +160,7 @@ class ToolsTest extends TestCase
                 ],
                 'printed' => 0,
                 'start' => $start,
-                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>full</b> esportato per mancanza di dati.'
+                'expected' => 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>full</b> esportato per mancanza di dati. (tocsv@127.0.0.1)'
             ],
             'only datefrom full print' => [
                 'request' => [
@@ -196,7 +196,7 @@ class ToolsTest extends TestCase
                 ],
                 'printed' => 0,
                 'start' => $start,
-                'expected' => 'Elaborazione dati <b>Livello</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati.'
+                'expected' => 'Elaborazione dati <b>Livello</b> variabile <b>30030</b> dal <b>01/01/2017</b> al <b>02/01/2017</b> avvenuta con successo in <b>| sec</b>. Nessun file CSV <b>senza zeri</b> esportato per mancanza di dati. (tocsv@127.0.0.1)'
             ]
         ];
         

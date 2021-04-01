@@ -113,7 +113,7 @@ class ScarichiTest extends TestCase
                 'dateto' => '02/01/2019',
                 'nozero' => 'TRUE',
                 'campo' => '',
-                'expected' => $header . PHP_EOL . '1) PID 0: Elaborazione dati Volume variabile 30030 dal 01/01/2019 al 02/01/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
+                'expected' => $header . PHP_EOL . '1) PID 0: Elaborazione dati Volume variabile 30030 dal 01/01/2019 al 02/01/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati. (tocsv@127.0.0.1)' . PHP_EOL
             ],
             'full 1' => [
                 'help' => null,
@@ -135,7 +135,7 @@ class ScarichiTest extends TestCase
                 'dateto' => '',
                 'nozero' => '',
                 'campo' => '',
-                'expected' => $header . PHP_EOL . '1) PID 0: Elaborazione dati Volume variabile 30030 dal ' . $day->format('d/m/Y') . ' al ' . $now->format('d/m/Y') . ' avvenuta con successo in | sec. Nessun file CSV full esportato per mancanza di dati.' . PHP_EOL
+                'expected' => $header . PHP_EOL . '1) PID 0: Elaborazione dati Volume variabile 30030 dal ' . $day->format('d/m/Y') . ' al ' . $now->format('d/m/Y') . ' avvenuta con successo in | sec. Nessun file CSV full esportato per mancanza di dati. (tocsv@127.0.0.1)' . PHP_EOL
             ],
             'help' => [
                 'help' => '',

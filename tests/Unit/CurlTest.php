@@ -179,7 +179,7 @@ class CurlTest extends TestCase
         ];
         $url = 'http://' . LOCALHOST . '/scarichi/tocsv.php';
         $json = false;
-        $response = 'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>|<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.';
+        $response = 'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>|<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati. (tocsv@127.0.0.1)';
         $expecteds = explode('|', $response);
         
         $actual = Curl::run($url, 'POST', $params, $json);
@@ -196,7 +196,7 @@ class CurlTest extends TestCase
     public function testRunGetContainsString() : void
     {
         $url = 'http://' . LOCALHOST . '/scarichi/tocsv.php?var=30030&datefrom=30/12/2019&dateto=31/12/2019&field=portata&full=0';
-        $response = 'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>|<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.';
+        $response = 'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>|<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati. (tocsv@127.0.0.1)';
         $expecteds = explode('|', $response);
         
         $actual = Curl::run($url);
@@ -456,7 +456,7 @@ class CurlTest extends TestCase
      */
     public function testExecContainsString($ch) : void
     {
-        $response = 'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>|<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.';
+        $response = 'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>|<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati. (tocsv@127.0.0.1)';
         $expecteds = explode('|', $response);
         
         $actual = Curl::exec($ch);
@@ -714,8 +714,8 @@ class CurlTest extends TestCase
     public function runMultiSyncProvider() : array
     {
         $url = TOCSVURL;
-        $single = 'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>| sec<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.';
-        $single2 = 'Elaborazione dati <b>Portata<\/b> variabile <b>30040<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>| sec<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.';
+        $single = 'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>| sec<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati. (tocsv@127.0.0.1)';
+        $single2 = 'Elaborazione dati <b>Portata<\/b> variabile <b>30040<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>| sec<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati. (tocsv@127.0.0.1)';
         $multi = [$single, $single2];
         
         $data = [
@@ -738,7 +738,7 @@ class CurlTest extends TestCase
                 ],
                 'callback' => null,
                 'expected' => [
-                    'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>|<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.'
+                    'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>|<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati. (tocsv@127.0.0.1)'
                 ]
             ],
             'no key' => [
@@ -760,7 +760,7 @@ class CurlTest extends TestCase
                 ],
                 'callback' => 'ServiceManager::formatResponse',
                 'expected' => [
-                    'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>| sec<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.'
+                    'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>| sec<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati. (tocsv@127.0.0.1)'
                 ]
             ],
             'single post' => [
@@ -1033,8 +1033,8 @@ class CurlTest extends TestCase
     public function runMultiSyncEchoProvider() : array
     {
         $url = TOCSVURL;
-        $single = '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
-        $multi = $single . '2) PID 1: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        $single = '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati. (tocsv@127.0.0.1)' . PHP_EOL;
+        $multi = $single . '2) PID 1: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati. (tocsv@127.0.0.1)' . PHP_EOL;
         
         $data = [
             'no callback' => [
@@ -1075,7 +1075,7 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => 'ServiceManager::formatResponse',
-                'expected' => '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
+                'expected' => '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati. (tocsv@127.0.0.1)' . PHP_EOL
             ],
             'single post' => [
                 'setParams' => [
@@ -1148,7 +1148,7 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => 'ServiceManager::formatResponse',
-                'expected' => '1) PID pippo: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
+                'expected' => '1) PID pippo: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati. (tocsv@127.0.0.1)' . PHP_EOL
             ],
             'post multi' => [
                 'setParams' => [
@@ -1180,7 +1180,7 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => 'ServiceManager::formatResponse',
-                'expected' => '1) PID 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL . '2) PID pippo: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
+                'expected' => '1) PID 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati. (tocsv@127.0.0.1)' . PHP_EOL . '2) PID pippo: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati. (tocsv@127.0.0.1)' . PHP_EOL
             ],
             'post multi mixed' => [
                 'setParams' => [
@@ -1343,8 +1343,8 @@ class CurlTest extends TestCase
     public function runMultiAsyncProvider() : array
     {
         $url = TOCSVURL;
-        $single = 'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>| sec<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.';
-        $single2 = 'Elaborazione dati <b>Portata<\/b> variabile <b>30040<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>| sec<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.';
+        $single = 'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>| sec<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati. (tocsv@127.0.0.1)';
+        $single2 = 'Elaborazione dati <b>Portata<\/b> variabile <b>30040<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>| sec<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati. (tocsv@127.0.0.1)';
         $multi = [$single, $single2];
         
         $data = [
@@ -1367,7 +1367,7 @@ class CurlTest extends TestCase
                 ],
                 'callback' => null,
                 'expected' => [
-                    'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>|<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.'
+                    'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>|<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati. (tocsv@127.0.0.1)'
                 ]
             ],
             'no key' => [
@@ -1389,7 +1389,7 @@ class CurlTest extends TestCase
                 ],
                 'callback' => 'ServiceManager::formatResponse',
                 'expected' => [
-                    'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>| sec<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati.'
+                    'Elaborazione dati <b>Portata<\/b> variabile <b>30030<\/b> dal <b>30\/12\/2019<\/b> al <b>31\/12\/2019<\/b> avvenuta con successo in <b>| sec<\/b>. Nessun file CSV <b>senza zeri<\/b> esportato per mancanza di dati. (tocsv@127.0.0.1)'
                 ]
             ],
             'single post' => [
@@ -1663,8 +1663,8 @@ class CurlTest extends TestCase
     public function runMultiAsyncEchoProvider() : array
     {
         $url = TOCSVURL;
-        $single = '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
-        $multi = $single . '2) PID 1: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL;
+        $single = '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati. (tocsv@127.0.0.1)' . PHP_EOL;
+        $multi = $single . '2) PID 1: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati. (tocsv@127.0.0.1)' . PHP_EOL;
         
         $data = [
             'no callback' => [
@@ -1705,7 +1705,7 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => 'ServiceManager::formatResponse',
-                'expected' => '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
+                'expected' => '1) PID 0: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati. (tocsv@127.0.0.1)' . PHP_EOL
             ],
             'single post' => [
                 'setParams' => [
@@ -1778,7 +1778,7 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => 'ServiceManager::formatResponse',
-                'expected' => '1) PID pippo: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
+                'expected' => '1) PID pippo: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati. (tocsv@127.0.0.1)' . PHP_EOL
             ],
             'post multi' => [
                 'setParams' => [
@@ -1810,7 +1810,7 @@ class CurlTest extends TestCase
                     ]
                 ],
                 'callback' => 'ServiceManager::formatResponse',
-                'expected' => '1) PID 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL . '2) PID pippo: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati.' . PHP_EOL
+                'expected' => '1) PID 30030: Elaborazione dati Portata variabile 30030 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati. (tocsv@127.0.0.1)' . PHP_EOL . '2) PID pippo: Elaborazione dati Portata variabile 30040 dal 30/12/2019 al 31/12/2019 avvenuta con successo in | sec. Nessun file CSV senza zeri esportato per mancanza di dati. (tocsv@127.0.0.1)' . PHP_EOL
             ],
             'post multi mixed' => [
                 'setParams' => [

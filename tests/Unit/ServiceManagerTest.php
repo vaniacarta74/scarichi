@@ -271,7 +271,7 @@ class ServiceManagerTest  extends TestCase
                 ],
                 'expected2' => [
                     'responses' => [
-                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
+                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
                     ]
                 ],
                 'expected3' => [
@@ -395,7 +395,7 @@ class ServiceManagerTest  extends TestCase
                 ],
                 'expected2' => [
                     'responses' => [
-                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
+                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
                     ]
                 ],
                 'expected3' => [
@@ -535,8 +535,8 @@ class ServiceManagerTest  extends TestCase
                 ],
                 'expected2' => [
                     'responses' => [
-                        '{"ok":true,"response":{"params":{"var":"30040","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}',
-                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30040<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
+                        '{"ok":true,"response":{"params":{"var":"30040","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}',
+                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30040<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
                     ]
                 ],
                 'expected3' => [
@@ -696,7 +696,7 @@ class ServiceManagerTest  extends TestCase
                 ],
                 'expected2' => [
                     'responses' => [
-                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
+                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
                     ]
                 ],
                 'expected3' => [
@@ -738,7 +738,7 @@ class ServiceManagerTest  extends TestCase
                 ],
                 'expected2' => [
                     'responses' => [
-                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
+                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
                     ]
                 ],
                 'expected3' => [
@@ -788,7 +788,7 @@ class ServiceManagerTest  extends TestCase
                 ],
                 'expected2' => [
                     'responses' => [
-                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
+                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
                     ]
                 ],
                 'expected3' => [
@@ -908,7 +908,7 @@ class ServiceManagerTest  extends TestCase
                 ],
                 'expected2' => [
                     'responses' => [
-                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
+                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
                     ]
                 ],
                 'expected3' => [
@@ -1038,17 +1038,17 @@ class ServiceManagerTest  extends TestCase
                 ],
                 'expected2' => [
                     'responses' => [
-                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
+                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
                     ]
                 ],
                 'expected3' => [
-                    'message' => '<b>withToken</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . PHP_EOL . 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2019</b> al <b>02/01/2019</b> avvenuta con successo in <b>|</b>. File CSV <b>full</b> esportati: <b>|</b>' . PHP_EOL . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL,
+                    'message' => '<b>withToken</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . PHP_EOL . 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2019</b> al <b>02/01/2019</b> avvenuta con successo in <b>|</b>. File CSV <b>full</b> esportati: <b>|</b> (tocsv@127.0.0.1)' . PHP_EOL . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL,
                 ],
                 'expected4' => [
                     'echos' => []
                 ]
             ],
-           'body more responses' => [
+            'body more responses' => [
                 'args' => [
                     'service' => 'test',
                     'token' => 'withToken',
@@ -1178,12 +1178,12 @@ class ServiceManagerTest  extends TestCase
                 ],
                 'expected2' => [
                     'responses' => [
-                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}',
-                        '{"ok":true,"response":{"params":{"var":"30040","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30040<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
+                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}',
+                        '{"ok":true,"response":{"params":{"var":"30040","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30040<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
                     ]
                 ],
                 'expected3' => [
-                    'message' => '<b>withToken</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . PHP_EOL . 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2019</b> al <b>02/01/2019</b> avvenuta con successo in <b>|</b>. File CSV <b>full</b> esportati: <b>|</b>' . PHP_EOL . 'Elaborazione dati <b>Volume</b> variabile <b>30040</b> dal <b>01/01/2019</b> al <b>02/01/2019</b> avvenuta con successo in <b>|</b>. File CSV <b>full</b> esportati: <b>|</b>' . PHP_EOL . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL,
+                    'message' => '<b>withToken</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . PHP_EOL . 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2019</b> al <b>02/01/2019</b> avvenuta con successo in <b>|</b>. File CSV <b>full</b> esportati: <b>|</b> (tocsv@127.0.0.1)' . PHP_EOL . 'Elaborazione dati <b>Volume</b> variabile <b>30040</b> dal <b>01/01/2019</b> al <b>02/01/2019</b> avvenuta con successo in <b>|</b>. File CSV <b>full</b> esportati: <b>|</b> (tocsv@127.0.0.1)' . PHP_EOL . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL,
                 ],
                 'expected4' => [
                     'echos' => [
@@ -1316,23 +1316,23 @@ class ServiceManagerTest  extends TestCase
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
-                            'key' => 'withToken1'
+                            'key' => 'withToken.1'
                         ]
                     ]
                 ],
                 'expected2' => [
                     'responses' => [
-                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}',
-                        '{"ok":true,"response":{"params":{"var":"30040","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30040<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
+                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}',
+                        '{"ok":true,"response":{"params":{"var":"30040","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30040<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
                     ]
                 ],
                 'expected3' => [
-                    'message' => '<b>withToken</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . PHP_EOL . 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2019</b> al <b>02/01/2019</b> avvenuta con successo in <b>|</b>. File CSV <b>full</b> esportati: <b>|</b>' . PHP_EOL . 'Elaborazione dati <b>Volume</b> variabile <b>30040</b> dal <b>01/01/2019</b> al <b>02/01/2019</b> avvenuta con successo in <b>|</b>. File CSV <b>full</b> esportati: <b>|</b>' . PHP_EOL . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL,
+                    'message' => '<b>withToken</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . PHP_EOL . 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2019</b> al <b>02/01/2019</b> avvenuta con successo in <b>|</b>. File CSV <b>full</b> esportati: <b>|</b> (tocsv@127.0.0.1)' . PHP_EOL . 'Elaborazione dati <b>Volume</b> variabile <b>30040</b> dal <b>01/01/2019</b> al <b>02/01/2019</b> avvenuta con successo in <b>|</b>. File CSV <b>full</b> esportati: <b>|</b> (tocsv@127.0.0.1)' . PHP_EOL . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL,
                 ],
                 'expected4' => [
                     'echos' => [
                         '1) PID withToken: Elaborazione dati Volume variabile 30030 dal 01/01/2019 al 02/01/2019 avvenuta con successo in | sec. File CSV full esportati: |',
-                        '2) PID withToken1: Elaborazione dati Volume variabile 30040 dal 01/01/2019 al 02/01/2019 avvenuta con successo in | sec. File CSV full esportati: |'
+                        '2) PID withToken.1: Elaborazione dati Volume variabile 30040 dal 01/01/2019 al 02/01/2019 avvenuta con successo in | sec. File CSV full esportati: |'
                     ]
                 ]
             ],
@@ -1448,23 +1448,23 @@ class ServiceManagerTest  extends TestCase
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
-                            'key' => 'pippo1'
+                            'key' => 'pippo.1'
                         ]
                     ]
                 ],
                 'expected2' => [
                     'responses' => [
-                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}',
-                        '{"ok":true,"response":{"params":{"var":"30040","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30040<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
+                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}',
+                        '{"ok":true,"response":{"params":{"var":"30040","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30040<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
                     ]
                 ],
                 'expected3' => [
-                    'message' => '<b>test</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . PHP_EOL . 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2019</b> al <b>02/01/2019</b> avvenuta con successo in <b>|</b>. File CSV <b>full</b> esportati: <b>|</b>' . PHP_EOL . 'Elaborazione dati <b>Volume</b> variabile <b>30040</b> dal <b>01/01/2019</b> al <b>02/01/2019</b> avvenuta con successo in <b>|</b>. File CSV <b>full</b> esportati: <b>|</b>' . PHP_EOL . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL,
+                    'message' => '<b>test</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . PHP_EOL . 'Elaborazione dati <b>Volume</b> variabile <b>30030</b> dal <b>01/01/2019</b> al <b>02/01/2019</b> avvenuta con successo in <b>|</b>. File CSV <b>full</b> esportati: <b>|</b> (tocsv@127.0.0.1)' . PHP_EOL . 'Elaborazione dati <b>Volume</b> variabile <b>30040</b> dal <b>01/01/2019</b> al <b>02/01/2019</b> avvenuta con successo in <b>|</b>. File CSV <b>full</b> esportati: <b>|</b> (tocsv@127.0.0.1)' . PHP_EOL . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL,
                 ],
                 'expected4' => [
                     'echos' => [
                         '1) PID pippo: Elaborazione dati Volume variabile 30030 dal 01/01/2019 al 02/01/2019 avvenuta con successo in | sec. File CSV full esportati: |',
-                        '2) PID pippo1: Elaborazione dati Volume variabile 30040 dal 01/01/2019 al 02/01/2019 avvenuta con successo in | sec. File CSV full esportati: |'
+                        '2) PID pippo.1: Elaborazione dati Volume variabile 30040 dal 01/01/2019 al 02/01/2019 avvenuta con successo in | sec. File CSV full esportati: |'
                     ]
                 ]
             ],
@@ -1897,7 +1897,7 @@ class ServiceManagerTest  extends TestCase
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
-                            'key' => 'sync1'
+                            'key' => 'sync.1'
                         ]
                         
                     ]
@@ -1915,8 +1915,8 @@ class ServiceManagerTest  extends TestCase
                     'echos' => [
                         '1.0) PID sync.0: Processata in 0,039 secondi | Records: 240 | Insert: 1 | Update: 0 | Presenti: 239 | Scartati: 0 | Cancellati: 0' . PHP_EOL,
                         '1.1) PID sync.1: Processata in 0,098 secondi | Records: 955 | Insert: 10 | Update: 0 | Presenti: 939 | Scartati: 6 | Cancellati: 0' . PHP_EOL,
-                        '2.0) PID sync1.0: Processata in 0,039 secondi | Records: 240 | Insert: 1 | Update: 0 | Presenti: 239 | Scartati: 0 | Cancellati: 0' . PHP_EOL,
-                        '2.1) PID sync1.1: Processata in 0,098 secondi | Records: 955 | Insert: 10 | Update: 0 | Presenti: 939 | Scartati: 6 | Cancellati: 0' . PHP_EOL
+                        '2.0) PID sync.1.0: Processata in 0,039 secondi | Records: 240 | Insert: 1 | Update: 0 | Presenti: 239 | Scartati: 0 | Cancellati: 0' . PHP_EOL,
+                        '2.1) PID sync.1.1: Processata in 0,098 secondi | Records: 955 | Insert: 10 | Update: 0 | Presenti: 939 | Scartati: 6 | Cancellati: 0' . PHP_EOL
                     ]
                 ]
             ],
@@ -2071,7 +2071,7 @@ class ServiceManagerTest  extends TestCase
                             'method' => 'GET',
                             'params' => [],
                             'isJson' => false,
-                            'key' => 'sync1'
+                            'key' => 'sync.1'
                         ]
                         
                     ]
@@ -2089,8 +2089,8 @@ class ServiceManagerTest  extends TestCase
                     'echos' => [
                         '1.0) PID sync.0: Processata in 0,039 secondi | Records: 240 | Insert: 1 | Update: 0 | Presenti: 239 | Scartati: 0 | Cancellati: 0' . PHP_EOL,
                         '1.1) PID sync.1: Processata in 0,098 secondi | Records: 955 | Insert: 10 | Update: 0 | Presenti: 939 | Scartati: 6 | Cancellati: 0' . PHP_EOL,
-                        '2.0) PID sync1.0: Processata in 0,039 secondi | Records: 240 | Insert: 1 | Update: 0 | Presenti: 239 | Scartati: 0 | Cancellati: 0' . PHP_EOL,
-                        '2.1) PID sync1.1: Processata in 0,098 secondi | Records: 955 | Insert: 10 | Update: 0 | Presenti: 939 | Scartati: 6 | Cancellati: 0' . PHP_EOL
+                        '2.0) PID sync.1.0: Processata in 0,039 secondi | Records: 240 | Insert: 1 | Update: 0 | Presenti: 239 | Scartati: 0 | Cancellati: 0' . PHP_EOL,
+                        '2.1) PID sync.1.1: Processata in 0,098 secondi | Records: 955 | Insert: 10 | Update: 0 | Presenti: 939 | Scartati: 6 | Cancellati: 0' . PHP_EOL
                     ]
                 ]
             ]
@@ -2569,7 +2569,7 @@ class ServiceManagerTest  extends TestCase
                 'isAsync' => false,
                 'printFunction' => 'ServiceManager::formatResponse',
                 'expected' => [
-                    '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
+                    '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
                 ]
             ],
             'multi' => [
@@ -2593,8 +2593,8 @@ class ServiceManagerTest  extends TestCase
                 'isAsync' => true,
                 'printFunction' => 'ServiceManager::formatResponse',
                 'expected' => [
-                    '{"ok":true,"response":{"params":{"var":"30040","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}',
-                    '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30040<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
+                    '{"ok":true,"response":{"params":{"var":"30040","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}',
+                    '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30040<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: |"]}}'
                 ]
             ]
         ];
@@ -5401,7 +5401,7 @@ class ServiceManagerTest  extends TestCase
      */
     public function setCallKeyProvider() : array
     {
-        $data = [
+        $data = [            
             'key const eq' => [
                 'args' => [
                     'i' => '1',
@@ -5416,23 +5416,7 @@ class ServiceManagerTest  extends TestCase
                     
                 ],
                 'key' => 'pippo',
-                'expected' => 'pippo1'
-            ],
-            'key const eq' => [
-                'args' => [
-                    'i' => '1',
-                    'params' => [
-                        'var' => '30030',
-                        'datefrom' => '01/01/2019',
-                        'dateto' => '02/01/2019',
-                        'full' => 1,
-                        'field' => 'volume'
-                    ],
-                    'prevKey' => 'pippo'
-                    
-                ],
-                'key' => 'pippo',
-                'expected' => 'pippo1'
+                'expected' => 'pippo.1'
             ],
             'prevKey void' => [
                 'args' => [
@@ -5757,8 +5741,8 @@ class ServiceManagerTest  extends TestCase
             'standard' => [
                 'args' => [
                     'responses' => [
-                        '{"ok":true,"response":{"params":{"var":"30040","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: 4"]}}',
-                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30040<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: 6"]}}'
+                        '{"ok":true,"response":{"params":{"var":"30040","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: 4"]}}',
+                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30040<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: 6"]}}'
                     ]
                 ],
                 'token' => 'tocsv',
@@ -5767,8 +5751,8 @@ class ServiceManagerTest  extends TestCase
             'no token' => [
                 'args' => [
                     'responses' => [
-                        '{"ok":true,"response":{"params":{"var":"30040","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: 4"]}}',
-                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30040<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: 6"]}}'
+                        '{"ok":true,"response":{"params":{"var":"30040","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: 4"]}}',
+                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30040<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: 6"]}}'
                     ]
                 ],
                 'token' => null,
@@ -5777,8 +5761,8 @@ class ServiceManagerTest  extends TestCase
             'token diff' => [
                 'args' => [
                     'responses' => [
-                        '{"ok":true,"response":{"params":{"var":"30040","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: 4"]}}',
-                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30040<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b>"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: 6"]}}'
+                        '{"ok":true,"response":{"params":{"var":"30040","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30030<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: 4"]}}',
+                        '{"ok":true,"response":{"params":{"var":"30030","datefrom":"01\/01\/2019 00:00:00","dateto":"02\/01\/2019 00:00:00","full":true,"field":"volume"},"header":["Procedura esportazione CSV dati movimentazioni dighe","Elaborazione iniziata in data: |"],"body":["Elaborazione dati <b>Volume<\/b> variabile <b>30040<\/b> dal <b>01\/01\/2019<\/b> al <b>02\/01\/2019<\/b> avvenuta con successo in <b>|<\/b>. File CSV <b>full<\/b> esportati: <b>|<\/b> (tocsv@127.0.0.1)"],"footer":["Elaborazione terminata in data: |","Tempo di elaborazione: | sec","Numero totale file csv esportati: 6"]}}'
                     ]
                 ],
                 'token' => 'pippo',

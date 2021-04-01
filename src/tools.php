@@ -1036,6 +1036,7 @@ function response(array $request, int $printed, string $start) : string
         } else {
             $html .= ' Nessun file CSV <b>' . $type . '</b> esportato per mancanza di dati.';
         }
+        $html .= ' (tocsv@' . REALHOST . ')';
         return $html;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);

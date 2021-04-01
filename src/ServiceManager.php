@@ -619,7 +619,7 @@ class ServiceManager extends Accessor
                 if ($currentKey !== $prevKey) {
                     $key = $currentKey;
                 } else {
-                    $key = $currentKey . $i;
+                    $key = $currentKey . '.' . $i;
                 }
             } else {
                 $key = null;
