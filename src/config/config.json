@@ -15,6 +15,40 @@
             "subdirectory": false
         },
         "services": {
+            "list": {
+                "sync": {
+                    "name": "telegram_REST",
+                    "token": "sync",
+                    "defaults": {
+                        "tel": "sendMode"
+                    },
+                    "method": "Sync"
+                },
+                "tocsv": {
+                    "name": "tocsv",
+                    "token": null,
+                    "defaults": {},
+                    "method": "ToCsv"
+                },
+                "watch1": {
+                    "name": "telegram_REST",
+                    "token": "watchdog",
+                    "defaults": {
+                        "tel": "sendMode"
+                    },
+                    "method": "Watchdog"
+                },
+                "watch2": {
+                    "name": "telegram_REST",
+                    "token": "watchdog",
+                    "defaults": {
+                        "host": 2,
+                        "move": 1,
+                        "tel": "sendMode"
+                    },
+                    "method": "Watchdog"
+                }
+            },
             "tocsv": {
                 "host": "LOCALHOST",
                 "path": "scarichi/tocsv.php",

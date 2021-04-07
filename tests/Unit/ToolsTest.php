@@ -18960,10 +18960,10 @@ class ToolsTest extends TestCase
                 ],
                 'mode' => false,
                 'expected' => [
-                    'sync' => '<b>Procedura sincronizzazione banche dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Records: 12.306 | Insert: 54 | Update: 0 | Presenti: 12.245 | Scartati: 7 | Cancellati: 0',
+                    'sync' => '<b>Procedura sincronizzazione banche dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Records: 1.195 | Insert: 11 | Update: 0 | Presenti: 1.178 | Scartati: 6 | Cancellati: 0',
                     'tocsv' => '<b>Procedura calcolo ed esportazione dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Esportati: ',
-                    'watch1' => '<b>Procedura caricamento dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Records: 0 | Insert: 0 | Update: 0 | Presenti: 0 | Scartati: 0 | Cancellati: 0',
-                    'watch2' => '<b>Procedura caricamento dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Records: 0 | Insert: 0 | Update: 0 | Presenti: 0 | Scartati: 0 | Cancellati: 0'
+                    'watch1' => '<b>Procedura caricamento dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Records: 47 | Insert: 0 | Update: 0 | Presenti: 47 | Scartati: 0 | Cancellati: 0',
+                    'watch2' => '<b>Procedura caricamento dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Records: 47 | Insert: 0 | Update: 0 | Presenti: 47 | Scartati: 0 | Cancellati: 0'
                 ]
             ]            
         ];

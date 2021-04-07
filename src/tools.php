@@ -3343,7 +3343,7 @@ function buildTelegram(array $messages, ?bool $sendGlobal = null) : string
  * @return array
  * @throws \Throwable
  */
-function callServices(string $type, ?array $csvParams, ?bool $mode = null) : array
+function callServices2(string $type, ?array $csvParams, ?bool $mode = null) : array
 {
     try {
         $sendMode = $mode ?? MODE;
@@ -3361,6 +3361,26 @@ function callServices(string $type, ?array $csvParams, ?bool $mode = null) : arr
 
             $watchService2 = New ServiceManager('telegram_REST', 'watchdog', [['host' => 2,'move' => 1,'tel' => $sendMode]]);
             $messages['watch2'] = $watchService2->getMessage();
+        }
+        return $messages;
+    //@codeCoverageIgnoreStart
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+    //@codeCoverageIgnoreEnd
+}
+
+function callServices(string $type, ?array $csvParams, ?bool $mode = null, ?array $list = null) : array
+{
+    try {
+        $sendMode = $mode ?? MODE;
+        $services = $list ?? SERVICES['list'];
+        $messages = [];
+        if ($type === 'ok' || $type === 'default') {            
+            foreach ($services as $key => $service) {
+                $messages[$key] = ServiceBuilder::run($service, $csvParams, $sendMode);
+            }
         }
         return $messages;
     //@codeCoverageIgnoreStart
