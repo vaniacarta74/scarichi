@@ -19,11 +19,28 @@ use vaniacarta74\Scarichi\Utility;
  */
 class ServiceBuilder
 {
-    public static function run(array $serParams, array $multiParams, bool $sendMode) : string
+    /**
+     * @param array $serParams
+     * @param array $multiParams
+     * @param bool|null $sendMode
+     * @return string
+     * @throws \Throwable
+     * @throws \Exception
+     */
+    public static function run(array $serParams, ?array $multiParams = null, ?bool $sendMode = false) : string
     {
         try {
-            $params = self::setParams($serParams, $multiParams, $sendMode);
-            $service = New ServiceManager($serParams['name'], $serParams['token'], $params);
+            $params = null;
+            if (array_key_exists('name', $serParams)) {
+                $service = $serParams['name'];
+            } else {
+                throw new \Exception('Configurazione service list non valida: name neccessario');
+            }
+            $token = (array_key_exists('token', $serParams)) ? $serParams['token'] : null;           
+            if (isset($multiParams)) {
+                $params = self::setParams($serParams, $multiParams, $sendMode);
+            }           
+            $service = New ServiceManager($service, $token, $params);
             $message = $service->getMessage();            
             return $message;
         } catch (\Throwable $e) {
@@ -32,10 +49,18 @@ class ServiceBuilder
         }        
     }
     
+    /**
+     * @param array $serParams
+     * @param array $multiParams
+     * @param bool $sendMode
+     * @return array
+     * @throws \Throwable
+     * @throws \Exception
+     */
     public static function setParams(array $serParams, array $multiParams, bool $sendMode) : array
     {
         try {
-            if (array_key_exists('method', $serParams)) {
+            if (array_key_exists('method', $serParams) && array_key_exists('defaults', $serParams)) {
                 $methodName = 'set' . $serParams['method'] . 'Params';
                 if (method_exists(__CLASS__, $methodName)) {
                     $className = str_replace(__NAMESPACE__ . '\\', '', get_class());
@@ -54,6 +79,13 @@ class ServiceBuilder
         }        
     }
     
+    /**
+     * @param array $defaults
+     * @param array $multiParams
+     * @param bool $sendMode
+     * @return array
+     * @throws \Throwable
+     */
     public static function setSyncParams(array $defaults, array $multiParams, bool $sendMode) : array
     {
         try {
@@ -63,22 +95,40 @@ class ServiceBuilder
                 self::setDelay($params, $multiParams);
             }
             return $params;
+        //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
-        }        
+        }
+        //@codeCoverageIgnoreEnd
     }
     
+    /**
+     * @param array $defaults
+     * @param array $multiParams
+     * @param bool $sendMode
+     * @return array
+     * @throws \Throwable
+     */
     public static function setToCsvParams(array $defaults, array $multiParams, bool $sendMode) : array
     {
         try {
             return $multiParams;
+        //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
-        }        
+        }
+        //@codeCoverageIgnoreEnd
     }
     
+    /**
+     * @param array $defaults
+     * @param array $multiParams
+     * @param bool $sendMode
+     * @return array
+     * @throws \Throwable
+     */
     public static function setWatchdogParams(array $defaults, array $multiParams, bool $sendMode) : array
     {
         try {
@@ -86,12 +136,21 @@ class ServiceBuilder
             self::setDefaults($params, $defaults, $sendMode);
             self::appendVar($params, $multiParams);
             return $params;
+        //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
-        }        
+        }
+        //@codeCoverageIgnoreEnd
     }
     
+    /**
+     * @param array $params
+     * @param array $defaults
+     * @param bool $sendMode
+     * @return void
+     * @throws \Throwable
+     */
     public static function setDefaults(array &$params, array $defaults, bool $sendMode) : void
     {
         try {
@@ -104,19 +163,27 @@ class ServiceBuilder
                 }
             }
             $params[] = $bases;
+        //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
-        }        
+        }
+        //@codeCoverageIgnoreEnd
     }
     
+    /**
+     * @param array $params
+     * @param array $multiParams
+     * @return bool
+     * @throws \Throwable
+     */
     public static function appendVar(array &$params, array $multiParams) : bool
     {
         try {
             $appended = false;
             $max = count($multiParams);
             if ($max > 1) {
-                for ($i = 1; $i <= $max; $i++) {
+                for ($i = 1; $i < $max; $i++) {
                     if ($multiParams[$i]['var'] === $multiParams[$i - 1]['var']) {
                         $var = $multiParams[$i - 1]['var'];
                     } else {
@@ -125,19 +192,29 @@ class ServiceBuilder
                     }
                 } 
             } elseif ($max === 1) {
-                $var = $multiParams[0]['var'];
+                if (array_key_exists('var', $multiParams[0])) {
+                    $var = $multiParams[0]['var'];
+                }
             }
             if (isset($var)) {
                 $params[0]['variabile'] = $var;
                 $appended = true;
             }
             return $appended;
+        //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
-        }        
+        }
+        //@codeCoverageIgnoreEnd
     }
     
+    /**
+     * @param array $params
+     * @param array $multiParams
+     * @return void
+     * @throws \Throwable
+     */
     public static function setDelay(array &$params, array $multiParams) : void
     {
         try {
@@ -151,12 +228,21 @@ class ServiceBuilder
             }
             $delay = self::getDelay($datefrom, $dateto, 24);
             $params[0]['delay'] = $delay;
+        //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
-        }        
+        }
+        //@codeCoverageIgnoreEnd        
     }
     
+    /**
+     * @param string $datefrom
+     * @param string $dateto
+     * @param int|null $deltaH
+     * @return int
+     * @throws \Throwable
+     */
     public static function getDelay(string $datefrom, string $dateto, ?int $deltaH = null) : int
     {
         try {
@@ -168,9 +254,11 @@ class ServiceBuilder
             $days = $interval->format('%a');
             $delay = intval($days) * 24 + $offset;
             return $delay;
+        //@codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
-        }        
+        }
+        //@codeCoverageIgnoreEnd
     }
 }

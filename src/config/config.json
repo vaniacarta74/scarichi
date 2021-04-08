@@ -5,7 +5,10 @@
             "memory_limit": "2048M"
         },
         "log": {
-            "debug_level": 2,
+            "debug_level": {
+                "prod": 1,
+                "dev": 2
+            },
             "log_path": "/../../log",
             "error_log": "error.log"
         },        
@@ -210,8 +213,14 @@
             ],
             "tagLimit": 100,
             "limit": 4096,
-            "send": false,
-            "global": true, 
+            "send": {
+                "prod": true,
+                "dev": false
+            },
+            "global": {
+                "prod": true,
+                "dev": true
+            }, 
             "path": "/../../../telegram.json",
             "url": "scarichi/telegram.php"
         },
@@ -222,7 +231,10 @@
     },
     "command": { 
         "sintax": "php scarichi.php",
-        "period": "99Y",
+        "period": {
+            "prod": "1M",
+            "dev": "99Y"
+        },
         "offset": "1D"
     },
     "modelli": {

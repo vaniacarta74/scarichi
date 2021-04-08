@@ -3338,39 +3338,12 @@ function buildTelegram(array $messages, ?bool $sendGlobal = null) : string
 
 /**
  * @param string $type
- * @param bool $sendMode
  * @param array $csvParams
+ * @param bool|null $mode
+ * @param array $list
  * @return array
  * @throws \Throwable
  */
-function callServices2(string $type, ?array $csvParams, ?bool $mode = null) : array
-{
-    try {
-        $sendMode = $mode ?? MODE;
-        $messages = [];
-        if ($type === 'ok' || $type === 'default') {            
-
-            $syncService = New ServiceManager('telegram_REST', 'sync', [['tel' => $sendMode]]);
-            $messages['sync'] = $syncService->getMessage();
-
-            $csvService = New ServiceManager('tocsv', null, $csvParams);
-            $messages['tocsv'] = $csvService->getMessage(); 
-
-            $watchService1 = New ServiceManager('telegram_REST', 'watchdog', [['tel' => $sendMode]]);
-            $messages['watch1'] = $watchService1->getMessage();
-
-            $watchService2 = New ServiceManager('telegram_REST', 'watchdog', [['host' => 2,'move' => 1,'tel' => $sendMode]]);
-            $messages['watch2'] = $watchService2->getMessage();
-        }
-        return $messages;
-    //@codeCoverageIgnoreStart
-    } catch (\Throwable $e) {
-        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-        throw $e;
-    }
-    //@codeCoverageIgnoreEnd
-}
-
 function callServices(string $type, ?array $csvParams, ?bool $mode = null, ?array $list = null) : array
 {
     try {
@@ -3381,7 +3354,7 @@ function callServices(string $type, ?array $csvParams, ?bool $mode = null, ?arra
             foreach ($services as $key => $service) {
                 $messages[$key] = ServiceBuilder::run($service, $csvParams, $sendMode);
             }
-        }
+        }        
         return $messages;
     //@codeCoverageIgnoreStart
     } catch (\Throwable $e) {

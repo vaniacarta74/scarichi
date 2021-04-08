@@ -18951,6 +18951,7 @@ class ToolsTest extends TestCase
                 'type' => 'ok',
                 'csvParams' => [
                     [
+                        'id' => '0',
                         'var' => '30030',
                         'datefrom' => '01/01/2019',
                         'dateto' => '02/01/2019',
@@ -18959,13 +18960,86 @@ class ToolsTest extends TestCase
                     ]
                 ],
                 'mode' => false,
+                'list' => null,
                 'expected' => [
                     'sync' => '<b>Procedura sincronizzazione banche dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Records: 1.195 | Insert: 11 | Update: 0 | Presenti: 1.178 | Scartati: 6 | Cancellati: 0',
                     'tocsv' => '<b>Procedura calcolo ed esportazione dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Esportati: ',
                     'watch1' => '<b>Procedura caricamento dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Records: 47 | Insert: 0 | Update: 0 | Presenti: 47 | Scartati: 0 | Cancellati: 0',
                     'watch2' => '<b>Procedura caricamento dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Records: 47 | Insert: 0 | Update: 0 | Presenti: 47 | Scartati: 0 | Cancellati: 0'
                 ]
-            ]            
+            ],
+            'one var multi' => [
+                'type' => 'ok',
+                'csvParams' => [
+                    [
+                        'id' => '0',
+                        'var' => '30030',
+                        'datefrom' => '01/01/2019',
+                        'dateto' => '02/01/2019',
+                        'full' => '1',
+                        'field' => 'volume'
+                    ],
+                    [
+                        'id' => '1',
+                        'var' => '30030',
+                        'datefrom' => '02/01/2019',
+                        'dateto' => '03/01/2019',
+                        'full' => '1',
+                        'field' => 'volume'
+                    ]
+                ],
+                'mode' => false,
+                'list' => null,
+                'expected' => [
+                    'sync' => '<b>Procedura sincronizzazione banche dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Records: 1.195 | Insert: 11 | Update: 0 | Presenti: 1.178 | Scartati: 6 | Cancellati: 0',
+                    'tocsv' => '<b>Procedura calcolo ed esportazione dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Esportati: ',
+                    'watch1' => '<b>Procedura caricamento dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Records: 47 | Insert: 0 | Update: 0 | Presenti: 47 | Scartati: 0 | Cancellati: 0',
+                    'watch2' => '<b>Procedura caricamento dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Records: 47 | Insert: 0 | Update: 0 | Presenti: 47 | Scartati: 0 | Cancellati: 0'
+                ]
+            ],
+            'multi var' => [
+                'type' => 'ok',
+                'csvParams' => [
+                    [
+                        'id' => '0',
+                        'var' => '30030',
+                        'datefrom' => '01/01/2019',
+                        'dateto' => '02/01/2019',
+                        'full' => '1',
+                        'field' => 'volume'
+                    ],
+                    [
+                        'id' => '1',
+                        'var' => '30040',
+                        'datefrom' => '01/01/2019',
+                        'dateto' => '02/01/2019',
+                        'full' => '1',
+                        'field' => 'volume'
+                    ]
+                ],
+                'mode' => false,
+                'list' => null,
+                'expected' => [
+                    'sync' => '<b>Procedura sincronizzazione banche dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Records: 12.306 | Insert: 54 | Update: 0 | Presenti: 12.245 | Scartati: 7 | Cancellati: 0',
+                    'tocsv' => '<b>Procedura calcolo ed esportazione dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Esportati: ',
+                    'watch1' => '<b>Procedura caricamento dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Records: 0 | Insert: 0 | Update: 0 | Presenti: 0 | Scartati: 0 | Cancellati: 0',
+                    'watch2' => '<b>Procedura caricamento dati</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL . '<b>Totali:</b> Records: 0 | Insert: 0 | Update: 0 | Presenti: 0 | Scartati: 0 | Cancellati: 0'
+                ]
+            ],
+            'list' => [
+                'type' => 'ok',
+                'csvParams' => null,
+                'mode' => false,
+                'list' => [
+                    'url' => [
+                        'name' => TOCSVURL . '?var=30030&datefrom=01/01/2019&dateto=02/01/2019&full=1&field=volume'
+                    ]
+                ],
+                'expected' => [
+                    'url' => '<b>' . TOCSVURL . '</b>' . PHP_EOL . 'Elaborazione iniziata in data: <b>|</b>' . PHP_EOL . 'Elaborazione terminata in data: <b>|</b>' . PHP_EOL . 'Tempo di elaborazione: <b>|</b>' . PHP_EOL
+                ]
+            ]
+            
         ];
         
         return $data;
@@ -18976,9 +19050,9 @@ class ToolsTest extends TestCase
      * covers callServices()
      * @dataProvider callServicesProvider
      */
-    public function testCallServicesStringContainsString(string $type, ?array $csvParams, ?bool $mode, array $responses) : void
+    public function testCallServicesStringContainsString(string $type, ?array $csvParams, ?bool $mode, ?array $list, array $responses) : void
     {
-        $actual = callServices($type, $csvParams, $mode);
+        $actual = callServices($type, $csvParams, $mode, $list);
         
         foreach ($responses as $key => $response) {
             $expecteds = explode('|', $response);
