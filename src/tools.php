@@ -17,10 +17,10 @@ use vaniacarta74\Scarichi\Utility;
 require_once('php_Router.inc.php');
 
 
-function checkRequest(?array $request, bool $fullCheck) : array
+function checkRequest(?array $request, bool $fullCheck, ?bool $admitAll = false) : array
 {
     try {
-        $variables['var'] = checkVariable($request);
+        $variables['var'] = checkVariable($request, $admitAll);
         $dates = checkInterval($request);
         if ($fullCheck) {
             $filters['full'] = checkFilter($request);
@@ -37,7 +37,7 @@ function checkRequest(?array $request, bool $fullCheck) : array
 }
 
 
-function checkVariable(?array $request) : string
+function checkVariable(?array $request, ?bool $admitAll = false) : string
 {
     try {
         if (isset($request['var']) || isset($request['variabile']) || isset($request['variable'])) {
@@ -48,16 +48,17 @@ function checkVariable(?array $request) : string
                     break;
                 }
             }
-            
-            $n_variabile = intval($variabile);
-            if ($n_variabile >= 30000 && $n_variabile <= 39999) {
-                return $n_variabile;
+            if ($admitAll && $variabile === 'ALL') {
+                $val = 'ALL';
+            } elseif (intval($variabile) >= 30000 && intval($variabile) <= 39999) {
+                $val = intval($variabile);
             } else {
                 throw new \Exception('Variabile non analizzabile. Valori ammessi compresi fra 30000 e 39999');
             }
         } else {
             throw new \Exception("Parametro variabile non presente nell'url o nome parametro non valido. Usare var, variable o variabile");
         }
+        return $val;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
@@ -3264,7 +3265,7 @@ function limitDates(array $values, ?string $limit = null, ?string $offset = null
         $dateOffset = $offset ?? OFFSET;
         $limited = [];
         if (count($values) > 0) {
-            if (!array_key_exists('datefrom', $values) || !array_key_exists('datefrom', $values)) {
+            if (!array_key_exists('datefrom', $values) || !array_key_exists('dateto', $values)) {
                 throw new \Exception('Parametri date mancanti');
             }
             $keys = array_keys($values);
@@ -3273,23 +3274,28 @@ function limitDates(array $values, ?string $limit = null, ?string $offset = null
                     $limited[$key] = $values[$key];
                 }
             }
-            $dateStart = \DateTime::createFromFormat('d/m/Y', $values['datefrom'], new \DateTimeZone('Europe/Rome'));
-            $dateEnd = \DateTime::createFromFormat('d/m/Y', $values['dateto'], new \DateTimeZone('Europe/Rome'));
-            $interval = new \DateInterval('P' . $dateLimit);
-            $offset = new \DateInterval('P' . $dateOffset);
-            $periods = new \DatePeriod($dateStart, $interval, $dateEnd);
-            $i = 0;
-            foreach ($periods as $period) {
-                $datefrom = clone $period;
-                $datefrom->sub($offset);
-                $dateto = clone $period;
-                $dateto->add($interval);            
-                $limited['datefrom'][$i] = $datefrom->format('d/m/Y');
-                $limited['dateto'][$i] = $dateto->format('d/m/Y');
-                $i++;
+            if ($values['datefrom'] !== $values['dateto']) { 
+                $dateStart = \DateTime::createFromFormat('d/m/Y', $values['datefrom'], new \DateTimeZone('Europe/Rome'));
+                $dateEnd = \DateTime::createFromFormat('d/m/Y', $values['dateto'], new \DateTimeZone('Europe/Rome'));
+                $interval = new \DateInterval('P' . $dateLimit);
+                $offset = new \DateInterval('P' . $dateOffset);
+                $periods = new \DatePeriod($dateStart, $interval, $dateEnd);
+                $i = 0;
+                foreach ($periods as $period) {
+                    $datefrom = clone $period;
+                    $datefrom->sub($offset);
+                    $dateto = clone $period;
+                    $dateto->add($interval);            
+                    $limited['datefrom'][$i] = $datefrom->format('d/m/Y');
+                    $limited['dateto'][$i] = $dateto->format('d/m/Y');
+                    $i++;
+                }
+                $limited['datefrom'][0] = $values['datefrom'];
+                $limited['dateto'][$i - 1] = $values['dateto'];
+            } else {
+                $limited['datefrom'][0] = $values['datefrom'];
+                $limited['dateto'][0] = $values['dateto'];
             }
-            $limited['datefrom'][0] = $values['datefrom'];
-            $limited['dateto'][$i - 1] = $values['dateto']; 
         }
         return $limited;
     } catch (\Throwable $e) {        
@@ -3362,4 +3368,93 @@ function callServices(string $type, ?array $csvParams, ?bool $mode = null, ?arra
         throw $e;
     }
     //@codeCoverageIgnoreEnd
+}
+
+/**
+ * @param array $request
+ * @return string
+ * @throws \Throwable
+ * @throws \Exception
+ */
+function setCommand(array $request) : string
+{
+    try {
+        if (!array_key_exists('var', $request) || !array_key_exists('datefrom', $request) || !array_key_exists('dateto', $request)) {
+            throw new \Exception('Chiavi request mancanti');
+        }
+        if ($request['var'] === 'ALL') {
+            $variabile = '';
+        } else {
+            $variabile = $request['var'];
+        }
+        $datefrom = $request['datefrom']->format('d/m/Y');
+        $dateto = $request['dateto']->format('d/m/Y');         
+        $arg = '-V ' . $variabile . ' -f ' . $datefrom . ' -t ' . $dateto . ' -c -n';
+        $command = 'php ' . __DIR__ . '/scarichi.php ' . $arg;
+                
+        return $command;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+function reCallResponse(string $output) : array
+{
+    try {
+        $response['ok'] = true;
+        $echoes = explode(PHP_EOL, $output);
+        $key = 0;
+        $watchdogs = [];
+        foreach ($echoes as $nkey => $echo) {
+            if ($echo !== '') {
+                if ($nkey === 0) {
+                    $response['response']['version'] = $echo;
+                } elseif ($nkey === 1) {
+                    $response['response']['date'] = $echo;
+                } elseif ($nkey === 2) {
+                    if ($echo === 'Descrizione Errore') {
+                        $response['ok'] = false;
+                        $key = 'internal error';
+                    } else {
+                        $key = setReCallKey($echo, $watchdogs);
+                    }                    
+                    $response['response'][$key][] = $echo;
+                } else {
+                    $key = setReCallKey($echo, $watchdogs);
+                    $response['response'][$key][] = $echo;
+                }                
+            }
+        }
+        return $response;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+function setReCallKey(string $echo, array &$watchdogs) : ?string
+{
+    try {
+        if (preg_match('/sync/', $echo)) {                        
+            $key = 'sync';
+        } elseif (preg_match('/watchdog(\.[0-9]*)?/', $echo, $matches)) {
+            if (in_array($matches[0], $watchdogs)) {
+                $key = 'watchdog host 2';
+            } else {
+                $watchdogs[] = $matches[0];
+                $key = 'watchdog host 1';
+            }           
+        } elseif (preg_match('/Telegram/', $echo)) {                        
+            $key = 'telegram';
+        } elseif (preg_match('/CSV/', $echo)) {
+            $key = 'tocsv';
+        } else {
+            $key = 'internal error';
+        }
+        return $key;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
 }

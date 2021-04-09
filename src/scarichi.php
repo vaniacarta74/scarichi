@@ -13,7 +13,7 @@ namespace vaniacarta74\Scarichi;
 require __DIR__ . '/../vendor/autoload.php';
 
 //$argc = 9;
-//$argv = ['scarichi.php', '-V', '30030', '-f', '01/01/2019', '-t', '02/01/2019', '-c', '-n', 'FALSE'];
+//$argv = ['scarichi.php', '-V', '30030', '-f', '02/01/2019', '-t', '02/01/2019', '-c', '-n', 'FALSE'];
 //$argv = ['scarichi.php', '-v'];
 
 try {
