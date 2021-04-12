@@ -3385,11 +3385,11 @@ function setCommand(array $request) : string
         if ($request['var'] === 'ALL') {
             $variabile = '';
         } else {
-            $variabile = $request['var'];
+            $variabile = $request['var'] . ' ';
         }
         $datefrom = $request['datefrom']->format('d/m/Y');
         $dateto = $request['dateto']->format('d/m/Y');         
-        $arg = '-V ' . $variabile . ' -f ' . $datefrom . ' -t ' . $dateto . ' -c -n';
+        $arg = '-V ' . $variabile . '-f ' . $datefrom . ' -t ' . $dateto . ' -c -n';
         $command = 'php ' . __DIR__ . '/scarichi.php ' . $arg;
                 
         return $command;
@@ -3427,13 +3427,15 @@ function reCallResponse(string $output) : array
             }
         }
         return $response;
+    //@codeCoverageIgnoreStart
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
     }
+    //@codeCoverageIgnoreEnd
 }
 
-function setReCallKey(string $echo, array &$watchdogs) : ?string
+function setReCallKey(string $echo, array &$watchdogs) : string
 {
     try {
         if (preg_match('/sync/', $echo)) {                        
@@ -3453,8 +3455,10 @@ function setReCallKey(string $echo, array &$watchdogs) : ?string
             $key = 'internal error';
         }
         return $key;
+    //@codeCoverageIgnoreStart
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
     }
+    //@codeCoverageIgnoreEnd
 }

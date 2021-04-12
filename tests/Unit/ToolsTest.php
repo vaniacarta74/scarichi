@@ -126,6 +126,9 @@ use function vaniacarta74\Scarichi\sendTelegram as sendTelegram;
 use function vaniacarta74\Scarichi\buildTelegram as buildTelegram;
 use function vaniacarta74\Scarichi\callServices as callServices;
 use function vaniacarta74\Scarichi\csvResponse as csvResponse;
+use function vaniacarta74\Scarichi\setCommand as setCommand;
+use function vaniacarta74\Scarichi\reCallResponse as reCallResponse;
+use function vaniacarta74\Scarichi\setReCallKey as setReCallKey;
 
 class ToolsTest extends TestCase
 {
@@ -1351,6 +1354,20 @@ class ToolsTest extends TestCase
         $this->assertEquals(
             '30030',
             checkVariable($request)
+        );
+    }
+    
+    /**
+     * @group tools
+     * covers checkVariable()
+     */
+    public function testCheckVariableALLEquals() : void
+    {
+        $request = ['var' => 'ALL'];
+        
+        $this->assertEquals(
+            'ALL',
+            checkVariable($request, true)
         );
     }
     
@@ -18847,7 +18864,25 @@ class ToolsTest extends TestCase
                     'field' => 'volume',
                     'full' => '1'
                 ]
-            ]            
+            ],
+            'date equals' => [                
+                'values' => [
+                    'var' => ['30030', '30040'],
+                    'datefrom' => '01/01/2018',
+                    'dateto' => '01/01/2018',
+                    'field' => 'volume',
+                    'full' => '1'
+                ],
+                'limit' => '6M',
+                'offset' => '1D',
+                'expected' => [
+                    'var' => ['30030', '30040'],
+                    'datefrom' => ['01/01/2018'],
+                    'dateto' => ['01/01/2018'],
+                    'field' => 'volume',
+                    'full' => '1'
+                ]
+            ]             
         ];
         
         return $data;
@@ -19154,5 +19189,252 @@ class ToolsTest extends TestCase
                 $this->assertStringContainsString($expected, $actualFooter);
             }
         }
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function setCommandProvider() : array
+    {
+        $data = [
+            'standard' => [
+                'request' => [
+                    'var' => '30030',
+                    'datefrom' => \DateTime::createFromFormat('d/m/Y H:i:s', '01/01/2019 00:00:00'),
+                    'dateto' => \DateTime::createFromFormat('d/m/Y H:i:s', '02/01/2019 00:00:00'),
+                ],
+                'expected' => 'php /var/www/html/telecontrollo/scarichi/github/src/scarichi.php -V 30030 -f 01/01/2019 -t 02/01/2019 -c -n'
+            ],
+            'all' => [
+                'request' => [
+                    'var' => 'ALL',
+                    'datefrom' => \DateTime::createFromFormat('d/m/Y H:i:s', '01/01/2019 00:00:00'),
+                    'dateto' => \DateTime::createFromFormat('d/m/Y H:i:s', '02/01/2019 00:00:00'),
+                ],
+                'expected' => 'php /var/www/html/telecontrollo/scarichi/github/src/scarichi.php -V -f 01/01/2019 -t 02/01/2019 -c -n'
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers setCommand()
+     * @dataProvider setCommandProvider
+     */
+    public function testSetCommandEquals(array $request, string $expected) : void
+    {
+        $actual = setCommand($request);
+        
+        $this->assertEquals($expected, $actual);            
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function setCommandExceptionProvider() : array
+    {
+        $data = [
+            'no var' => [
+                'request' => [
+                    'pippo' => '30030',
+                    'datefrom' => \DateTime::createFromFormat('d/m/Y H:i:s', '01/01/2019 00:00:00'),
+                    'dateto' => \DateTime::createFromFormat('d/m/Y H:i:s', '02/01/2019 00:00:00'),
+                ]
+            ],
+            'no datefrom' => [
+                'request' => [
+                    'var' => '30030',
+                    'pippo' => \DateTime::createFromFormat('d/m/Y H:i:s', '01/01/2019 00:00:00'),
+                    'dateto' => \DateTime::createFromFormat('d/m/Y H:i:s', '02/01/2019 00:00:00'),
+                ]
+            ],
+            'no dateto' => [
+                'request' => [
+                    'var' => '30030',
+                    'datefrom' => \DateTime::createFromFormat('d/m/Y H:i:s', '01/01/2019 00:00:00'),
+                    'pippo' => \DateTime::createFromFormat('d/m/Y H:i:s', '02/01/2019 00:00:00'),
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers setCommand()
+     * @dataProvider setCommandExceptionProvider
+     */
+    public function testSetCommandException(array $request) : void
+    {
+        $this->expectException(\Exception::class);
+        
+        setCommand($request);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function reCallResponseProvider() : array
+    {
+        $data = [
+            'standard' => [
+                'output' => 'scarichi 1.4.2 by Vania Carta and contributors' . PHP_EOL .
+                    '2021-04-12 10:11:53' . PHP_EOL .
+                    '1.0) PID sync.0: bla bla bla' . PHP_EOL .
+                    '1.1) PID sync.1: bla bla bla' . PHP_EOL .
+                    '1) PID 0: Elaborazione...file CSV...' . PHP_EOL .
+                    '1.0) PID watchdog.0: bla bla bla' . PHP_EOL .
+                    '1.1) PID watchdog.1: bla bla bla' . PHP_EOL .
+                    '1.0) PID watchdog.0: bla bla bla' . PHP_EOL .
+                    '1.1) PID watchdog.1: bla bla bla' . PHP_EOL .
+                    'Messaggio Telegram...',
+                'expected' => [
+                    'ok' => true,
+                    'response' => [
+                        'version' => 'scarichi 1.4.2 by Vania Carta and contributors',
+                        'date' => '2021-04-12 10:11:53',
+                        'sync' => [
+                            '1.0) PID sync.0: bla bla bla',
+                            '1.1) PID sync.1: bla bla bla'
+                        ],
+                        'tocsv' => [
+                            '1) PID 0: Elaborazione...file CSV...'
+                        ],
+                        'watchdog host 1' => [
+                            '1.0) PID watchdog.0: bla bla bla',
+                            '1.1) PID watchdog.1: bla bla bla'
+                        ],
+                        'watchdog host 2' => [
+                            '1.0) PID watchdog.0: bla bla bla',
+                            '1.1) PID watchdog.1: bla bla bla'
+                        ],
+                        'telegram' => [
+                            'Messaggio Telegram...'
+                        ]
+                    ]                    
+                ]
+            ],
+            'internal error' => [
+                'output' => 'scarichi 1.4.2 by Vania Carta and contributors' . PHP_EOL .
+                    '2021-04-12 10:11:53' . PHP_EOL .
+                    'Descrizione Errore' . PHP_EOL .
+                    'Pippo Pluto Paperino',
+                'expected' => [
+                    'ok' => false,
+                    'response' => [
+                        'version' => 'scarichi 1.4.2 by Vania Carta and contributors',
+                        'date' => '2021-04-12 10:11:53',
+                        'internal error' => [
+                            'Descrizione Errore',
+                            'Pippo Pluto Paperino'
+                        ]
+                    ]                    
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers reCallResponse()
+     * @dataProvider reCallResponseProvider
+     */
+    public function testReCallResponseEquals(string $output, array $expected) : void
+    {
+        $actual = reCallResponse($output);
+        
+        $this->assertEquals($expected, $actual);            
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function setReCallKeyProvider() : array
+    {
+        $data = [
+            'sync' => [
+                'echo' => '1.0) PID sync.0: bla bla bla',
+                'watchdog' => [],
+                'expected' => 'sync',
+                'expected2' => []
+            ],
+            'tocsv' => [
+                'echo' => '1) PID 0: Elaborazione...file CSV...',
+                'watchdog' => [],
+                'expected' => 'tocsv',
+                'expected2' => []
+            ],
+            'watchdog host 1' => [
+                'echo' => '1.0) PID watchdog.0: bla bla bla',
+                'watchdog' => [],
+                'expected' => 'watchdog host 1',
+                'expected2' => [
+                    'watchdog.0'
+                ]
+            ],
+            'watchdog host 1.1' => [
+                'echo' => '1.0) PID watchdog.1: bla bla bla',
+                'watchdog' => [
+                    'watchdog.0'
+                ],
+                'expected' => 'watchdog host 1',
+                'expected2' => [
+                    'watchdog.0',
+                    'watchdog.1'
+                ]
+            ],
+            'watchdog host 2' => [
+                'echo' => '1.0) PID watchdog.0: bla bla bla',
+                'watchdog' => [
+                    'watchdog.0'
+                ],
+                'expected' => 'watchdog host 2',
+                'expected2' => [
+                    'watchdog.0'
+                ]                    
+            ],
+            'telegram' => [
+                'echo' => 'Messaggio Telegram...',
+                'watchdog' => [
+                    'watchdog.0'
+                ],
+                'expected' => 'telegram',
+                'expected2' => [
+                    'watchdog.0'
+                ]
+            ],
+            'internal error' => [
+                'echo' => 'Messaggio non previsto',
+                'watchdog' => [
+                    'watchdog.0'
+                ],
+                'expected' => 'internal error',
+                'expected2' => [
+                    'watchdog.0'
+                ]                    
+            ]
+            
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers setReCallKey()
+     * @dataProvider setReCallKeyProvider
+     */
+    public function testSetReCallKeyEquals(string $echo, array $watchdog, string $expected, array $expected2) : void
+    {
+        $actual = setReCallKey($echo, $watchdog);
+        
+        $this->assertEquals($expected, $actual); 
+        
+        $this->assertEquals($expected2, $watchdog);
     }
 }
