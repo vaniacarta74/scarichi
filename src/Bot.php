@@ -334,7 +334,7 @@ class Bot
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
-        // @codeCoverageIgnoreStart
+        // @codeCoverageIgnoreEnd
     }
     
     private function updateOffset() : void
@@ -679,7 +679,7 @@ class Bot
                     if ($tested['ok']) {
                         $response = Utility::callback($this->methods['runner'], $tested['params']);
                         if ($response['ok']) {
-                            $message = Utility::callback($this->methods['messager'], array($response['records']));
+                            $message = Utility::callback($this->methods['messager'], array($response['response']));
                         } else {
                             $message = $response['descrizione errore'];
                         }
@@ -764,6 +764,56 @@ class Bot
         }
     }
     
+    public static function runnerVolume(string $variabile, string $datefrom, string $dateto) : array
+    {
+        try {
+            $url = 'http://' . LOCALHOST . '/scarichi/tojson.php';
+            $params = [
+                'var' => $variabile,
+                'datefrom' => $datefrom,
+                'dateto' => $dateto,
+                'field' => 'cumulato'
+            ];
+            $json = Curl::run($url, 'POST', $params, true);            
+            $arrJson = json_decode($json, true);
+            
+            return $arrJson;
+        // @codeCoverageIgnoreStart
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+        // @codeCoverageIgnoreEnd
+    }
+    
+    public static function messagerVolume(array $response) : string
+    {
+        try {
+            if (count($response) > 0) {
+                $startRecord = reset($response);
+                $endRecord = end($response);
+                
+                $variabile = Bot::extractVariabile($startRecord);
+                $iniziale = Bot::extractDataOra($startRecord);
+                $finale = Bot::extractDataOra($endRecord);
+                $valore = Bot::extractValore($endRecord);
+                
+                $message = 'Il volume movimentato da <b>' . $variabile . '</b>' . PHP_EOL;
+                $message .= 'dal <i>' . $iniziale['data'] . '</i> alle <i>' . $iniziale['ora'] . '</i>' . PHP_EOL;
+                $message .= 'al <i>' . $finale['data'] . '</i> alle <i>' . $finale['ora'] . '</i>' . PHP_EOL;
+                $message .= 'é di <b>' . $valore . ' mc</b>.';
+            } else {
+                $message = 'Non ci sono dati per il periodo selezionato.';
+            }            
+            return $message;
+        // @codeCoverageIgnoreStart
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+        // @codeCoverageIgnoreEnd
+    }
+    
     public static function testVariabile(array $params) : array
     {
         try {
@@ -789,7 +839,7 @@ class Bot
             throw $e;
         }
     }
-    
+        
     public static function testDatefrom(array $params) : array
     {
         try {
@@ -846,56 +896,6 @@ class Bot
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
-    }
-    
-    public static function runnerVolume(string $variabile, string $datefrom, string $dateto) : array
-    {
-        try {
-            $url = 'http://' . LOCALHOST . '/scarichi/tojson.php';
-            $params = [
-                'var' => $variabile,
-                'datefrom' => $datefrom,
-                'dateto' => $dateto,
-                'field' => 'cumulato'
-            ];
-            $json = Curl::run($url, 'POST', $params, true);            
-            $arrJson = json_decode($json, true);
-            
-            return $arrJson;
-        // @codeCoverageIgnoreStart
-        } catch (\Throwable $e) {
-            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-            throw $e;
-        }
-        // @codeCoverageIgnoreEnd
-    }
-    
-    public static function messagerVolume(array $response) : string
-    {
-        try {
-            if (count($response) > 0) {
-                $startRecord = reset($response);
-                $endRecord = end($response);
-                
-                $variabile = Bot::extractVariabile($startRecord);
-                $iniziale = Bot::extractDataOra($startRecord);
-                $finale = Bot::extractDataOra($endRecord);
-                $valore = Bot::extractValore($endRecord);
-                
-                $message = 'Il volume movimentato da <b>' . $variabile . '</b>' . PHP_EOL;
-                $message .= 'dal <i>' . $iniziale['data'] . '</i> alle <i>' . $iniziale['ora'] . '</i>' . PHP_EOL;
-                $message .= 'al <i>' . $finale['data'] . '</i> alle <i>' . $finale['ora'] . '</i>' . PHP_EOL;
-                $message .= 'é di <b>' . $valore . ' mc</b>.';
-            } else {
-                $message = 'Non ci sono dati per il periodo selezionato.';
-            }            
-            return $message;
-        // @codeCoverageIgnoreStart
-        } catch (\Throwable $e) {
-            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
-            throw $e;
-        }
-        // @codeCoverageIgnoreEnd
     }
     
     public static function extractVariabile(array $record) : string
@@ -969,5 +969,104 @@ class Bot
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
             throw $e;
         }
+    }
+    
+    public static function selectorUpdate(array $params) : array
+    {
+        try {
+            $n_params = count($params);
+            switch ($n_params) {
+                case 0:
+                    $tests = [
+                        'testNames' => [],
+                        'errors' => [
+                            'Parametri non definiti (es. <i>/update 30030 01/01/2020 02/01/2020</i>).'
+                        ]
+                    ];
+                    break;
+                case 1:
+                    $tests = [
+                        'testNames' => [],
+                        'errors' => [
+                            'Numero parametri non sufficiente:' . PHP_EOL . 'inserire l\'id della variabile e almeno una data.'
+                        ]
+                    ];
+                    break;
+                default:
+                    $tests = [
+                        'testNames' => [
+                            'variabile',
+                            'datefrom',
+                            'dateto'
+                        ],
+                        'errors' => []
+                    ];
+                    break;
+            }
+            return $tests;
+        // @codeCoverageIgnoreStart
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+        // @codeCoverageIgnoreEnd
+    }
+    
+    public static function testerUpdate(array $tests, array $params) : array
+    {
+        try {            
+            $testNames = $tests['testNames'];
+            $errors = $tests['errors'];
+            if (count($testNames) === 0 && count($errors) === 0)  {
+                throw new \Exception("Problemi con la selezione dei test");
+            }
+            foreach ($testNames as $testName) {
+                $functionName = 'Bot::test' . ucfirst($testName);
+                $resTest = Utility::callback($functionName, array($params));
+                if ($resTest['ok']) {
+                    $testedParams[] = $resTest['param'];
+                } else {
+                    $errors[] = $resTest['error'];
+                }
+            }
+            return (count($errors) > 0) ? ['ok' => false,'errors' => $errors] : ['ok' => true,'params' => $testedParams];
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    public static function runnerUpdate(string $variabile, string $datefrom, string $dateto) : array
+    {
+        try {            
+            $params = [
+                'var' => $variabile,
+                'datefrom' => $datefrom,
+                'dateto' => $dateto
+            ];
+            $url = 'http://' . LOCALHOST . '/scarichi/recall.php?' . http_build_query($params);
+            $json = Curl::run($url);            
+            $arrJson = json_decode($json, true);
+            
+            return $arrJson;
+        // @codeCoverageIgnoreStart
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+        // @codeCoverageIgnoreEnd
+    }
+    
+    public static function messagerUpdate(array $response) : string
+    {
+        try {
+            $message = 'Calcolo e aggiornamento banche dati <b>avvenuto con successo</b>';           
+            return $message;
+        // @codeCoverageIgnoreStart
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+        // @codeCoverageIgnoreEnd
     }
 }
