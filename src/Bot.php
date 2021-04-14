@@ -975,23 +975,7 @@ class Bot
     {
         try {
             $n_params = count($params);
-            switch ($n_params) {
-                case 0:
-                    $tests = [
-                        'testNames' => [],
-                        'errors' => [
-                            'Parametri non definiti (es. <i>/update 30030 01/01/2020 02/01/2020</i>).'
-                        ]
-                    ];
-                    break;
-                case 1:
-                    $tests = [
-                        'testNames' => [],
-                        'errors' => [
-                            'Numero parametri non sufficiente:' . PHP_EOL . 'inserire l\'id della variabile e almeno una data.'
-                        ]
-                    ];
-                    break;
+            switch ($n_params) {                
                 default:
                     $tests = [
                         'testNames' => [
@@ -1021,7 +1005,7 @@ class Bot
                 throw new \Exception("Problemi con la selezione dei test");
             }
             foreach ($testNames as $testName) {
-                $functionName = 'Bot::test' . ucfirst($testName);
+                $functionName = 'Bot::testUpdate' . ucfirst($testName);
                 $resTest = Utility::callback($functionName, array($params));
                 if ($resTest['ok']) {
                     $testedParams[] = $resTest['param'];
@@ -1047,8 +1031,15 @@ class Bot
             $url = 'http://' . LOCALHOST . '/scarichi/recall.php?' . http_build_query($params);
             $json = Curl::run($url);            
             $arrJson = json_decode($json, true);
-            
-            return $arrJson;
+            if ($arrJson['ok']) {
+                $response = [
+                    'ok' => true,
+                    'response' => $arrJson['response'] + $params
+                ];
+            } else {
+                $response = $arrJson;
+            }
+            return $response;
         // @codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -1060,8 +1051,141 @@ class Bot
     public static function messagerUpdate(array $response) : string
     {
         try {
-            $message = 'Calcolo e aggiornamento banche dati <b>avvenuto con successo</b>';           
+            $message = 'Aggiornamento dati <b>volumi movimentati</b>' . PHP_EOL . 'per ';
+            if (isset($response['var']) && isset($response['datefrom']) && isset($response['dateto'])) {
+                if ($response['var'] === 'ALL') {
+                    $message .= '<b>tutte le variabili</b>'; 
+                } else {
+                    $message .= 'la variabile <b>' . $response['var'] . '</b>'; 
+                }
+                $message .= ' nel periodo' . PHP_EOL;
+                $message .= 'dal <i>' . $response['datefrom'] . '</i> alle <i>00:00:00</i>' . PHP_EOL;
+                $message .= 'al <i>' . $response['dateto'] . '</i> alle <i>00:00:00</i>' . PHP_EOL;
+                $message .= 'avvenuto con successo in <b>' . Utility::benchmark(START) . '</b>';                
+            } else {
+                throw new \Exception("Problemi con la risposta del servizio"); 
+            }
             return $message;
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+    }
+    
+    public static function testUpdateVariabile(array $params) : array
+    {
+        try {
+            if (count($params) === 0) {
+                $resTest = [
+                    'ok' => true,
+                    'param' => 'ALL'
+                ];
+            } else {
+                if ($params[0] === 'ALL') {
+                    $resTest = [
+                        'ok' => true,
+                        'param' => 'ALL'
+                    ];
+                } else {
+                    $raw = intval($params[0]);
+                    if ($raw >= 30000 && $raw <= 39999) {
+                        $resTest = [
+                            'ok' => true,
+                            'param' => strval($raw)
+                        ];
+                    } else {
+                        $resTest = [
+                            'ok' => false,
+                            'error' => 'Il primo parametro deve essere l\'id della variabile:' . PHP_EOL . 'inserire un numero compreso fra 30000 e 39999 o ALL.'
+                        ];
+                    }
+                }
+            }
+            return $resTest;
+        // @codeCoverageIgnoreStart
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+        // @codeCoverageIgnoreEnd
+    }
+        
+    public static function testUpdateDatefrom(array $params) : array
+    {
+        try {
+            $dateTime = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
+            if (count($params) < 2) {                
+                $resTest = [
+                    'ok' => true,
+                    'param' => $dateTime->format('d/m/Y')
+                ];
+            } elseif (count($params) === 2) {
+                $raw = strval($params[1]);
+                if (preg_match('/^([1-9][Y])?(([1-9]|[1][0-1])[M])?(([1-9]|[1-4][0-9]|[5][0-1])[W])?(([1-9]|[1-9][0-9]|[1-2][0-9][0-9]|[3][0-5][0-9]|[3][6][0-4])[D])?$/', $raw)) {
+                    $dateTime->sub(new \DateInterval('P' . $raw));            
+                    $resTest = [
+                        'ok' => true,
+                        'param' => $dateTime->format('d/m/Y')
+                    ];
+                } elseif (preg_match('/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/', $raw) && Utility::checkDate($raw, true)) {
+                    $resTest = [
+                        'ok' => true,
+                        'param' => $raw
+                    ];
+                } else {
+                    $resTest = [
+                        'ok' => false,
+                        'error' => 'Il secondo parametro deve essere una data valida:' . PHP_EOL . 'utilizzare il formato dd/mm/yyyy.'
+                    ];
+                }
+            } else {
+                $raw = strval($params[1]);
+                if (preg_match('/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/', $raw) && Utility::checkDate($raw, true)) {
+                    $resTest = [
+                        'ok' => true,
+                        'param' => $raw
+                    ];
+                } else {
+                    $resTest = [
+                        'ok' => false,
+                        'error' => 'Il secondo parametro deve essere una data valida:' . PHP_EOL . 'utilizzare il formato dd/mm/yyyy.'
+                    ];
+                }
+            }
+            return $resTest;
+        // @codeCoverageIgnoreStart
+        } catch (\Throwable $e) {
+            Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+            throw $e;
+        }
+        // @codeCoverageIgnoreEnd
+    }
+    
+    public static function testUpdateDateto(array $params) : array
+    {
+        try {
+            if (count($params) <= 2) {                
+                $dateTime = new \DateTime('NOW', new \DateTimeZone('Europe/Rome'));
+                $dateTime->add(new \DateInterval('P1D'));            
+                $resTest = [
+                    'ok' => true,
+                    'param' => $dateTime->format('d/m/Y')
+                ];
+            } else {
+                $raw = strval($params[2]);               
+                if (preg_match('/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}$/', $raw) && Utility::checkDate($raw, true)) {
+                    $resTest = [
+                        'ok' => true,
+                        'param' => $raw
+                    ];
+                } else {
+                    $resTest = [
+                        'ok' => false,
+                        'error' => 'Il terzo parametro deve essere una data valida:' . PHP_EOL . 'utilizzare il formato dd/mm/yyyy.'
+                    ];
+                }
+            }
+            return $resTest;
         // @codeCoverageIgnoreStart
         } catch (\Throwable $e) {
             Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
