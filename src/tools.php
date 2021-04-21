@@ -544,6 +544,32 @@ function formulaAltezza2(array $campi, float $quota, array $fields) : array
 }
 
 
+function addQuota(array $dati, array $coefficienti, array $fields) : array
+{
+    try {
+        $quota_sfioro = $coefficienti['quota'];
+        $quote = [];
+        foreach ($dati as $record => $campi) {
+            if (!array_key_exists('manovra', $campi)) {
+                throw new \Exception('Dati manovre assenti impossibile calcolare la quota all\'estradosso');
+            }
+            foreach ($campi as $campo => $valore) {
+                $quote[$record][$campo] = $valore;
+            }
+            if ($quote[$record]['manovra'] != NODATA) {
+                $quote[$record]['quota'] = $quota_sfioro + ($quote[$record]['manovra'] / 100);
+            } else {
+                $quote[$record]['quota'] = NODATA;
+            }
+        }
+        return $quote;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
 function addPortata(array $dati, array $coefficienti, array $nomiCampo) : array
 {
     try {
@@ -1368,6 +1394,92 @@ function formulaPortataGalleria(array $coefficienti, array $parametri, array $ca
         } else {
             $portata = 0;
         }
+        return $portata;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function formulaPortataTabellare(array $coefficienti, array $parametri, array $campi) : float
+{
+    try {
+        foreach ($campi as $campo) {
+            if (!array_key_exists($campo, $parametri) || $parametri[$campo] == NODATA) {
+                throw new \Exception('Parametro ' . $campo . ' non impostato o nodata');
+            } else {
+                if ($campo === 'livello' || $campo === 'media livello') {
+                    $default = $parametri[$campo];
+                } elseif ($campo === 'quota') {
+                    $quota_mobile = $parametri[$campo];
+                }
+            }
+        }
+        $scarico = $coefficienti['scarico'];
+        $quota = $quota_mobile ?? $coefficienti['quota'];
+        $livello = $default ?? $parametri[$campi[0]];
+        $livelli = trovaLimitiLivelli($livello);
+        $portate = trovaLimitiPortate($scarico, $quota, $livelli);        
+        $portata = ricavaPortata($portate, $livelli, $livello);
+        
+        return $portata;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function trovaLimitiLivelli(float $livello) : array
+{
+    try {
+        if (floor($livello) == $livello || floor($livello * 10) / 10 == $livello) {
+            $livelli[] = $livello;
+        } else {
+            $livelli[] = floor($livello * 10) / 10;
+            $livelli[] = ceil($livello * 10) / 10;
+        }        
+        return $livelli;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function trovaLimitiPortate(int $scarico, float $quota, array $livelli) : array
+{
+    try {
+        $portate = [];
+        foreach ($livelli as $i => $livello) {
+            $params['scarico'] = $scarico;
+            $params['quota'] = $quota;
+            $params['livello'] = $livello;        
+            $portate[$i] = loadPortate($params);
+        }      
+        return $portate;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function ricavaPortata(array $portate, array $livelli, float $livello) : float
+{
+    try {
+        if (count($portate) > 1) {
+            if (count($portate[0]) > 0 && count($portate[1]) > 0) {
+                $portata = interpola($livelli[0], $livelli[1], $portate[0][0]['portata'], $portate[1][0]['portata'], $livello);
+            } else {
+                $portata = 0;
+            }
+        } elseif (count($portate) === 1) {
+            $portata = $portate[0][0]['portata'];
+        } else {
+            $portata = 0;
+        }   
         return $portata;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
@@ -3157,6 +3269,29 @@ function loadDatiAcquisiti(array $request, array $variabili_scarichi) : array
             $dati_acquisiti = array_merge_recursive($dati_acquisiti, $dati_manovra);
         }
         return $dati_acquisiti;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function loadPortate(array $params) : array
+{
+    try {
+        if (!array_key_exists('scarico', $params) || !array_key_exists('quota', $params) || !array_key_exists('livello', $params)) {
+            throw new \Exception('Chiave portate non definite');
+        }
+        $db = 'dbcore';
+        $queryFileName = 'query_portate';
+        $parametri = [
+            'scarico' => $params['scarico'],
+            'quota' => $params['quota'],
+            'livello' => $params['livello']
+        ];
+        $portate = getDataFromDb($db, $queryFileName, $parametri);
+        
+        return $portate;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;

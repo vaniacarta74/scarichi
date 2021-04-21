@@ -338,6 +338,67 @@
                     "volume"
                 ]
             }
+        },
+        "4": {
+            "base": "data_e_ora",
+            "dati": [
+                "livello",
+                "manovra"
+            ],
+            "calcoli": {
+                "delta": [
+                    "data_e_ora"
+                ],
+                "media": [
+                    "livello"
+                ]
+            },
+            "formule": {
+                "quota": [
+                    "manovra"
+                ],
+                "portata": [
+                    "media livello",
+                    "quota"
+                ],
+                "volume": [
+                    "portata",
+                    "delta"
+                ]
+            },
+            "sommatorie": {
+                "cumulato": [
+                    "volume"
+                ]
+            }
+        },
+        "5": {
+            "base": "data_e_ora",
+            "dati": [
+                "livello"
+            ],
+            "calcoli": {
+                "delta": [
+                    "data_e_ora"
+                ],
+                "media": [
+                    "livello"
+                ]
+            },
+            "formule": {
+                "portata": [
+                    "media livello"
+                ],
+                "volume": [
+                    "portata",
+                    "delta"
+                ]
+            },
+            "sommatorie": {
+                "cumulato": [
+                    "volume"
+                ]
+            }
         }
     },    
     "global": {
