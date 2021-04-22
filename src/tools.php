@@ -1434,7 +1434,7 @@ function formulaPortataTabellare(array $coefficienti, array $parametri, array $c
 function trovaLimiti(float $valore) : array
 {
     try {
-        if (floor($valore) == $valore || floor($valore * 10) / 10 == $valore) {
+        if (floor($valore) == $valore || floor($valore * 10) / 10 == $valore || floor($valore * 10) / 10 === ceil($valore * 10) / 10) {
             $limiti[] = $valore;
         } else {
             $limiti[] = floor($valore * 10) / 10;

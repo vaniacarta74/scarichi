@@ -19948,6 +19948,42 @@ class ToolsTest extends TestCase
                         ]
                     ]
                 ]
+            ],
+            'limit decimal +' => [
+                'scarico' => 35,      
+                'quote' => [
+                    '0' => 101
+                ],        
+                'livelli' => [
+                    '0' => 101.99999999999999
+                ],        
+                'expected' => [
+                    '0' => [
+                        '0' => [
+                            '0' => [
+                                'portata' => 35.47986981
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'limit decimal -' => [
+                'scarico' => 35,      
+                'quote' => [
+                    '0' => 101
+                ],        
+                'livelli' => [
+                    '0' => 101.9499999999999
+                ],        
+                'expected' => [
+                    '0' => [
+                        '0' => [
+                            '0' => [
+                                'portata' => 35.47986981
+                            ]
+                        ]
+                    ]
+                ]
             ]
         ];
         
@@ -20092,6 +20128,19 @@ class ToolsTest extends TestCase
                 'valore' => 101.1,        
                 'expected' => [
                     101.1
+                ]
+            ],
+            'limite decimali +' => [
+                'valore' => 102.69999999999999,        
+                'expected' => [
+                    102.7
+                ]
+            ],
+            'limite decimali -' => [
+                'valore' => 102.6999999999999,        
+                'expected' => [
+                    102.6,
+                    102.7
                 ]
             ]
         ];
