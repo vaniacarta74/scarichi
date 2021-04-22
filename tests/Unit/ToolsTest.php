@@ -25,6 +25,7 @@ use function vaniacarta74\Scarichi\inizializza as inizializza;
 use function vaniacarta74\Scarichi\addCategoria as addCategoria;
 use function vaniacarta74\Scarichi\addMedia as addMedia;
 use function vaniacarta74\Scarichi\addAltezza as addAltezza;
+use function vaniacarta74\Scarichi\addQuota as addQuota;
 use function vaniacarta74\Scarichi\formulaAltezza1 as formulaAltezza1;
 use function vaniacarta74\Scarichi\formulaAltezza2 as formulaAltezza2;
 use function vaniacarta74\Scarichi\addPortata as addPortata;
@@ -49,6 +50,7 @@ use function vaniacarta74\Scarichi\formulaPortataScarico4 as formulaPortataScari
 use function vaniacarta74\Scarichi\formulaPortataVentola as formulaPortataVentola;
 use function vaniacarta74\Scarichi\formulaPortataSaracinesca as formulaPortataSaracinesca;
 use function vaniacarta74\Scarichi\formulaPortataGalleria as formulaPortataGalleria;
+use function vaniacarta74\Scarichi\formulaPortataTabellare as formulaPortataTabellare;
 use function vaniacarta74\Scarichi\integraDate as integraDate;
 use function vaniacarta74\Scarichi\uniformaCategorie as uniformaCategorie;
 use function vaniacarta74\Scarichi\completaDati as completaDati;
@@ -129,6 +131,10 @@ use function vaniacarta74\Scarichi\csvResponse as csvResponse;
 use function vaniacarta74\Scarichi\setCommand as setCommand;
 use function vaniacarta74\Scarichi\reCallResponse as reCallResponse;
 use function vaniacarta74\Scarichi\setReCallKey as setReCallKey;
+use function vaniacarta74\Scarichi\interpolaPortate as interpolaPortate;
+use function vaniacarta74\Scarichi\trovaPortate as trovaPortate;
+use function vaniacarta74\Scarichi\loadPortate as loadPortate;
+use function vaniacarta74\Scarichi\trovaLimiti as trovaLimiti;
 
 class ToolsTest extends TestCase
 {
@@ -19436,5 +19442,807 @@ class ToolsTest extends TestCase
         $this->assertEquals($expected, $actual); 
         
         $this->assertEquals($expected2, $watchdog);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function addQuotaProvider() : array
+    {
+        $data = [
+            'standard' => [
+                'dati' => [
+                    '0' => [
+                        'variabile' => 30064,
+                        'data_e_ora' => new \DateTime('2019-01-01 00:00:00'),
+                        'delta' => 3660,
+                        'manovra' => 0,
+                        'livello' => 99.099998474121,
+                        'media livello' => 99.11499786377,
+                        'tipo_dato' => 1
+                    ],
+                    '1' => [
+                        'variabile' => 30064,
+                        'data_e_ora' => new \DateTime('2019-01-01 01:00:00'),
+                        'delta' => 3600,
+                        'manovra' => 20,
+                        'livello' => 99.089996337891,
+                        'media livello' => 99.094997406006,
+                        'tipo_dato' => 1
+                    ]
+                ],      
+                'coefficienti' => [
+                    'tipo_formula' => 'portata sfiorante dati tabellari',
+                    'alias' => 'tabellare',
+                    'scarico' => 35,
+                    'quota' => 100,
+                    'limite' => 632.1
+                ],        
+                'campi' => [
+                    'manovra'
+                ],        
+                'expected' => [
+                    '0' => [
+                        'variabile' => 30064,
+                        'data_e_ora' => new \DateTime('2019-01-01 00:00:00'),
+                        'delta' => 3660,
+                        'manovra' => 0,
+                        'livello' => 99.099998474121,
+                        'media livello' => 99.11499786377,
+                        'tipo_dato' => 1,
+                        'quota' => 100
+                    ],
+                    '1' => [
+                        'variabile' => 30064,
+                        'data_e_ora' => new \DateTime('2019-01-01 01:00:00'),
+                        'delta' => 3600,
+                        'manovra' => 20,
+                        'livello' => 99.089996337891,
+                        'media livello' => 99.094997406006,
+                        'tipo_dato' => 1,
+                        'quota' => 100.2
+                    ]
+                ]
+            ],
+            'no data' => [
+                'dati' => [
+                    '0' => [
+                        'variabile' => 30064,
+                        'data_e_ora' => new \DateTime('2019-01-01 00:00:00'),
+                        'delta' => 3660,
+                        'manovra' => NODATA,
+                        'livello' => 99.099998474121,
+                        'media livello' => 99.11499786377,
+                        'tipo_dato' => 1
+                    ],
+                    '1' => [
+                        'variabile' => 30064,
+                        'data_e_ora' => new \DateTime('2019-01-01 01:00:00'),
+                        'delta' => 3600,
+                        'manovra' => 20,
+                        'livello' => 99.089996337891,
+                        'media livello' => 99.094997406006,
+                        'tipo_dato' => 1
+                    ]
+                ],      
+                'coefficienti' => [
+                    'tipo_formula' => 'portata sfiorante dati tabellari',
+                    'alias' => 'tabellare',
+                    'scarico' => 35,
+                    'quota' => 100,
+                    'limite' => 632.1
+                ],        
+                'campi' => [
+                    'manovra'
+                ],        
+                'expected' => [
+                    '0' => [
+                        'variabile' => 30064,
+                        'data_e_ora' => new \DateTime('2019-01-01 00:00:00'),
+                        'delta' => 3660,
+                        'manovra' => NODATA,
+                        'livello' => 99.099998474121,
+                        'media livello' => 99.11499786377,
+                        'tipo_dato' => 1,
+                        'quota' => NODATA
+                    ],
+                    '1' => [
+                        'variabile' => 30064,
+                        'data_e_ora' => new \DateTime('2019-01-01 01:00:00'),
+                        'delta' => 3600,
+                        'manovra' => 20,
+                        'livello' => 99.089996337891,
+                        'media livello' => 99.094997406006,
+                        'tipo_dato' => 1,
+                        'quota' => 100.2
+                    ]
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers addQuota()
+     * @dataProvider addQuotaProvider
+     */
+    public function testAddQuotaEquals(array $dati, array $coefficienti, array $fields, array $expected) : void
+    {
+        $actual = addQuota($dati, $coefficienti, $fields);
+        
+        $this->assertEquals($expected, $actual); 
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function addQuotaExceptionProvider() : array
+    {
+        $data = [
+            'no data' => [
+                'dati' => [
+                    '0' => [
+                        'variabile' => 30064,
+                        'data_e_ora' => new \DateTime('2019-01-01 00:00:00'),
+                        'delta' => 3660,
+                        'livello' => 99.099998474121,
+                        'media livello' => 99.11499786377,
+                        'tipo_dato' => 1
+                    ]
+                ],      
+                'coefficienti' => [
+                    'tipo_formula' => 'portata sfiorante dati tabellari',
+                    'alias' => 'tabellare',
+                    'scarico' => 35,
+                    'quota' => 100,
+                    'limite' => 632.1
+                ],        
+                'campi' => [
+                    'manovra'
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers addQuota()
+     * @dataProvider addQuotaExceptionProvider
+     */
+    public function testAddQuotaException(array $dati, array $coefficienti, array $fields) : void
+    {
+        $this->expectException(\Exception::class);
+        
+        addQuota($dati, $coefficienti, $fields);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function interpolaPortateProvider() : array
+    {
+        $data = [
+            'double quote double level' => [
+                'portate' => [
+                    '0' => [
+                        '0' => [
+                            '0' => [
+                                'portata' => 35.47986981
+                            ]
+                        ],
+                        '1' => [
+                            '0' => [
+                                'portata' => 40.93276153
+                            ]
+                        ]
+                    ],
+                    '1' => [
+                        '0' => [
+                            '0' => [
+                                'portata' => 30.29324392
+                            ]
+                        ],
+                        '1' => [
+                            '0' => [
+                                'portata' => 35.47986981
+                            ]
+                        ]
+                    ]
+                ],      
+                'quote' => [
+                    '0' => 101.1,
+                    '1' => 101.2
+                ],        
+                'quota' => 101.15,
+                'livelli' => [
+                    '0' => 102.1,
+                    '1' => 102.2
+                ],        
+                'livello' => 102.15,
+                'expected' => 35.5464362675
+            ],
+            'double quote single level' => [
+                'portate' => [
+                    '0' => [
+                        '0' => [
+                            '0' => [
+                                'portata' => 35.47986981
+                            ]
+                        ]
+                    ],
+                    '1' => [
+                        '0' => [
+                            '0' => [
+                                'portata' => 30.29324392
+                            ]
+                        ]
+                    ]
+                ],      
+                'quote' => [
+                    '0' => 101.1,
+                    '1' => 101.2
+                ],        
+                'quota' => 101.15,
+                'livelli' => [
+                    '0' => 102.1
+                ],        
+                'livello' => 102.1,
+                'expected' => 32.886556864999626
+            ],
+            'single quote double level' => [
+                'portate' => [
+                    '0' => [
+                        '0' => [
+                            '0' => [
+                                'portata' => 35.47986981
+                            ]
+                        ],
+                        '1' => [
+                            '0' => [
+                                'portata' => 40.93276153
+                            ]
+                        ]
+                    ]
+                ],      
+                'quote' => [
+                    '0' => 101.1
+                ],        
+                'quota' => 101.1,
+                'livelli' => [
+                    '0' => 102.1,
+                    '1' => 102.2
+                ],        
+                'livello' => 102.15,
+                'expected' => 38.206315670000386
+            ],
+            'single quote single level' => [
+                'portate' => [
+                    '0' => [
+                        '0' => [
+                            '0' => [
+                                'portata' => 35.47986981
+                            ]
+                        ]
+                    ]
+                ],      
+                'quote' => [
+                    '0' => 101.1
+                ],        
+                'quota' => 101.1,
+                'livelli' => [
+                    '0' => 102.1
+                ],        
+                'livello' => 102.1,
+                'expected' => 35.47986981
+            ],
+            'zero portata' => [
+                'portate' => [
+                    '0' => [
+                        '0' => [],
+                        '1' => [
+                            '0' => [
+                                'portata' => 40.93276153
+                            ]
+                        ]
+                    ],
+                    '1' => [
+                        '0' => [
+                            '0' => [
+                                'portata' => 30.29324392
+                            ]
+                        ],
+                        '1' => [
+                            '0' => [
+                                'portata' => 35.47986981
+                            ]
+                        ]
+                    ]
+                ],      
+                'quote' => [
+                    '0' => 101.1,
+                    '1' => 101.2
+                ],        
+                'quota' => 101.15,
+                'livelli' => [
+                    '0' => 102.1,
+                    '1' => 102.2
+                ],        
+                'livello' => 102.15,
+                'expected' => 0
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers interpolaPortate()
+     * @dataProvider interpolaPortateProvider
+     */
+    public function testInterpolaPortateEquals(array $portate, array $quote, float $quota, array $livelli, float $livello, float $expected) : void
+    {
+        $actual = interpolaPortate($portate, $quote, $quota, $livelli, $livello);
+        
+        $this->assertEquals($expected, $actual); 
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function trovaPortateProvider() : array
+    {
+        $data = [
+            'double quote double level' => [
+                'scarico' => 35,
+                'quote' => [
+                    '0' => 101.1,
+                    '1' => 101.2
+                ],        
+                'livelli' => [
+                    '0' => 102.1,
+                    '1' => 102.2
+                ],        
+                'expected' => [
+                    '0' => [
+                        '0' => [
+                            '0' => [
+                                'portata' => 35.47986981
+                            ]
+                        ],
+                        '1' => [
+                            '0' => [
+                                'portata' => 40.93276153
+                            ]
+                        ]
+                    ],
+                    '1' => [
+                        '0' => [
+                            '0' => [
+                                'portata' => 30.29324392
+                            ]
+                        ],
+                        '1' => [
+                            '0' => [
+                                'portata' => 35.47986981
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'double quote single level' => [
+                'scarico' => 35,
+                'quote' => [
+                    '0' => 101.1,
+                    '1' => 101.2
+                ],        
+                'livelli' => [
+                    '0' => 102.1
+                ],        
+                'expected' => [
+                    '0' => [
+                        '0' => [
+                            '0' => [
+                                'portata' => 35.47986981
+                            ]
+                        ]
+                    ],
+                    '1' => [
+                        '0' => [
+                            '0' => [
+                                'portata' => 30.29324392
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'single quote double level' => [
+                'scarico' => 35,      
+                'quote' => [
+                    '0' => 101.1
+                ],        
+                'livelli' => [
+                    '0' => 102.1,
+                    '1' => 102.2
+                ],        
+                'expected' => [
+                    '0' => [
+                        '0' => [
+                            '0' => [
+                                'portata' => 35.47986981
+                            ]
+                        ],
+                        '1' => [
+                            '0' => [
+                                'portata' => 40.93276153
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'single quote single level' => [
+                'scarico' => 35,      
+                'quote' => [
+                    '0' => 101.1
+                ],        
+                'livelli' => [
+                    '0' => 102.1
+                ],        
+                'expected' => [
+                    '0' => [
+                        '0' => [
+                            '0' => [
+                                'portata' => 35.47986981
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'zero portata' => [
+                'scarico' => 35,      
+                'quote' => [
+                    '0' => 101.1,
+                    '1' => 101.2
+                ],        
+                'livelli' => [
+                    '0' => 59.9,
+                    '1' => 60
+                ],        
+                'expected' => [
+                    '0' => [
+                        '0' => [],
+                        '1' => [
+                            '0' => [
+                                'portata' => 0
+                            ]
+                        ]
+                    ],
+                    '1' => [
+                        '0' => [],
+                        '1' => [
+                            '0' => [
+                                'portata' => 0
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'integer' => [
+                'scarico' => 35,      
+                'quote' => [
+                    '0' => 101
+                ],        
+                'livelli' => [
+                    '0' => 102
+                ],        
+                'expected' => [
+                    '0' => [
+                        '0' => [
+                            '0' => [
+                                'portata' => 35.47986981
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers trovaPortate()
+     * @dataProvider trovaPortateProvider
+     */
+    public function testTrovaPortateEquals(int $scarico, array $quote, array $livelli, array $expected) : void
+    {
+        $actual = trovaPortate($scarico, $quote, $livelli);
+        
+        $this->assertEquals($expected, $actual); 
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function loadPortateProvider() : array
+    {
+        $data = [
+            'scarico 35' => [
+                'params' => [
+                    'scarico' => 35,
+                    'quota' => '101.1',        
+                    'livello' => '102.1'
+                ],        
+                'expected' => [
+                    '0' => [
+                        'portata' => 35.47986981
+                    ]
+                ]
+            ],
+            'scarico 36' => [
+                'params' => [
+                    'scarico' => 36,
+                    'quota' => '110',        
+                    'livello' => '112.1'
+                ],        
+                'expected' => [
+                    '0' => [
+                        'portata' => 173.8
+                    ]
+                ]
+            ],
+            'scarico 37' => [
+                'params' => [
+                    'scarico' => 37,
+                    'quota' => '115',        
+                    'livello' => '116.1'
+                ],        
+                'expected' => [
+                    '0' => [
+                        'portata' => 35.94035246
+                    ]
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers loadPortate()
+     * @dataProvider loadPortateProvider
+     */
+    public function testLoadPortateEquals(array $params, array $expected) : void
+    {
+        $actual = loadPortate($params);
+        
+        $this->assertEquals($expected, $actual); 
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function loadPortateExceptionProvider() : array
+    {
+        $data = [
+            'no scarico' => [
+                'params' => [
+                    'pippo' => 35,
+                    'quota' => 101.1,        
+                    'livello' => 102.1
+                ]
+            ],
+            'no quota' => [
+                'params' => [
+                    'scarico' => 35,
+                    'pippo' => 101.1,        
+                    'livello' => 102.1
+                ]
+            ],
+            'no livello' => [
+                'params' => [
+                    'scarico' => 35,
+                    'quota' => 101.1,        
+                    'pippo' => 102.1
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers loadPortate()
+     * @dataProvider loadPortateExceptionProvider
+     */
+    public function testLoadPortateException(array $params) : void
+    {
+        $this->expectException(\Exception::class);
+        
+        loadPortate($params);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function trovaLimitiProvider() : array
+    {
+        $data = [
+            'standard' => [
+                'valore' => 101.375,        
+                'expected' => [
+                    101.3,
+                    101.4
+                ]
+            ],
+            'intero' => [
+                'valore' => 101,        
+                'expected' => [
+                    101
+                ]
+            ],
+            'discreto' => [
+                'valore' => 101.1,        
+                'expected' => [
+                    101.1
+                ]
+            ]
+        ];
+        
+        return $data;
+    }
+    
+    /**
+     * @group test
+     * covers trovaLimiti()
+     * @dataProvider trovaLimitiProvider
+     */
+    public function testTrovaLimitiEquals(float $valore, array $expected) : void
+    {
+        $actual = trovaLimiti($valore);
+        
+        $this->assertEquals($expected, $actual); 
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function formulaPortataTabellareProvider() : array
+    {
+        $dati = [
+            'manovra' => [
+                'coefficienti' => [
+                    'tipo_formula' => 'portata sfiorante dati tabellari',
+                    'alias' => 'tabellare',
+                    'scarico' => 35,
+                    'quota' => 100,
+                    'limite' => 632.1
+                ], 
+                'parametri' => [
+                    'variabile' => 30064,
+                    'data_e_ora' => new \DateTime('2019-01-01 00:00:00'),
+                    'delta' => 3660,
+                    'manovra' => 115,
+                    'livello' => 102.1,
+                    'media livello' => 102.15,
+                    'tipo_dato' => 1,
+                    'quota' => 101.15
+                ],    
+                'campi' => [
+                    'media livello',
+                    'quota'
+                ],        
+                'expected' => 35.5464362675
+            ],
+            'no manovra' => [
+                'coefficienti' => [
+                    'tipo_formula' => 'portata sfiorante dati tabellari',
+                    'alias' => 'tabellare',
+                    'scarico' => 36,
+                    'quota' => 110,
+                    'limite' => 632.1
+                ], 
+                'parametri' => [
+                    'variabile' => 30065,
+                    'data_e_ora' => new \DateTime('2019-01-01 00:00:00'),
+                    'delta' => 3660,
+                    'livello' => 112.1,
+                    'media livello' => 112.15,
+                    'tipo_dato' => 1
+                ],    
+                'campi' => [
+                    'media livello'
+                ],        
+                'expected' => 180.20000000000009
+            ],
+            'campo diff' => [
+                'coefficienti' => [
+                    'tipo_formula' => 'portata sfiorante dati tabellari',
+                    'alias' => 'tabellare',
+                    'scarico' => 36,
+                    'quota' => 110,
+                    'limite' => 632.1
+                ], 
+                'parametri' => [
+                    'variabile' => 30065,
+                    'data_e_ora' => new \DateTime('2019-01-01 00:00:00'),
+                    'delta' => 3660,
+                    'altezza' => 112.1,
+                    'media altezza' => 112.15,
+                    'tipo_dato' => 1
+                ],    
+                'campi' => [
+                    'altezza'
+                ],        
+                'expected' => 173.8
+            ]
+        ];
+        
+        return $dati;
+    }
+    
+    /**
+     * covers formulaPortataTabellare()
+     * @group tools
+     * @dataProvider formulaPortataTabellareProvider
+     */
+    public function testFormulaPortataTabellareEquals(array $coefficienti, array $parametri, array $campi, float $expected) : void
+    {
+        $actual = formulaPortataTabellare($coefficienti, $parametri, $campi);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function formulaPortataTabellareExceptionProvider() : array
+    {
+        $dati = [
+            'no campi' => [
+                'coefficienti' => [
+                    'tipo_formula' => 'portata sfiorante dati tabellari',
+                    'alias' => 'tabellare',
+                    'scarico' => 35,
+                    'quota' => 100,
+                    'limite' => 632.1
+                ], 
+                'parametri' => [
+                    'variabile' => 30064,
+                    'data_e_ora' => new \DateTime('2019-01-01 00:00:00'),
+                    'delta' => 3660,
+                    'manovra' => 115,
+                    'livello' => 102.1,
+                    'media livello' => 102.15,
+                    'tipo_dato' => 1,
+                    'quota' => 101.15
+                ],    
+                'campi' => [
+                    'pippo',
+                    'pluto'
+                ]
+            ]  
+        ];
+        
+        return $dati;
+    }
+    
+    /**
+     * @group tools
+     * covers formulaPortataTabellare()
+     * @dataProvider formulaPortataTabellareExceptionProvider
+     */
+    public function testFormulaPortataTabellareException(array $coefficienti, array $parametri, array $campi) : void
+    {
+        $this->expectException(\Exception::class);
+        
+        formulaPortataTabellare($coefficienti, $parametri, $campi);
     }
 }

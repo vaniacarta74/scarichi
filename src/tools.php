@@ -280,7 +280,6 @@ function query($conn, string $fileName, array $paramValues)
         include __DIR__ . '/inc/query/' . $fileName . '.php';
 
         $query = str_replace($paramNames, $paramValues, $queryString);
-
         $stmt = sqlsrv_query($conn, $query);
         
         if ($stmt !== false) {
@@ -1419,9 +1418,10 @@ function formulaPortataTabellare(array $coefficienti, array $parametri, array $c
         $scarico = $coefficienti['scarico'];
         $quota = $quota_mobile ?? $coefficienti['quota'];
         $livello = $default ?? $parametri[$campi[0]];
-        $livelli = trovaLimitiLivelli($livello);
-        $portate = trovaLimitiPortate($scarico, $quota, $livelli);        
-        $portata = ricavaPortata($portate, $livelli, $livello);
+        $quote = trovaLimiti($quota);
+        $livelli = trovaLimiti($livello);        
+        $portate = trovaPortate($scarico, $quote, $livelli);        
+        $portata = interpolaPortate($portate, $quote, $quota, $livelli, $livello);
         
         return $portata;
     } catch (\Throwable $e) {
@@ -1431,60 +1431,70 @@ function formulaPortataTabellare(array $coefficienti, array $parametri, array $c
 }
 
 
-function trovaLimitiLivelli(float $livello) : array
+function trovaLimiti(float $valore) : array
 {
     try {
-        if (floor($livello) == $livello || floor($livello * 10) / 10 == $livello) {
-            $livelli[] = $livello;
+        if (floor($valore) == $valore || floor($valore * 10) / 10 == $valore) {
+            $limiti[] = $valore;
         } else {
-            $livelli[] = floor($livello * 10) / 10;
-            $livelli[] = ceil($livello * 10) / 10;
+            $limiti[] = floor($valore * 10) / 10;
+            $limiti[] = ceil($valore * 10) / 10;
         }        
-        return $livelli;
+        return $limiti;
+    //@codeCoverageIgnoreStart
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
     }
+    //@codeCoverageIgnoreEnd
 }
 
 
-function trovaLimitiPortate(int $scarico, float $quota, array $livelli) : array
+function trovaPortate(int $scarico, array $quote, array $livelli) : array
 {
     try {
         $portate = [];
-        foreach ($livelli as $i => $livello) {
-            $params['scarico'] = $scarico;
-            $params['quota'] = $quota;
-            $params['livello'] = $livello;        
-            $portate[$i] = loadPortate($params);
-        }      
+        foreach ($quote as $i => $quota) {
+            foreach ($livelli as $j => $livello) {
+                $params['scarico'] = $scarico;
+                $params['quota'] = number_format($quota, 1, '.', '');
+                $params['livello'] = number_format($livello, 1, '.', ''); 
+                $portate[$i][$j] = loadPortate($params);
+            }
+        }
         return $portate;
+    //@codeCoverageIgnoreStart
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
     }
+    //@codeCoverageIgnoreEnd
 }
 
 
-function ricavaPortata(array $portate, array $livelli, float $livello) : float
+function interpolaPortate(array $portate, array $quote, float $quota, array $livelli, float $livello) : float
 {
     try {
-        if (count($portate) > 1) {
-            if (count($portate[0]) > 0 && count($portate[1]) > 0) {
-                $portata = interpola($livelli[0], $livelli[1], $portate[0][0]['portata'], $portate[1][0]['portata'], $livello);
-            } else {
-                $portata = 0;
-            }
-        } elseif (count($portate) === 1) {
-            $portata = $portate[0][0]['portata'];
+        if (count($portate) === 2 && count($portate[0]) === 2 && count($portate[1]) === 2 && count($portate[0][0]) > 0 && count($portate[0][1]) > 0 && count($portate[1][0]) > 0 && count($portate[1][1]) > 0) {
+            $portateQuote[0] = interpola($livelli[0], $livelli[1], $portate[0][0][0]['portata'], $portate[0][1][0]['portata'], $livello);
+            $portateQuote[1] = interpola($livelli[0], $livelli[1], $portate[1][0][0]['portata'], $portate[1][1][0]['portata'], $livello);
+            $portata = interpola($quote[0], $quote[1], $portateQuote[0], $portateQuote[1], $quota);
+        } elseif (count($portate) === 2 && count($portate[0]) === 1 && count($portate[1]) === 1 && count($portate[0][0]) > 0 && count($portate[1][0]) > 0) {
+            $portata = interpola($quote[0], $quote[1], $portate[0][0][0]['portata'], $portate[1][0][0]['portata'], $quota);
+        } elseif (count($portate) === 1 && count($portate[0]) === 2 && count($portate[0][0]) > 0 && count($portate[0][1]) > 0) {
+            $portata = interpola($livelli[0], $livelli[1], $portate[0][0][0]['portata'], $portate[0][1][0]['portata'], $livello);
+        } elseif (count($portate) === 1 && count($portate[0]) === 1 && count($portate[0][0]) > 0) {
+            $portata = $portate[0][0][0]['portata'];
         } else {
             $portata = 0;
         }   
         return $portata;
+    //@codeCoverageIgnoreStart
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
         throw $e;
     }
+    //@codeCoverageIgnoreEnd
 }
 
 
@@ -3584,7 +3594,7 @@ function setReCallKey(string $echo, array &$watchdogs) : string
             }           
         } elseif (preg_match('/Telegram/', $echo)) {                        
             $key = 'telegram';
-        } elseif (preg_match('/CSV/', $echo)) {
+        } elseif (preg_match('/Elaborazione/', $echo)) {
             $key = 'tocsv';
         } else {
             $key = 'internal error';
