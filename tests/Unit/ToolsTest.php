@@ -19465,7 +19465,7 @@ class ToolsTest extends TestCase
                         'variabile' => 30064,
                         'data_e_ora' => new \DateTime('2019-01-01 01:00:00'),
                         'delta' => 3600,
-                        'manovra' => 20,
+                        'manovra' => 0.2,
                         'livello' => 99.089996337891,
                         'media livello' => 99.094997406006,
                         'tipo_dato' => 1
@@ -19519,7 +19519,7 @@ class ToolsTest extends TestCase
                         'variabile' => 30064,
                         'data_e_ora' => new \DateTime('2019-01-01 01:00:00'),
                         'delta' => 3600,
-                        'manovra' => 20,
+                        'manovra' => 0.2,
                         'livello' => 99.089996337891,
                         'media livello' => 99.094997406006,
                         'tipo_dato' => 1

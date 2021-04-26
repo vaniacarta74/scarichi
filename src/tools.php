@@ -555,8 +555,8 @@ function addQuota(array $dati, array $coefficienti, array $fields) : array
             foreach ($campi as $campo => $valore) {
                 $quote[$record][$campo] = $valore;
             }
-            if ($quote[$record]['manovra'] != NODATA) {
-                $quote[$record]['quota'] = $quota_sfioro + ($quote[$record]['manovra'] / 100);
+            if ($quote[$record]['manovra'] != NODATA) {                
+                $quote[$record]['quota'] = $quota_sfioro + $quote[$record]['manovra'];
             } else {
                 $quote[$record]['quota'] = NODATA;
             }
