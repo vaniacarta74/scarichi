@@ -1430,6 +1430,50 @@ function formulaPortataTabellare(array $coefficienti, array $parametri, array $c
     }
 }
 
+function formulaPortataScarico5(array $coefficienti, array $parametri, array $campi) : float
+{
+    try {
+        foreach ($campi as $campo) {
+            if (!array_key_exists($campo, $parametri) || $parametri[$campo] == NODATA) {
+                throw new \Exception('Parametro ' . $campo . ' non impostato o nodata');
+            } else {
+                if ($campo === 'altezza') {
+                    $altezza_idrostatica = $parametri[$campo];
+                } elseif ($campo === 'manovra') {
+                    $apertura_paratoia = $parametri[$campo];
+                }
+            }
+        }
+        if ($apertura_paratoia > 0 && $altezza_idrostatica > 0) {
+            $g = 9.81;
+            $alfa1 = 0.30;
+            $alfa2 = 1;
+            $scabrosita = $coefficienti['scabrosita'];
+            $lunghezza_condotta = $coefficienti['lunghezza'];
+            $raggio_condotta = $coefficienti['raggio'];
+            $larghezza_paratoia = $coefficienti['larghezza'];
+            
+            $area_apertura_paratoia = $larghezza_paratoia * $apertura_paratoia;
+            $area_sez_condotta = $raggio_condotta ** 2 * pi();
+            $perimetro_sez_condotta =  2 * $raggio_condotta * pi();
+            $R = $area_sez_condotta / $perimetro_sez_condotta;
+            $chi = 87 / (1 + $scabrosita / sqrt($R));
+            
+            $k1 = $alfa1 / (2 * $g * ($area_sez_condotta ** 2));            
+            $k2 = $alfa2 / (2 * $g * ($area_apertura_paratoia ** 2));
+            $k3 = $lunghezza_condotta / (($chi ** 2) * $R * ($area_sez_condotta ** 2));
+            $k = $k1 + $k2 + $k3;
+            
+            $portata = sqrt($altezza_idrostatica / $k);
+        } else {
+            $portata = 0;
+        }        
+        return $portata;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
 
 function trovaLimiti(float $valore) : array
 {
