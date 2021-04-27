@@ -47,9 +47,11 @@ use function vaniacarta74\Scarichi\formulaPortataScarico1 as formulaPortataScari
 use function vaniacarta74\Scarichi\formulaPortataScarico2 as formulaPortataScarico2;
 use function vaniacarta74\Scarichi\formulaPortataScarico3 as formulaPortataScarico3;
 use function vaniacarta74\Scarichi\formulaPortataScarico4 as formulaPortataScarico4;
+use function vaniacarta74\Scarichi\formulaPortataScarico5 as formulaPortataScarico5;
 use function vaniacarta74\Scarichi\formulaPortataVentola as formulaPortataVentola;
 use function vaniacarta74\Scarichi\formulaPortataSaracinesca as formulaPortataSaracinesca;
-use function vaniacarta74\Scarichi\formulaPortataGalleria as formulaPortataGalleria;
+use function vaniacarta74\Scarichi\formulaPortataGalleria1 as formulaPortataGalleria1;
+use function vaniacarta74\Scarichi\formulaPortataGalleria2 as formulaPortataGalleria2;
 use function vaniacarta74\Scarichi\formulaPortataTabellare as formulaPortataTabellare;
 use function vaniacarta74\Scarichi\integraDate as integraDate;
 use function vaniacarta74\Scarichi\uniformaCategorie as uniformaCategorie;
@@ -3052,7 +3054,7 @@ class ToolsTest extends TestCase
                 ],
                 'coefficienti' => [
                     'tipo_formula' => 'portata galleria',
-                    'alias' => 'galleria',
+                    'alias' => 'galleria1',
                     'scabrosita' => 0.1,
                     'lunghezza' => 6890,
                     'angolo' => 301,
@@ -3127,7 +3129,7 @@ class ToolsTest extends TestCase
                 ],
                 'coefficienti' => [
                     'tipo_formula' => 'portata galleria',
-                    'alias' => 'galleria',
+                    'alias' => 'galleria1',
                     'scabrosita' => 0.1,
                     'lunghezza' => 6890,
                     'angolo' => 301,
@@ -3612,7 +3614,7 @@ class ToolsTest extends TestCase
                 'formule' => [
                     '0' => [
                         'tipo_formula' => 'portata galleria',
-                        'alias' => 'galleria',
+                        'alias' => 'galleria1',
                         'scarico' => 32,
                         'scabrosita' => 0.1,
                         'lunghezza' => 6890,
@@ -7149,7 +7151,7 @@ class ToolsTest extends TestCase
             'galleria' => [
                 'formule' => [
                     'tipo_formula' => 'portata galleria',
-                    'alias' => 'galleria',
+                    'alias' => 'galleria1',
                     'scabrosita' => 0.1,
                     'lunghezza' => 6890,
                     'angolo' => 301,
@@ -7172,7 +7174,7 @@ class ToolsTest extends TestCase
             'galleria sbocco libero' => [
                 'formule' => [
                     'tipo_formula' => 'portata galleria',
-                    'alias' => 'galleria',
+                    'alias' => 'galleria1',
                     'scabrosita' => 0.1,
                     'lunghezza' => 6890,
                     'angolo' => 301,
@@ -7195,7 +7197,7 @@ class ToolsTest extends TestCase
             'galleria moto a pelo libero' => [
                 'formule' => [
                     'tipo_formula' => 'portata galleria',
-                    'alias' => 'galleria',
+                    'alias' => 'galleria1',
                     'scabrosita' => 0.1,
                     'lunghezza' => 6890,
                     'angolo' => 301,
@@ -8015,13 +8017,13 @@ class ToolsTest extends TestCase
     /**
      * @coversNothing
      */
-    public function formulaPortataGalleriaProvider() : array
+    public function formulaPortataGalleria1Provider() : array
     {
         $dati = [
             'galleria' => [
                 'formule' => [
                     'tipo_formula' => 'portata galleria',
-                    'alias' => 'galleria',
+                    'alias' => 'galleria1',
                     'scabrosita' => 0.1,
                     'lunghezza' => 6890,
                     'angolo' => 301,
@@ -8044,7 +8046,7 @@ class ToolsTest extends TestCase
             'galleria sbocco libero' => [
                 'formule' => [
                     'tipo_formula' => 'portata galleria',
-                    'alias' => 'galleria',
+                    'alias' => 'galleria1',
                     'scabrosita' => 0.1,
                     'lunghezza' => 6890,
                     'angolo' => 301,
@@ -8067,7 +8069,7 @@ class ToolsTest extends TestCase
             'galleria moto a pelo libero' => [
                 'formule' => [
                     'tipo_formula' => 'portata galleria',
-                    'alias' => 'galleria',
+                    'alias' => 'galleria1',
                     'scabrosita' => 0.1,
                     'lunghezza' => 6890,
                     'angolo' => 301,
@@ -8093,26 +8095,26 @@ class ToolsTest extends TestCase
     }
     
     /**
-     * covers formulaPortataGalleria()
+     * covers formulaPortataGalleria1()
      * @group tools
-     * @dataProvider formulaPortataGalleriaProvider
+     * @dataProvider formulaPortataGalleria1Provider
      */
-    public function testFormulaPortataGalleriaEqualsWithDelta(array $formule, array $parametri, array $campi, float $expected) : void
+    public function testFormulaPortataGalleria1EqualsWithDelta(array $formule, array $parametri, array $campi, float $expected) : void
     {
-        $actual = formulaPortataGalleria($formule, $parametri, $campi);
+        $actual = formulaPortataGalleria1($formule, $parametri, $campi);
         
         $this->assertEqualsWithDelta($expected, $actual, 0.001);
     }
     
     /**
      * @group tools
-     * covers formulaPortataGalleria()
+     * covers formulaPortataGalleria1()
      */
-    public function testFormulaPortataGalleriaAltezzaException() : void
+    public function testFormulaPortataGalleria1AltezzaException() : void
     {
         $formule = [
             'tipo_formula' => 'portata galleria',
-            'alias' => 'galleria',
+            'alias' => 'galleria1',
             'scabrosita' => 0.1,
             'lunghezza' => 6890,
             'angolo' => 301,
@@ -8133,18 +8135,18 @@ class ToolsTest extends TestCase
         
         $this->expectException(\Exception::class);
         
-        formulaPortataGalleria($formule, $parametri, $campi);
+        formulaPortataGalleria1($formule, $parametri, $campi);
     }
     
     /**
      * @group tools
-     * covers formulaPortataGalleria()
+     * covers formulaPortataGalleria1()
      */
-    public function testFormulaPortataGalleriaManovraException() : void
+    public function testFormulaPortataGalleria1ManovraException() : void
     {
         $formule = [
             'tipo_formula' => 'portata galleria',
-            'alias' => 'galleria',
+            'alias' => 'galleria1',
             'scabrosita' => 0.1,
             'lunghezza' => 6890,
             'angolo' => 301,
@@ -8165,18 +8167,18 @@ class ToolsTest extends TestCase
         
         $this->expectException(\Exception::class);
         
-        formulaPortataGalleria($formule, $parametri, $campi);
+        formulaPortataGalleria1($formule, $parametri, $campi);
     }
     
     /**
      * @group tools
-     * covers formulaPortataGalleria()
+     * covers formulaPortataGalleria1()
      */
-    public function testFormulaPortataGalleriaLivelloException() : void
+    public function testFormulaPortataGalleria1LivelloException() : void
     {
         $formule = [
             'tipo_formula' => 'portata galleria',
-            'alias' => 'galleria',
+            'alias' => 'galleria1',
             'scabrosita' => 0.1,
             'lunghezza' => 6890,
             'angolo' => 301,
@@ -8197,7 +8199,7 @@ class ToolsTest extends TestCase
         
         $this->expectException(\Exception::class);
         
-        formulaPortataGalleria($formule, $parametri, $campi);
+        formulaPortataGalleria1($formule, $parametri, $campi);
     }
     
     /**
@@ -18555,7 +18557,7 @@ class ToolsTest extends TestCase
                 'formule' => [
                     '0' => [
                         'tipo_formula' => 'portata galleria',
-                        'alias' => 'galleria',
+                        'alias' => 'galleria1',
                         'scarico' => 32,
                         'mi' => null,
                         'scabrosita' => 0.1,
@@ -18572,7 +18574,7 @@ class ToolsTest extends TestCase
                 'expected' => [
                     '0' => [
                         'tipo_formula' => 'portata galleria',
-                        'alias' => 'galleria',
+                        'alias' => 'galleria1',
                         'scarico' => 32,
                         'scabrosita' => 0.1,
                         'lunghezza' => 6890,
@@ -18595,7 +18597,7 @@ class ToolsTest extends TestCase
                     ],
                     '1' => [
                         'tipo_formula' => 'portata galleria',
-                        'alias' => 'galleria',
+                        'alias' => 'galleria1',
                         'scarico' => 32,
                         'scabrosita' => 0.1,
                         'lunghezza' => 6890,
@@ -19496,7 +19498,7 @@ class ToolsTest extends TestCase
                         'variabile' => 30064,
                         'data_e_ora' => new \DateTime('2019-01-01 01:00:00'),
                         'delta' => 3600,
-                        'manovra' => 20,
+                        'manovra' => 0.2,
                         'livello' => 99.089996337891,
                         'media livello' => 99.094997406006,
                         'tipo_dato' => 1,
@@ -19550,7 +19552,7 @@ class ToolsTest extends TestCase
                         'variabile' => 30064,
                         'data_e_ora' => new \DateTime('2019-01-01 01:00:00'),
                         'delta' => 3600,
-                        'manovra' => 20,
+                        'manovra' => 0.2,
                         'livello' => 99.089996337891,
                         'media livello' => 99.094997406006,
                         'tipo_dato' => 1,
@@ -20293,5 +20295,353 @@ class ToolsTest extends TestCase
         $this->expectException(\Exception::class);
         
         formulaPortataTabellare($coefficienti, $parametri, $campi);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function formulaPortataScarico5Provider() : array
+    {
+        $dati = [
+            'standard' => [
+                'coefficienti' => [
+                    'tipo_formula' => 'portata scarico con condotta a sezione circolare e paratoia rettangolare',
+                    'alias' => 'scarico5',
+                    'scarico' => 38,
+                    'mi' => 1,
+                    'scabrosita' => 1.23,
+                    'lunghezza' => 122,
+                    'larghezza' => 3,
+                    'raggio' => 3,
+                    'quota' => 59.9,
+                    'limite' => 369.92
+                ], 
+                'parametri' => [
+                    'manovra' => 1,
+                    'altezza' => 40
+                ],    
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],        
+                'expected' => 83.50545991828767
+            ],
+            'no manovra' => [
+                'coefficienti' => [
+                    'tipo_formula' => 'portata scarico con condotta a sezione circolare e paratoia rettangolare',
+                    'alias' => 'scarico5',
+                    'scarico' => 38,
+                    'mi' => 1,
+                    'scabrosita' => 1.23,
+                    'lunghezza' => 122,
+                    'larghezza' => 3,
+                    'raggio' => 3,
+                    'quota' => 59.9,
+                    'limite' => 369.92
+                ], 
+                'parametri' => [
+                    'manovra' => 0,
+                    'altezza' => 40
+                ],    
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],        
+                'expected' => 0
+            ],
+            'no altezza' => [
+                'coefficienti' => [
+                    'tipo_formula' => 'portata scarico con condotta a sezione circolare e paratoia rettangolare',
+                    'alias' => 'scarico5',
+                    'scarico' => 38,
+                    'mi' => 1,
+                    'scabrosita' => 1.23,
+                    'lunghezza' => 122,
+                    'larghezza' => 3,
+                    'raggio' => 3,
+                    'quota' => 59.9,
+                    'limite' => 369.92
+                ], 
+                'parametri' => [
+                    'manovra' => 3.6,
+                    'altezza' => 0
+                ],    
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],        
+                'expected' => 0
+            ],
+            'max manovra' => [
+                'coefficienti' => [
+                    'tipo_formula' => 'portata scarico con condotta a sezione circolare e paratoia rettangolare',
+                    'alias' => 'scarico5',
+                    'scarico' => 38,
+                    'mi' => 1,
+                    'scabrosita' => 1.23,
+                    'lunghezza' => 122,
+                    'larghezza' => 3,
+                    'raggio' => 3,
+                    'quota' => 59.9,
+                    'limite' => 369.92
+                ], 
+                'parametri' => [
+                    'manovra' => 3.6,
+                    'altezza' => 40
+                ],    
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],        
+                'expected' => 280.02990749116424
+            ],
+            'max portata' => [
+                'coefficienti' => [
+                    'tipo_formula' => 'portata scarico con condotta a sezione circolare e paratoia rettangolare',
+                    'alias' => 'scarico5',
+                    'scarico' => 38,
+                    'mi' => 1,
+                    'scabrosita' => 1.23,
+                    'lunghezza' => 122,
+                    'larghezza' => 3,
+                    'raggio' => 3,
+                    'quota' => 59.9,
+                    'limite' => 369.92
+                ], 
+                'parametri' => [
+                    'manovra' => 3.6,
+                    'altezza' => 69.8
+                ],    
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],        
+                'expected' => 369.9151621131458
+            ]
+        ];
+        
+        return $dati;
+    }
+    
+    /**
+     * covers formulaPortataScarico5()
+     * @group tools
+     * @dataProvider formulaPortataScarico5Provider
+     */
+    public function testFormulaPortataScarico5Equals(array $coefficienti, array $parametri, array $campi, float $expected) : void
+    {
+        $actual = formulaPortataScarico5($coefficienti, $parametri, $campi);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function formulaPortataScarico5ExceptionProvider() : array
+    {
+        $dati = [
+            'no campi' => [
+                'coefficienti' => [
+                    'tipo_formula' => 'portata scarico con condotta a sezione circolare e paratoia rettangolare',
+                    'alias' => 'scarico5',
+                    'scarico' => 38,
+                    'mi' => 1,
+                    'scabrosita' => 1.23,
+                    'lunghezza' => 122,
+                    'larghezza' => 3,
+                    'raggio' => 3,
+                    'quota' => 59.9,
+                    'limite' => 369.92
+                ], 
+                'parametri' => [
+                    'manovra' => 3.6,
+                    'altezza' => 69.8
+                ],    
+                'campi' => [
+                    'pippo',
+                    'pluto'
+                ]
+            ]  
+        ];
+        
+        return $dati;
+    }
+    
+    /**
+     * @group tools
+     * covers formulaPortataScarico5()
+     * @dataProvider formulaPortataScarico5ExceptionProvider
+     */
+    public function testFormulaPortataScarico5Exception(array $coefficienti, array $parametri, array $campi) : void
+    {
+        $this->expectException(\Exception::class);
+        
+        formulaPortataScarico5($coefficienti, $parametri, $campi);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function formulaPortataGalleria2Provider() : array
+    {
+        $dati = [
+            'standard' => [
+                'coefficienti' => [
+                    'tipo_formula' => 'portata galleria proporzionale apertura paratoia',
+                    'alias' => 'galleria2',
+                    'scarico' => 39,
+                    'mi' => 1,
+                    'altezza' => 2.4,
+                    'quota' => 208,
+                    'limite' => 101.51
+                ], 
+                'parametri' => [
+                    'manovra' => 1,
+                    'altezza' => 40
+                ],    
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],        
+                'expected' => 33.974213836167976
+            ],
+            'no manovra' => [
+                'coefficienti' => [
+                    'tipo_formula' => 'portata galleria proporzionale apertura paratoia',
+                    'alias' => 'galleria2',
+                    'scarico' => 39,
+                    'mi' => 1,
+                    'altezza' => 2.4,
+                    'quota' => 208,
+                    'limite' => 101.51
+                ], 
+                'parametri' => [
+                    'manovra' => 0,
+                    'altezza' => 40
+                ],    
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],        
+                'expected' => 0
+            ],
+            'no altezza' => [
+                'coefficienti' => [
+                    'tipo_formula' => 'portata galleria proporzionale apertura paratoia',
+                    'alias' => 'galleria2',
+                    'scarico' => 39,
+                    'mi' => 1,
+                    'altezza' => 2.4,
+                    'quota' => 208,
+                    'limite' => 101.51
+                ], 
+                'parametri' => [
+                    'manovra' => 1,
+                    'altezza' => 0
+                ],    
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],        
+                'expected' => 0
+            ],
+            'max manovra' => [
+                'coefficienti' => [
+                    'tipo_formula' => 'portata galleria proporzionale apertura paratoia',
+                    'alias' => 'galleria2',
+                    'scarico' => 39,
+                    'mi' => 1,
+                    'altezza' => 2.4,
+                    'quota' => 208,
+                    'limite' => 101.51
+                ], 
+                'parametri' => [
+                    'manovra' => 2.4,
+                    'altezza' => 40
+                ],    
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],        
+                'expected' => 81.53811320680313
+            ],
+            'max portata' => [
+                'coefficienti' => [
+                    'tipo_formula' => 'portata galleria proporzionale apertura paratoia',
+                    'alias' => 'galleria2',
+                    'scarico' => 39,
+                    'mi' => 1,
+                    'altezza' => 2.4,
+                    'quota' => 208,
+                    'limite' => 101.51
+                ], 
+                'parametri' => [
+                    'manovra' => 2.4,
+                    'altezza' => 62
+                ],    
+                'campi' => [
+                    'altezza',
+                    'manovra'
+                ],        
+                'expected' => 101.5141322834138
+            ]
+        ];
+        
+        return $dati;
+    }
+    
+    /**
+     * covers formulaPortataGalleria2()
+     * @group tools
+     * @dataProvider formulaPortataGalleria2Provider
+     */
+    public function testFormulaPortataGalleria2Equals(array $coefficienti, array $parametri, array $campi, float $expected) : void
+    {
+        $actual = formulaPortataGalleria2($coefficienti, $parametri, $campi);
+        
+        $this->assertEquals($expected, $actual);
+    }
+    
+    /**
+     * @coversNothing
+     */
+    public function formulaPortataGalleria2ExceptionProvider() : array
+    {
+        $dati = [
+            'no campi' => [
+                'coefficienti' => [
+                    'tipo_formula' => 'portata galleria proporzionale apertura paratoia',
+                    'alias' => 'galleria2',
+                    'scarico' => 39,
+                    'mi' => 1,
+                    'altezza' => 2.4,
+                    'quota' => 208,
+                    'limite' => 101.51
+                ], 
+                'parametri' => [
+                    'manovra' => 2.4,
+                    'altezza' => 62
+                ],    
+                'campi' => [
+                    'pippo',
+                    'pluto'
+                ]
+            ]  
+        ];
+        
+        return $dati;
+    }
+    
+    /**
+     * @group tools
+     * covers formulaPortataGalleria2()
+     * @dataProvider formulaPortataGalleria2ExceptionProvider
+     */
+    public function testFormulaPortataGalleria2Exception(array $coefficienti, array $parametri, array $campi) : void
+    {
+        $this->expectException(\Exception::class);
+        
+        formulaPortataGalleria2($coefficienti, $parametri, $campi);
     }
 }

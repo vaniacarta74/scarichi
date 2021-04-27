@@ -1342,7 +1342,7 @@ function formulaPortataSaracinesca(array $coefficienti, array $parametri, array 
 }
 
 
-function formulaPortataGalleria(array $coefficienti, array $parametri, array $campi) : float
+function formulaPortataGalleria1(array $coefficienti, array $parametri, array $campi) : float
 {
     try {
         $livello = $campi[0];
@@ -1393,6 +1393,36 @@ function formulaPortataGalleria(array $coefficienti, array $parametri, array $ca
         } else {
             $portata = 0;
         }
+        return $portata;
+    } catch (\Throwable $e) {
+        Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
+        throw $e;
+    }
+}
+
+
+function formulaPortataGalleria2(array $coefficienti, array $parametri, array $campi) : float
+{
+    try {
+        foreach ($campi as $campo) {
+            if (!array_key_exists($campo, $parametri) || $parametri[$campo] == NODATA) {
+                throw new \Exception('Parametro ' . $campo . ' non impostato o nodata');
+            } else {
+                if ($campo === 'altezza') {
+                    $altezza_idrostatica = $parametri[$campo];
+                } elseif ($campo === 'manovra') {
+                    $apertura_paratoia = $parametri[$campo];
+                }
+            }
+        }
+        $c1 = 12.57;
+        $c2 = 80;
+        $c3 = 78;
+        $altezza_max_paratoia = $coefficienti['altezza'];
+        $rapporto_apertura = $apertura_paratoia / $altezza_max_paratoia;
+         
+        $portata =  $rapporto_apertura * $c1 * ($c2 / $c3) * sqrt($altezza_idrostatica);    
+                
         return $portata;
     } catch (\Throwable $e) {
         Error::printErrorInfo(__FUNCTION__, DEBUG_LEVEL);
