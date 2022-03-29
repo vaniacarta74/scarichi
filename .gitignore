@@ -5,6 +5,5 @@
 /docs/
 /vendor/
 /log/
-/tests/Unit/FtpTest.php
 /src/config/config_backup.json
 /Dockerfile
