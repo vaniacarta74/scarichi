@@ -12,6 +12,9 @@ class ToJsonTest extends TestCase
      */
     public function toJsonProvider() : array
     {
+        $dateTime = new \DateTime('NOW');
+        $now = $dateTime->format('d/m/Y');
+        
         $data = [
             'standard' => [
                 'var' => '30030',
@@ -31,7 +34,7 @@ class ToJsonTest extends TestCase
             ],
             'only datefrom' => [
                 'var' => '30030',
-                'datefrom' => '29/05/2020',
+                'datefrom' => $now,
                 'dateto' => null,
                 'full' => null,
                 'field' => null,
