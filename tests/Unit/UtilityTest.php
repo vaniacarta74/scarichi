@@ -280,7 +280,7 @@ class UtilityTest extends TestCase
         
         $actual = Utility::benchmark($date);
         
-        $this->assertRegExp('/^([1-9]\s(ora)[,]\s([1-5]?[0-9])\s(min)\s[e]\s([1-5]?[0-9])\s(sec))$/', $actual);
+        $this->assertMatchesRegularExpression('/^([1-9]\s(ora)[,]\s([1-5]?[0-9])\s(min)\s[e]\s([1-5]?[0-9])\s(sec))$/', $actual);
     }
     
     /**
@@ -295,7 +295,7 @@ class UtilityTest extends TestCase
         
         $actual = Utility::benchmark($date);
         
-        $this->assertRegExp('/^(([1-9]|[1-5][0-9])\s(min)\s[e]\s([1-5]?[0-9])\s(sec))$/', $actual);
+        $this->assertMatchesRegularExpression('/^(([1-9]|[1-5][0-9])\s(min)\s[e]\s([1-5]?[0-9])\s(sec))$/', $actual);
     }
     
     /**
@@ -310,7 +310,7 @@ class UtilityTest extends TestCase
         
         $actual = Utility::benchmark($date);
         
-        $this->assertRegExp('/^(([1-5]?[0-9])[,][0-9]{3}\s(sec))$/', $actual);
+        $this->assertMatchesRegularExpression('/^(([1-5]?[0-9])[,][0-9]{3}\s(sec))$/', $actual);
     }
     
     /**
@@ -1158,7 +1158,7 @@ class UtilityTest extends TestCase
     {
         $actual = Utility::getMicroTime();
         
-        $this->assertRegExp('/^[0-9]{4}[-][0-9]{2}[-][0-9]{2}[\s][0-9]{2}[:][0-9]{2}[:][0-9]{2}[\.][0-9]{6}$/', $actual);
+        $this->assertMatchesRegularExpression('/^[0-9]{4}[-][0-9]{2}[-][0-9]{2}[\s][0-9]{2}[:][0-9]{2}[:][0-9]{2}[\.][0-9]{6}$/', $actual);
     }
     
     /**
@@ -1169,7 +1169,7 @@ class UtilityTest extends TestCase
     {
         $actual = Utility::getLatinTime();
         
-        $this->assertRegExp('/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}[\s][0-9]{2}[:][0-9]{2}[:][0-9]{2}$/', $actual);
+        $this->assertMatchesRegularExpression('/^[0-9]{2}[\/][0-9]{2}[\/][0-9]{4}[\s][0-9]{2}[:][0-9]{2}[:][0-9]{2}$/', $actual);
     }
     
     /**
