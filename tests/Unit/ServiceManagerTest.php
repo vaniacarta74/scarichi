@@ -2149,7 +2149,7 @@ class ServiceManagerTest  extends TestCase
             }
         }
         
-        $this->assertRegExp('/^[0-9]{4}[-][0-9]{2}[-][0-9]{2}[\s][0-9]{2}[:][0-9]{2}[:][0-9]{2}[\.][0-9]{6}$/', $start);
+        $this->assertMatchesRegularExpression('/^[0-9]{4}[-][0-9]{2}[-][0-9]{2}[\s][0-9]{2}[:][0-9]{2}[:][0-9]{2}[\.][0-9]{6}$/', $start);
     }
     
     /**
@@ -2656,7 +2656,7 @@ class ServiceManagerTest  extends TestCase
         
         $actual = Reflections::getProperty($this->serviceManager, 'start');
         
-        $this->assertRegExp('/^[0-9]{4}[-][0-9]{2}[-][0-9]{2}[\s][0-9]{2}[:][0-9]{2}[:][0-9]{2}[\.][0-9]{6}$/', $actual);
+        $this->assertMatchesRegularExpression('/^[0-9]{4}[-][0-9]{2}[-][0-9]{2}[\s][0-9]{2}[:][0-9]{2}[:][0-9]{2}[\.][0-9]{6}$/', $actual);
     }
     
     /**
