@@ -6,7 +6,7 @@ use vaniacarta74\Scarichi\Curl;
 
 use function vaniacarta74\Scarichi\setHeader as setHeader;
 
-class RecallTest extends TestCase
+class ReCallTest extends TestCase
 {
     
     /**
