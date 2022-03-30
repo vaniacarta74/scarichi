@@ -329,7 +329,8 @@ class CurlTest extends TestCase
      */
     public function testSetIsResource($url, $method, $params, $json)
     {
-        $actual = is_resource(Curl::set($url, $method, $params, $json));
+        $ch = Curl::set($url, $method, $params, $json);
+        $actual = $ch instanceof \CurlHandle;
         
         $this->assertTrue($actual);
     }   
@@ -351,7 +352,8 @@ class CurlTest extends TestCase
         
         $actual = Curl::set($url, 'POST', $params);
         
-        $this->assertIsResource($actual);
+        //$this->assertIsResource($actual);
+        $this->assertIsObject($actual);
         
         return $actual;
     }
@@ -366,7 +368,7 @@ class CurlTest extends TestCase
         
         $actual = Curl::set($url, 'GET');
         
-        $this->assertIsResource($actual);
+        $this->assertIsObject($actual);
         
         return $actual;
     }
@@ -388,7 +390,7 @@ class CurlTest extends TestCase
         
         $actual = Curl::set($url, 'POST', $params, true);
         
-        $this->assertIsResource($actual);
+        $this->assertIsObject($actual);
         
         return $actual;
     }
@@ -691,7 +693,7 @@ class CurlTest extends TestCase
         $actuals = Curl::multiSet($setParams);
         
         foreach ($actuals as $actual) {
-            $this->assertIsResource($actual);
+            $this->assertIsObject($actual);
         }
     }
     
