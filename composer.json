@@ -28,7 +28,8 @@
             "src/config/config.php"            
         ],
         "psr-4": {
-            "vaniacarta74\\Scarichi\\": "src/" 
+            "vaniacarta74\\Scarichi\\": "src/",
+            "vaniacarta74\\Scarichi\\tests\\": "tests/"
         }
     },
     "autoload-dev": {
