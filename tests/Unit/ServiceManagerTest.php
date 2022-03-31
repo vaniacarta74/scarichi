@@ -2106,7 +2106,11 @@ class ServiceManagerTest  extends TestCase
      */
     public function testConstructorEquals(array $args, array $expected1, array $expected2, array $expected3, array $expected4) : void
     {
-        Reflections::invokeConstructor($this->serviceManager, $args);
+        //Reflections::invokeConstructor($this->serviceManager, $args);
+        
+        $class = new \ReflectionClass($this->serviceManager);        
+        $constructor = $class->getConstructor();        
+        $constructor->invoke($this->serviceManager, $args['service'], $args['token'], $args['postParams'], $args['config']);
         
         $actual1['serConfig'] = Reflections::getProperty($this->serviceManager, 'serConfig');
         $actual1['service'] = Reflections::getProperty($this->serviceManager, 'service');
