@@ -3189,13 +3189,25 @@ class ToolsTest extends TestCase
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                }
             }
         }
         
         foreach ($expected as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                }
             }
         }
     }
@@ -3334,7 +3346,29 @@ class ToolsTest extends TestCase
     {
         $actual = addCampiSommatorie($table, $campi);
         
-        $this->assertEqualsWithDelta($expected, $actual, 0.001);
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                }
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                }
+            }
+        }
     }
     
     /**
@@ -3672,13 +3706,25 @@ class ToolsTest extends TestCase
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                }
             }
         }
         
         foreach ($expected as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                }
             }
         }
     }
@@ -4856,10 +4902,28 @@ class ToolsTest extends TestCase
     /**
      * @group depends
      * covers addPortata()
-     * @depends testAddAltezzaEquals
      */
-    public function testAddPortataEqualsWithDelta(array $volumi) : array
+    public function testAddPortataEqualsWithDelta() : array
     {
+        $volumi = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media livello' => 266.206,
+                'altezza' => 0.026,
+                'tipo_dato' => 1
+            ],
+            '1' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media livello' => 266.173,
+                'altezza' => -0.007,
+                'tipo_dato' => 1
+            ]
+        ];
+        
         $specifiche = [
             'tipo_formula' => 'portata sfiorante',
             'alias' => 'sfioro',
@@ -4899,13 +4963,25 @@ class ToolsTest extends TestCase
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                }
             }
         }
         
         foreach ($expected as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                }
             }
         }
         return $actual;
@@ -4914,10 +4990,28 @@ class ToolsTest extends TestCase
     /**
      * covers addPortata().
      * @group depends
-     * @depends testAddAltezzaEquals
      */
-    public function testAddPortataEqualsWithDelta1(array $volumi) : void
+    public function testAddPortataEqualsWithDeltaB() : void
     {
+        $volumi = [
+            '0' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:00:00'),
+                'livello' => 266.206,
+                'media livello' => 266.206,
+                'altezza' => 0.026,
+                'tipo_dato' => 1
+            ],
+            '1' => [
+                'variabile' => 30030,
+                'data_e_ora' => new \DateTime('2018-01-02 00:15:00'),
+                'livello' => 266.140,
+                'media livello' => 266.173,
+                'altezza' => -0.007,
+                'tipo_dato' => 1
+            ]
+        ];
+        
         $specifiche = [
             'tipo_formula' => 'portata sfiorante',
             'alias' => 'sfioro',
@@ -4957,13 +5051,25 @@ class ToolsTest extends TestCase
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                }
             }
         }
         
         foreach ($expected as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                }
             }
         }
     }
@@ -4972,7 +5078,7 @@ class ToolsTest extends TestCase
      * covers addPortata().
      * @group depends
      */
-    public function testAddPortataEqualsWithDelta2() : void
+    public function testAddPortataEqualsWithDeltaC() : void
     {
         $volumi = [
             '0' => [
@@ -5039,13 +5145,25 @@ class ToolsTest extends TestCase
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                }
             }
         }
         
         foreach ($expected as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                }
             }
         }
     }
@@ -5054,7 +5172,7 @@ class ToolsTest extends TestCase
      * covers addPortata().
      * @group depends
      */
-    public function testAddPortataEqualsWithDelta3() : void
+    public function testAddPortataEqualsWithDeltaD() : void
     {
         $volumi = [
             '0' => [
@@ -5120,13 +5238,25 @@ class ToolsTest extends TestCase
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                }
             }
         }
         
         foreach ($expected as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                }
             }
         }
     }
@@ -5201,13 +5331,25 @@ class ToolsTest extends TestCase
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                }
             }
         }
         
         foreach ($expected as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                }
             }
         }
     }
@@ -5282,13 +5424,25 @@ class ToolsTest extends TestCase
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                }
             }
         }
         
         foreach ($expected as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                }
             }
         }
     }
@@ -5379,13 +5533,25 @@ class ToolsTest extends TestCase
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                }
             }
         }
         
         foreach ($expected as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                }
             }
         }
         return $actual;
@@ -5450,13 +5616,25 @@ class ToolsTest extends TestCase
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                }
             }
         }
         
         foreach ($expected as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                }
             }
         }
     }
@@ -5547,13 +5725,25 @@ class ToolsTest extends TestCase
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                }
             }
         }
         
         foreach ($expected as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                }
             }
         }
         return $actual;
@@ -5628,13 +5818,25 @@ class ToolsTest extends TestCase
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                }
             }
         }
         
         foreach ($expected as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                }
             }
         }
     }
@@ -5783,13 +5985,25 @@ class ToolsTest extends TestCase
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                }
             }
         }
         
         foreach ($expected as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                }
             }
         }
         return $actual;
@@ -5888,7 +6102,31 @@ class ToolsTest extends TestCase
         
         $actual = addCumulato($volumi, $campi);
         
-        $this->assertEqualsWithDelta($expected, $actual, 0.001);
+        //$this->assertEqualsWithDelta($expected, $actual, 0.001);
+        
+        foreach ($actual as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                }
+            }
+        }
+        
+        foreach ($expected as $row => $fields) {
+            foreach ($fields as $key => $value) {
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                }
+            }
+        }
     }
     
     /**
@@ -5961,13 +6199,25 @@ class ToolsTest extends TestCase
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                }
             }
         }
         
         foreach ($expected as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                }
             }
         }
     }
@@ -10135,7 +10385,13 @@ class ToolsTest extends TestCase
         foreach ($actual as $categoria => $dati) {
             foreach ($dati as $row => $fields) {
                 foreach ($fields as $key => $value) {
-                    $this->assertEqualsWithDelta($expected[$categoria][$row][$key], $value, 0.001);
+                    if (is_object($expected[$categoria][$row][$key]) && ($expected[$categoria][$row][$key] instanceof \DateTime)) {
+                        $timeExp = $expected[$categoria][$row][$key]->getTimestamp();
+                        $timeAct = $value->getTimestamp();
+                        $this->assertEquals($timeExp, $timeAct);
+                    } else {
+                        $this->assertEqualsWithDelta($expected[$categoria][$row][$key], $value, 0.001);
+                    }
                 }
             }
         }
@@ -10143,10 +10399,16 @@ class ToolsTest extends TestCase
         foreach ($expected as $categoria => $dati) {
             foreach ($dati as $row => $fields) {
                 foreach ($fields as $key => $value) {
-                    $this->assertEqualsWithDelta($value, $actual[$categoria][$row][$key], 0.001);
+                    if (is_object($value) && ($value instanceof \DateTime)) {
+                        $timeExp = $value->getTimestamp();
+                        $timeAct = $actual[$categoria][$row][$key]->getTimestamp();
+                        $this->assertEquals($timeExp, $timeAct);
+                    } else {
+                        $this->assertEqualsWithDelta($value, $actual[$categoria][$row][$key], 0.001);
+                    }
                 }
             }
-        }
+        }   
     }
     
     /**
@@ -10514,7 +10776,13 @@ class ToolsTest extends TestCase
         foreach ($actual as $categoria => $dati) {
             foreach ($dati as $row => $fields) {
                 foreach ($fields as $key => $value) {
-                    $this->assertEqualsWithDelta($expected[$categoria][$row][$key], $value, 0.001);
+                    if (is_object($expected[$categoria][$row][$key]) && ($expected[$categoria][$row][$key] instanceof \DateTime)) {
+                        $timeExp = $expected[$categoria][$row][$key]->getTimestamp();
+                        $timeAct = $value->getTimestamp();
+                        $this->assertEquals($timeExp, $timeAct);
+                    } else {
+                        $this->assertEqualsWithDelta($expected[$categoria][$row][$key], $value, 0.001);
+                    }
                 }
             }
         }
@@ -10522,7 +10790,13 @@ class ToolsTest extends TestCase
         foreach ($expected as $categoria => $dati) {
             foreach ($dati as $row => $fields) {
                 foreach ($fields as $key => $value) {
-                    $this->assertEqualsWithDelta($value, $actual[$categoria][$row][$key], 0.001);
+                    if (is_object($value) && ($value instanceof \DateTime)) {
+                        $timeExp = $value->getTimestamp();
+                        $timeAct = $actual[$categoria][$row][$key]->getTimestamp();
+                        $this->assertEquals($timeExp, $timeAct);
+                    } else {
+                        $this->assertEqualsWithDelta($value, $actual[$categoria][$row][$key], 0.001);
+                    }
                 }
             }
         }
@@ -12457,13 +12731,25 @@ class ToolsTest extends TestCase
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEquals($expected[$row][$key], $value);
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEquals($expected[$row][$key], $value);
+                }
             }
         }
         
         foreach ($expected as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEquals($value, $actual[$row][$key]);
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEquals($value, $actual[$row][$key]);
+                }
             }
         }
     }
@@ -12542,13 +12828,25 @@ class ToolsTest extends TestCase
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEquals($expected[$row][$key], $value);
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEquals($expected[$row][$key], $value);
+                }
             }
         }
         
         foreach ($expected as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEquals($value, $actual[$row][$key]);
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEquals($value, $actual[$row][$key]);
+                }
             }
         }
     }
@@ -12627,13 +12925,25 @@ class ToolsTest extends TestCase
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEquals($expected[$row][$key], $value);
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEquals($expected[$row][$key], $value);
+                }
             }
         }
         
         foreach ($expected as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEquals($value, $actual[$row][$key]);
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEquals($value, $actual[$row][$key]);
+                }
             }
         }
     }
@@ -12769,13 +13079,25 @@ class ToolsTest extends TestCase
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                }
             }
         }
         
         foreach ($expected as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                }
             }
         }
     }
@@ -12854,13 +13176,25 @@ class ToolsTest extends TestCase
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEquals($expected[$row][$key], $value);
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEquals($expected[$row][$key], $value);
+                }
             }
         }
         
         foreach ($expected as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEquals($value, $actual[$row][$key]);
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEquals($value, $actual[$row][$key]);
+                }
             }
         }
     }
@@ -18635,13 +18969,25 @@ class ToolsTest extends TestCase
         
         foreach ($actual as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($expected[$row][$key], $value, 0.001);
+                if (is_object($expected[$row][$key]) && ($expected[$row][$key] instanceof \DateTime)) {
+                    $timeExp = $expected[$row][$key]->getTimestamp();
+                    $timeAct = $value->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEquals($expected[$row][$key], $value);
+                }
             }
         }
         
         foreach ($expected as $row => $fields) {
             foreach ($fields as $key => $value) {
-                $this->assertEqualsWithDelta($value, $actual[$row][$key], 0.001);
+                if (is_object($value) && ($value instanceof \DateTime)) {
+                    $timeExp = $value->getTimestamp();
+                    $timeAct = $actual[$row][$key]->getTimestamp();
+                    $this->assertEquals($timeExp, $timeAct);
+                } else {
+                    $this->assertEquals($value, $actual[$row][$key]);
+                }
             }
         }
     }
@@ -19800,7 +20146,7 @@ class ToolsTest extends TestCase
     {
         $data = [
             'double quote double level' => [
-                'scarico' => 35,
+                'scarico' => 25,
                 'quote' => [
                     '0' => 101.1,
                     '1' => 101.2
@@ -19837,7 +20183,7 @@ class ToolsTest extends TestCase
                 ]
             ],
             'double quote single level' => [
-                'scarico' => 35,
+                'scarico' => 25,
                 'quote' => [
                     '0' => 101.1,
                     '1' => 101.2
@@ -19863,7 +20209,7 @@ class ToolsTest extends TestCase
                 ]
             ],
             'single quote double level' => [
-                'scarico' => 35,      
+                'scarico' => 25,      
                 'quote' => [
                     '0' => 101.1
                 ],        
@@ -19887,7 +20233,7 @@ class ToolsTest extends TestCase
                 ]
             ],
             'single quote single level' => [
-                'scarico' => 35,      
+                'scarico' => 25,      
                 'quote' => [
                     '0' => 101.1
                 ],        
@@ -19905,7 +20251,7 @@ class ToolsTest extends TestCase
                 ]
             ],
             'zero portata' => [
-                'scarico' => 35,      
+                'scarico' => 25,      
                 'quote' => [
                     '0' => 101.1,
                     '1' => 101.2
@@ -19934,7 +20280,7 @@ class ToolsTest extends TestCase
                 ]
             ],
             'integer' => [
-                'scarico' => 35,      
+                'scarico' => 25,      
                 'quote' => [
                     '0' => 101
                 ],        
@@ -19952,7 +20298,7 @@ class ToolsTest extends TestCase
                 ]
             ],
             'limit decimal +' => [
-                'scarico' => 35,      
+                'scarico' => 25,      
                 'quote' => [
                     '0' => 101
                 ],        
@@ -19970,7 +20316,7 @@ class ToolsTest extends TestCase
                 ]
             ],
             'limit decimal -' => [
-                'scarico' => 35,      
+                'scarico' => 25,      
                 'quote' => [
                     '0' => 101
                 ],        
@@ -20002,6 +20348,7 @@ class ToolsTest extends TestCase
         $actual = trovaPortate($scarico, $quote, $livelli);
         
         $this->assertEquals($expected, $actual); 
+        
     }
     
     /**
@@ -20012,7 +20359,7 @@ class ToolsTest extends TestCase
         $data = [
             'scarico 35' => [
                 'params' => [
-                    'scarico' => 35,
+                    'scarico' => 25,
                     'quota' => '101.1',        
                     'livello' => '102.1'
                 ],        
@@ -20024,7 +20371,7 @@ class ToolsTest extends TestCase
             ],
             'scarico 36' => [
                 'params' => [
-                    'scarico' => 36,
+                    'scarico' => 26,
                     'quota' => '110',        
                     'livello' => '112.1'
                 ],        
@@ -20036,7 +20383,7 @@ class ToolsTest extends TestCase
             ],
             'scarico 37' => [
                 'params' => [
-                    'scarico' => 37,
+                    'scarico' => 27,
                     'quota' => '115',        
                     'livello' => '116.1'
                 ],        
@@ -20071,21 +20418,21 @@ class ToolsTest extends TestCase
         $data = [
             'no scarico' => [
                 'params' => [
-                    'pippo' => 35,
+                    'pippo' => 25,
                     'quota' => 101.1,        
                     'livello' => 102.1
                 ]
             ],
             'no quota' => [
                 'params' => [
-                    'scarico' => 35,
+                    'scarico' => 25,
                     'pippo' => 101.1,        
                     'livello' => 102.1
                 ]
             ],
             'no livello' => [
                 'params' => [
-                    'scarico' => 35,
+                    'scarico' => 25,
                     'quota' => 101.1,        
                     'pippo' => 102.1
                 ]
@@ -20172,7 +20519,7 @@ class ToolsTest extends TestCase
                 'coefficienti' => [
                     'tipo_formula' => 'portata sfiorante dati tabellari',
                     'alias' => 'tabellare',
-                    'scarico' => 35,
+                    'scarico' => 25,
                     'quota' => 100,
                     'limite' => 632.1
                 ], 
@@ -20196,7 +20543,7 @@ class ToolsTest extends TestCase
                 'coefficienti' => [
                     'tipo_formula' => 'portata sfiorante dati tabellari',
                     'alias' => 'tabellare',
-                    'scarico' => 36,
+                    'scarico' => 26,
                     'quota' => 110,
                     'limite' => 632.1
                 ], 
@@ -20217,7 +20564,7 @@ class ToolsTest extends TestCase
                 'coefficienti' => [
                     'tipo_formula' => 'portata sfiorante dati tabellari',
                     'alias' => 'tabellare',
-                    'scarico' => 36,
+                    'scarico' => 26,
                     'quota' => 110,
                     'limite' => 632.1
                 ], 
