@@ -2498,7 +2498,15 @@ class ServiceManagerTest  extends TestCase
      */
     public function testCheckServiceResponseEquals(array $args, array $expected) : void
     {
-        $actual = Reflections::invokeStaticMethod($this->serviceManager, 'checkServiceResponse', $args);
+        $report = $args['response'];
+        $debug_level = $args['debug'];
+        
+        $method = new \ReflectionMethod($this->serviceManager, 'checkServiceResponse');             
+        if ($report !== '') {
+            $actual = $method->invoke($this->serviceManager, $report, $debug_level);
+        } else {
+            $actual = $method->invoke($this->serviceManager, '', $debug_level);
+        }
         
         $this->assertEquals($expected, $actual);
     }
@@ -3094,7 +3102,8 @@ class ServiceManagerTest  extends TestCase
         Reflections::setProperty($this->serviceManager, 'service', $service);
         Reflections::setProperty($this->serviceManager, 'serConfig', $serConfig);
         
-        Reflections::invokeMethod($this->serviceManager, 'setToken', $args);
+        $method = new \ReflectionMethod($this->serviceManager, 'setToken');             
+        $method->invoke($this->serviceManager, $args['token']);
         
         $actual = Reflections::getProperty($this->serviceManager, 'token');
         
@@ -4646,7 +4655,10 @@ class ServiceManagerTest  extends TestCase
     {
         Reflections::setProperty($this->serviceManager, 'serParams', $serParams);
         
-        $actual = Reflections::invokeMethod($this->serviceManager, 'purgeParams', $args);
+        //$actual = Reflections::invokeMethod($this->serviceManager, 'purgeParams', $args);
+        
+        $method = new \ReflectionMethod($this->serviceManager, 'purgeParams');             
+        $actual = $method->invoke($this->serviceManager, $args['postParams']);
         
         $this->assertEquals($expected, $actual);
     }
@@ -5151,7 +5163,10 @@ class ServiceManagerTest  extends TestCase
         Reflections::setProperty($this->serviceManager, 'isJson', $isJson);
         Reflections::setProperty($this->serviceManager, 'key', $key);
         
-        $actual = Reflections::invokeMethod($this->serviceManager, 'setCallParams', $args);
+        //$actual = Reflections::invokeMethod($this->serviceManager, 'setCallParams', $args);
+        
+        $reflMethod = new \ReflectionMethod($this->serviceManager, 'setCallParams');             
+        $actual = $reflMethod->invoke($this->serviceManager, $args['params']);
         
         $this->assertEquals($expected, $actual);
     }

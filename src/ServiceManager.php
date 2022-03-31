@@ -665,10 +665,10 @@ class ServiceManager extends Accessor
      * @throws \Throwable
      * @throws \Exception
      */
-    protected static function checkServiceResponse(string $report, int $debug_level) : array
+    protected static function checkServiceResponse(?string $report = null, int $debug_level) : array
     {
-        try {
-            $response = json_decode($report, true);
+        try {            
+            $response = $report ? json_decode($report, true) : ['ok' => false];
             if (!$response['ok']) {
                 $message = 'Elaborazione fallita.';
                 $message .= ($debug_level === 1) ? ' Verificare il log degli errori (' . realpath(LOG_PATH) . '/' . ERROR_LOG . ').' : '';
