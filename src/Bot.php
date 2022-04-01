@@ -124,13 +124,13 @@ class Bot
         try {
             $n = 5;
             $delay = 10000;
-            $updates = [];
+            $updates = [];            
             $tokenBot = $token ?? self::$defaultBot;
             $offsetBot = $offset ?? 0;
             for ($i = 1; $i <= $n; $i++) {
                 try {
                     $response = Bot::getUpdates($offsetBot, $tokenBot);
-                    $arrJson = json_decode($response, true);
+                    $arrJson = json_decode($response, true);                    
                     if (array_key_exists('result', $arrJson)) {
                         if(count($arrJson['result']) > 1) {            
                             $updates = self::arrayShift($arrJson['result']);

@@ -2106,7 +2106,13 @@ class ServiceManagerTest  extends TestCase
      */
     public function testConstructorEquals(array $args, array $expected1, array $expected2, array $expected3, array $expected4) : void
     {
-        Reflections::invokeConstructor($this->serviceManager, $args);
+        if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+            $class = new \ReflectionClass($this->serviceManager);        
+            $constructor = $class->getConstructor();        
+            $constructor->invoke($this->serviceManager, $args['service'], $args['token'], $args['postParams'], $args['config']);
+        } else {
+            Reflections::invokeConstructor($this->serviceManager, $args);
+        }
         
         $actual1['serConfig'] = Reflections::getProperty($this->serviceManager, 'serConfig');
         $actual1['service'] = Reflections::getProperty($this->serviceManager, 'service');
@@ -2149,7 +2155,11 @@ class ServiceManagerTest  extends TestCase
             }
         }
         
-        $this->assertRegExp('/^[0-9]{4}[-][0-9]{2}[-][0-9]{2}[\s][0-9]{2}[:][0-9]{2}[:][0-9]{2}[\.][0-9]{6}$/', $start);
+        if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+            $this->assertMatchesRegularExpression('/^[0-9]{4}[-][0-9]{2}[-][0-9]{2}[\s][0-9]{2}[:][0-9]{2}[:][0-9]{2}[\.][0-9]{6}$/', $start);
+        } else {
+            $this->assertRegExp('/^[0-9]{4}[-][0-9]{2}[-][0-9]{2}[\s][0-9]{2}[:][0-9]{2}[:][0-9]{2}[\.][0-9]{6}$/', $start);
+        }
     }
     
     /**
@@ -2441,7 +2451,13 @@ class ServiceManagerTest  extends TestCase
     {
         $this->expectException(\Exception::class);
         
-        Reflections::invokeConstructor($this->serviceManager, $args);
+        if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+            $class = new \ReflectionClass($this->serviceManager);        
+            $constructor = $class->getConstructor();        
+            $constructor->invoke($this->serviceManager, $args['service'], $args['token'], $args['params'], $args['config']);
+        } else {
+            Reflections::invokeConstructor($this->serviceManager, $args);
+        }
     }
     
     /**
@@ -2498,7 +2514,16 @@ class ServiceManagerTest  extends TestCase
      */
     public function testCheckServiceResponseEquals(array $args, array $expected) : void
     {
-        $actual = Reflections::invokeStaticMethod($this->serviceManager, 'checkServiceResponse', $args);
+        if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+            $method = new \ReflectionMethod($this->serviceManager, 'checkServiceResponse');             
+            if ($args['response'] !== '') {
+                $actual = $method->invoke($this->serviceManager, $args['response'], $args['debug']);
+            } else {
+                $actual = $method->invoke($this->serviceManager, '', $args['debug']);
+            }
+        } else {
+            $actual = Reflections::invokeStaticMethod($this->serviceManager, 'checkServiceResponse', $args);
+        }
         
         $this->assertEquals($expected, $actual);
     }
@@ -2656,7 +2681,11 @@ class ServiceManagerTest  extends TestCase
         
         $actual = Reflections::getProperty($this->serviceManager, 'start');
         
-        $this->assertRegExp('/^[0-9]{4}[-][0-9]{2}[-][0-9]{2}[\s][0-9]{2}[:][0-9]{2}[:][0-9]{2}[\.][0-9]{6}$/', $actual);
+        if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+            $this->assertMatchesRegularExpression('/^[0-9]{4}[-][0-9]{2}[-][0-9]{2}[\s][0-9]{2}[:][0-9]{2}[:][0-9]{2}[\.][0-9]{6}$/', $actual);
+        } else {
+            $this->assertRegExp('/^[0-9]{4}[-][0-9]{2}[-][0-9]{2}[\s][0-9]{2}[:][0-9]{2}[:][0-9]{2}[\.][0-9]{6}$/', $actual);
+        }
     }
     
     /**
@@ -3094,7 +3123,12 @@ class ServiceManagerTest  extends TestCase
         Reflections::setProperty($this->serviceManager, 'service', $service);
         Reflections::setProperty($this->serviceManager, 'serConfig', $serConfig);
         
-        Reflections::invokeMethod($this->serviceManager, 'setToken', $args);
+        if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+            $method = new \ReflectionMethod($this->serviceManager, 'setToken');             
+            $method->invoke($this->serviceManager, $args['token']);
+        } else {
+            Reflections::invokeMethod($this->serviceManager, 'setToken', $args);
+        }
         
         $actual = Reflections::getProperty($this->serviceManager, 'token');
         
@@ -4646,7 +4680,12 @@ class ServiceManagerTest  extends TestCase
     {
         Reflections::setProperty($this->serviceManager, 'serParams', $serParams);
         
-        $actual = Reflections::invokeMethod($this->serviceManager, 'purgeParams', $args);
+        if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+            $method = new \ReflectionMethod($this->serviceManager, 'purgeParams');             
+            $actual = $method->invoke($this->serviceManager, $args['postParams']);
+        } else {
+            $actual = Reflections::invokeMethod($this->serviceManager, 'purgeParams', $args);
+        }
         
         $this->assertEquals($expected, $actual);
     }
@@ -5151,7 +5190,12 @@ class ServiceManagerTest  extends TestCase
         Reflections::setProperty($this->serviceManager, 'isJson', $isJson);
         Reflections::setProperty($this->serviceManager, 'key', $key);
         
-        $actual = Reflections::invokeMethod($this->serviceManager, 'setCallParams', $args);
+        if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+            $reflMethod = new \ReflectionMethod($this->serviceManager, 'setCallParams');             
+            $actual = $reflMethod->invoke($this->serviceManager, $args['params']);
+        } else {
+            $actual = Reflections::invokeMethod($this->serviceManager, 'setCallParams', $args);
+        }
         
         $this->assertEquals($expected, $actual);
     }

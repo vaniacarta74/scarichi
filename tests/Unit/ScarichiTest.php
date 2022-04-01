@@ -135,7 +135,7 @@ class ScarichiTest extends TestCase
                 'dateto' => '',
                 'nozero' => '',
                 'campo' => '',
-                'expected' => $header . PHP_EOL . '1) PID 0: Elaborazione dati Volume variabile 30030 dal ' . $day->format('d/m/Y') . ' al ' . $now->format('d/m/Y') . ' avvenuta con successo in | sec. Nessun file CSV full esportato per mancanza di dati. (tocsv@' . REALHOST . ')' . PHP_EOL
+                'expected' => $header . PHP_EOL . '1) PID 0: Elaborazione dati Volume variabile 30030 dal ' . $day->format('d/m/Y') . ' al ' . $now->format('d/m/Y') . ' avvenuta con successo in | sec. | (tocsv@' . REALHOST . ')' . PHP_EOL
             ],
             'help' => [
                 'help' => '',

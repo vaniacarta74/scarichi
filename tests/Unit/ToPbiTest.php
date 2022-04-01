@@ -12,24 +12,27 @@ class ToPbiTest extends TestCase
      */
     public function toPbiProvider() : array
     {
+        $dateTime = new \DateTime('NOW');
+        $now = $dateTime->format('d/m/Y');
+        
         $data = [
             'standard' => [
                 'var' => '30030',
                 'datefrom' => '29/05/2020',
                 'dateto' => '30/05/2020',
-                'provider' => 'toPbiStandard.json'
+                'provider' => 'toPbiStandard_' . RDBMS . '.json'
             ],            
             'only datefrom' => [
                 'var' => '30030',
-                'datefrom' => '29/05/2020',
+                'datefrom' => $now,
                 'dateto' => null,
-                'provider' => 'toPbiStandard.json'
+                'provider' => 'toPbiDatefrom.json'
             ],
             'only dateto' => [
                 'var' => '30030',
                 'datefrom' => null,
                 'dateto' => '30/05/2020',
-                'provider' => 'toPbiStandard.json'
+                'provider' => 'toPbiStandard_' . RDBMS . '.json'
             ]
         ];
         

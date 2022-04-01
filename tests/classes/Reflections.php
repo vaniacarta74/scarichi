@@ -50,12 +50,12 @@ class Reflections
     {
         $class = new \ReflectionClass($object);
         
-        $method = $class->getMethod($methodName);
+        $method = $class->getMethod($methodName);        
         $method->setAccessible(true);
-        
+                
         return $method->invokeArgs(null, $args);
     }
-    
+            
     /**
      * @group reflections
      * @coversNothing

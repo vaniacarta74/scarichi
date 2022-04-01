@@ -6,7 +6,7 @@ use vaniacarta74\Scarichi\Curl;
 
 use function vaniacarta74\Scarichi\setHeader as setHeader;
 
-class RecallTest extends TestCase
+class ReCallTest extends TestCase
 {
     
     /**
@@ -15,7 +15,8 @@ class RecallTest extends TestCase
     public function recallProvider() : array
     {
         $header = setHeader(COMPOSER);
-        $now = new \DateTime('now', new \DateTimeZone('Europe/Rome'));        
+        $now = new \DateTime('now', new \DateTimeZone('Europe/Rome'));
+        $nowInput = $now->format('d/m/Y');
         
         $data = [
             'standard' => [
@@ -133,7 +134,7 @@ class RecallTest extends TestCase
             ],
             'only datefrom' => [
                 'var' => '30030',
-                'datefrom' => '01/05/2020',
+                'datefrom' => $nowInput,
                 'dateto' => null,
                 'expected' => [
                     'ok' => true,
@@ -145,7 +146,7 @@ class RecallTest extends TestCase
                             '1.1) PID sync.1: Processata in 0,098 secondi | Records: 955 | Insert: 10 | Update: 0 | Presenti: 939 | Scartati: 6 | Cancellati: 0'
                         ],
                         'tocsv' => [
-                            '1) PID 0: Elaborazione dati Volume variabile 30030 dal 01/05/2020 al ' . $now->format('d/m/Y') . ' avvenuta con successo in | sec. File CSV full esportati: 1 (tocsv@' . LOCALHOST . ')'                            
+                            '1) PID 0: Elaborazione dati Volume variabile 30030 dal ' . $now->format('d/m/Y') . ' al ' . $now->format('d/m/Y') . ' avvenuta con successo in | sec. Nessun file CSV full esportato per mancanza di dati. (tocsv@' . LOCALHOST . ')'                            
                         ],
                         'watchdog host 1' => [
                             '1) PID watchdog: Processato in 0,005 secondi | Records: 47 | Insert: 0 | Update: 0 | Presenti: 47 | Scartati: 0 | Cancellati: 0'

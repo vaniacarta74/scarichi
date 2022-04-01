@@ -329,7 +329,13 @@ class CurlTest extends TestCase
      */
     public function testSetIsResource($url, $method, $params, $json)
     {
-        $actual = is_resource(Curl::set($url, $method, $params, $json));
+        $ch = Curl::set($url, $method, $params, $json);
+        
+        if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+            $actual = $ch instanceof \CurlHandle;
+        } else {
+            $actual = is_resource($ch);
+        }
         
         $this->assertTrue($actual);
     }   
@@ -351,7 +357,11 @@ class CurlTest extends TestCase
         
         $actual = Curl::set($url, 'POST', $params);
         
-        $this->assertIsResource($actual);
+        if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+            $this->assertIsObject($actual);
+        } else {
+            $this->assertIsResource($actual);
+        }
         
         return $actual;
     }
@@ -366,7 +376,11 @@ class CurlTest extends TestCase
         
         $actual = Curl::set($url, 'GET');
         
-        $this->assertIsResource($actual);
+        if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+            $this->assertIsObject($actual);
+        } else {
+            $this->assertIsResource($actual);
+        }
         
         return $actual;
     }
@@ -388,7 +402,11 @@ class CurlTest extends TestCase
         
         $actual = Curl::set($url, 'POST', $params, true);
         
-        $this->assertIsResource($actual);
+        if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+            $this->assertIsObject($actual);
+        } else {
+            $this->assertIsResource($actual);
+        }
         
         return $actual;
     }
@@ -691,7 +709,11 @@ class CurlTest extends TestCase
         $actuals = Curl::multiSet($setParams);
         
         foreach ($actuals as $actual) {
-            $this->assertIsResource($actual);
+            if (PHP_MAJOR_VERSION >= 8 && PHP_MINOR_VERSION >= 1) {
+                $this->assertIsObject($actual);
+            } else {
+                $this->assertIsResource($actual);
+            }
         }
     }
     

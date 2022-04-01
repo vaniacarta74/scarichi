@@ -39,7 +39,7 @@ class Curl
                 }
             } else {
                 $ch = self::set($url, $method);
-            }            
+            }
             $report = self::exec($ch);
             
             return $report;
@@ -113,7 +113,7 @@ class Curl
     public static function exec($ch) : string
     {
         try {
-            if (!is_resource($ch)) {
+            if (!is_resource($ch) && !($ch instanceof \CurlHandle)) {
                 throw new \Exception('Risorsa non definita');
             }
             $report = curl_exec($ch);

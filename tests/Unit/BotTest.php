@@ -2398,6 +2398,9 @@ class BotTest extends TestCase
      */
     public function getCommandReplyProvider() : array
     {
+        $dateTime = new \DateTime('NOW');
+        $now = $dateTime->format('d/m/Y');
+        
         $data = [
             'command no exist' => [
                 'text' => '/variabile',
@@ -2432,8 +2435,9 @@ class BotTest extends TestCase
                 'expected' => 'Il terzo parametro deve essere una data valida:' . PHP_EOL . 'utilizzare il formato dd/mm/yyyy.'
             ],
             'volume dateto now' => [
-                'text' => '/volume 30030 28/05/2020',
-                'expected' => 'Il volume movimentato da <b>30030</b>' . PHP_EOL . 'dal <i>28/05/2020</i> alle <i>00:00:00</i>' . PHP_EOL . 'al <i>29/05/2020</i> alle <i>22:00:00</i>' . PHP_EOL . 'é di <b>209.120,610 mc</b>.'
+                'text' => '/volume 30030 ' . $now,
+                'expected' => 'Non ci sono dati per il periodo selezionato.'
+
             ],
             'volume standard' => [
                 'text' => '/volume 30030 20/01/2020 27/01/2020',
