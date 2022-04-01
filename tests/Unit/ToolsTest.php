@@ -20343,8 +20343,10 @@ class ToolsTest extends TestCase
      * covers trovaPortate()
      * @dataProvider trovaPortateProvider
      */
-    public function testTrovaPortateEquals(int $scarico, array $quote, array $livelli, array $expected) : void
+    public function testTrovaPortateEquals(int $scaricoRaw, array $quote, array $livelli, array $expected) : void
     {
+        $scarico = (RDBMS == '192.168.1.41') ? $scaricoRaw + 10 : $scaricoRaw;
+        
         $actual = trovaPortate($scarico, $quote, $livelli);
         
         $this->assertEquals($expected, $actual); 
@@ -20405,6 +20407,10 @@ class ToolsTest extends TestCase
      */
     public function testLoadPortateEquals(array $params, array $expected) : void
     {
+        if (RDBMS == '192.168.1.41') {
+            $params['scarico'] += 10;
+        }
+        
         $actual = loadPortate($params);
         
         $this->assertEquals($expected, $actual); 
@@ -20593,6 +20599,10 @@ class ToolsTest extends TestCase
      */
     public function testFormulaPortataTabellareEquals(array $coefficienti, array $parametri, array $campi, float $expected) : void
     {
+        if (RDBMS == '192.168.1.41') {
+            $coefficienti['scarico'] += 10;
+        }
+        
         $actual = formulaPortataTabellare($coefficienti, $parametri, $campi);
         
         $this->assertEquals($expected, $actual);

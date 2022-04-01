@@ -20,7 +20,7 @@ class ToPbiTest extends TestCase
                 'var' => '30030',
                 'datefrom' => '29/05/2020',
                 'dateto' => '30/05/2020',
-                'provider' => 'toPbiStandard.json'
+                'provider' => 'toPbiStandard_' . RDBMS . '.json'
             ],            
             'only datefrom' => [
                 'var' => '30030',
@@ -32,7 +32,7 @@ class ToPbiTest extends TestCase
                 'var' => '30030',
                 'datefrom' => null,
                 'dateto' => '30/05/2020',
-                'provider' => 'toPbiStandard.json'
+                'provider' => 'toPbiStandard_' . RDBMS . '.json'
             ]
         ];
         
