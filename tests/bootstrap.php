@@ -9,7 +9,7 @@
 namespace vaniacarta74\Scarichi\tests;
 
 // TODO: check include path
-ini_set('include_path', '/var/www/html/include');
+ini_set('include_path', '/var/www/include');
 
 // put your code here
 $_REQUEST['var'] = '30030';
